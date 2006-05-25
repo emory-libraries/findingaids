@@ -1,0 +1,71 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<xs:schema targetNamespace = "http://purl.org/dc/elements/1.1/" elementFormDefault = "qualified" xmlns = "http://purl.org/dc/elements/1.1/" xmlns:tsd = "http://namespaces.softwareag.com/tamino/TaminoSchemaDefinition" xmlns:xs = "http://www.w3.org/2001/XMLSchema">
+  <xs:annotation>
+    <xs:appinfo>
+      <tsd:schemaInfo name = "dc">
+        <tsd:collection name = "links"></tsd:collection>
+        <tsd:doctype name = "title">
+          <tsd:logical>
+            <tsd:content>closed</tsd:content>
+          </tsd:logical>
+        </tsd:doctype>
+        <tsd:adminInfo>
+          <tsd:created>2004-04-05T15:08:42.993-05:00</tsd:created>
+          <tsd:modified>2004-04-05T15:08:42.993-05:00</tsd:modified>
+          <tsd:version>TSD4</tsd:version>
+          <tsd:server>4.1.4.1</tsd:server>
+        </tsd:adminInfo>
+      </tsd:schemaInfo>
+    </xs:appinfo>
+  </xs:annotation>
+  <xs:annotation>
+    <xs:documentation xml:lang = "en">
+      DCMES 1.1 XML Schema
+      XML Schema for http://purl.org/dc/elements/1.1/ namespace
+
+      Created 2003-04-02
+
+      Created by 
+
+      Tim Cole (t-cole3@uiuc.edu)
+      Tom Habing (thabing@uiuc.edu)
+      Jane Hunter (jane@dstc.edu.au)
+      Pete Johnston (p.johnston@ukoln.ac.uk),
+      Carl Lagoze (lagoze@cs.cornell.edu)
+
+      This schema declares XML elements for the 15 DC elements from the
+      http://purl.org/dc/elements/1.1/ namespace.
+
+      It defines a complexType SimpleLiteral which permits mixed content 
+      and makes the xml:lang attribute available. It disallows child elements by
+      use of minOcccurs/maxOccurs.
+
+      However, this complexType does permit the derivation of other complexTypes
+      which would permit child elements.
+
+      All elements are declared as substitutable for the abstract element any, 
+      which means that the default type for all elements is dc:SimpleLiteral.
+
+    </xs:documentation>
+  </xs:annotation>
+  <xs:complexType name = "elementType">
+    <xs:simpleContent>
+      <xs:extension base = "xs:string"></xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:element name = "title" type = "elementType"></xs:element>
+  <xs:element name = "creator" type = "elementType"></xs:element>
+  <xs:element name = "subject" type = "elementType"></xs:element>
+  <xs:element name = "description" type = "elementType"></xs:element>
+  <xs:element name = "publisher" type = "elementType"></xs:element>
+  <xs:element name = "contributor" type = "elementType"></xs:element>
+  <xs:element name = "date" type = "elementType"></xs:element>
+  <xs:element name = "type" type = "elementType"></xs:element>
+  <xs:element name = "format" type = "elementType"></xs:element>
+  <xs:element name = "identifier" type = "elementType"></xs:element>
+  <xs:element name = "source" type = "elementType"></xs:element>
+  <xs:element name = "language" type = "elementType"></xs:element>
+  <xs:element name = "relation" type = "elementType"></xs:element>
+  <xs:element name = "coverage" type = "elementType"></xs:element>
+  <xs:element name = "rights" type = "elementType"></xs:element>
+</xs:schema>
