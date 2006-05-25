@@ -39,7 +39,8 @@ $data_qry = "
 			{\$a/eadheader/filedesc/titlestmt/titleproper}
 			{\$a/archdesc/did/physdesc}
 			{\$a/archdesc/did/abstract}
-		   </record>	
+		   </record>
+   	sort by (unittitle)
 ";
 
 
