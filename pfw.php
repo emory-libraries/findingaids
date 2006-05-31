@@ -9,15 +9,15 @@ $url_qs = key($_REQUEST);
 //list($devnull, $cmd, $devnull, $id) = $matches;
 //echo "<pre>"; print_r($matches); echo "</pre>";
 
-$redirectURL = "http://biliku.library.emory.edu/jbwhite/projects/marblfa-php/";
+$dir = split('/', $_SERVER['SCRIPT_URI']);
+array_pop($dir);
+$redirectURL = join("/", $dir) . "/";
 
 $cmd = split('-', $url_qs);
 //echo "<pre>"; print_r($_SERVER); echo "</pre>";
 //exit;
-
+session_start();
 $crumbs = $_SESSION['crumb'];
-
-echo "<pre>"; print_r($crumbs); echo "</pre>";
 
 $crumbs[0] = array ('href' => 'http://marbl.library.emory.edu', 'anchor' => 'MARBL Finding Aids');
 
@@ -30,6 +30,8 @@ switch ($cmd[0])
 	case 'tamino': 
 		$crumbs[2] = array ('href' => $_REQUEST['QUERY_STRING'], 'anchor' => 'Finding Aid');	
 		
+		html_head("Finding Aids");
+		
 		$toc = "section-toc-".end($cmd);
 		$content = "section-content-".end($cmd);
 	
@@ -41,7 +43,9 @@ switch ($cmd[0])
 	case 'browse':
 		
 		$crumbs[1] = array ('href' => 'browse', 'anchor' => 'Browse');
+		$crumbs[2] = null;
 		
+		html_head("Browse - Collections");
 		$f = "html/browse.php?l=".$cmd[2];
 		$content = file_get_contents($redirectURL . $f);
 		$left_nav = "";
@@ -52,6 +56,10 @@ switch ($cmd[0])
 	break;
 	
 	case 'rqst':
+		$crumbs[1] = array ('href' => 'rqst', 'anchor' => 'Search');
+		$crumbs[2] = null;
+				
+		html_head("Search - Finding Aids");
 		$f = "html/searchoptions.php?";
 		$content = file_get_contents($redirectURL . $f);
 
@@ -60,7 +68,10 @@ switch ($cmd[0])
 		include("template-footer.inc");
 	break;
 
-	case 'search':				
+	case 'search':		
+		$crumbs[1] = array ('href' => 'rqst', 'anchor' => 'Search');
+		$crumbs[2] = null;
+	
 		foreach($_REQUEST as $k => $v)
 		{
 			$qs .= "&$k=" . encode_url($v);
@@ -73,11 +84,11 @@ switch ($cmd[0])
 		include("template-footer.inc");
 	break;	
 	
-	case 'section':		
+	case 'section':	
 		switch ($cmd[1])
 		{
 			case 'toc':
-				$f = "html/toc.php?id=".end($cmd);
+				$f = "html/toc.php?id=".end($cmd);			
 				readfile($redirectURL . $f);
 			break;
 			

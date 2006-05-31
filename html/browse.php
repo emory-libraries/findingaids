@@ -51,14 +51,16 @@ $data_qry = "
 	$letter_search
 	return <record>
 			{\$a/@id}
+			<name>
 			{\$a/archdesc/did/origination/persname}
 			{\$a/archdesc/did/origination/corpname}
 			{\$a/archdesc/did/origination/famname}
+			</name>
 			{\$a/eadheader/filedesc/titlestmt/titleproper}
 			{\$a/archdesc/did/physdesc}
 			{\$a/archdesc/did/abstract}
 		   </record>
-   	sort by (unittitle)
+   	sort by (name)
 ";
 
 

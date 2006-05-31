@@ -71,27 +71,25 @@ $conditions = array();
 if ($kw) {
     if ($mode == "exact") {
         array_push($conditions, "tf:containsText(\$a, '$kw')");
-	$ref_let = "let \$ref := tf:createTextReference(\$a//p, '$kw') let \$allrefs := (\$ref) 
-	let \$countref := tf:createTextReference(\$a//p//text()[not(../figDesc)], '$kw') let \$allcounts := (\$countref) ";
+	$ref_let = "let \$ref := tf:createTextReference(\$a, '$kw') let \$allrefs := (\$ref)";
 	$wordcount = count($kwarray);
     } else if ($mode == "synonym") {
         array_push($conditions, "tf:containsText(\$a, tf:synonym('$kw'))");
     } else {
       $all = 'let $allrefs := (';
       $allcount = 'let $allcounts := (';
-      for ($i = 0; $i < count($kwarray); $i++) {
-	$term = ($mode == "phonetic") ? "tf:phonetic('$kwarray[$i]')" : "'$kwarray[$i]'";
-	$let .= "let \$ref$i := tf:createTextReference(\$a//p, $term) ";
-	$let .= "let \$count$i := tf:createTextReference(\$a//p//text()[not(parent::figDesc)], $term) ";
-	if ($i > 0) { $all .= ", "; $allcount .= ", "; }
-	$all .= "\$ref$i"; 
-	$allcount .= "\$count$i"; 
-        array_push($conditions, "tf:containsText(\$a, $term)");
+      for ($i = 0; $i < count($kwarray); $i++) 
+      {
+		$term = ($mode == "phonetic") ? "tf:phonetic('$kwarray[$i]')" : "'$kwarray[$i]'";
+		$let .= "let \$ref$i := tf:createTextReference(\$a, $term) ";
+		
+		if ($i > 0) { $all .= ", "; }
+		$all .= "\$ref$i"; 
+		
+		array_push($conditions, "tf:containsText(\$a, $term)");
       }
       $all .= ") ";
       $let .= $all;
-      $allcount .= ") ";
-      $let .= $allcount;
     }
 }
 if ($title) {
@@ -101,7 +99,9 @@ if ($title) {
 }
 if ($author) {
         foreach ($autharray as $a){
-        array_push($conditions, "tf:containsText(\$b/author, '$a') ");
+        array_push($conditions, "tf:containsText(\$a/archdesc/did/origination/persname, '$a') 
+              or tf:containsText(\$a/archdesc/did/origination/corpname, '$a') 
+              or tf:containsText(\$a/archdesc/did/origination/famname, '$a') ");
     }
 }
 if ($date) {
@@ -151,10 +151,10 @@ $countquery = "$declare <total>{count($for $let $where return \$a)}</total>";
 $sort = 'sort by (author)';
 
 $query = $declare . " <results><records>{ " . "$for $let $where $return </record> $sort" . "}</records></results>";
-$tamino->xquery($countquery);
-$total = $tamino->findNode("total");
-$tamino->xquery($query);
-$tamino->getXqueryCursor();
+//$tamino->xquery($countquery);
+//$total = $tamino->findNode("total");
+//$tamino->xquery($query);
+//$tamino->getXqueryCursor();
 
 $xsl_file = "stylesheets/results.xsl";
 
@@ -163,12 +163,12 @@ if ($kw) {
   if ($mode == "exact") {   
     /* note: in exact mode, Tamino still tokenizes the text references, so count is off for the phrase (e.g., one match for a 4-word phrase counts as 4);
        this divide-by-wordcount correctly calculates the number of occurrences of the entire phrase. */
-    $return .= "<matches><total>{xs:integer(count(\$allcounts) div $wordcount)}</total>"; 
-  } else { $return .= '<matches><total>{count($allcounts)}</total>'; }
+    $return .= "<matches><total>{xs:integer(count(\$allrefs) div $wordcount)}</total>"; 
+  } else { $return .= '<matches><total>{count($allrefs)}</total>'; }
   if ($mode != "exact") {	// exact mode - treat string as a phrase, not multiple terms
     if (count($kwarray) > 1) {	// if there are multiple terms, display count for each term
       for ($i = 0; $i < count($kwarray); $i++) {
-        $return .= "<term>$kwarray[$i]<count>{count(\$count$i)}</count></term>";
+        $return .= "<term>$kwarray[$i]<count>{count(\$ref$i)}</count></term>";
       }
     }
   }

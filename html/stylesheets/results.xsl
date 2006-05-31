@@ -49,9 +49,8 @@
 	
 	<xsl:template match="record">
 		<div>			
-			<xsl:apply-templates select="persname"/>
-			<xsl:apply-templates select="corpname"/>
-			<xsl:apply-templates select="famsname"/>
+			<xsl:apply-templates select="name"/>
+			<xsl:apply-templates select="unittitle"/>
 			<br />
 								
 			<xsl:apply-templates select="titleproper"/><br />
@@ -61,7 +60,7 @@
 		</div><p />
 	</xsl:template>
 
-	<xsl:template match="persname | corpname | famname">	
+	<xsl:template match="persname | corpname | famname | unittitle">	
 		<xsl:element name="a">
 			<xsl:attribute name="href">tamino-<xsl:value-of select="../@id" /></xsl:attribute>
 			<xsl:value-of select="." />

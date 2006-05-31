@@ -126,13 +126,14 @@ function displayBreadCrumbs($array_bc)
 		{
 			if ($bc['href'] != '')
 			{
-				$rv .= "<a href=\"" . $bc['href'] . "\">" . $bc['anchor'] . "</a>, ";
+				$rv .= " <a href=\"" . $bc['href'] . "\">" . $bc['anchor'] . "</a> ";
 			} else {
-				$rv .= $bc['anchor'];
+				$rv .= " ".$bc['anchor'];
 			}
 		}
 	}
-	print $rv;
+		
+	print rtrim($rv, ",");
 }
 
 ?>

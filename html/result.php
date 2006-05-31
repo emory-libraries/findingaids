@@ -9,15 +9,15 @@ require_once("common_functions.php");
 </div>
 
 <div style="margin-left: 310px; height:100%">
-	<div style="height:150px;">
+	<div style="height:50px;">
 		<div class="pageHeader">
 			<? displayBreadCrumbs($crumbs); ?>
 		</div>
-	
+		<p />
 		<? include("html/MARBL-bar.inc"); ?>
 	</div>
 	<br />
-	<iframe name="content" src="<?= $content ?>" style="width:99%; height:950px;"></iframe>
+	<iframe name="content" src="<?= $content ?>" style="width:99%; height:940px;"></iframe>
 
 </div>
 
