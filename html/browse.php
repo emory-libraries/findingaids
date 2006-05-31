@@ -20,21 +20,40 @@ switch ($browseBy)
 
 $browse_qry = "
 	for \$b in 
-	distinct-values(for \$a in input()/ead$search_path
-	let \$l := substring(\$a,1,1)
-	return \$l)
+	distinct-values
+	(
+		for \$a in 
+		(
+			input()/ead/archdesc/did/origination/persname,
+			input()/ead/archdesc/did/origination/corpname,
+			input()/ead/archdesc/did/origination/famname
+		)
+		let \$l := substring(\$a,1,1)
+		return \$l
+	)
 	return <letter>{\$b}</letter>
 ";
 
+
+
 $letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'A';
-$letter_search = ($letter != 'all') ? "let \$l := substring(\$a/$search_path,1,1) where \$l = '$letter' " : '';
+if ($letter != 'all')
+{
+	$letter_search =  " where substring(\$a/archdesc/did/origination/persname,1,1) = '$letter' ";
+	$letter_search .= " or substring(\$a/archdesc/did/origination/corpname,1,1) = '$letter' ";
+	$letter_search .= " or substring(\$a/archdesc/did/origination/famname,1,1) = '$letter' ";
+} else {
+	$letter_search = "";
+}
 
 $data_qry = "
 	for \$a in input()/ead
 	$letter_search
 	return <record>
 			{\$a/@id}
-			{\$a/archdesc/did/unittitle}
+			{\$a/archdesc/did/origination/persname}
+			{\$a/archdesc/did/origination/corpname}
+			{\$a/archdesc/did/origination/famname}
 			{\$a/eadheader/filedesc/titlestmt/titleproper}
 			{\$a/archdesc/did/physdesc}
 			{\$a/archdesc/did/abstract}
