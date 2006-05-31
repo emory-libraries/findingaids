@@ -47,6 +47,9 @@
 <!--</xsl:element>--><!--_mapBody-->
 </xsl:template>
 
+<xsl:template match="frontmatter">
+</xsl:template>
+
 <xsl:template match="dsc">
 <a>
 <xsl:attribute name="name"><xsl:value-of select="local-name()"/></xsl:attribute>

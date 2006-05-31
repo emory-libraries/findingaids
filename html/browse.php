@@ -1,6 +1,6 @@
 <?php
-include("config.php");
 include("common_functions.php");
+include_once("config.php");
 include_once("lib/xmlDbConnection.class.php");
 
 $args = array('host' => $tamino_server,
@@ -14,9 +14,8 @@ switch ($browseBy)
 {
 	case 'unittitle':
 	default:
-		$search_path = "/archdesc/did/unittitle";
+		$search_path = "/archdesc/did/origination/persname";
 		// query for all volumes 
-		$mode = 'alpha';
 }
 
 $browse_qry = "
@@ -45,18 +44,18 @@ $data_qry = "
 
 
 $query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_qry."}</records></results>";
+$mode = 'browse';
 
 //echo $query;
 
-$xsl_file 	= "stylesheets/browse.xsl";
+$xsl_file 	= "stylesheets/results.xsl";
 $xsl_params = array('mode' => $mode, 'label_text' => "Browse Collections Alphabetically:", 'baseLink' => "browse-coll");
 
 $rval = $tamino->xquery(trim($query));
 $tamino->xslTransform($xsl_file, $xsl_params);
 
-echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/jbwhite/projects/marblfa-php/html/css/marblfa.css\">\n";
 html_head("Browse - Collections");
-
+echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/jbwhite/projects/marblfa-php/html/css/marblfa.css\">\n";
 print '<div class="content">';
 $tamino->printResult();
 print '</div>';

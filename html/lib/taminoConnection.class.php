@@ -42,7 +42,7 @@ class taminoConnection {
     }
     if ($this->debug) {
       print "DEBUG: In function taminoConnection::xquery, url is $myurl.<br>";
-      print "<a href=\"$myurl\">run xquery</a><br>";
+      print "<a href=\"".htmlentities($myurl)."\">run xquery</a><br>";
     }
 
     $this->xmlContent = file_get_contents($myurl);

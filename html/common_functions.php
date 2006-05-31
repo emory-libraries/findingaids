@@ -38,7 +38,7 @@ function html_head ($mode, $contentlist = false) {
   $mycss = getCSS();
 print "<html>
  <head>
- <title>$mode - The Civil War in America from The Illustrated London News</title>
+ <title>$mode - Manuscript, Archives, and Rare Books Library</title>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">
 <meta name=\"robots\" content=\"index,follow\">
 <link rel=\"stylesheet\" type=\"text/css\" href=\"$mycss\">\n";
@@ -116,5 +116,23 @@ function transform ($xml_file, $xsl_file, $xsl_params = NULL) {
 	return $xsl_result;
 }
 
+// display bread crumbs
+function displayBreadCrumbs($array_bc)
+{
+	$rv = '';
+	if (is_array($array_bc))
+	{
+		foreach ($array_bc as $bc)
+		{
+			if ($bc['href'] != '')
+			{
+				$rv .= "<a href=\"" . $bc['href'] . "\">" . $bc['anchor'] . "</a>, ";
+			} else {
+				$rv .= $bc['anchor'];
+			}
+		}
+	}
+	print $rv;
+}
 
 ?>
