@@ -62,7 +62,7 @@
 
 	<xsl:template match="persname | corpname | famname | unittitle">	
 		<xsl:element name="a">
-			<xsl:attribute name="href">tamino-<xsl:value-of select="../@id" /></xsl:attribute>
+			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /></xsl:attribute>
 			<xsl:value-of select="." />
 		</xsl:element>
 	</xsl:template>	
