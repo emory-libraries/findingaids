@@ -23,8 +23,9 @@
 <form name="advancedquery" action="search" method="post">
 <table class="searchform" border="0">
 <tr><th>Enter word or phrase:</th><td class="input"><input type="text" size="40" name="keyword"></td></tr>
-<tr><th>Type of search:</th><td><input type="radio" name="mode" value="phonetic">Phonetic
-<input type="radio" name="mode" value="exact">Exact Phrase
+<tr><th>Type of search:</th><td>
+<input type="radio" name="mode" value="exact" CHECKED>Exact Phrase
+<input type="radio" name="mode" value="phonetic">Phonetic
 <!-- This requires a defined dictionary which we do not have yet<input type="radio" name="mode" value="synonym">Synonym</td>-->
 </tr>
 <tr><td></td><td><input type="submit" value="Submit"><input type="reset" value="Reset"></td></tr> 

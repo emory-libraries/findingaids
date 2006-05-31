@@ -73,7 +73,6 @@ $xsl_params = array('mode' => $mode, 'label_text' => "Browse Collections Alphabe
 $rval = $tamino->xquery(trim($query));
 $tamino->xslTransform($xsl_file, $xsl_params);
 
-html_head("Browse - Collections");
 echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/jbwhite/projects/marblfa-php/html/css/marblfa.css\">\n";
 print '<div class="content">';
 $tamino->printResult();
