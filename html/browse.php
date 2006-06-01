@@ -26,7 +26,8 @@ $browse_qry = "
 		(
 			input()/ead/archdesc/did/origination/persname,
 			input()/ead/archdesc/did/origination/corpname,
-			input()/ead/archdesc/did/origination/famname
+			input()/ead/archdesc/did/origination/famname,
+			input()/ead/archdesc/did/unittitle
 		)
 		let \$l := substring(\$a,1,1)
 		return \$l
@@ -52,22 +53,30 @@ $data_qry = "
 	return <record>
 			{\$a/@id}
 			<name>
-			{\$a/archdesc/did/origination/persname}
-			{\$a/archdesc/did/origination/corpname}
-			{\$a/archdesc/did/origination/famname}
+				{\$a/archdesc/did/origination/persname}
+				{\$a/archdesc/did/origination/corpname}
+				{\$a/archdesc/did/origination/famname}
 			</name>
 			{\$a/archdesc/did/unittitle}
 			{\$a/archdesc/did/physdesc}
 			{\$a/archdesc/did/abstract}
+			<sort-title>
+				{string(\$a/archdesc/did/origination/persname)}
+				{string(\$a/archdesc/did/origination/corpname)}
+				{string(\$a/archdesc/did/origination/famname)}			
+				{string(\$a/archdesc/did/unittitle)}			
+			</sort-title>
 		   </record>
-   	sort by (name)
+   	sort by (sort-title)
 ";
 
+/*
+{ for \$i in (\" \", \"'\", \"A \", \"An \", \"The \", \"\", \"The Register of the \", \"A Register of \", \"The Register of \", \"Register of \", \"Register \") where starts-with(\$a/archdesc/did/unittitle, \$i)
+			 	return substring-after(\$a/archdesc/did/unittitle, \$i) }
+*/
 
 $query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_qry."}</records></results>";
 $mode = 'browse';
-
-//echo $query;
 
 $xsl_file 	= "stylesheets/results.xsl";
 $xsl_params = array('mode' => $mode, 'label_text' => "Browse Collections Alphabetically:", 'baseLink' => "browse-coll");
