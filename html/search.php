@@ -140,15 +140,19 @@ if ($mode == "exact") {
 
 $return  = ' return';
 $return .= ' <record> {$a/@id}';
-$return .= '  {$a/archdesc/did/unittitle}';
-$return .= '  {$b/filedesc/titlestmt/titleproper}';
-$return .= '  {$a/archdesc/did/physdesc}';
-$return .= '  {$a/archdesc/did/abstract}';
+$return .= ' <name>';
+$return .= ' 	{$a/archdesc/did/origination/persname}';
+$return .= ' 	{$a/archdesc/did/origination/corpname}';
+$return .= ' 	{$a/archdesc/did/origination/famname}';
+$return .= ' </name>';
+$return .= ' {$a/archdesc/did/unittitle}';
+$return .= ' {$a/archdesc/did/physdesc}';
+$return .= ' {$a/archdesc/did/abstract}';
 
 
 
 $countquery = "$declare <total>{count($for $let $where return \$a)}</total>";
-$sort = 'sort by (author)';
+$sort = 'sort by (name)';
 
 $query = $declare . " <results><records>{ " . "$for $let $where $return </record> $sort" . "}</records></results>";
 //$tamino->xquery($countquery);

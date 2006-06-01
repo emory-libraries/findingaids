@@ -56,7 +56,7 @@ $data_qry = "
 			{\$a/archdesc/did/origination/corpname}
 			{\$a/archdesc/did/origination/famname}
 			</name>
-			{\$a/eadheader/filedesc/titlestmt/titleproper}
+			{\$a/archdesc/did/unittitle}
 			{\$a/archdesc/did/physdesc}
 			{\$a/archdesc/did/abstract}
 		   </record>

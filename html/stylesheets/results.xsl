@@ -49,26 +49,23 @@
 	
 	<xsl:template match="record">
 		<div>			
-			<xsl:apply-templates select="name"/>
-			<xsl:apply-templates select="unittitle"/>
-			<br />
-								
-			<xsl:apply-templates select="titleproper"/><br />
+			<xsl:apply-templates select="name"/><br />
+			<xsl:apply-templates select="unittitle"/><br />								
 			<xsl:apply-templates select="physdesc/extent"/><br />
 			<xsl:apply-templates select="abstract"/><br />
 			<xsl:apply-templates select="matches" />
 		</div><p />
 	</xsl:template>
 
-	<xsl:template match="persname | corpname | famname | unittitle">	
+	<xsl:template match="persname | corpname | famname ">	
 		<xsl:element name="a">
-			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /></xsl:attribute>
+			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /></xsl:attribute>			
 			<xsl:value-of select="." />
 		</xsl:element>
 	</xsl:template>	
 	
-	<xsl:template match="titleproper | physdesc/extent | abstract">	
-		<xsl:value-of select="." /> 
+	<xsl:template match="physdesc/extent | abstract | unittitle">	
+		<xsl:value-of select="." /> <xsl:text> </xsl:text> 
 	</xsl:template>
 	
 	<xsl:template match="matches">
