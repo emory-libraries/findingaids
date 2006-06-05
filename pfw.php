@@ -19,7 +19,7 @@ $cmd = split('-', $url_qs);
 session_start();
 $crumbs = $_SESSION['crumb'];
 
-$crumbs[0] = array ('href' => 'http://marbl.library.emory.edu', 'anchor' => 'MARBL Finding Aids');
+$crumbs[0] = array ('href' => 'http://marbl.library.emory.edu/FindingAids/index.html', 'anchor' => 'MARBL Finding Aids');
 
 switch ($cmd[0])
 {
