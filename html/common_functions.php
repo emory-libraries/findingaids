@@ -116,6 +116,18 @@ function transform ($xml_file, $xsl_file, $xsl_params = NULL) {
 	return $xsl_result;
 }
 
+//Function that takes multiple terms separated by white spaces and puts them into an array
+function processterms ($str) {
+// clean up input so explode will work properly
+    $str = preg_replace("/\s+/", " ", $str);  // multiple white spaces become one space
+    $str = preg_replace("/\s$/", "", $str);	// ending white space is removed
+    $str = preg_replace("/^\s/", "", $str);  //beginning space is removed
+    $terms = explode(" ", $str);    // multiple search terms, divided by spaces
+    return $terms;
+}
+
+
+
 // display bread crumbs
 function displayBreadCrumbs($array_bc)
 {
