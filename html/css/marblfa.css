@@ -109,3 +109,7 @@ div#headingBlock
 {
 	font-size:15px;
 }
+
+
+span.hits { color:red; padding-left:1em;font-weight:bold;}
+span.match { color:red; font-weight:bold; }
