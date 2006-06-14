@@ -15,89 +15,87 @@
 </xsl:template>
 
 <xsl:template match="ead/archdesc" mode="toc">
-<div class="navbar">
-<xsl:element name="emph">
-<xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
-</xsl:element>
-<xsl:element name="h2">
-<a name="a0">
-</a>
-</xsl:element>
-<xsl:element name="p">
-<xsl:attribute name="class">navbar</xsl:attribute>
-<a>
-<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#descriptiveSummary</xsl:attribute>
-<xsl:attribute name="target">content</xsl:attribute>
-Descriptive Overview
-</a>
-</xsl:element>
-
-<!-- remove details of ead header in toc 
-<a>
-<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#descriptiveSummary</xsl:attribute>
-<xsl:attribute name="target">content</xsl:attribute>
-Descriptive Summary
-</a>
-</xsl:element>
-
-<xsl:element name="p">
-<xsl:attribute name="class">navbar</xsl:attribute>
-<a>
-<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#adminInfo</xsl:attribute>
-<xsl:attribute name="target">content</xsl:attribute>
-Administrative Information
-</a>
-<ul class="navbar">
-<xsl:apply-templates select="acqinfo | accessrestrict | userestrict | prefercite | separatedmaterial" mode="toc"/>
-</ul>
-</xsl:element>
-
-<xsl:element name="p">
-<xsl:attribute name="class">navbar</xsl:attribute>
-<a>
-<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#collectionDesc</xsl:attribute>
-<xsl:attribute name="target">content</xsl:attribute>
-Collection Description
-</a>
-<ul class="navbar">
-<xsl:apply-templates select="bioghist | scopecontent | arrangement | controlaccess " mode="toc"/>
-</ul>
-</xsl:element>
--->
-<xsl:apply-templates select="dsc" mode="toc"/>
-</div>
+	<!--<div class="navbar">-->
+	<!--<xsl:element name="emph">-->
+	<xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
+	<!--</xsl:element>-->
+	<xsl:element name="span">
+	<xsl:attribute name="class">toc-heading</xsl:attribute>
+	<a name="a0">
+	</a>
+	</xsl:element>
+	<xsl:element name="p">
+	<xsl:attribute name="class">navbar</xsl:attribute>
+	<a>
+	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#descriptiveSummary</xsl:attribute>
+	
+	Descriptive Overview
+	</a>
+	</xsl:element>
+	
+	<!-- remove details of ead header in toc 
+	<a>
+	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#descriptiveSummary</xsl:attribute>
+	
+	Descriptive Summary
+	</a>
+	</xsl:element>
+	
+	<xsl:element name="p">
+	<xsl:attribute name="class">navbar</xsl:attribute>
+	<a>
+	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#adminInfo</xsl:attribute>
+	
+	Administrative Information
+	</a>
+	<ul class="navbar">
+	<xsl:apply-templates select="acqinfo | accessrestrict | userestrict | prefercite | separatedmaterial" mode="toc"/>
+	</ul>
+	</xsl:element>
+	
+	<xsl:element name="p">
+	<xsl:attribute name="class">navbar</xsl:attribute>
+	<a>
+	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#collectionDesc</xsl:attribute>
+	
+	Collection Description
+	</a>
+	<ul class="navbar">
+	<xsl:apply-templates select="bioghist | scopecontent | arrangement | controlaccess " mode="toc"/>
+	</ul>
+	</xsl:element>
+	-->
+	<xsl:apply-templates select="dsc" mode="toc"/>
+	<!--</div>-->
 </xsl:template>
 
 <xsl:template match="bioghist" mode="toc">
 <xsl:element name="li">
 <a>
 <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#<xsl:value-of select="local-name(parent::node())"/>.<xsl:value-of select="position()"/></xsl:attribute>
-<xsl:attribute name="target">content</xsl:attribute>
+
 
 <xsl:value-of select="head"/>
 </a>
 </xsl:element>
 </xsl:template>
 
-<xsl:template match="ead/archdesc/dsc" mode="toc">
-<xsl:element name="li">
-<xsl:element name="a">
-<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
-<xsl:attribute name="target">content</xsl:attribute>
-<xsl:value-of select="head"/>
-</xsl:element>
-<xsl:element name="ul">
-<xsl:attribute name="class">navbar</xsl:attribute>
-<xsl:apply-templates select="c01" mode="toc"/>
-</xsl:element>
-</xsl:element>
+<xsl:template match="ead/archdesc/dsc" mode="toc">	
+	<xsl:element name="a">
+		<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
+		
+		<xsl:value-of select="head"/>
+	</xsl:element>
+	<xsl:element name="ul">			
+		<xsl:apply-templates select="c01" mode="toc"/>
+	</xsl:element>
 </xsl:template>
 
 <xsl:template match="ead/archdesc/*[not(self::bioghist)]" mode="toc" priority="-1">
 <xsl:element name="li">
 <a>
 <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
-<xsl:attribute name="target">content</xsl:attribute>
+
 <xsl:value-of select="head"/>
 </a>
 
@@ -121,33 +119,36 @@ Collection Description
 
 
 <xsl:template match="c01[c02]" mode="toc">
-<!-- don't include the container list items in the table of contents, unless this is not toc mode (navbar creation)-->
-<xsl:if test="did/unittitle and (not($mode = 'toc') or not(did/container))">
-
-<xsl:element name="p"> 
-<xsl:attribute name="class">navbar</xsl:attribute>
-<a>
-<xsl:attribute name="href">section-content-<xsl:value-of select="local-name()"/>-<xsl:value-of select="self::node()/@id"/>#<xsl:apply-templates select="self::node()" mode="c-level-index"/></xsl:attribute>
-<xsl:if test="ancestor::dsc">
-<xsl:attribute name="target">content</xsl:attribute>
-</xsl:if>
-
-<xsl:apply-templates select="did/unittitle" mode="toc"/>
-<xsl:apply-templates select="did/unitdate" mode="toc"/>
-</a>
-
-<!-- only display c01 levels in toc navbar, otherwise display the full table of contents -->
-<!-- toc is not coming back; some subtle xslt error (could be cpu), so only show c01 level
-<xsl:if test="not($mode = 'toc') and c02">
-<xsl:element name="ul">
-<xsl:attribute name="class">navbar</xsl:attribute>
-<xsl:apply-templates select="c02" mode="toc"/>
-</xsl:element>
-</xsl:if>
--->
-
-</xsl:element>
-</xsl:if>
+	<xsl:element name="li">
+		<xsl:attribute name="class">navbar</xsl:attribute>
+		<!-- don't include the container list items in the table of contents, unless this is not toc mode (navbar creation)-->
+		<xsl:if test="did/unittitle and (not($mode = 'toc') or not(did/container))">
+		
+		<xsl:element name="p"> 
+		<xsl:attribute name="class">navbar</xsl:attribute>
+		<a>
+		<xsl:attribute name="href">section-content-<xsl:value-of select="local-name()"/>-<xsl:value-of select="self::node()/@id"/>#<xsl:apply-templates select="self::node()" mode="c-level-index"/></xsl:attribute>
+		<xsl:if test="ancestor::dsc">
+		
+		</xsl:if>
+		
+		<xsl:apply-templates select="did/unittitle" mode="toc"/>
+		<xsl:apply-templates select="did/unitdate" mode="toc"/>
+		</a>
+		
+		<!-- only display c01 levels in toc navbar, otherwise display the full table of contents -->
+		<!-- toc is not coming back; some subtle xslt error (could be cpu), so only show c01 level
+		<xsl:if test="not($mode = 'toc') and c02">
+		<xsl:element name="ul">
+		<xsl:attribute name="class">navbar</xsl:attribute>
+		<xsl:apply-templates select="c02" mode="toc"/>
+		</xsl:element>
+		</xsl:if>
+		-->
+		
+		</xsl:element>
+		</xsl:if>
+	</xsl:element>		
 </xsl:template>
 
 <!-- ============================================= -->
@@ -159,7 +160,7 @@ Collection Description
 <a>
 <xsl:attribute name="href">section-content-c01-<xsl:value-of select="ancestor::c01/@id"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
 <xsl:if test="ancestor::dsc">
-<xsl:attribute name="target">content</xsl:attribute>
+
 </xsl:if>
 
 <xsl:apply-templates select="did/unittitle" mode="toc"/>

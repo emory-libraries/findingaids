@@ -122,8 +122,10 @@ function displayBreadCrumbs($array_bc)
 	$rv = '';
 	if (is_array($array_bc))
 	{
-		foreach ($array_bc as $bc)
+		//foreach ($array_bc as $bc)
+		for($i=0;$i<count($array_bc);$i++)
 		{
+			$bc = $array_bc[$i];
 			if ($bc['href'] != '')
 			{
 				$rv .= " <a href=\"" . $bc['href'] . "\">" . $bc['anchor'] . "</a> ";

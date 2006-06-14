@@ -99,10 +99,17 @@ if ($title) {
 }
 if ($author) {
         foreach ($autharray as $a){
-        array_push($conditions, "tf:containsText(\$a/archdesc/did/origination/persname, '$a') 
-              or tf:containsText(\$a/archdesc/did/origination/corpname, '$a') 
-              or tf:containsText(\$a/archdesc/did/origination/famname, '$a') ");
-    }
+	        array_push($conditions, "(tf:containsText(\$a/archdesc/did/origination/persname, '$a') 
+	              						or tf:containsText(\$a/archdesc/did/origination/corpname, '$a') 
+	              						or tf:containsText(\$a/archdesc/did/origination/famname, '$a')) 
+	        						or 
+        								(tf:containsText(\$a/archdesc/controlaccess/controlaccess/persname[@encodinganalog=\"700\"], '$a') 
+  										or tf:containsText(\$a/archdesc/controlaccess/controlaccess/corpname[@encodinganalog=\"710\"], '$a') 
+  										or tf:containsText(\$a/archdesc/controlaccess/controlaccess/famname[@encodinganalog=\"700\"], '$a')
+  										) "
+  			);
+	    }
+	   
 }
 if ($date) {
         foreach ($darray as $d){    
