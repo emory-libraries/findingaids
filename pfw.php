@@ -1,5 +1,7 @@
 <?
-include "html/common_functions.php";
+include_once("html/config.php");
+include_once("html/lib/xmlDbConnection.class.php");
+include("html/common_functions.php");
 
 $url_qs = key($_REQUEST);
 //echo "url_qs=$url_qs<hr>";
@@ -14,13 +16,13 @@ array_pop($dir);
 $redirectURL = join("/", $dir) . "/";
 
 $cmd = split('-', $url_qs);
-//echo "<pre>"; print_r($_SERVER); echo "</pre>";
+//echo "<pre>"; print_r($cmd); echo "</pre>";
 //exit;
 session_start();
 $crumbs = $_SESSION['crumb'];
 
 $crumbs[0] = array ('href' => 'http://marbl.library.emory.edu/FindingAids/index.html', 'anchor' => 'MARBL Finding Aids');
-
+//echo "<pre>"; print_r($crumbs); echo "</pre>";
 switch ($cmd[0])
 {
 	case 'banner':
@@ -28,16 +30,18 @@ switch ($cmd[0])
 	break;
 	
 	case 'tamino': 
-		$crumbs[2] = array ('href' => $_REQUEST['QUERY_STRING'], 'anchor' => 'Finding Aid');	
-		
 		html_head("Finding Aids");
 		
-		$toc = "section-toc-".end($cmd);
-		$content = "section-content-".end($cmd);
-	
-		include("template-header.inc");
-		include ("html/result.php");
+		include("html/content.php");		
+		
+		$content = getXMLContentsAsHTML(array('host' => $tamino_server,'db' => $tamino_db,'coll' => $tamino_coll,'debug' => false), $cmd[1]);
+		
+		include("template-header.inc");	
+		displayBreadCrumbs($crumbs);	
+		include("html/MARBL-bar.inc");		
+		echo $content;
 		include("template-footer.inc");		
+
 	break;
 	
 	case 'browse':
@@ -48,6 +52,8 @@ switch ($cmd[0])
 		html_head("Browse - Collections");
 		$f = "html/browse.php?l=".$cmd[2];
 		$content = file_get_contents($redirectURL . $f);
+		
+		
 		$left_nav = "";
 		
 		include("template-header.inc");
