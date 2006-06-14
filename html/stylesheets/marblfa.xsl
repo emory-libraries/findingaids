@@ -35,14 +35,12 @@
 	-->	
 		<xsl:otherwise>	
 			<div id="toc">	
-				<xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
+			   <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
 			</div>
 			
 			<div id="content"><!--start content-->
-				<div id="headingBlock">
-					<xsl:apply-templates select="//results/ead/eadheader/filedesc/titlestmt"/>
-				</div>
-				<xsl:apply-templates select="//results/ead/*"/>		
+                          <xsl:apply-templates select="//results/ead/eadheader/filedesc/titlestmt"/>
+                          <xsl:apply-templates select="//results/ead/*"/>		
 			</div>
 			
 		</xsl:otherwise>
@@ -216,15 +214,17 @@
 <!-- ===========   =========== -->
 
 <xsl:template match="titlestmt">
-	<xsl:element name="span">
-		<xsl:attribute name="class">content_title</xsl:attribute>
-		<xsl:value-of select="titleproper"/>
-	</xsl:element>
-	
-	<xsl:element name="span">
-		<xsl:attribute name="class">content_subtitle</xsl:attribute>
-		<xsl:value-of select="subtitle"/>	
-	</xsl:element>
+  <div id="headingBlock">
+    <xsl:element name="span">
+      <xsl:attribute name="class">content_title</xsl:attribute>
+      <xsl:value-of select="titleproper"/>
+    </xsl:element>
+    
+    <xsl:element name="span">
+      <xsl:attribute name="class">content_subtitle</xsl:attribute>
+      <xsl:value-of select="subtitle"/>	
+    </xsl:element>
+  </div>
 </xsl:template>
              
 <xsl:template match="ead/archdesc">
@@ -512,21 +512,54 @@
 <!-- ====================================================== -->
 
 <xsl:template match="cti:h1">
-<h1>
-<xsl:attribute name="class">
-<xsl:apply-templates select="@class"/>
-</xsl:attribute>
-<xsl:apply-templates/>
-</h1>
+  <h1>
+    <xsl:attribute name="class">
+      <xsl:apply-templates select="@class"/>
+    </xsl:attribute>
+    <xsl:apply-templates/>
+  </h1>
 </xsl:template>
 
 <!-- now that we are retrieving at the c01 level, the relative position of c01 will always be '1' -->
 <xsl:template match="c01" mode="c-level-index">
 <xsl:value-of select="local-name()"/>.<xsl:number value="0+1"/>:</xsl:template>
-
+  
 <xsl:template match=" c02 | c03 | c04 | c05 | c06 | c07 | c08 | c09" mode="c-level-index">
 <xsl:value-of select="local-name()"/>.<xsl:number value="count(preceding-sibling::*[self::c01 | self::c02| self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08| self::c09 ])+1"/>:</xsl:template>
 
 
+
+<!-- mark text after a MATCH + n processing instruction as a match to highlight -->
+<xsl:template match="text()[preceding-sibling::processing-instruction('MATCH')]">
+  <xsl:variable name="pi"><xsl:value-of select="preceding-sibling::processing-instruction('MATCH')[1]"/></xsl:variable>
+  <xsl:choose>
+    <xsl:when test="starts-with($pi, '+')">
+      <span class="match">
+        <xsl:value-of select="."/> 
+      </span>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="."/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="processing-instruction('MATCH')">
+  <xsl:variable name="n"><xsl:value-of select="count(preceding::processing-instruction('MATCH'))"/></xsl:variable>
+  <a>
+    <xsl:attribute name="name">match<xsl:value-of select="$n"/></xsl:attribute>
+    <xsl:choose>
+      <xsl:when test="starts-with(., '+')">
+        <xsl:attribute name="href">#match<xsl:value-of select="($n - 1)"/></xsl:attribute>
+	&lt;
+      </xsl:when>
+      <xsl:when test="starts-with(., '-')">
+        <xsl:attribute name="href">#match<xsl:value-of select="($n + 1)"/></xsl:attribute>
+ 	&gt;
+      </xsl:when>
+    </xsl:choose>
+  </a>
+
+</xsl:template>
 
 </xsl:stylesheet>

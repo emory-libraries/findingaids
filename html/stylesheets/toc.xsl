@@ -31,7 +31,13 @@
 	
 	Descriptive Overview
 	</a>
+
+        <!-- display number of keyword matches in this section if in kwic mode -->
+        <xsl:apply-templates select="hits"/>
+        <!-- FIXME: why is this not matching the correct template? -->
+        
 	</xsl:element>
+
 	
 	<!-- remove details of ead header in toc 
 	<a>
@@ -135,6 +141,9 @@
 		<xsl:apply-templates select="did/unittitle" mode="toc"/>
 		<xsl:apply-templates select="did/unitdate" mode="toc"/>
 		</a>
+
+                <!-- display number of keyword matches in this section if in kwic mode -->
+                <xsl:apply-templates select="hits"/>
 		
 		<!-- only display c01 levels in toc navbar, otherwise display the full table of contents -->
 		<!-- toc is not coming back; some subtle xslt error (could be cpu), so only show c01 level
@@ -183,5 +192,14 @@
 </xsl:if>
 </xsl:template>
 <!-- ============================================= -->
+
+
+<xsl:template match="hits">
+  <xsl:if test=". != 0">
+    <span class="hits">
+      <xsl:apply-templates/> hit<xsl:if test=". > 1">s</xsl:if>
+    </span>
+  </xsl:if>
+</xsl:template>
 
 </xsl:stylesheet>
