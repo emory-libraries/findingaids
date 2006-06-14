@@ -34,7 +34,7 @@ switch ($cmd[0])
 		
 		include("html/content.php");		
 		
-		$content = getXMLContentsAsHTML(array('host' => $tamino_server,'db' => $tamino_db,'coll' => $tamino_coll,'debug' => false), $cmd[1]);
+		$content = getXMLContentsAsHTML($cmd[1]);
 		
 		include("template-header.inc");	
 		displayBreadCrumbs($crumbs);	
@@ -100,8 +100,19 @@ switch ($cmd[0])
 			
 			case 'content':			
 				$e = (count($cmd) > 3) ? $cmd[2] : '';
-				$f = "html/content.php?element=$e&id=".end($cmd);
-				readfile($redirectURL . $f);	
+
+				  //$f = "html/content.php?element=$e&id=".end($cmd);
+				  //				readfile($redirectURL . $f);
+				
+				include("html/content.php");		
+				$content = getXMLContentsAsHTML(end($cmd), $e);
+
+				include("template-header.inc");	
+				displayBreadCrumbs($crumbs);	
+				include("html/MARBL-bar.inc");		
+				echo $content;
+				include("template-footer.inc");		
+
 			break;
 		}
 	break;
