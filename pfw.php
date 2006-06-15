@@ -6,41 +6,53 @@ include("html/common_functions.php");
 $url_qs = key($_REQUEST);
 //echo "url_qs=$url_qs<hr>";
 
-//$pattern = '/(.*)(-)(.*)*/';
-//preg_match($pattern, $url_qs, $matches) > 0;
-//list($devnull, $cmd, $devnull, $id) = $matches;
-//echo "<pre>"; print_r($matches); echo "</pre>";
+//Set Pattern to match against URL must have corresponding switch case below
+$pattern[0] = '/(browse)(-coll-)?(.*)/';
+$pattern[1] = '/(tamino)-(.*)/';
+$pattern[2] = '/(rqst)/';
+$pattern[3] = '/(search)/';
+$pattern[4] = '/(section-content)-?(c0[12])?-?(.*)/';
+
+//$pattern = '/'. join('|', $pattern) . '/';
+
+$i = 0;
+//$matches = null;
+do 
+{
+	preg_match($pattern[$i], $url_qs, $matches) > 0;
+	$i++;	
+} while (empty($matches) && $i < count($pattern));
+$cmd = $matches[1];
+
+echo "matches<br>";
+echo "<pre>"; print_r($matches); echo "</pre><p>";
+
 
 $dir = split('/', $_SERVER['SCRIPT_URI']);
-array_pop($dir);
+array_pop($dir); //drop the last field from the array which contains the filename
 $redirectURL = join("/", $dir) . "/";
 
-$cmd = split('-', $url_qs);
-//echo "<pre>"; print_r($cmd); echo "</pre>";
-//exit;
 session_start();
 $crumbs = $_SESSION['crumb'];
 
 $crumbs[0] = array ('href' => 'http://marbl.library.emory.edu/FindingAids/index.html', 'anchor' => 'MARBL Finding Aids');
 //echo "<pre>"; print_r($crumbs); echo "</pre>";
-switch ($cmd[0])
+switch ($cmd)
 {
 	case 'banner':
 		$f = "html/". $cmd[1] .".html";
 	break;
 	
+	case 'section-content':			
 	case 'tamino': 
+		$id = end($matches);
+		$element = ($matches[2]) ? $matches[2] : 'ead';
+		
 		html_head("Finding Aids");
 		
 		include("html/content.php");		
 		
-		$content = getXMLContentsAsHTML($cmd[1]);
-		
-		include("template-header.inc");	
-		displayBreadCrumbs($crumbs);	
-		include("html/MARBL-bar.inc");		
-		echo $content;
-		include("template-footer.inc");		
+		$content = getXMLContentsAsHTML($id, $element);
 
 	break;
 	
@@ -50,15 +62,9 @@ switch ($cmd[0])
 		$crumbs[2] = null;
 		
 		html_head("Browse - Collections");
-		$f = "html/browse.php?l=".$cmd[2];
+		$f = "html/browse.php?l=".$parameters;
 		$content = file_get_contents($redirectURL . $f);
 		
-		
-		$left_nav = "";
-		
-		include("template-header.inc");
-		include("template.php");
-		include("template-footer.inc");
 	break;
 	
 	case 'rqst':
@@ -69,9 +75,6 @@ switch ($cmd[0])
 		$f = "html/searchoptions.php?";
 		$content = file_get_contents($redirectURL . $f);
 
-		include("template-header.inc");
-		include("template.php");
-		include("template-footer.inc");
 	break;
 
 	case 'search':		
@@ -85,41 +88,16 @@ switch ($cmd[0])
 		$f = "html/search.php?1=1" . $qs;
 		$content = file_get_contents($redirectURL . $f);
 		
-		include("template-header.inc");
-		include("template.php");
-		include("template-footer.inc");
 	break;	
-	
-	case 'section':	
-		switch ($cmd[1])
-		{
-			case 'toc':
-				$f = "html/toc.php?id=".end($cmd);			
-				readfile($redirectURL . $f);
-			break;
-			
-			case 'content':			
-				$e = (count($cmd) > 3) ? $cmd[2] : '';
-
-				  //$f = "html/content.php?element=$e&id=".end($cmd);
-				  //				readfile($redirectURL . $f);
-				
-				include("html/content.php");		
-				$content = getXMLContentsAsHTML(end($cmd), $e);
-
-				include("template-header.inc");	
-				displayBreadCrumbs($crumbs);	
-				include("html/MARBL-bar.inc");		
-				echo $content;
-				include("template-footer.inc");		
-
-			break;
-		}
-	break;
 	
 	default:
 		exit;
 }
+
+include("template-header.inc");
+include("template.php");
+include("template-footer.inc");
+
 
 $_SESSION['crumb'] = $crumbs;
 ?>

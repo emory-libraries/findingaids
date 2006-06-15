@@ -18,12 +18,12 @@
  
 								
 								<? include("html/MARBL-bar.inc"); ?>
-										
+								<?= $content ?>		
 																	<!-- ~~~~~~~~~~~~~~~~~~~~~~~ BEGIN CONTENT AREA  ~~~~~~~~~~~~~~~~~~~~~~~ -->
 								<!-- InstanceBeginEditable name="content" -->	  
 										  
 										 <!---- XSLT Content Area ---->
-								         <table align="center" width="90%"><?= $content ?></td></tr>
+								         <!--<table align="center" width="90%"><?//= $content ?></td></tr>-->
 								         <!---- End XSLT Content Area ---->
 								      </table>
 								<!-- InstanceEndEditable -->

@@ -16,6 +16,7 @@ $connectionArray = array('host' => $tamino_server,
 
 function getXMLContentsAsHTML($id, $element = "ead")
 {
+echo "function getXMLContentsAsHTML($id, $element)<br/>";
 	global $crumbs;
 	global $connectionArray;
 
@@ -23,31 +24,28 @@ function getXMLContentsAsHTML($id, $element = "ead")
 	switch ($element)
 	{
 		case 'c01':
-		  $path = "/ead/archdesc/dsc/c01";
+		  $path = "/archdesc/dsc/c01";
 		  $mode = 'c-level-index';
 		  break;
 		
 		case 'c02':
-		  $path = "/ead/archdesc/dsc/c01/c02";
+		  $path = "/archdesc/dsc/c01/c02";
 		  $mode = 'c-level-index';
 		break;
 			
 		case 'did':
-		  $path = "/ead/archdesc/did";
+		  $path = "/archdesc/did";
 		  $mode = 'c-level-index';
 		break;
+		
+		case 'ead':
 		default:
 		  // query for all volumes 
-		  $path = "/ead";
+		  $path = "";
 		  $mode = 'summary';
 	}
 
-	/*	$query = "
-				for \$a in input()$path
-				$hquery
-				where \$a/@id='$id' 
-				return <ead>{$rval}</ead>
-	*/
+echo "path=$path<hr>";
 
 
 	$kw = $_REQUEST['kw'];
@@ -67,19 +65,20 @@ function getXMLContentsAsHTML($id, $element = "ead")
 	$declare = "declare namespace tf='http://namespaces.softwareag.com/tamino/TaminoFunction' ";
 
 	$toc_query = "
-		for \$a in input()/$path
-		let \$ad := root(\$a)/ead/archdesc
+		for \$z in input()/ead
+		for \$a in \$z$path
+		let \$ad := \$z/archdesc
 		where \$a/@id='$id'  
 		return 
 			<toc>
-				<ead>{\$a/@id}
+				<ead>{\$z/@id}
 					<name>
-						{string(\$a/archdesc/did/origination/persname)}
-						{string(\$a/archdesc/did/origination/corpname)}
-						{string(\$a/archdesc/did/origination/famname)}
+						{string(\$z/archdesc/did/origination/persname)}
+						{string(\$z/archdesc/did/origination/corpname)}
+						{string(\$z/archdesc/did/origination/famname)}
 					</name>
 					<eadheader>
-						<filedesc><titlestmt>{\$a/eadheader/filedesc/titlestmt/titleproper}</titlestmt></filedesc>
+						<filedesc><titlestmt>{\$z/eadheader/filedesc/titlestmt/titleproper}</titlestmt></filedesc>
 					</eadheader>
 					<archdesc>";
 
@@ -149,10 +148,12 @@ function getXMLContentsAsHTML($id, $element = "ead")
 	  }
 	}
 
-	$query = "for \$a in input()$path
-		 $hquery
-		 where \$a/@id='$id' 
-		 return $rval";
+	$query = "
+		for \$z in input()/ead
+		for \$a in \$z$path
+		$hquery
+		where \$a/@id='$id' 
+		return $rval";
 
 	
 	$xsl_file 	= "html/stylesheets/marblfa.xsl";
