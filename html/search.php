@@ -235,7 +235,7 @@ $kwic2_xsl = "kwic-words.xsl";
 // pass search terms into xslt as parameters 
 // (xslt passes on terms to browse page for highlighting)
 $term_list = implode("|", $myterms);
-$xsl_params = array("term_list"  => $term_list);
+$xsl_params = array("url_suffix"  => "-kw-$term_list");
 
 print '<div class="content">';
 
