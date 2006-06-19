@@ -41,7 +41,8 @@ class taminoConnection {
       $myurl .= "&_cursor=open&_position=$position&_quantity=$maxdisplay&_sensitive=vague";
     }
     if ($this->debug) {
-      print "DEBUG: In function taminoConnection::xquery, url is $myurl.<p>";
+      print "DEBUG: In function taminoConnection::xquery, url is $myurl.<br>";
+      print "<a href=\"".htmlentities($myurl)."\">run xquery</a><br>";
     }
 
     $this->xmlContent = file_get_contents($myurl);

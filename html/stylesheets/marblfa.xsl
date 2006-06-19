@@ -3,104 +3,102 @@
 	xmlns:xq="http://metalab.unc.edu/xq/"
 	xmlns:cti="http://cti.library.emory.edu/"
 	version="1.0">
-<xsl:import href="ino.xsl"/> 
-<xsl:import href="toc.xsl"/> 
-<xsl:import href="summary.xsl"/> 
-<!--<xsl:import href="summary2.xsl"/> -->
-<xsl:import href="headingFooting.xsl"/>
-<xsl:strip-space elements="*"/>
+  <xsl:import href="ino.xsl"/> 
+  <xsl:import href="toc.xsl"/> 
+  <xsl:import href="summary.xsl"/> 
+  <!--<xsl:import href="summary2.xsl"/> -->
+  <xsl:import href="headingFooting.xsl"/>
+  <xsl:strip-space elements="*"/>
+  
+  <xsl:param name="mode"/>
+  
+  <xsl:param name="url_suffix"/>	<!-- any parameters to be added to urls within the site (e.g., keywords) -->
+  
+<!-- <xsl:param name="content" ></xsl:param>   -->
+  <!-- Creates the body of the finding aid.-->
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="//ino:message/@ino:returnvalue &gt; 0">
+        <xsl:element name="h1">Database Error</xsl:element>
+        <xsl:apply-templates select="//ino:message"/>
+        <xsl:element name="strong">Please contact <a href="mailto:jleon@emory.edu">Julia Leon</a></xsl:element>
+      </xsl:when>
+      
+      <xsl:otherwise>	
+        <div id="toc">	
+        <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
+      </div>
+      
+      <div id="content"><!--start content-->
+        <xsl:apply-templates select="//results/ead/eadheader/filedesc/titlestmt"/>
+        <xsl:apply-templates select="//results/ead/*"/>		
+      </div>
+      
+    </xsl:otherwise>
+  </xsl:choose>
 
-<xsl:param name="mode"/>
-<!--
-<xsl:param name="content" ></xsl:param>
--->
-<!-- Creates the body of the finding aid.-->
-<xsl:template match="/">
-<!--<h1>mode=<xsl:value-of select="$mode"/></h1>-->
+	
+	<xsl:apply-templates select="//footing" mode="style"/>
 
-<!--<xsl:element name="_mapBody">-->
-<!--<xsl:apply-templates select="//_mapBody/heading" mode="style"/>-->
-<xsl:element name="content">
-<xsl:element name="div">
-<xsl:attribute name="class">content</xsl:attribute>
-
-<xsl:choose>
-	<xsl:when test="//ino:message/@ino:returnvalue &gt; 0">
-		<xsl:element name="h1">Database Error</xsl:element>
-		<xsl:apply-templates select="//ino:message"/>
-		<xsl:element name="strong">Please contact <a href="mailto:jleon@emory.edu">Julia Leon</a></xsl:element>
-	</xsl:when>
-
-	<xsl:when test="$mode='toc'">
-		<xsl:apply-templates select="//ead/archdesc" mode="toc"/>
-	</xsl:when>
-
-	<xsl:otherwise>	
-		<xsl:apply-templates select="//ead/eadheader/filedesc/titlestmt"/>
-		<xsl:apply-templates select="//ead/*"/>		
-	</xsl:otherwise>
-</xsl:choose>
- 
-</xsl:element> <!-- div -->
-<xsl:apply-templates select="//footing" mode="style"/>
-</xsl:element><!-- content -->
-<!--</xsl:element>--><!--_mapBody-->
 </xsl:template>
 
-<xsl:template match="dsc">
-<a>
-<xsl:attribute name="name"><xsl:value-of select="local-name()"/></xsl:attribute>
-</a>
-<xsl:choose>
-<!-- if at least 2 c levels exist, do a toc display -->
-<xsl:when test="c01/c02">
-<xsl:apply-templates mode="summary"/>
-</xsl:when>
+<xsl:template match="frontmatter"></xsl:template>
 
-<!-- otherwise, display the full container list -->
-<!-- if there are no c02's then process all c01's with containers. Ignore the c01's that are headings -->
-<xsl:otherwise>
-<xsl:element name="h2">
-<xsl:apply-templates select="head"/>
-</xsl:element>
-<a><xsl:attribute name="name">series<xsl:number/>
-</xsl:attribute>
-</a>
-<table>
-<xsl:attribute name="border">0</xsl:attribute>
-<col width="7%" align="left" valign="top"/>
-<col width="7%" align="left" valign="top"/>
-<col width="86%"/>
-<thbody valign="top"/>
-<!-- process container c01's -->
-<xsl:apply-templates select="c01/did" mode="table"/>
-</table>
-</xsl:otherwise>
-</xsl:choose>
+<xsl:template match="dsc">
+	<a>
+	<xsl:attribute name="name"><xsl:value-of select="local-name()"/></xsl:attribute>
+	</a>
+	<xsl:choose>
+	<!-- if at least 2 c levels exist, do a toc display -->
+	<xsl:when test="c01/c02">
+	<xsl:apply-templates mode="summary"/>
+	</xsl:when>
+	
+	<!-- otherwise, display the full container list -->
+	<!-- if there are no c02's then process all c01's with containers. Ignore the c01's that are headings -->
+	<xsl:otherwise>
+	<xsl:element name="h2">
+	<xsl:apply-templates select="head"/>
+	</xsl:element>
+	<a><xsl:attribute name="name">series<xsl:number/>
+	</xsl:attribute>
+	</a>
+	<table>
+	<xsl:attribute name="border">0</xsl:attribute>
+	<col width="7%" align="left" valign="top"/>
+	<col width="7%" align="left" valign="top"/>
+	<col width="86%"/>
+	<thbody valign="top"/>
+	<!-- process container c01's -->
+	<xsl:apply-templates select="c01/did" mode="table"/>
+	</table>
+	</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 
 <xsl:template match="ead/eadheader">
-<xsl:element name="center">
-	<xsl:element name="h3"><xsl:apply-templates select="//publicationstmt/publisher" /></xsl:element>
-	<xsl:element name="h4"><xsl:apply-templates select="//publicationstmt/address" /></xsl:element>	
-</xsl:element>
+	<xsl:element name="center">
+		<xsl:element name="h3"><xsl:apply-templates select="//publicationstmt/publisher" /></xsl:element>
+		<xsl:element name="h4"><xsl:apply-templates select="//publicationstmt/address" /></xsl:element>	
+	</xsl:element>
 </xsl:template>
 
 <xsl:template match="archdesc/did">
-<xsl:element name="h2">
-<a>
-<xsl:attribute name="name">descriptiveSummary</xsl:attribute>
-<xsl:attribute name="target">content"</xsl:attribute>
-Descriptive Summary
-</a>
-</xsl:element>
-<table>
-<col width="20%" align="left" valign="top"/>
-<col width="80%" align="left" valign="top"/>
-<thbody valign="top"/>
-<xsl:apply-templates mode="table"/>
-</table>
+	<xsl:element name="h2">
+	<a>
+	<xsl:attribute name="name">descriptiveSummary</xsl:attribute>	
+	Descriptive Summary
+	</a>
+	</xsl:element>
+
+	<table>
+	<col width="20%" align="left" valign="top"/>
+	<col width="80%" align="left" valign="top"/>
+	<thbody valign="top"/>
+	<xsl:apply-templates mode="table"/>
+	</table>
+
 </xsl:template>
 
 <xsl:template match="extent">
@@ -108,40 +106,40 @@ Descriptive Summary
 </xsl:template>
 
 <xsl:template match="title[parent::unittitle]">
-<i><xsl:apply-templates/></i>
+	<i><xsl:apply-templates/></i>
 </xsl:template>
 
 <xsl:template match="title">
-<i>
-	<xsl:apply-templates/>
-</i>
+	<i>
+		<xsl:apply-templates/>
+	</i>
 </xsl:template>
 
 <xsl:template match="addressline[not (local-name(../..)='titlepage')] | filedesc/publicationstmt//* | profiledesc//*">
-<xsl:apply-templates/><br/>
+	<xsl:apply-templates/><br/>
 </xsl:template>
-
+	
 <xsl:template match="filedesc/publicationstmt" mode="table">
-<tr><td valign="top"/>
-<td>
-<xsl:apply-templates/>
-</td></tr>
+	<tr><td valign="top"/>
+	<td>
+	<xsl:apply-templates/>
+	</td></tr>
 </xsl:template>
-
-<!--<xsl:template match="archdesc/did/child::node()" mode="table">-->
+	
+	<!--<xsl:template match="archdesc/did/child::node()" mode="table">-->
 <xsl:template match="archdesc/did/*" mode="table">
-<tr><td valign="top">
-<xsl:choose>
-<xsl:when test="local-name()='unittitle'">title:</xsl:when>
-<xsl:when test="local-name()='unitid'">call no:</xsl:when>
-<xsl:when test="local-name()='physdesc'">extent:</xsl:when>
-<xsl:when test="local-name()='origination'">creator:</xsl:when>
-<xsl:otherwise><xsl:value-of select="local-name()"/>:</xsl:otherwise>
-</xsl:choose>
-</td>
-<td>
-<xsl:apply-templates/>
-</td></tr>
+	<tr><td valign="top">
+	<xsl:choose>
+	<xsl:when test="local-name()='unittitle'">title:</xsl:when>
+	<xsl:when test="local-name()='unitid'">call no:</xsl:when>
+	<xsl:when test="local-name()='physdesc'">extent:</xsl:when>
+	<xsl:when test="local-name()='origination'">creator:</xsl:when>
+	<xsl:otherwise><xsl:value-of select="local-name()"/>:</xsl:otherwise>
+	</xsl:choose>
+	</td>
+	<td>
+	<xsl:apply-templates/>
+	</td></tr>
 </xsl:template>
 
 <!-- =============== unittitle ===============-->
@@ -207,37 +205,42 @@ Descriptive Summary
 <!-- ===========   =========== -->
 
 <xsl:template match="titlestmt">
-<h1><center>
-<xsl:value-of select="titleproper"/>
-</center></h1>
-<h2><center>
-<xsl:value-of select="subtitle"/>
-</center></h2>
+  <div id="headingBlock">
+    <xsl:element name="span">
+      <xsl:attribute name="class">content_title</xsl:attribute>
+      <xsl:value-of select="titleproper"/>
+    </xsl:element>
+    
+    <xsl:element name="span">
+      <xsl:attribute name="class">content_subtitle</xsl:attribute>
+      <xsl:value-of select="subtitle"/>	
+    </xsl:element>
+  </div>
 </xsl:template>
              
 <xsl:template match="ead/archdesc">
-<div class="content">
-<xsl:apply-templates select="ead/eadheader"/>
-<xsl:apply-templates select="did" />
-<hr/>
-<xsl:element name="h2">
-<a>
-<xsl:attribute name="name">adminInfo</xsl:attribute>
-Administrative Information
-</a>
-</xsl:element>
-<xsl:apply-templates select="acqinfo | accessrestrict | userestrict | prefercite | separatedmaterial"/>
-<hr/>
-<xsl:element name="h2">
-<a>
-<xsl:attribute name="name">collectionDesc</xsl:attribute>
-Collection Description
-</a>
-</xsl:element>
-<xsl:apply-templates select="bioghist | scopecontent | arrangement | controlaccess "/>
-<hr/>
-<xsl:apply-templates select="dsc"/>
-</div>
+	<div class="content">
+	<xsl:apply-templates select="ead/eadheader"/>
+	<xsl:apply-templates select="did" />
+	<hr/>
+	<xsl:element name="h2">
+	<a>
+	<xsl:attribute name="name">adminInfo</xsl:attribute>
+	Administrative Information
+	</a> 
+	</xsl:element>
+	<xsl:apply-templates select="acqinfo | accessrestrict | userestrict | prefercite | separatedmaterial"/>
+	<hr/>
+	<xsl:element name="h2">
+	<a>
+	<xsl:attribute name="name">collectionDesc</xsl:attribute>
+	Collection Description
+	</a>
+	</xsl:element>
+	<xsl:apply-templates select="bioghist | scopecontent | arrangement | controlaccess "/>
+	<hr/>
+	<xsl:apply-templates select="dsc"/>
+	</div>
 </xsl:template>
 
 
@@ -478,7 +481,7 @@ Collection Description
 <a>
 <xsl:attribute name="name"><xsl:apply-templates   select="ancestor::node()[self::c01 | self::c02| self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08| self::c09]" mode="c-level-index"/>
 </xsl:attribute>
-<xsl:attribute name="href">section-content-<xsl:value-of select="local-name(parent::node())"/>-<xsl:value-of select="parent::c01/@id"/><xsl:value-of select="parent::c02/@id"/><xsl:value-of select="parent::c03/@id"/><xsl:value-of select="parent::c04/@id"/><xsl:value-of select="parent::c05/@id"/><xsl:value-of select="parent::c06/@id"/><xsl:value-of select="parent::c07/@id"/><xsl:value-of select="parent::c08/@id"/><xsl:value-of select="parent::c09/@id"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
+<xsl:attribute name="href">section-content-<xsl:value-of select="local-name(parent::node())"/>-<xsl:value-of select="parent::c01/@id"/><xsl:value-of select="parent::c02/@id"/><xsl:value-of select="parent::c03/@id"/><xsl:value-of select="parent::c04/@id"/><xsl:value-of select="parent::c05/@id"/><xsl:value-of select="parent::c06/@id"/><xsl:value-of select="parent::c07/@id"/><xsl:value-of select="parent::c08/@id"/><xsl:value-of select="parent::c09/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
 <xsl:apply-templates select="unitid"/>:
 <xsl:text> </xsl:text>
 <xsl:apply-templates select="unittitle"/>
@@ -500,21 +503,56 @@ Collection Description
 <!-- ====================================================== -->
 
 <xsl:template match="cti:h1">
-<h1>
-<xsl:attribute name="class">
-<xsl:apply-templates select="@class"/>
-</xsl:attribute>
-<xsl:apply-templates/>
-</h1>
+  <h1>
+    <xsl:attribute name="class">
+      <xsl:apply-templates select="@class"/>
+    </xsl:attribute>
+    <xsl:apply-templates/>
+  </h1>
 </xsl:template>
 
 <!-- now that we are retrieving at the c01 level, the relative position of c01 will always be '1' -->
 <xsl:template match="c01" mode="c-level-index">
 <xsl:value-of select="local-name()"/>.<xsl:number value="0+1"/>:</xsl:template>
-
+  
 <xsl:template match=" c02 | c03 | c04 | c05 | c06 | c07 | c08 | c09" mode="c-level-index">
 <xsl:value-of select="local-name()"/>.<xsl:number value="count(preceding-sibling::*[self::c01 | self::c02| self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08| self::c09 ])+1"/>:</xsl:template>
 
 
+
+<!-- mark text after a MATCH + n processing instruction as a match to highlight -->
+<xsl:template match="text()[preceding-sibling::processing-instruction('MATCH')]">
+  <xsl:variable name="pi"><xsl:value-of select="preceding-sibling::processing-instruction('MATCH')[1]"/></xsl:variable>
+  <xsl:choose>
+    <xsl:when test="starts-with($pi, '+')">
+      <span class="match">
+        <xsl:value-of select="."/> 
+      </span>
+    </xsl:when>
+    <xsl:otherwise> <!-- this is the text following the match -->
+      <xsl:value-of select="."/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!-- Match the processing instruction and perform action -->
+<xsl:template match="processing-instruction('MATCH')">
+	<xsl:if test="preceding::processing-instruction('MATCH') or following::processing-instruction('MATCH')">
+	  	<xsl:variable name="n"><xsl:value-of select="count(preceding::processing-instruction('MATCH'))"/></xsl:variable>
+		  <a>
+		    <xsl:attribute name="name">m<xsl:value-of select="$n"/></xsl:attribute>
+		    <xsl:choose>
+		      <xsl:when test="starts-with(., '+') and preceding::processing-instruction('MATCH')">
+		        <xsl:attribute name="href">#m<xsl:value-of select="($n - 1)"/></xsl:attribute>
+					<img src="html/images/previous-match.gif" border="0"/> 
+		      </xsl:when>
+		      <xsl:when test="starts-with(., '-') and following::processing-instruction('MATCH')">
+		        <xsl:attribute name="href">#m<xsl:value-of select="($n + 1)"/></xsl:attribute>
+		 			<img src="html/images/next-match.gif" border="0"/> 
+		      </xsl:when>		      
+		    </xsl:choose>
+		  </a>
+	</xsl:if>
+</xsl:template>
 
 </xsl:stylesheet>

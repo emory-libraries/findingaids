@@ -1,75 +1,206 @@
 <?
-include_once("config.php");
-include_once("lib/xmlDbConnection.class.php");
-include("common_functions.php");
+//include_once("config.php");
+//include_once("lib/xmlDbConnection.class.php");
+include_once("common_functions.php");
 
 //echo "<pre>";print_r($_REQUEST);echo "</pre>";
 
 
-$id = $_REQUEST['id'];
+//$id = $_REQUEST['id'];
 
-$element = (isset($_REQUEST['element'])) ? $_REQUEST['element'] : null;
-//$mode = ($element == 'did' || $element == 'c01') ? 'c-level-index' : 'summary';
-//$mode = 'table';
 
-$args = array('host' => $tamino_server,
-	      'db' => $tamino_db,
-	      'coll' => $tamino_coll,
-	      'debug' => false);
-$tamino = new xmlDbConnection($args);
+$connectionArray = array('host' => $tamino_server,
+			 'db' => $tamino_db,
+			 'coll' => $tamino_coll,
+			 'debug' => false);
 
-switch ($element)
+function getXMLContentsAsHTML($id, $element = "ead", $kw = null)
 {
-	case 'c01':
-		$query = "
-			for \$a in input()/ead/archdesc/dsc/c01 
-			where \$a/@id='$id' 
-			return <ead>{\$a}</ead>
-		";		
-		$mode = 'c-level-index';
-	break;
-	
-	case 'c02':
-		$query = "
-			for \$a in input()/ead/archdesc/dsc/c01/c02 
-			where \$a/@id='$id' 
-			return <ead>{\$a}</ead>
-		";		
-		$mode = 'c-level-index';
-	break;
+echo "function getXMLContentsAsHTML($id, $element)<hr>";
+	global $crumbs;
+	global $htmltitle;
+	global $connectionArray;
+
+	// determine xpath for query according to element
+	switch ($element)
+	{
+		case 'c01':
+		  $path = "/archdesc/dsc/c01";
+		  $mode = 'c-level-index';
+		  $wrapOutput = true;
+		  break;
 		
-	case 'did':
-		$query = "
-			for \$a in input()/ead/archdesc/did
-			where \$a/@id='$id' 
-			return <ead>{\$a}</ead>
-		";		
-		$mode = 'c-level-index';
-	break;
-	default:
-		// query for all volumes 
-		$query = "
-			for \$a in input()/ead 
-			where \$a/@id='$id' 
-			return \$a
-		";
-		$mode = 'summary';
-}
+		case 'c02':
+		  $path = "/archdesc/dsc/c01/c02";
+		  $mode = 'c-level-index';
+		  $wrapOutput = true;
+		break;
+			
+		case 'did':
+		  $path = "/archdesc/did";
+		  $mode = 'c-level-index';
+		  $wrapOutput = true;
+		break;
+		
+		case 'ead':
+		default:
+		  // query for all volumes 
+		  $path = "";
+		  $mode = 'summary';
+		  
+		  $wrapOutput = false;
+	}
 
-$xsl_file 	= "stylesheets/marblfa.xsl";
-$xsl_params = array('mode' => $mode);
+	//$kwarray = processterms($kw);
+	// keyword is being passed in as a | delimited string
+	$kwarray = explode('|', $kw);
+	
+	//echo "<pre>"; print_r($kwarray); echo "</pre>";
 
-$rval = $tamino->xquery(trim($query));
-$tamino->xslTransform($xsl_file, $xsl_params);
+	//	$element = (isset($_REQUEST['element'])) ? $_REQUEST['element'] : null;
+	//$mode = ($element == 'did' || $element == 'c01') ? 'c-level-index' : 'summary';
+	//$mode = 'table';
+		
+	$tamino = new xmlDbConnection($connectionArray);
+	
 
-/*
-echo "$id<br>";
-echo "$mode<br>";
-echo "$element<br>";
-echo "$query<br>";
-*/
+	$declare = "declare namespace tf='http://namespaces.softwareag.com/tamino/TaminoFunction' ";
+
+	$toc_query = "
+		for \$z in input()/ead
+		for \$a in \$z$path
+		let \$ad := \$z/archdesc
+		where \$a/@id='$id'  
+		return 
+			<toc>
+				<ead>{\$z/@id}
+					<name>
+						{string(\$z/archdesc/did/origination/persname)}
+						{string(\$z/archdesc/did/origination/corpname)}
+						{string(\$z/archdesc/did/origination/famname)}
+					</name>
+					<eadheader>
+						<filedesc><titlestmt>{\$z/eadheader/filedesc/titlestmt/titleproper}</titlestmt></filedesc>
+					</eadheader>
+					<archdesc>";
+
+	if ($kw != '') {
+	  $reflist = array();
+	  $toc_query .= " <hits> { ";
+	  for ($i=0; $i < count($kwarray); $i++) {
+	    // count should include all nodes but the c01s, which are counted separately
+	    $toc_query .= "let \$ref$i := tf:createTextReference(\$ad/*[not(c01)], '$kwarray[$i]')\n";
+	    array_push($reflist, "\$ref$i");
+	  }
+	  $toc_query .= " return count((" . implode($reflist, ',') . ")) }
+			</hits>";
+	}
+
+	$toc_query .= "
+
+						<did>{\$ad/did/unittitle}</did>
+						<dsc>
+							{\$ad/dsc/head}
+							{for \$c in \$ad/dsc/c01 ";
+	if ($kw != '') {
+	  $creflist = array();
+	  for ($i=0; $i < count($kwarray); $i++) {
+	    $toc_query .= "let \$ref$i := tf:createTextReference(\$c, '$kwarray[$i]')\n";
+	    array_push($creflist, "\$ref$i");
+	  }
+	}
+	$toc_query .= "
+							 return 
+							 <c01> 
+								{\$c/@id} {\$c/@level}
+								<did>
+									{\$c/did/unittitle}
+									{\$c/did/physdesc}
+								</did>
+								{for \$c2 in \$c/c02 return <c02>{\$c2/@id}</c02>}";
+	
+	if ($kw != '') {
+	  $toc_query .= "<hits>{count((" . implode($creflist, ',') . "))}</hits>\n";
+	}
+	$toc_query .= "
+
+							</c01>}
+						</dsc>
+					</archdesc>
+				</ead>
+			</toc>
+	";
+
+
+	// addition to query for highlighting (when there are search terms)
+	$hquery = "";
+	$rval = "\$a";
+	if ($kw) {
+	  $refs = array();
+	  for ($i=0; $i < count($kwarray); $i++) {
+	    if ($element == "ead") {	// ead 
+	      // only create text references for the sections where highlighting is desired
+	      $hquery .= "let \$ref$i := tf:createTextReference((\$a/frontmatter,\$a/archdesc/*[not(c01)]), '$kwarray[$i]')\n";
+	    } else {
+	      $hquery .= "let \$ref$i := tf:createTextReference(\$a, '$kwarray[$i]')\n";
+	    }
+	    array_push($refs, "\$ref$i");
+	  }
+	  $hquery .= "let \$allrefs := (" . implode($refs, ',') . ")\n";
+	  $rval =  'tf:highlight($a, $allrefs, "MATCH")';
+	  if ($element == "ead") {	// return only necessary sections, not the entire document
+	    $rval = "<ead>{\$a/@id}
+	  {\$a/eadheader}
+	  {tf:highlight(\$a/frontmatter, \$allrefs, 'MATCH')}
+	 <archdesc>
+	  {tf:highlight(\$a/archdesc/*[not(c01)], \$allrefs, 'MATCH')}
+	  <dsc> {\$a/archdesc/dsc/@*}
+	   {\$a/archdesc/dsc/head}
+	   {for \$c01 in \$a/archdesc/dsc/c01[c02]
+	    return <c01>
+	      {\$c01/@*}
+	      {\$c01/did}
+	      <c02/>
+	     </c01> }
+	  </dsc>
+	 </archdesc></ead>
+	 ";
+	  }
+
+	}
+
+	// all elements other than ead must be wrapped in an ead node
+	if ($wrapOutput) {
+		$rval = "<ead>{ $rval }</ead>";
+	}
+
+
+	$query = "
+		for \$z in input()/ead
+		for \$a in \$z$path
+		$hquery
+		where \$a/@id='$id' 
+		return $rval";
+
+	
+	$xsl_file 	= "html/stylesheets/marblfa.xsl";
+	// xslt passes on keywords to subsections of document via url
+	$term_list = implode("|", $kwarray);
+	$xsl_params = array("url_suffix"  => "-kw-$term_list");
+	
+	
+	$xquery = "$declare <results>{ $toc_query } { $query }</results>";
+	//echo "$xquery<hr>";
+	$rval = $tamino->xquery(trim($xquery));
+	$tamino->xslTransform($xsl_file, $xsl_params);
+	
+
+	$docname = $tamino->findNode('name');
+	$crumbs[2] = array ('anchor' => $docname);
+	$htmltitle .= ": $docname";
+	if ($element != "ead") 
+	  $htmltitle .= " [" . $tamino->findNode("results/ead/$element//unittitle") . "]";
+	
+	return $tamino->xsl_result->saveXML();
+}	
 ?>
-
-<? //include("htmlHead.html"); ?>
-
-<? $tamino->printResult(); ?>

@@ -18,8 +18,7 @@
 			<!--<xsl:apply-templates select="unitid" mode="summary"/>-->
 
 			<xsl:element name="a">
-				<xsl:attribute name="href">section-content-<xsl:value-of select="local-name()"/>-<xsl:value-of select="self::node()/@id"/>#<xsl:apply-templates select="self::node()" mode="c-level-index"/></xsl:attribute>			
-				<xsl:attribute name="target">content</xsl:attribute>
+                          <xsl:attribute name="href">section-content-<xsl:value-of select="local-name()"/>-<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:apply-templates select="self::node()" mode="c-level-index"/></xsl:attribute>			
 				<xsl:value-of select="did/unitid"/>: <xsl:value-of select="did/unittitle"/>
 			</xsl:element>
 		</h3>

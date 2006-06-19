@@ -38,7 +38,7 @@ function html_head ($mode, $contentlist = false) {
   $mycss = getCSS();
 print "<html>
  <head>
- <title>$mode - The Civil War in America from The Illustrated London News</title>
+ <title>$mode - Manuscript, Archives, and Rare Books Library</title>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">
 <meta name=\"robots\" content=\"index,follow\">
 <link rel=\"stylesheet\" type=\"text/css\" href=\"$mycss\">\n";
@@ -116,5 +116,40 @@ function transform ($xml_file, $xsl_file, $xsl_params = NULL) {
 	return $xsl_result;
 }
 
+//Function that takes multiple terms separated by white spaces and puts them into an array
+function processterms ($str) {
+// clean up input so explode will work properly
+    $str = preg_replace("/\s+/", " ", $str);  // multiple white spaces become one space
+    $str = preg_replace("/\s$/", "", $str);	// ending white space is removed
+    $str = preg_replace("/^\s/", "", $str);  //beginning space is removed
+    $terms = explode(" ", $str);    // multiple search terms, divided by spaces
+    return $terms;
+}
+
+
+
+// display bread crumbs
+function displayBreadCrumbs($array_bc)
+{
+	$rv = '';
+	if (is_array($array_bc))
+	{
+		//foreach ($array_bc as $bc)
+		for($i=0;$i<count($array_bc);$i++)
+		{
+			$bc = $array_bc[$i];
+			if ($bc['href'] != '')
+			{
+				$rv .= " <a href=\"" . $bc['href'] . "\">" . $bc['anchor'] . "</a> ";
+			} else {
+				$rv .= " ".$bc['anchor'];
+			}
+		}
+	}
+		
+	$rv = rtrim($rv, ",");
+	
+	print "<span class=\"breadCrumbs\">$rv</span>";
+}
 
 ?>
