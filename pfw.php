@@ -9,9 +9,11 @@ $url_qs = key($_REQUEST);
 //Set Pattern to match against URL must have corresponding switch case below
 $pattern[0] = '/(browse)(-coll-)?(.*)/';
 $pattern[1] = '/(tamino)-(.*)(-kw-)(.*)/';
-$pattern[2] = '/(rqst)/';
-$pattern[3] = '/(search)/';
-$pattern[4] = '/(section-content-)(c0[12])?-?(.*)(-kw-)?(.*)?/';
+$pattern[2] = '/(tamino)-(.*)/';
+$pattern[3] = '/(rqst)/';
+$pattern[4] = '/(search)/';
+$pattern[5] = '/(section-content-)(c0[12])?-?(.*)(-kw-)(.*)/';
+$pattern[6] = '/(section-content-)(c0[12])?-?(.*)/';
 
 $i = 0;
 //$matches = null;
