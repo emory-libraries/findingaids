@@ -68,7 +68,7 @@ div#toc
 	padding-bottom:10px;
 
 	float:left;
-	width:179px;	
+	width:179px;
 	display:inline;
 	font-size:12px;
 	font-weight:500;
@@ -78,9 +78,9 @@ div#toc
 div#content
 {
 	float:left;
-	width:621px;	
 	padding-left:10px;	
 	display:inline;
+	width:68%
 }
 
 
@@ -113,3 +113,12 @@ div#headingBlock
 
 span.hits { color:red; padding-left:1em;font-weight:bold;}
 span.match { color:red; font-weight:bold; }
+
+.keywords
+.breadCrumbs
+{
+	font-family:arial;
+	font-size:16px;
+	color:#1c1e2d; 
+	font-weight:bold;
+}

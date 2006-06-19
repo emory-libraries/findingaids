@@ -8,12 +8,10 @@ $url_qs = key($_REQUEST);
 
 //Set Pattern to match against URL must have corresponding switch case below
 $pattern[0] = '/(browse)(-coll-)?(.*)/';
-$pattern[1] = '/(tamino)-(.*)/';
+$pattern[1] = '/(tamino)-(.*)(-kw-)(.*)/';
 $pattern[2] = '/(rqst)/';
 $pattern[3] = '/(search)/';
-$pattern[4] = '/(section-content)-?(c0[12])?-?(.*)/';
-
-//$pattern = '/'. join('|', $pattern) . '/';
+$pattern[4] = '/(section-content-)(c0[12])?-?(.*)(-kw-)?(.*)?/';
 
 $i = 0;
 //$matches = null;
@@ -24,7 +22,6 @@ do
 } while (empty($matches) && $i < count($pattern));
 $cmd = $matches[1];
 
-echo "matches<br>";
 echo "<pre>"; print_r($matches); echo "</pre><p>";
 
 
@@ -43,26 +40,34 @@ switch ($cmd)
 		$f = "html/". $cmd[1] .".html";
 	break;
 	
-	case 'section-content':			
+	case 'section-content-':			
 	case 'tamino': 
-		$id = end($matches);
-		$element = ($matches[2]) ? $matches[2] : 'ead';
+		if($cmd == 'section-content-') 
+		{
+			$element = $matches[2];
+			$id 	 = $matches[3];
+			$kw 	 = $matches[5];
+		} else {
+			$id = $matches[2];
+			$kw = $matches[4];
+		}
+	
 		
 		html_head("Finding Aids");
 		
 		include("html/content.php");		
 		
-		$content = getXMLContentsAsHTML($id, $element);
+		$content = getXMLContentsAsHTML($id, $element, $kw);
 
 	break;
 	
 	case 'browse':
 		
-		$crumbs[1] = array ('href' => 'browse', 'anchor' => 'Browse');
+		$crumbs[1] = array ('href' => $url_qs, 'anchor' => 'Browse');
 		$crumbs[2] = null;
 		
 		html_head("Browse - Collections");
-		$f = "html/browse.php?l=".$parameters;
+		$f = "html/browse.php?l=".end($matches);
 		$content = file_get_contents($redirectURL . $f);
 		
 	break;

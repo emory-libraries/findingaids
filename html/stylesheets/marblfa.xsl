@@ -22,17 +22,7 @@
 			<xsl:apply-templates select="//ino:message"/>
 			<xsl:element name="strong">Please contact <a href="mailto:jleon@emory.edu">Julia Leon</a></xsl:element>
 		</xsl:when>
-	<!--
-		<xsl:when test="$mode='toc'">
-			<xsl:apply-templates select="//ead/archdesc" mode="toc"/>
-		</xsl:when>
-		<xsl:apply-templates select="//ead/archdesc" mode="toc"/>
-		
-		<xsl:otherwise>	
-			<xsl:apply-templates select="//ead/eadheader/filedesc/titlestmt"/>
-			<xsl:apply-templates select="//ead/*"/>		
-		</xsl:otherwise>
-	-->	
+
 		<xsl:otherwise>	
 			<div id="toc">	
 			   <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
@@ -538,28 +528,30 @@
         <xsl:value-of select="."/> 
       </span>
     </xsl:when>
-    <xsl:otherwise>
+    <xsl:otherwise> <!-- this is the text following the match -->
       <xsl:value-of select="."/>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
+<!-- Match the processing instruction and perform action -->
 <xsl:template match="processing-instruction('MATCH')">
-  <xsl:variable name="n"><xsl:value-of select="count(preceding::processing-instruction('MATCH'))"/></xsl:variable>
-  <a>
-    <xsl:attribute name="name">match<xsl:value-of select="$n"/></xsl:attribute>
-    <xsl:choose>
-      <xsl:when test="starts-with(., '+')">
-        <xsl:attribute name="href">#match<xsl:value-of select="($n - 1)"/></xsl:attribute>
-	&lt;
-      </xsl:when>
-      <xsl:when test="starts-with(., '-')">
-        <xsl:attribute name="href">#match<xsl:value-of select="($n + 1)"/></xsl:attribute>
- 	&gt;
-      </xsl:when>
-    </xsl:choose>
-  </a>
-
+	<xsl:if test="preceding::processing-instruction('MATCH') or following::processing-instruction('MATCH')">
+	  	<xsl:variable name="n"><xsl:value-of select="count(preceding::processing-instruction('MATCH'))"/></xsl:variable>
+		  <a>
+		    <xsl:attribute name="name">m<xsl:value-of select="$n"/></xsl:attribute>
+		    <xsl:choose>
+		      <xsl:when test="starts-with(., '+') and preceding::processing-instruction('MATCH')">
+		        <xsl:attribute name="href">#m<xsl:value-of select="($n - 1)"/></xsl:attribute>
+					<img src="html/images/previous-match.gif" border="0"/> 
+		      </xsl:when>
+		      <xsl:when test="starts-with(., '-') and following::processing-instruction('MATCH')">
+		        <xsl:attribute name="href">#m<xsl:value-of select="($n + 1)"/></xsl:attribute>
+		 			<img src="html/images/next-match.gif" border="0"/> 
+		      </xsl:when>		      
+		    </xsl:choose>
+		  </a>
+	</xsl:if>
 </xsl:template>
 
 </xsl:stylesheet>

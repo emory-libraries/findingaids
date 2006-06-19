@@ -14,9 +14,9 @@ $connectionArray = array('host' => $tamino_server,
 			 'coll' => $tamino_coll,
 			 'debug' => false);
 
-function getXMLContentsAsHTML($id, $element = "ead")
+function getXMLContentsAsHTML($id, $element = "ead", $kw = null)
 {
-echo "function getXMLContentsAsHTML($id, $element)<br/>";
+echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	global $crumbs;
 	global $connectionArray;
 
@@ -26,16 +26,19 @@ echo "function getXMLContentsAsHTML($id, $element)<br/>";
 		case 'c01':
 		  $path = "/archdesc/dsc/c01";
 		  $mode = 'c-level-index';
+		  $wrapOutput = true;
 		  break;
 		
 		case 'c02':
 		  $path = "/archdesc/dsc/c01/c02";
 		  $mode = 'c-level-index';
+		  $wrapOutput = true;
 		break;
 			
 		case 'did':
 		  $path = "/archdesc/did";
 		  $mode = 'c-level-index';
+		  $wrapOutput = true;
 		break;
 		
 		case 'ead':
@@ -43,14 +46,10 @@ echo "function getXMLContentsAsHTML($id, $element)<br/>";
 		  // query for all volumes 
 		  $path = "";
 		  $mode = 'summary';
+		  
+		  $wrapOutput = false;
 	}
 
-echo "path=$path<hr>";
-
-
-	$kw = $_REQUEST['kw'];
-	// TEMPORARY - until passing search terms is implemented
-	$kw = "dublin abbey boyle";
 	$kwarray = processterms($kw);
 	
 	//echo "<pre>"; print_r($kwarray); echo "</pre>";
@@ -114,9 +113,9 @@ echo "path=$path<hr>";
 								<did>
 									{\$c/did/unittitle}
 									{\$c/did/physdesc}
-								</did>
-								{-- adding c02 so c01 will display in xslt (kind of a hack) --}
-								<c02/> ";
+								</did>";
+								//{-- adding c02 so c01 will display in xslt (kind of a hack) --}
+								//<c02/> ";
 	
 	if ($kw != '') {
 	  $toc_query .= "<hits>{count((" . implode($creflist, ',') . "))}</hits>\n";
@@ -143,10 +142,12 @@ echo "path=$path<hr>";
 	  $hquery .= "let \$allrefs := (" . implode($refs, ',') . ")\n";
 	  $rval =  'tf:highlight($a, $allrefs, "MATCH")';
 	  // all elements other than ead must be wrapped in an ead node
-	  if ($element != "ead") {
-	    $rval = "<ead>{ $rval }</ead>";
-	  }
 	}
+	
+	if ($wrapOutput) {
+		$rval = "<ead>{ $rval }</ead>";
+	}
+
 
 	$query = "
 		for \$z in input()/ead
