@@ -9,7 +9,7 @@
 	<xsl:param name="mode"/>
 	<xsl:param name="label_text"/>
 	<xsl:param name="baseLink"/>
-	<xsl:param name="term_list"/>
+	<xsl:param name="url_suffix"/>
 	
 
 	<xsl:template match="/">
@@ -60,7 +60,7 @@
 
 	<xsl:template match="persname | corpname | famname ">	
 		<xsl:element name="a">
-			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" />-kw-<xsl:value-of select="$term_list" /></xsl:attribute>			
+			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
 			<xsl:value-of select="." />
 		</xsl:element>
 		<br />

@@ -17,7 +17,10 @@
 <xsl:template match="ead/archdesc" mode="toc">
 	<!--<div class="navbar">-->
 	<!--<xsl:element name="emph">-->
+        <a>
+          <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
 	<xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
+      </a>
 	<!--</xsl:element>-->
 	<xsl:element name="span">
 	<xsl:attribute name="class">toc-heading</xsl:attribute>
@@ -27,7 +30,7 @@
 	<xsl:element name="p">
 	<xsl:attribute name="class">navbar</xsl:attribute>
 	<a>
-	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#descriptiveSummary</xsl:attribute>
+          <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#descriptiveSummary</xsl:attribute>
 	
 	Descriptive Overview
 	</a>
@@ -78,7 +81,7 @@
 <xsl:template match="bioghist" mode="toc">
 <xsl:element name="li">
 <a>
-<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#<xsl:value-of select="local-name(parent::node())"/>.<xsl:value-of select="position()"/></xsl:attribute>
+  <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:value-of select="local-name(parent::node())"/>.<xsl:value-of select="position()"/></xsl:attribute>
 
 
 <xsl:value-of select="head"/>
@@ -88,7 +91,7 @@
 
 <xsl:template match="ead/archdesc/dsc" mode="toc">	
 	<xsl:element name="a">
-		<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
+          <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
 		
 		<xsl:value-of select="head"/>
 	</xsl:element>
@@ -100,7 +103,7 @@
 <xsl:template match="ead/archdesc/*[not(self::bioghist)]" mode="toc" priority="-1">
 <xsl:element name="li">
 <a>
-<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
+  <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
 
 <xsl:value-of select="head"/>
 </a>
@@ -126,14 +129,18 @@
 
 <xsl:template match="c01[c02]" mode="toc">
 	<xsl:element name="li">
-		<xsl:attribute name="class">navbar</xsl:attribute>
+		<xsl:attribute name="class">navbar 
+                <!-- mark this entry as the current one if the main content is this node or a child node -->
+                <xsl:if test="//results/ead/c01/@id = ./@id or //results/ead/c02/@id = ./c02/@id"> current</xsl:if>
+               </xsl:attribute>
+
 		<!-- don't include the container list items in the table of contents, unless this is not toc mode (navbar creation)-->
 		<xsl:if test="did/unittitle and (not($mode = 'toc') or not(did/container))">
 		
 		<xsl:element name="p"> 
 		<xsl:attribute name="class">navbar</xsl:attribute>
 		<a>
-		<xsl:attribute name="href">section-content-<xsl:value-of select="local-name()"/>-<xsl:value-of select="self::node()/@id"/>#<xsl:apply-templates select="self::node()" mode="c-level-index"/></xsl:attribute>
+                  <xsl:attribute name="href">section-content-<xsl:value-of select="local-name()"/>-<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:apply-templates select="self::node()" mode="c-level-index"/></xsl:attribute>
 		<xsl:if test="ancestor::dsc">
 		
 		</xsl:if>
@@ -167,7 +174,7 @@
 
 <xsl:element name="li"> 
 <a>
-<xsl:attribute name="href">section-content-c01-<xsl:value-of select="ancestor::c01/@id"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
+  <xsl:attribute name="href">section-content-c01-<xsl:value-of select="ancestor::c01/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
 <xsl:if test="ancestor::dsc">
 
 </xsl:if>
