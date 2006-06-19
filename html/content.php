@@ -18,6 +18,7 @@ function getXMLContentsAsHTML($id, $element = "ead", $kw = null)
 {
 echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	global $crumbs;
+	global $htmltitle;
 	global $connectionArray;
 
 	// determine xpath for query according to element
@@ -50,7 +51,9 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 		  $wrapOutput = false;
 	}
 
-	$kwarray = processterms($kw);
+	//$kwarray = processterms($kw);
+	// keyword is being passed in as a | delimited string
+	$kwarray = explode('|', $kw);
 	
 	//echo "<pre>"; print_r($kwarray); echo "</pre>";
 
@@ -113,9 +116,8 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 								<did>
 									{\$c/did/unittitle}
 									{\$c/did/physdesc}
-								</did>";
-								//{-- adding c02 so c01 will display in xslt (kind of a hack) --}
-								//<c02/> ";
+								</did>
+								{for \$c2 in \$c/c02 return <c02>{\$c2/@id}</c02>}";
 	
 	if ($kw != '') {
 	  $toc_query .= "<hits>{count((" . implode($creflist, ',') . "))}</hits>\n";
@@ -136,14 +138,38 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	if ($kw) {
 	  $refs = array();
 	  for ($i=0; $i < count($kwarray); $i++) {
-	    $hquery .= "let \$ref$i := tf:createTextReference(\$a, '$kwarray[$i]')\n";
+	    if ($element == "ead") {	// ead 
+	      // only create text references for the sections where highlighting is desired
+	      $hquery .= "let \$ref$i := tf:createTextReference((\$a/frontmatter,\$a/archdesc/*[not(c01)]), '$kwarray[$i]')\n";
+	    } else {
+	      $hquery .= "let \$ref$i := tf:createTextReference(\$a, '$kwarray[$i]')\n";
+	    }
 	    array_push($refs, "\$ref$i");
 	  }
 	  $hquery .= "let \$allrefs := (" . implode($refs, ',') . ")\n";
 	  $rval =  'tf:highlight($a, $allrefs, "MATCH")';
-	  // all elements other than ead must be wrapped in an ead node
+	  if ($element == "ead") {	// return only necessary sections, not the entire document
+	    $rval = "<ead>{\$a/@id}
+	  {\$a/eadheader}
+	  {tf:highlight(\$a/frontmatter, \$allrefs, 'MATCH')}
+	 <archdesc>
+	  {tf:highlight(\$a/archdesc/*[not(c01)], \$allrefs, 'MATCH')}
+	  <dsc> {\$a/archdesc/dsc/@*}
+	   {\$a/archdesc/dsc/head}
+	   {for \$c01 in \$a/archdesc/dsc/c01[c02]
+	    return <c01>
+	      {\$c01/@*}
+	      {\$c01/did}
+	      <c02/>
+	     </c01> }
+	  </dsc>
+	 </archdesc></ead>
+	 ";
+	  }
+
 	}
-	
+
+	// all elements other than ead must be wrapped in an ead node
 	if ($wrapOutput) {
 		$rval = "<ead>{ $rval }</ead>";
 	}
@@ -158,7 +184,9 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 
 	
 	$xsl_file 	= "html/stylesheets/marblfa.xsl";
-	//$xsl_params = array('mode' => $mode);
+	// xslt passes on keywords to subsections of document via url
+	$term_list = implode("|", $kwarray);
+	$xsl_params = array("url_suffix"  => "-kw-$term_list");
 	
 	
 	$xquery = "$declare <results>{ $toc_query } { $query }</results>";
@@ -166,8 +194,12 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	$rval = $tamino->xquery(trim($xquery));
 	$tamino->xslTransform($xsl_file, $xsl_params);
 	
-	
-	$crumbs[2] = array ('anchor' => $tamino->findNode('name'));	
+
+	$docname = $tamino->findNode('name');
+	$crumbs[2] = array ('anchor' => $docname);
+	$htmltitle .= ": $docname";
+	if ($element != "ead") 
+	  $htmltitle .= " [" . $tamino->findNode("results/ead/$element//unittitle") . "]";
 	
 	return $tamino->xsl_result->saveXML();
 }	
