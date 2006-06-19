@@ -12,8 +12,8 @@ $pattern[1] = '/(tamino)-(.*)(-kw-)(.*)/';
 $pattern[2] = '/(tamino)-(.*)/';
 $pattern[3] = '/(rqst)/';
 $pattern[4] = '/(search)/';
-$pattern[5] = '/(section-content-)(c0[12])?-?(.*)(-kw-)(.*)/';
-$pattern[6] = '/(section-content-)(c0[12])?-?(.*)/';
+$pattern[5] = '/(section-content)-(c0[12])?-?(.*)(-kw-)(.*)/';
+$pattern[6] = '/(section-content)-(c0[12])?-?(.*)/';
 
 $i = 0;
 //$matches = null;
@@ -42,9 +42,9 @@ switch ($cmd)
 		$f = "html/". $cmd[1] .".html";
 	break;
 	
-	case 'section-content-':			
+	case 'section-content':			
 	case 'tamino': 
-		if($cmd == 'section-content-') 
+		if($cmd == 'section-content') 
 		{
 			$element = $matches[2];
 			$id 	 = $matches[3];
@@ -53,13 +53,15 @@ switch ($cmd)
 			$id = $matches[2];
 			$kw = $matches[4];
 		}
+		if ($element == "") $element = "ead";
 	
-		
-		html_head("Finding Aids");
+		$htmltitle = "Finding Aid";
 		
 		include("html/content.php");		
 		
 		$content = getXMLContentsAsHTML($id, $element, $kw);
+		html_head($htmltitle);
+				
 
 	break;
 	
@@ -67,8 +69,9 @@ switch ($cmd)
 		
 		$crumbs[1] = array ('href' => $url_qs, 'anchor' => 'Browse');
 		$crumbs[2] = null;
-		
-		html_head("Browse - Collections");
+		$htmltitle = "Browse - Collections";
+		if (end($matches)) $htmltitle .= " (" . end($matches) . ")";
+		html_head($htmltitle);
 		$f = "html/browse.php?l=".end($matches);
 		$content = file_get_contents($redirectURL . $f);
 		
