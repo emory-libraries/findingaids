@@ -3,39 +3,40 @@
 	xmlns:xq="http://metalab.unc.edu/xq/"
 	xmlns:cti="http://cti.library.emory.edu/"
 	version="1.0">
-<xsl:import href="ino.xsl"/> 
-<xsl:import href="toc.xsl"/> 
-<xsl:import href="summary.xsl"/> 
-<!--<xsl:import href="summary2.xsl"/> -->
-<xsl:import href="headingFooting.xsl"/>
-<xsl:strip-space elements="*"/>
+  <xsl:import href="ino.xsl"/> 
+  <xsl:import href="toc.xsl"/> 
+  <xsl:import href="summary.xsl"/> 
+  <!--<xsl:import href="summary2.xsl"/> -->
+  <xsl:import href="headingFooting.xsl"/>
+  <xsl:strip-space elements="*"/>
+  
+  <xsl:param name="mode"/>
+  
+  <xsl:param name="url_suffix"/>	<!-- any parameters to be added to urls within the site (e.g., keywords) -->
+  
+<!-- <xsl:param name="content" ></xsl:param>   -->
+  <!-- Creates the body of the finding aid.-->
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="//ino:message/@ino:returnvalue &gt; 0">
+        <xsl:element name="h1">Database Error</xsl:element>
+        <xsl:apply-templates select="//ino:message"/>
+        <xsl:element name="strong">Please contact <a href="mailto:jleon@emory.edu">Julia Leon</a></xsl:element>
+      </xsl:when>
+      
+      <xsl:otherwise>	
+        <div id="toc">	
+        <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
+      </div>
+      
+      <div id="content"><!--start content-->
+        <xsl:apply-templates select="//results/ead/eadheader/filedesc/titlestmt"/>
+        <xsl:apply-templates select="//results/ead/*"/>		
+      </div>
+      
+    </xsl:otherwise>
+  </xsl:choose>
 
-<xsl:param name="mode"/>
-<!--
-<xsl:param name="content" ></xsl:param>
--->
-<!-- Creates the body of the finding aid.-->
-<xsl:template match="/">
-	<xsl:choose>
-		<xsl:when test="//ino:message/@ino:returnvalue &gt; 0">
-			<xsl:element name="h1">Database Error</xsl:element>
-			<xsl:apply-templates select="//ino:message"/>
-			<xsl:element name="strong">Please contact <a href="mailto:jleon@emory.edu">Julia Leon</a></xsl:element>
-		</xsl:when>
-
-		<xsl:otherwise>	
-			<div id="toc">	
-			   <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
-			</div>
-			
-			<div id="content"><!--start content-->
-                          <xsl:apply-templates select="//results/ead/eadheader/filedesc/titlestmt"/>
-                          <xsl:apply-templates select="//results/ead/*"/>		
-			</div>
-			
-		</xsl:otherwise>
-	</xsl:choose>
-	 
 	
 	<xsl:apply-templates select="//footing" mode="style"/>
 
@@ -480,7 +481,7 @@
 <a>
 <xsl:attribute name="name"><xsl:apply-templates   select="ancestor::node()[self::c01 | self::c02| self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08| self::c09]" mode="c-level-index"/>
 </xsl:attribute>
-<xsl:attribute name="href">section-content-<xsl:value-of select="local-name(parent::node())"/>-<xsl:value-of select="parent::c01/@id"/><xsl:value-of select="parent::c02/@id"/><xsl:value-of select="parent::c03/@id"/><xsl:value-of select="parent::c04/@id"/><xsl:value-of select="parent::c05/@id"/><xsl:value-of select="parent::c06/@id"/><xsl:value-of select="parent::c07/@id"/><xsl:value-of select="parent::c08/@id"/><xsl:value-of select="parent::c09/@id"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
+<xsl:attribute name="href">section-content-<xsl:value-of select="local-name(parent::node())"/>-<xsl:value-of select="parent::c01/@id"/><xsl:value-of select="parent::c02/@id"/><xsl:value-of select="parent::c03/@id"/><xsl:value-of select="parent::c04/@id"/><xsl:value-of select="parent::c05/@id"/><xsl:value-of select="parent::c06/@id"/><xsl:value-of select="parent::c07/@id"/><xsl:value-of select="parent::c08/@id"/><xsl:value-of select="parent::c09/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
 <xsl:apply-templates select="unitid"/>:
 <xsl:text> </xsl:text>
 <xsl:apply-templates select="unittitle"/>
