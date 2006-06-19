@@ -99,6 +99,10 @@ div#headingBlock
 	font-weight:500;
 }
 
+.current { 
+  background-color:#ffffff;
+}
+
 .content_title
 {
 	font-size:15px;
