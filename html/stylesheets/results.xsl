@@ -1,4 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:exist="http://exist.sourceforge.net/NS/exist"
 	xmlns:ino="http://namespaces.softwareag.com/tamino/response2"
 	xmlns:xql="http://metalab.unc.edu/xql/"
 	xmlns:cti="http://cti.library.emory.edu/"
@@ -68,7 +69,7 @@
 	
 	<xsl:template match="unittitle[not(../name/node())]">	
 		<xsl:element name="a">
-			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" />-kw-<xsl:value-of select="$term_list" /></xsl:attribute>			
+			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
 			<xsl:value-of select="." />
 		</xsl:element>
 	</xsl:template>	

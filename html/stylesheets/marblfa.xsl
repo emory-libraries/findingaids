@@ -1,4 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:exist="http://exist.sourceforge.net/NS/exist"
 	xmlns:ino="http://namespaces.softwareag.com/tamino/response2"
 	xmlns:xq="http://metalab.unc.edu/xq/"
 	xmlns:cti="http://cti.library.emory.edu/"
@@ -344,7 +345,7 @@
 </xsl:template>
 
 <xsl:template match="text()">
-<xsl:value-of select="."/>
+  <xsl:value-of select="."/>
 </xsl:template>
 
 <!-- used for development, to see that all elements are considered -->
@@ -519,7 +520,34 @@
 <xsl:value-of select="local-name()"/>.<xsl:number value="count(preceding-sibling::*[self::c01 | self::c02| self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08| self::c09 ])+1"/>:</xsl:template>
 
 
+<xsl:template match="exist:match">
+  <!-- for some reason, the single space between two matching terms is getting lost; put it back in here. -->
+  <xsl:if test="preceding-sibling::exist:match">
+    <xsl:text> </xsl:text>
+  </xsl:if>
 
+  <xsl:variable name="n"><xsl:value-of select="count(preceding::exist:match)"/></xsl:variable>
+  <a>
+    <xsl:attribute name="name">m<xsl:value-of select="$n"/></xsl:attribute>
+    <xsl:if test="$n > 0 and not(preceding-sibling::exist:match)">
+      <xsl:attribute name="href">#m<xsl:value-of select="($n - 1)"/></xsl:attribute>
+      <img src="html/images/previous-match.gif" border="0"/> 
+    </xsl:if>
+    <xsl:text> </xsl:text>
+  </a>
+  <span class="match"><xsl:apply-templates/></span>
+  <!-- FIXME: this following-sibling test is not quite correct -->
+  <xsl:if test="count(following::exist:match) and not(following-sibling::exist:match)">
+    <a>
+      <xsl:attribute name="href">#m<xsl:value-of select="($n + 1)"/></xsl:attribute>
+      <img src="html/images/next-match.gif" border="0"/> 
+    </a>
+  </xsl:if>
+
+</xsl:template>
+
+
+<!-- tamino highlighting -->
 <!-- mark text after a MATCH + n processing instruction as a match to highlight -->
 <xsl:template match="text()[preceding-sibling::processing-instruction('MATCH')]">
   <xsl:variable name="pi"><xsl:value-of select="preceding-sibling::processing-instruction('MATCH')[1]"/></xsl:variable>
