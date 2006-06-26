@@ -93,7 +93,8 @@ switch ($cmd)
 	
 		foreach($_REQUEST as $k => $v)
 		{
-			$qs .= "&$k=" . encode_url($v);
+		  // strip slashes from query string or else slashes get added twice
+		  $qs .= "&$k=" . encode_url(stripslashes($v));
 		}
 		$f = "html/search.php?1=1" . $qs;
 		$content = file_get_contents($redirectURL . $f);
