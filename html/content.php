@@ -9,11 +9,6 @@ include_once("common_functions.php");
 //$id = $_REQUEST['id'];
 
 
-$connectionArray = array('host' => $tamino_server,
-			 'db' => $tamino_db,
-			 'coll' => $tamino_coll,
-			 'debug' => false);
-
 function getXMLContentsAsHTML($id, $element = "ead", $kw = null)
 {
 echo "function getXMLContentsAsHTML($id, $element)<hr>";
@@ -21,23 +16,25 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	global $htmltitle;
 	global $connectionArray;
 
+	$connectionArray{"debug"} = false;
+	
 	// determine xpath for query according to element
 	switch ($element)
 	{
 		case 'c01':
-		  $path = "/archdesc/dsc/c01";
+		  $path = "//c01";
 		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		  break;
 		
 		case 'c02':
-		  $path = "/archdesc/dsc/c01/c02";
+		  $path = "//c02";
 		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
 			
 		case 'did':
-		  $path = "/archdesc/did";
+		  $path = "//did";
 		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
@@ -53,7 +50,20 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 
 	//$kwarray = processterms($kw);
 	// keyword is being passed in as a | delimited string
-	$kwarray = explode('|', $kw);
+	$kwarray = array();
+	$phrases = array();
+	$keywords = "";
+	foreach (explode('|', $kw) as $k) {
+	  if (preg_match("/_/", $k)) {
+	    $k = preg_replace("/_/", " ", $k);
+	    array_push($phrases, $k);
+	  } else {
+	    array_push($kwarray, $k);
+	    $keywords .= " $k";
+	  }
+	}
+	  //	$kwarray = explode('|', $kw);
+	  //	$kw = preg_replace("/\|/", " ", $kw);  // multiple white spaces become one space
 	
 	//echo "<pre>"; print_r($kwarray); echo "</pre>";
 
@@ -64,10 +74,15 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	$tamino = new xmlDbConnection($connectionArray);
 	
 
-	$declare = "declare namespace tf='http://namespaces.softwareag.com/tamino/TaminoFunction' ";
-
+	//$declare = "declare namespace tf='http://namespaces.softwareag.com/tamino/TaminoFunction' ";
+	// filters to add onto path in 'for' statement
+	$filter = "";
+	if (count($kwarray)) $filter .= "[. &= '$keywords']";
+	foreach ($phrases as $p)
+	  $filter .= "[near(., '$p')]";
+ 
 	$toc_query = "
-		for \$z in input()/ead
+		for \$z in /ead$filter
 		for \$a in \$z$path
 		let \$ad := \$z/archdesc
 		where \$a/@id='$id'  
@@ -85,15 +100,8 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 					<archdesc>";
 
 	if ($kw != '') {
-	  $reflist = array();
-	  $toc_query .= " <hits> { ";
-	  for ($i=0; $i < count($kwarray); $i++) {
-	    // count should include all nodes but the c01s, which are counted separately
-	    $toc_query .= "let \$ref$i := tf:createTextReference(\$ad/*[not(c01)], '$kwarray[$i]')\n";
-	    array_push($reflist, "\$ref$i");
-	  }
-	  $toc_query .= " return count((" . implode($reflist, ',') . ")) }
-			</hits>";
+	  //	  $toc_query .= " <hits> { text:match-count(\$ad/*[not(c01)]) }</hits>";
+	  $toc_query .= " <hits> { text:match-count(\$ad) }</hits>";
 	}
 
 	$toc_query .= "
@@ -101,29 +109,19 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 						<did>{\$ad/did/unittitle}</did>
 						<dsc>
 							{\$ad/dsc/head}
-							{for \$c in \$ad/dsc/c01 ";
-	if ($kw != '') {
-	  $creflist = array();
-	  for ($i=0; $i < count($kwarray); $i++) {
-	    $toc_query .= "let \$ref$i := tf:createTextReference(\$c, '$kwarray[$i]')\n";
-	    array_push($creflist, "\$ref$i");
-	  }
+							{for \$c in \$ad/dsc/c01
+							 return  
+							 <c01> 
+								{\$c/@id} {\$c/@level}\n";
+	if ($kw != '') { 
+	  $toc_query .= "<hits>{text:match-count(\$c)}</hits>\n"; 
 	}
 	$toc_query .= "
-							 return 
-							 <c01> 
-								{\$c/@id} {\$c/@level}
 								<did>
 									{\$c/did/unittitle}
 									{\$c/did/physdesc}
 								</did>
-								{for \$c2 in \$c/c02 return <c02>{\$c2/@id}</c02>}";
-	
-	if ($kw != '') {
-	  $toc_query .= "<hits>{count((" . implode($creflist, ',') . "))}</hits>\n";
-	}
-	$toc_query .= "
-
+								{for \$c2 in \$c/c02 return <c02>{\$c2/@id}</c02>}
 							</c01>}
 						</dsc>
 					</archdesc>
@@ -135,25 +133,12 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	// addition to query for highlighting (when there are search terms)
 	$hquery = "";
 	$rval = "\$a";
-	if ($kw) {
-	  $refs = array();
-	  for ($i=0; $i < count($kwarray); $i++) {
-	    if ($element == "ead") {	// ead 
-	      // only create text references for the sections where highlighting is desired
-	      $hquery .= "let \$ref$i := tf:createTextReference((\$a/frontmatter,\$a/archdesc/*[not(c01)]), '$kwarray[$i]')\n";
-	    } else {
-	      $hquery .= "let \$ref$i := tf:createTextReference(\$a, '$kwarray[$i]')\n";
-	    }
-	    array_push($refs, "\$ref$i");
-	  }
-	  $hquery .= "let \$allrefs := (" . implode($refs, ',') . ")\n";
-	  $rval =  'tf:highlight($a, $allrefs, "MATCH")';
-	  if ($element == "ead") {	// return only necessary sections, not the entire document
-	    $rval = "<ead>{\$a/@id}
+	if ($element == "ead") {	// return only necessary sections, not the entire document
+	  $rval = "<ead>{\$a/@id}
 	  {\$a/eadheader}
-	  {tf:highlight(\$a/frontmatter, \$allrefs, 'MATCH')}
+	  {\$a/frontmatter}
 	 <archdesc>
-	  {tf:highlight(\$a/archdesc/*[not(c01)], \$allrefs, 'MATCH')}
+	  {\$a/archdesc/*[not(self::dsc)]}
 	  <dsc> {\$a/archdesc/dsc/@*}
 	   {\$a/archdesc/dsc/head}
 	   {for \$c01 in \$a/archdesc/dsc/c01[c02]
@@ -162,12 +147,11 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	      {\$c01/did}
 	      <c02/>
 	     </c01> }
-	  </dsc>
+	     </dsc>  
 	 </archdesc></ead>
 	 ";
-	  }
-
 	}
+
 
 	// all elements other than ead must be wrapped in an ead node
 	if ($wrapOutput) {
@@ -175,21 +159,26 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	}
 
 
-	$query = "
+	/*	$query = "
 		for \$z in input()/ead
 		for \$a in \$z$path
 		$hquery
 		where \$a/@id='$id' 
 		return $rval";
+	*/
+	
+	$query = "for \$a in /ead$filter" . $path . "[@id = '$id']
+		  return $rval";
 
 	
 	$xsl_file 	= "html/stylesheets/marblfa.xsl";
 	// xslt passes on keywords to subsections of document via url
-	$term_list = implode("|", $kwarray);
+	$term_list = urlencode(implode("|", array_merge($kwarray, $phrases)));
 	$xsl_params = array("url_suffix"  => "-kw-$term_list");
 	
 	
-	$xquery = "$declare <results>{ $toc_query } { $query }</results>";
+	//$xquery = "$declare <results>{ $toc_query } { $query }</results>";
+	$xquery = "<results>{ $toc_query } { $query }</results>";
 	//echo "$xquery<hr>";
 	$rval = $tamino->xquery(trim($xquery));
 	$tamino->xslTransform($xsl_file, $xsl_params);
