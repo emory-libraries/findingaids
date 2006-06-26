@@ -8,8 +8,8 @@ error_reporting(E_ERROR | E_PARSE);
 
 // root directory and url where the website resides
 $server = "biliku.library.emory.edu";
-$base_path = "/projects/marblfa-php";
-$basedir = "/home/jbwhite/html$base_path"; 
+$base_path = "/marblfa-php";
+$basedir = "/home/rsutton/html$base_path"; 
 $base_url = "http://$server$base_path"; 
 
 // add basedir to the php include path (for header/footer files and lib directory)
@@ -21,5 +21,15 @@ $tamino_db = "EAD_TEST";
 $tamino_coll = "MARBLFindingAids";
 //$link_coll = "links";
 //$bibl_coll = "bibliog";
+
+/* exist settings  */
+$server = "wilson.library.emory.edu";
+$port = "8080";
+$db = "FindingAids";
+
+$connectionArray = array('host'   => $server,
+	      	    'port'   => $port,
+		    'db'     => $db,
+		    'dbtype' => "exist");
 
 ?>

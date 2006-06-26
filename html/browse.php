@@ -3,12 +3,9 @@ include("common_functions.php");
 include_once("config.php");
 include_once("lib/xmlDbConnection.class.php");
 
-$args = array('host' => $tamino_server,
-	      'db' => $tamino_db,
-	      'coll' => $tamino_coll,
-	      'debug' => false);
+$connectionArray{"debug"} = false;
 
-$tamino = new xmlDbConnection($args);
+$tamino = new xmlDbConnection($connectionArray);
 
 switch ($browseBy)
 {
@@ -18,20 +15,18 @@ switch ($browseBy)
 		// query for all volumes 
 }
 
+// note: in all cases, unit title is used as a fall-back *only* if no origination name exists
+
 $browse_qry = "
 	for \$b in 
 	distinct-values
 	(
-		for \$a in 
-		(
-			input()/ead/archdesc/did/origination/persname,
-			input()/ead/archdesc/did/origination/corpname,
-			input()/ead/archdesc/did/origination/famname,
-			input()/ead/archdesc/did/unittitle
-		)
+		for \$a in (//archdesc/did/origination/persname, //archdesc/did/origination/corpname,
+			    //archdesc/did/origination/famname, //archdesc/did[not(exists(origination/*))]/unittitle)
 		let \$l := substring(\$a,1,1)
 		return \$l
 	)
+	order by \$b
 	return <letter>{\$b}</letter>
 ";
 
@@ -40,18 +35,23 @@ $browse_qry = "
 $letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'A';
 if ($letter != 'all')
 {
-	$letter_search =  " where substring(\$a/archdesc/did/origination/persname,1,1) = '$letter' ";
-	$letter_search .= " or substring(\$a/archdesc/did/origination/corpname,1,1) = '$letter' ";
-	$letter_search .= " or substring(\$a/archdesc/did/origination/famname,1,1) = '$letter' ";
+	$letter_search =  " where starts-with(\$a//origination/persname,'$letter') ";
+	$letter_search .= " or starts-with(\$a//origination/corpname,'$letter') ";
+	$letter_search .= " or starts-with(\$a//origination/famname,'$letter') ";
+       	$letter_search .= " or starts-with(\$a//archdesc/did[not(exists(origination/*))]/unittitle,'$letter') ";
 } else {
 	$letter_search = "";
 }
 
 $data_qry = "
-	for \$a in input()/ead
+	for \$a in /ead
+	let \$sort-title := concat(\$a/archdesc/did/origination/persname,\$a/archdesc/did/origination/corpname,
+			\$a/archdesc/did/origination/famname,\$a/archdesc/did[not(exists(origination/*))]/unittitle) 
 	$letter_search
+	order by \$sort-title
 	return <record>
 			{\$a/@id}
+			<sort-title>{\$sort-title}</sort-title>
 			<name>
 				{\$a/archdesc/did/origination/persname}
 				{\$a/archdesc/did/origination/corpname}
@@ -60,14 +60,7 @@ $data_qry = "
 			{\$a/archdesc/did/unittitle}
 			{\$a/archdesc/did/physdesc}
 			{\$a/archdesc/did/abstract}
-			<sort-title>
-				{string(\$a/archdesc/did/origination/persname)}
-				{string(\$a/archdesc/did/origination/corpname)}
-				{string(\$a/archdesc/did/origination/famname)}			
-				{string(\$a/archdesc/did/unittitle)}			
-			</sort-title>
 		   </record>
-   	sort by (sort-title)
 ";
 
 /*
@@ -76,8 +69,8 @@ $data_qry = "
 */
 
 $alpha_list = file_get_contents("browse-ndx.xml");
-$query = "<results>$alpha_list<records>{".$data_qry."}</records></results>";
-//$query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_qry."}</records></results>";
+//$query = "<results>$alpha_list<records>{".$data_qry."}</records></results>";
+$query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_qry."}</records></results>";
 
 $mode = 'browse';
 
@@ -87,7 +80,7 @@ $xsl_params = array('mode' => $mode, 'label_text' => "Browse Collections Alphabe
 $rval = $tamino->xquery(trim($query));
 $tamino->xslTransform($xsl_file, $xsl_params);
 
-echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/jbwhite/projects/marblfa-php/html/css/marblfa.css\">\n";
+echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/rebecca/marblfa-php/html/css/marblfa.css\">\n";
 print '<div class="content">';
 $tamino->printResult();
 print '</div>';
