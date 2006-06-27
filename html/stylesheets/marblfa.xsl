@@ -521,25 +521,31 @@
 
 
 <xsl:template match="exist:match">
+  <xsl:variable name="txt"><xsl:value-of select="preceding-sibling::text()[0]"/></xsl:variable>
   <!-- for some reason, the single space between two matching terms is getting lost; put it back in here. -->
-  <xsl:if test="preceding-sibling::exist:match">
+  <xsl:if test="preceding-sibling::exist:match and ($txt = '')">
     <xsl:text> </xsl:text>
-  </xsl:if>
+  </xsl:if> 
 
+  <!-- create an anchor, and link to previous match (if it is not an adjacent term) -->
   <xsl:variable name="n"><xsl:value-of select="count(preceding::exist:match)"/></xsl:variable>
-  <a>
+  <a class="match">
     <xsl:attribute name="name">m<xsl:value-of select="$n"/></xsl:attribute>
-    <xsl:if test="$n > 0 and not(preceding-sibling::exist:match)">
+    <!-- FIXME: this test does not correctly detect an immediately following match -->
+    <!--    <xsl:if test="$n > 0 and not(preceding-sibling::exist:match)"> -->
+    <xsl:if test="$n > 0">
       <xsl:attribute name="href">#m<xsl:value-of select="($n - 1)"/></xsl:attribute>
+      <xsl:attribute name="alt">previous match</xsl:attribute>
       <img src="html/images/previous-match.gif" border="0"/> 
     </xsl:if>
-    <xsl:text> </xsl:text>
   </a>
   <span class="match"><xsl:apply-templates/></span>
-  <!-- FIXME: this following-sibling test is not quite correct -->
-  <xsl:if test="count(following::exist:match) and not(following-sibling::exist:match)">
-    <a>
+  <!-- FIXME: this following-sibling test is not quite correct, either -->
+  <!--  <xsl:if test="count(following::exist:match) and not(following-sibling::exist:match)"> -->
+  <xsl:if test="count(following::exist:match)">
+    <a class="match">
       <xsl:attribute name="href">#m<xsl:value-of select="($n + 1)"/></xsl:attribute>
+      <xsl:attribute name="alt">next match</xsl:attribute>
       <img src="html/images/next-match.gif" border="0"/> 
     </a>
   </xsl:if>
