@@ -126,3 +126,5 @@ span.match { color:red; font-weight:bold; }
 	color:#1c1e2d; 
 	font-weight:bold;
 }
+
+a.match { text-decoration:none; }
