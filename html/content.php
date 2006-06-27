@@ -77,8 +77,11 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	//$declare = "declare namespace tf='http://namespaces.softwareag.com/tamino/TaminoFunction' ";
 	// filters to add onto path in 'for' statement
 	$filter = "";
-	if (count($kwarray)) $filter .= "[. &= '$keywords']";
+	// only add a keyword filter if there are keywords defined
+	if ($keywords != ' ' and $keywords != '') $filter .= "[. &= '$keywords']";
 	foreach ($phrases as $p)
+	  // eXist's near function finds the terms in this order, by default 1 word away
+	  // (it does, however count & match every occurrence of the terms in the phrase)
 	  $filter .= "[near(., '$p')]";
  
 	$toc_query = "
@@ -114,8 +117,8 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 							 <c01> 
 								{\$c/@id} {\$c/@level}\n";
 	if ($kw != '') { 
-	  $toc_query .= "<hits>{text:match-count(\$c)}</hits>\n"; 
-	}
+	  $toc_query .= "<hits>{for \$i in \$c$filter return text:match-count(\$i)}</hits>\n";
+	} 
 	$toc_query .= "
 								<did>
 									{\$c/did/unittitle}
