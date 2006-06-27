@@ -111,7 +111,9 @@ $xsl_file  = "stylesheets/results.xsl";
 // pass search terms into xslt as parameters 
 // (xslt passes on terms to browse page for highlighting)
 $term_list = urlencode(implode("|", $myterms));
-$xsl_params = array("url_suffix"  => "-kw-$term_list");
+// only pass keywords, not creator search terms
+if ($term_list != '')
+    $xsl_params = array("url_suffix"  => "-kw-$term_list");
 
 print '<div class="content">';
 
