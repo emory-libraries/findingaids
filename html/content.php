@@ -73,38 +73,45 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 		
 	$tamino = new xmlDbConnection($connectionArray);
 	
-
-	//$declare = "declare namespace tf='http://namespaces.softwareag.com/tamino/TaminoFunction' ";
-	// filters to add onto path in 'for' statement
-	$filter = "";
+	// using filters to restrict element path in 'for' statement
+	$filter = array();
 	// only add a keyword filter if there are keywords defined
-	if ($keywords != ' ' and $keywords != '') $filter .= "[. &= '$keywords']";
+	if ($keywords != ' ' and $keywords != '') array_push($filter, ". &= '$keywords'");
 	foreach ($phrases as $p)
 	  // eXist's near function finds the terms in this order, by default 1 word away
 	  // (it does, however count & match every occurrence of the terms in the phrase)
-	  $filter .= "[near(., '$p')]";
- 
+	  array_push($filter, "near(., '$p')");
+
+	// using an "or" filter to highlight any of the search terms that occur in any section of the document
+	if (count($filter)) {	// keyword/phrase mode (at least one filter)
+	  $orfilter = "[" . implode(" or ", $filter) . "]";
+	} else {
+	  $orfilter = "";
+	}
+
+	// note: the filter is at the top-level, since the item we are returning (c01, etc.)
+	// may or may not include the search terms, but should be returned either way
 	$toc_query = "
-		for \$z in /ead$filter
-		for \$a in \$z$path
-		let \$ad := \$z/archdesc
-		where \$a/@id='$id'  
+		let \$a := /ead${orfilter}${path}[@id = '$id']
+		let \$doc := root(\$a)/ead
+		let \$ad := \$doc/archdesc 
 		return 
 			<toc>
-				<ead>{\$z/@id}
+				<ead>{\$doc/@id}
 					<name>
-						{string(\$z/archdesc/did/origination/persname)}
-						{string(\$z/archdesc/did/origination/corpname)}
-						{string(\$z/archdesc/did/origination/famname)}
+						{string(\$doc/archdesc/did/origination/persname)}
+						{string(\$doc/archdesc/did/origination/corpname)}
+						{string(\$doc/archdesc/did/origination/famname)}
 					</name>
 					<eadheader>
-						<filedesc><titlestmt>{\$z/eadheader/filedesc/titlestmt/titleproper}</titlestmt></filedesc>
+						<filedesc><titlestmt>{\$doc/eadheader/filedesc/titlestmt/titleproper}</titlestmt></filedesc>
 					</eadheader>
 					<archdesc>";
 
 	if ($kw != '') {
 	  //	  $toc_query .= " <hits> { text:match-count(\$ad/*[not(c01)]) }</hits>";
-	  $toc_query .= " <hits> { text:match-count(\$ad) }</hits>";
+	  $toc_query .= " <hits> { let \$adm := \$ad$orfilter
+			return text:match-count(\$adm) }</hits>";
 	}
 
 	$toc_query .= "
@@ -113,11 +120,12 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 						<dsc>
 							{\$ad/dsc/head}
 							{for \$c in \$ad/dsc/c01
+							 let \$cmatch := \$c$orfilter
 							 return  
 							 <c01> 
 								{\$c/@id} {\$c/@level}\n";
 	if ($kw != '') { 
-	  $toc_query .= "<hits>{for \$i in \$c$filter return text:match-count(\$i)}</hits>\n";
+	  $toc_query .= "<hits>{text:match-count(\$cmatch)}</hits>\n";
 	} 
 	$toc_query .= "
 								<did>
@@ -163,17 +171,23 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 
 
 	/*	$query = "
-		for \$z in input()/ead
-		for \$a in \$z$path
+		for \$doc in input()/ead
+		for \$a in \$doc$path
 		$hquery
 		where \$a/@id='$id' 
 		return $rval";
 	*/
-	
-	$query = "for \$a in /ead$filter" . $path . "[@id = '$id']
-		  return $rval";
 
-	
+	$query = "for \$a in /ead${path}[@id = '$id'] ";
+	if ($kw != '')
+	  $query .= "let \$am := \$a$orfilter
+		  return if (exists(\$am)) then
+		     <ead>{\$am}</ead>
+		  else $rval";
+	else
+	  $query .= "return $rval";
+	//		  return if (exist$rval";
+
 	$xsl_file 	= "html/stylesheets/marblfa.xsl";
 	// xslt passes on keywords to subsections of document via url
 	$term_list = urlencode(implode("|", array_merge($kwarray, $phrases)));
