@@ -13,7 +13,8 @@
   
   <xsl:param name="mode"/>
   
-  <xsl:param name="url_suffix"/>	<!-- any parameters to be added to urls within the site (e.g., keywords) -->
+  <!-- any parameters to be added to urls within the site (e.g., for passing keywords) -->
+  <xsl:param name="url_suffix"/>
   
 <!-- <xsl:param name="content" ></xsl:param>   -->
   <!-- Creates the body of the finding aid.-->
@@ -275,6 +276,9 @@
 </xsl:template>
 
 
+<!-- commented out 2006.06.27 by RSK
+  I think these two templates are completely unnecessary, as they do the default action,  
+  and may cause unexpected behavior elsewhere 
 <xsl:template match="archdesc/*" priority="-1">
 <xsl:apply-templates/>
 </xsl:template>
@@ -282,6 +286,7 @@
 <xsl:template match="*[not(text())]" priority="-2">
 <xsl:apply-templates/>
 </xsl:template>
+ -->
 
 <!-- repeating element, needs generative href attribute value -->
 <xsl:template match="bioghist">
