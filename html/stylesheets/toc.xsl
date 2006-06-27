@@ -1,11 +1,12 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:exist="http://exist.sourceforge.net/NS/exist"
 	xmlns:ino="http://namespaces.softwareag.com/tamino/response2"
 	xmlns:xql="http://metalab.unc.edu/xql/"
 	xmlns:cti="http://cti.library.emory.edu/"
 	version="1.0">
 
 <xsl:template match="unittitle"  mode="toc">
-<xsl:value-of select="text()"/>
+  <xsl:apply-templates select="*[not(self::unitdate)]|text()" mode="toc"/>
 <xsl:text> </xsl:text>
 <xsl:apply-templates select="unitdate" mode="toc"/>
 </xsl:template>
@@ -201,12 +202,33 @@
 <!-- ============================================= -->
 
 
+<!-- for eXist only...
+   in eXist, there is no way to restrict the count, so subtract the
+   count from hits known to be in the c01 sections -->
+<xsl:template match="archdesc/hits">
+  <xsl:variable name="n"><xsl:value-of select=". - sum(//c01/hits)"/></xsl:variable> 
+ <!-- don't display anything if there are zero hits -->
+  <xsl:if test="$n != 0">
+    <span class="hits">
+      <xsl:value-of select="$n"/> hit<xsl:if test=". > 1">s</xsl:if>
+    </span>
+  </xsl:if>
+</xsl:template>
+
+
 <xsl:template match="hits">
+ <!-- don't display anything if there are zero hits -->
   <xsl:if test=". != 0">
     <span class="hits">
       <xsl:apply-templates/> hit<xsl:if test=". > 1">s</xsl:if>
     </span>
   </xsl:if>
+</xsl:template>
+
+<!-- don't highlight matches in the table of contents -->
+<!-- FIXME: is this the correct behaviour? -->
+<xsl:template match="exist:match" mode="toc">
+  <xsl:apply-templates select="text()"/>
 </xsl:template>
 
 </xsl:stylesheet>
