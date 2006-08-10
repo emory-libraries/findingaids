@@ -22,19 +22,19 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	switch ($element)
 	{
 		case 'c01':
-		  $path = "//c01";
+		  $path = "/archdesc/dsc/c01";
 		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		  break;
 		
 		case 'c02':
-		  $path = "//c02";
+		  $path = "/archdesc/dsc/c01/c02";
 		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
 			
 		case 'did':
-		  $path = "//did";
+		  $path = "/archdesc/did";
 		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
@@ -119,7 +119,7 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 						<did>{\$ad/did/unittitle}</did>
 						<dsc>
 							{\$ad/dsc/head}
-							{for \$c in \$ad/dsc/c01
+							{for \$c in \$ad/dsc/c01[@level='series']
 							 let \$cmatch := \$c$orfilter
 							 return  
 							 <c01> 
@@ -129,6 +129,7 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	} 
 	$toc_query .= "
 								<did>
+									{\$c/did/unitid}
 									{\$c/did/unittitle}
 									{\$c/did/physdesc}
 								</did>
@@ -144,23 +145,28 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	// addition to query for highlighting (when there are search terms)
 	$hquery = "";
 	$rval = "\$a";
-	if ($element == "ead") {	// return only necessary sections, not the entire document
-	  $rval = "<ead>{\$a/@id}
-	  {\$a/eadheader}
-	  {\$a/frontmatter}
-	 <archdesc>
-	  {\$a/archdesc/*[not(self::dsc)]}
-	  <dsc> {\$a/archdesc/dsc/@*}
-	   {\$a/archdesc/dsc/head}
-	   {for \$c01 in \$a/archdesc/dsc/c01[c02]
-	    return <c01>
-	      {\$c01/@*}
-	      {\$c01/did}
-	      <c02/>
-	     </c01> }
-	     </dsc>  
-	 </archdesc></ead>
-	 ";
+	if ($kw != '') { 
+	  $hitcount .= "{let \$m := \$c01$orfilter return <hits>{text:match-count(\$m)}</hits>}\n";
+	}
+
+	if ($element == "ead") {		// return only necessary sections, not the entire document
+		  $rval = "<ead>{\$a/@id}
+		  {\$a/eadheader}
+		  {\$a/frontmatter}
+		 <archdesc>
+		  {\$a/archdesc/*[not(self::dsc)]}
+		  {for \$d in \$a/archdesc/dsc
+		   return <dsc> {\$d/@*}
+		   {\$d/head}
+		   {for \$c01 in \$d/c01[c02]
+		    return <c01>
+		      {\$c01/@*}
+		      {\$c01/did}
+		      <c02/>
+		       $hitcount
+		     </c01> }
+		     </dsc>} 
+		 </archdesc></ead> ";
 	}
 
 
@@ -178,12 +184,14 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 		return $rval";
 	*/
 
-	$query = "for \$a in /ead${path}[@id = '$id'] ";
+	// section may or may not contain keywords; return with highlighting if it does
+	$query = "let \$i := /ead${path}[@id = '$id'] ";
 	if ($kw != '')
-	  $query .= "let \$am := \$a$orfilter
-		  return if (exists(\$am)) then
-		     <ead>{\$am}</ead>
-		  else $rval";
+	  $query .= "let \$im := \$i$orfilter
+		  let \$a := (if (exists(\$im)) then
+		      \$im
+		  else  \$i)
+		  return $rval";
 	else
 	  $query .= "return $rval";
 	//		  return if (exist$rval";
