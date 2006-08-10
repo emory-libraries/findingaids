@@ -72,6 +72,7 @@ div#toc
 	display:inline;
 	font-size:12px;
 	font-weight:500;
+	text-align:left;
 }
 
 
@@ -91,12 +92,19 @@ div#headingBlock
 	padding-right:10px;
 	padding-top:10px;
 	padding-bottom:10px;
+	text-align:center;
 }
 
 .navbar
 {
 	font-size:12px;
 	font-weight:500;
+	text-align:left;
+}
+
+/* overrides a style from main marbl css */
+div#toc a:link { 
+  text-decoration: underline;
 }
 
 .current { 
@@ -127,4 +135,33 @@ span.match { color:red; font-weight:bold; }
 	font-weight:bold;
 }
 
+.breadCrumbs a { 
+  padding-right:5px;
+}
+
 a.match { text-decoration:none; }
+
+table.searchform td.info { 
+  padding-bottom:10px;
+}
+
+ul.searchtips li {
+  list-style-type: disc;
+}
+
+div.searchinfo, div.searchinfo h2 { 
+  font-size:115%;
+}
+
+
+h2 a, h3 a { 
+  text-decoration:none;
+}
+/* no line before text immediately after h3 heading */
+h3 { 
+  margin-bottom:0px;
+}
+p.indent { 
+  margin-top:0px;
+}
+
