@@ -13,7 +13,8 @@
 		
 <!--	</xsl:template>	
 	<xsl:template match="unittitle"  mode="summary">	-->
-		<h3>
+		<p>
+                  <h4>
 			<xsl:attribute name="class">indent</xsl:attribute>
 			<!--<xsl:apply-templates select="unitid" mode="summary"/>-->
 
@@ -21,8 +22,8 @@
                           <xsl:attribute name="href">section-content-<xsl:value-of select="local-name()"/>-<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:apply-templates select="self::node()" mode="c-level-index"/></xsl:attribute>			
 				<xsl:value-of select="did/unitid"/>: <xsl:value-of select="did/unittitle"/>
 			</xsl:element>
-		</h3>
-		<br/>
+                        <xsl:apply-templates select="hits"/></h4>
+		</p>
 	</xsl:template>
 
 <!--
