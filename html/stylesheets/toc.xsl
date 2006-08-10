@@ -15,6 +15,11 @@
 <xsl:value-of select="text()"/>
 </xsl:template>
 
+<xsl:template match="unitid" mode="toc">
+  <xsl:apply-templates/>.
+</xsl:template>
+
+
 <xsl:template match="ead/archdesc" mode="toc">
 	<!--<div class="navbar">-->
 	<!--<xsl:element name="emph">-->
@@ -145,7 +150,8 @@
 		<xsl:if test="ancestor::dsc">
 		
 		</xsl:if>
-		
+
+		<xsl:apply-templates select="did/unitid" mode="toc"/>
 		<xsl:apply-templates select="did/unittitle" mode="toc"/>
 		<xsl:apply-templates select="did/unitdate" mode="toc"/>
 		</a>
@@ -208,7 +214,7 @@
 <xsl:template match="archdesc/hits">
   <xsl:variable name="n"><xsl:value-of select=". - sum(//c01/hits)"/></xsl:variable> 
  <!-- don't display anything if there are zero hits -->
-  <xsl:if test="$n != 0">
+  <xsl:if test="$n > 0">
     <span class="hits">
       <xsl:value-of select="$n"/> hit<xsl:if test=". > 1">s</xsl:if>
     </span>
@@ -216,14 +222,6 @@
 </xsl:template>
 
 
-<xsl:template match="hits">
- <!-- don't display anything if there are zero hits -->
-  <xsl:if test=". != 0">
-    <span class="hits">
-      <xsl:apply-templates/> hit<xsl:if test=". > 1">s</xsl:if>
-    </span>
-  </xsl:if>
-</xsl:template>
 
 <!-- don't highlight matches in the table of contents -->
 <!-- FIXME: is this the correct behaviour? -->
