@@ -27,13 +27,14 @@ if ($position == '') $position = 1;
 // set a default maxdisplay
 if ($maxdisplay == '') $maxdisplay = 10;       // what is a reasonable default?
 
+// pull out exact phrase enclosed in quotation marks
 preg_match_all("/\"([^\"]+)\"/", stripslashes($kw), &$phrases);
 
 $keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", stripslashes($kw));
 
 // clean up input & convert into an array
 $kwarray = processterms($keywords);
-$ttlarray = processterms($title);
+$autharray = processterms($author);
 
 
 
@@ -74,7 +75,7 @@ if ($mode == "exact") {
   if ($keywords != '') {$myterms = array_merge($myterms, $kwarray); }
   if (count($phrases[1])) {$myterms = array_merge($myterms, $phrases[1]); }
   if ($title) {$myterms = array_merge($myterms, $ttlarray); }
-  if ($author) {$myterms = array_merge($myterms, $autharray); }
+  //  if ($author) {$myterms = array_merge($myterms, $autharray); }
   if ($date) {$myterms = array_merge($myterms, $darray); }
   if ($place) {$myterms = array_merge($myterms, $plarray); }
 }
@@ -118,21 +119,27 @@ if ($term_list != '')
 print '<div class="content">';
 
 if ($total == 0){
- print "<p><b>No matches found.</b> You may want to broaden your search and see search tips for suggestions.</p>";
+ print "<p><b>No collections found.</b> You may want to broaden your search and see search tips for suggestions.</p>";
   include ("searchoptions.php");
 } else {
 
-  print "<h2 align='center'>Search Results</h2>";
+  print "<div class='searchinfo'><h2 align='center'>Search Results</h2>";
 
-  // of documents found
-  print "<p align='center'>Found <b>" . $total . "</b> match";
-  if ($total != 1) { print "es"; }
+  // # of documents found
+  print "<p align='center'>Found <b>" . $total . "</b> collection";
+  if ($total != 1) { print "s"; }
 
 
   // in phonetic mode, php highlighting will be inaccurate and/or useless... 
-  //if ($mode != "phonetic") { $tamino->highlightInfo($myterms); }
-  if ($mode != "phonetic") { echo "<p align=\"center\">Search Terms: ". join(" ", $myterms) ." </p>"; }
+  // $tamino->highlightInfo($myterms); 
+  print "<p align=\"center\">where ";
+  if ($kw) print "document contains '" . stripslashes($kw) . "'";
+  if ($kw && $author) print " and ";
+  if ($author) print "creator matches \"$author\"";
+    "</p>"; 
 
+  print "</div>";
+  
   $tamino->count = $total;	// set tamino count from first (count) query, so resultLinks will work
   //$rlinks = $tamino->resultLinks("search.php?$myopts", $position, $maxdisplay);
   //print $rlinks;
