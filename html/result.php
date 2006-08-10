@@ -14,7 +14,6 @@ require_once("common_functions.php");
 			<? displayBreadCrumbs($crumbs); ?>
 		</div>
 		<p />
-		<? include("html/MARBL-bar.inc"); ?>
 	</div>
 	<br />
 	<iframe name="content" src="<?= $content ?>" style="width:99%; height:940px;"></iframe>
