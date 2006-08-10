@@ -15,6 +15,11 @@
   
   <!-- any parameters to be added to urls within the site (e.g., for passing keywords) -->
   <xsl:param name="url_suffix"/>
+
+  <!-- strings for translating case -->
+  <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'"/>
+  <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+
   
 <!-- <xsl:param name="content" ></xsl:param>   -->
   <!-- Creates the body of the finding aid.-->
@@ -130,13 +135,18 @@
 	
 	<!--<xsl:template match="archdesc/did/child::node()" mode="table">-->
 <xsl:template match="archdesc/did/*" mode="table">
+  <xsl:variable name="name"><xsl:value-of select="local-name()"/></xsl:variable>
 	<tr><td valign="top">
 	<xsl:choose>
-	<xsl:when test="local-name()='unittitle'">title:</xsl:when>
-	<xsl:when test="local-name()='unitid'">call no:</xsl:when>
-	<xsl:when test="local-name()='physdesc'">extent:</xsl:when>
-	<xsl:when test="local-name()='origination'">creator:</xsl:when>
-	<xsl:otherwise><xsl:value-of select="local-name()"/>:</xsl:otherwise>
+	<xsl:when test="$name = 'unittitle'">Title:</xsl:when>
+	<xsl:when test="$name = 'unitid'">Call no:</xsl:when>
+	<xsl:when test="$name = 'physdesc'">Extent:</xsl:when>
+	<xsl:when test="$name = 'origination'">Creator:</xsl:when>
+	<xsl:when test="$name = 'langmaterial'">Language:</xsl:when>
+	<xsl:otherwise>
+          <!-- use element name for label; capitalize the first letter -->
+            <xsl:value-of select="concat(translate(substring($name,1,1),$lowercase, $uppercase),substring($name, 2, (string-length($name) - 1)))"/>: 
+        </xsl:otherwise>
 	</xsl:choose>
 	</td>
 	<td>
@@ -469,7 +479,7 @@
 	<xsl:apply-templates />
 </xsl:template>
 
-<xsl:template match="scopecontent[parent::c01]/head | arrangement[parent::c01]/head">
+<xsl:template match="scopecontent[parent::c01|parent::c02]/head | arrangement[parent::c01|parent::c02]/head">
 	<h3><xsl:value-of select="."/></h3>
 </xsl:template>
 
@@ -493,7 +503,21 @@
 <xsl:apply-templates select="unittitle"/>
 <xsl:text> </xsl:text>
 <xsl:apply-templates select="unitdate"/>
-</a>
+</a> 
+
+<!-- count & display # of matches in this section -->
+  <xsl:variable name="hits">	
+  <!-- not sure why, but this path seems to give a more accurate number... -->
+    <xsl:value-of select="count(..//exist:match)"/>
+  </xsl:variable>
+
+  <xsl:if test="$hits > 0">
+    <span class="hits">
+      <xsl:value-of select="$hits"/> hit<xsl:if test="$hits > 1">s</xsl:if>
+    </span>
+  </xsl:if>
+
+
 </xsl:element>
 </xsl:when>
 
@@ -593,5 +617,15 @@
 		  </a>
 	</xsl:if>
 </xsl:template>
+
+<xsl:template match="hits">
+ <!-- don't display anything if there are zero hits -->
+  <xsl:if test=". != 0">
+    <span class="hits">
+      <xsl:apply-templates/> hit<xsl:if test=". > 1">s</xsl:if>
+    </span>
+  </xsl:if>
+</xsl:template>
+
 
 </xsl:stylesheet>
