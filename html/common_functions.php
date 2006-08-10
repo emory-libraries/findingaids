@@ -149,7 +149,7 @@ function displayBreadCrumbs($array_bc)
 		
 	$rv = rtrim($rv, ",");
 	
-	print "<span class=\"breadCrumbs\">$rv</span>";
+	print "<div class=\"breadCrumbs\">$rv</div>";
 }
 
 ?>
