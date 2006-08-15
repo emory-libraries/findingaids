@@ -12,8 +12,8 @@ $pattern[1] = '/(tamino)-(.*)(-kw-)(.*)/';
 $pattern[2] = '/(tamino)-(.*)/';
 $pattern[3] = '/(rqst)/';
 $pattern[4] = '/(search)/';
-$pattern[5] = '/(section-content)-(c0[12])?-?(.*)(-kw-)(.*)/';
-$pattern[6] = '/(section-content)-(c0[12])?-?(.*)/';
+$pattern[5] = '/(section-content)-(c0[123])?-?(.*)(-kw-)(.*)/';
+$pattern[6] = '/(section-content)-(c0[123])?-?(.*)/';
 
 $i = 0;
 //$matches = null;
