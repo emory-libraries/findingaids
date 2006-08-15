@@ -7,12 +7,13 @@
 
 <xsl:template match="unittitle"  mode="toc">
   <xsl:apply-templates select="*[not(self::unitdate)]|text()" mode="toc"/>
-<xsl:text> </xsl:text>
-<xsl:apply-templates select="unitdate" mode="toc"/>
+  <xsl:text> </xsl:text>
+  <xsl:apply-templates select="unitdate" mode="toc"/> 
+
 </xsl:template>
 
 <xsl:template match="unitdate" mode="toc">
-<xsl:value-of select="text()"/>
+  <xsl:apply-templates/>
 </xsl:template>
 
 <xsl:template match="unitid" mode="toc">
@@ -20,13 +21,19 @@
 </xsl:template>
 
 
+<xsl:template match="text()" mode="toc">
+  <xsl:value-of select="."/>
+</xsl:template>
+
 <xsl:template match="ead/archdesc" mode="toc">
 	<!--<div class="navbar">-->
 	<!--<xsl:element name="emph">-->
-        <a>
-          <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
-	<xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
-      </a>
+        <div class="titleproper">	<!-- so title can be centered -->
+          <a>
+            <xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
+            <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
+          </a>
+        </div>
 	<!--</xsl:element>-->
 	<xsl:element name="span">
 	<xsl:attribute name="class">toc-heading</xsl:attribute>
@@ -137,7 +144,7 @@
 	<xsl:element name="li">
 		<xsl:attribute name="class">navbar 
                 <!-- mark this entry as the current one if the main content is this node or a child node -->
-                <xsl:if test="//results/ead/c01/@id = ./@id or //results/ead/c02/@id = ./c02/@id"> current</xsl:if>
+                <xsl:if test="//results/ead/c01/@id = ./@id or //results/ead/parent/@id = ./@id"> current</xsl:if>
                </xsl:attribute>
 
 		<!-- don't include the container list items in the table of contents, unless this is not toc mode (navbar creation)-->
@@ -226,6 +233,12 @@
 <!-- don't highlight matches in the table of contents -->
 <!-- FIXME: is this the correct behaviour? -->
 <xsl:template match="exist:match" mode="toc">
+  <xsl:variable name="txt"><xsl:value-of select="preceding::text()[0]"/></xsl:variable>
+  <!--  DEBUG: preceding text is :<xsl:value-of select="$txt"/>:<br/>  -->
+  <!-- for some reason, the single space between two matching terms is getting lost; put it back in here. -->
+  <xsl:if test="preceding-sibling::exist:match and ($txt = '')">
+    <xsl:text> </xsl:text>
+  </xsl:if> 
   <xsl:apply-templates select="text()"/>
 </xsl:template>
 
