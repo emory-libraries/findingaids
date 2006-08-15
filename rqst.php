@@ -1,3 +1,11 @@
+<?php
+include_once("common_functions.php");
+
+html_head("Search - Finding Aids");
+include("template-header.inc");
+?>
+
+
 <div class='content' id='search'>
 
 <table name="searchtable">
@@ -33,3 +41,7 @@
 
 
 </div>
+
+<?php
+include("template-footer.inc");
+?>
