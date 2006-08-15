@@ -1,1 +1,0 @@
-http://tamino.library.emory.edu/passthru/servlet/transform/tamino/BECKCTR/ILN?_xquery=for%20$b%20in%20input()/TEI.2//div1%20return%20%3Cdiv1%3E%20{$b/@type}{$b/head}{$b/docDate}{for%20$c%20in%20$b/div2%20return%20%3Cdiv2%3E%20{$c/@id}{$c/@type}{$c/head}{$c/bibl}{%20for%20$d%20in%20$c/p/figure%20return%20$d}%20%3C/div2%3E}%3C/div1%3E&_xslsrc=xsl:stylesheet/contents.xsl
