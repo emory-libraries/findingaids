@@ -32,7 +32,13 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
-			
+
+		case 'c03':
+		  $path = "/archdesc/dsc/c01/c02/c03";
+		  $mode = 'c-level-index';
+		  $wrapOutput = true;
+		break;
+
 		case 'did':
 		  $path = "/archdesc/did";
 		  $mode = 'c-level-index';
@@ -123,7 +129,8 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 							 let \$cmatch := \$c$orfilter
 							 return  
 							 <c01> 
-								{\$c/@id} {\$c/@level}\n";
+								{\$c/@id} {\$c/@level}
+								{if (exists(\$c/c02)) then <c02/> else ()}\n";
 	if ($kw != '') { 
 	  $toc_query .= "<hits>{text:match-count(\$cmatch)}</hits>\n";
 	} 
@@ -133,7 +140,6 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 									{\$c/did/unittitle}
 									{\$c/did/physdesc}
 								</did>
-								{for \$c2 in \$c/c02 return <c02>{\$c2/@id}</c02>}
 							</c01>}
 						</dsc>
 					</archdesc>
@@ -162,8 +168,20 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 		    return <c01>
 		      {\$c01/@*}
 		      {\$c01/did}
-		      <c02/>
 		       $hitcount
+		      {for \$c02 in \$c01/c02[@level='subseries']
+			return <c02>
+				{\$c02/@*}
+				{\$c02/did}
+				{let \$m2 := \$c02$orfilter
+				  return <hits>{text:match-count(\$m2)}</hits>}
+			      {for \$c03 in \$c02/c03[c04]
+				return <c03>{\$c03/@*}
+					{\$c03/did}
+					{let \$m3 := \$c03$orfilter
+					  return <hits>{text:match-count(\$m3)}</hits>}
+				       </c03>}
+			      </c02> }
 		     </c01> }
 		     </dsc>} 
 		 </archdesc></ead> ";
@@ -172,7 +190,9 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 
 	// all elements other than ead must be wrapped in an ead node
 	if ($wrapOutput) {
-		$rval = "<ead>{ $rval }</ead>";
+	  // return parent c01 id so we can highlight current section in table of contents
+		$rval = "<ead>{ $rval } <parent id='{\$a/ancestor::c01/@id}'/></ead>";
+		       
 	}
 
 
@@ -193,7 +213,8 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 		  else  \$i)
 		  return $rval";
 	else
-	  $query .= "return $rval";
+	  $query .= "let \$a := \$i
+		     return $rval";
 	//		  return if (exist$rval";
 
 	$xsl_file 	= "html/stylesheets/marblfa.xsl";
