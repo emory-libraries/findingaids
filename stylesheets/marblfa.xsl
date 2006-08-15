@@ -4,12 +4,12 @@
 	xmlns:xq="http://metalab.unc.edu/xq/"
 	xmlns:cti="http://cti.library.emory.edu/"
 	version="1.0">
-  <xsl:import href="ino.xsl"/> 
+  <!--  <xsl:import href="ino.xsl"/>  -->
   <xsl:import href="toc.xsl"/> 
   <xsl:import href="summary.xsl"/> 
   <!--<xsl:import href="summary2.xsl"/> -->
-  <xsl:import href="headingFooting.xsl"/>
-  <xsl:strip-space elements="*"/>
+  <!--  <xsl:import href="headingFooting.xsl"/> -->
+  <!--  <xsl:strip-space elements="*"/>-->
   
   <xsl:param name="mode"/>
   
@@ -517,7 +517,7 @@
 <a>
 <xsl:attribute name="name"><xsl:apply-templates   select="ancestor::node()[self::c01 | self::c02| self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08| self::c09]" mode="c-level-index"/>
 </xsl:attribute>
-<xsl:attribute name="href">section-content-<xsl:value-of select="local-name(parent::node())"/>-<xsl:value-of select="parent::c01/@id"/><xsl:value-of select="parent::c02/@id"/><xsl:value-of select="parent::c03/@id"/><xsl:value-of select="parent::c04/@id"/><xsl:value-of select="parent::c05/@id"/><xsl:value-of select="parent::c06/@id"/><xsl:value-of select="parent::c07/@id"/><xsl:value-of select="parent::c08/@id"/><xsl:value-of select="parent::c09/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:apply-templates select="ancestor-or-self::node()[self::c01 |self::c02 | self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08 | self::c09]" mode="c-level-index"/></xsl:attribute>
+<xsl:attribute name="href">content.php?el=<xsl:value-of select="local-name(parent::node())"/>&amp;id=<xsl:value-of select="parent::c01/@id"/><xsl:value-of select="parent::c02/@id"/><xsl:value-of select="parent::c03/@id"/><xsl:value-of select="parent::c04/@id"/><xsl:value-of select="parent::c05/@id"/><xsl:value-of select="parent::c06/@id"/><xsl:value-of select="parent::c07/@id"/><xsl:value-of select="parent::c08/@id"/><xsl:value-of select="parent::c09/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
 <xsl:apply-templates select="unitid"/>:
 <xsl:text> </xsl:text>
 <xsl:apply-templates select="unittitle"/>

@@ -13,7 +13,7 @@ include("template-header.inc");
 
 <h2 class="alphaText">Search Collections</h2>
 
-<form name="fa_query" action="search" method="post">
+<form name="fa_query" action="search.php" method="get">
 <table class="searchform" border="0">
 <tr><th>Keyword</th><td class="input"><input type="text" size="40" name="keyword" value="<?php print $kw ?>"></td></tr>
 <tr><th></th><td class="info">Searches entire text of finding aid</td></tr>

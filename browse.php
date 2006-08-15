@@ -7,6 +7,11 @@ $connectionArray{"debug"} = false;
 
 $tamino = new xmlDbConnection($connectionArray);
 
+html_head("Browse Collections");
+
+include("template-header.inc");
+
+
 switch ($browseBy)
 {
 	case 'unittitle':
@@ -73,13 +78,18 @@ $query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_
 $mode = 'browse';
 
 $xsl_file 	= "stylesheets/results.xsl";
-$xsl_params = array('mode' => $mode, 'label_text' => "Browse Collections Alphabetically:", 'baseLink' => "browse-coll");
+$xsl_params = array('mode' => $mode,
+		'label_text' => "Browse Collections Alphabetically:",
+		'baseLink' => "browse.php");
 
-$rval = $tamino->xquery(trim($query));
+$rval = $tamino->xquery($query);
 $tamino->xslTransform($xsl_file, $xsl_params);
 
-echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/rebecca/marblfa-php/html/css/marblfa.css\">\n";
+//echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/rebecca/marblfa-php/html/css/marblfa.css\">\n";
 print '<div class="content">';
 $tamino->printResult();
 print '</div>';
+
+include("template-footer.inc");
+
 ?>

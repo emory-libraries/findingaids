@@ -1,6 +1,9 @@
 <?
+include_once("common_functions.php");
+
 $baseURL  = "http://marbl.library.emory.edu";
-$localURL = "http://biliku.library.emory.edu/jbwhite/projects/marblfa-php";
+$localURL = "http://biliku.library.emory.edu/rebecca/marblfa-php";
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -10,7 +13,7 @@ $localURL = "http://biliku.library.emory.edu/jbwhite/projects/marblfa-php";
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link href="<?= $baseURL ?>/includes/css/main.css" rel="stylesheet" type="text/css" />
 <link href="<?= $baseURL ?>/includes/css/web.css" rel="stylesheet" type="text/css" />
-<link href="<?= $localURL ?>/html/css/marblfa.css" rel="stylesheet" type="text/css" />
+<link href="<?= $localURL ?>/css/marblfa.css" rel="stylesheet" type="text/css" />
 
 <script src="<?= $baseURL ?>/includes/js/common.js" type="text/javascript" language="javascript"></script>
 <!-- InstanceBeginEditable name="doctitle" -->
@@ -108,3 +111,9 @@ $localURL = "http://biliku.library.emory.edu/jbwhite/projects/marblfa-php";
 					<td bgcolor="#FFFFFF"><img src="<?= $baseURL ?>/images/common/spacer.gif" width="1" height="8" alt=""></td>
 				</tr>				
 			</table>
+
+
+<?php
+displayBreadCrumbs($crumbs);
+								
+?>

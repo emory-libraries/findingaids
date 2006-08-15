@@ -1,23 +1,32 @@
 <?
-//include_once("config.php");
-//include_once("lib/xmlDbConnection.class.php");
+include_once("config.php");
+include_once("lib/xmlDbConnection.class.php");
 include_once("common_functions.php");
+
+html_head("Finding Aid");
+include("template-header.inc");
+
+$id = $_GET["id"];
+$element = $_GET["el"];
+$kw = $_GET["keyword"];
+
+
+if (empty($element)) {
+  $element = "ead";		// default element to retrieve
+ } else if (!($element == "c01" || $element ==  "c02" || $element == "c03"
+	      || $element == "did" || $element == "ead")) {
+  // make sure that the element is something we expect
+  print "DEBUG: element $el not expected, quitting.\n";
+  exit();
+ }
+
+$connectionArray{"debug"} = false;
+
+ 
 
 //echo "<pre>";print_r($_REQUEST);echo "</pre>";
 
 
-//$id = $_REQUEST['id'];
-
-
-function getXMLContentsAsHTML($id, $element = "ead", $kw = null)
-{
-echo "function getXMLContentsAsHTML($id, $element)<hr>";
-	global $crumbs;
-	global $htmltitle;
-	global $connectionArray;
-
-	$connectionArray{"debug"} = false;
-	
 	// determine xpath for query according to element
 	switch ($element)
 	{
@@ -217,10 +226,11 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 		     return $rval";
 	//		  return if (exist$rval";
 
-	$xsl_file 	= "html/stylesheets/marblfa.xsl";
+	$xsl_file 	= "stylesheets/marblfa.xsl";
 	// xslt passes on keywords to subsections of document via url
 	$term_list = urlencode(implode("|", array_merge($kwarray, $phrases)));
-	$xsl_params = array("url_suffix"  => "-kw-$term_list");
+if ($kw != '') 
+  $xsl_params = array("url_suffix"  => "&keyword=$kw");
 	
 	
 	//$xquery = "$declare <results>{ $toc_query } { $query }</results>";
@@ -236,6 +246,10 @@ echo "function getXMLContentsAsHTML($id, $element)<hr>";
 	if ($element != "ead") 
 	  $htmltitle .= " [" . $tamino->findNode("results/ead/$element//unittitle") . "]";
 	
-	return $tamino->xsl_result->saveXML();
-}	
+print '<div class="content">';
+$tamino->printResult();
+print '</div>';
+
+include("template-footer.inc");
+	
 ?>

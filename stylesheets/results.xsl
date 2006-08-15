@@ -5,7 +5,7 @@
 	xmlns:cti="http://cti.library.emory.edu/"
 	version="1.0">
 	
-	<xsl:import href="ino.xsl"/> 
+  <!--	<xsl:import href="ino.xsl"/>  -->
 	
 	<xsl:param name="mode"/>
 	<xsl:param name="label_text"/>
@@ -28,7 +28,7 @@
 			<xsl:element name="span">
 				<xsl:attribute name="class">alphaList</xsl:attribute>
 				<xsl:element name="a">	
-					<xsl:attribute name="href"><xsl:value-of select="$baseLink" />-all</xsl:attribute>ALL
+					<xsl:attribute name="href"><xsl:value-of select="$baseLink" />?l=all</xsl:attribute>ALL
 				</xsl:element>
 				<xsl:apply-templates select="letter"/>
 			</xsl:element>
@@ -41,7 +41,7 @@
 				<xsl:attribute name="class">alphaList</xsl:attribute>
 				<xsl:element name="a">	
 					<xsl:attribute name="href">
-						<xsl:value-of select="$baseLink" />-<xsl:value-of select="." />
+						<xsl:value-of select="$baseLink" />?l=<xsl:value-of select="." />
 					</xsl:attribute>
 					<xsl:value-of select="." />
 				</xsl:element>
@@ -61,7 +61,7 @@
 
 	<xsl:template match="persname | corpname | famname ">	
 		<xsl:element name="a">
-			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
+                  <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
 			<xsl:value-of select="." />
 		</xsl:element>
 		<br />

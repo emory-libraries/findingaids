@@ -41,8 +41,8 @@ $autharray = processterms($author);
 $doctitle = "Search Results";
 
 html_head($doctitle);
-print "<body>";
-include("header.html");
+include("template-header.inc");
+
 
 $for = ' for $a in /ead';
 $let = "\n" . 'let $b := $a/eadheader
@@ -113,8 +113,11 @@ $xsl_file  = "stylesheets/results.xsl";
 // (xslt passes on terms to browse page for highlighting)
 $term_list = urlencode(implode("|", $myterms));
 // only pass keywords, not creator search terms
-if ($term_list != '')
-    $xsl_params = array("url_suffix"  => "-kw-$term_list");
+//if ($term_list != '')
+  //    $xsl_params = array("url_suffix"  => "-kw-$term_list");
+
+if ($kw != '')
+  $xsl_params = array("url_suffix"  => "&keyword=$kw");
 
 print '<div class="content">';
 
@@ -153,7 +156,7 @@ print '</div>';		// end of content div
 
 
 
-include("footer.html");
+include("template-footer.inc");
 ?>
 
 </body>

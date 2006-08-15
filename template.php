@@ -1,4 +1,6 @@
-<? 
+<?
+include("template-header.inc");
+
 	displayBreadCrumbs($crumbs); 
 	echo "<br />";
 	
@@ -9,4 +11,6 @@
 	
 
 	echo $content;
+
+include("template-footer.inc");
 ?>	
