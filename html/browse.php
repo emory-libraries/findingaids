@@ -68,8 +68,6 @@ $data_qry = "
 			 	return substring-after(\$a/archdesc/did/unittitle, \$i) }
 */
 
-$alpha_list = file_get_contents("browse-ndx.xml");
-//$query = "<results>$alpha_list<records>{".$data_qry."}</records></results>";
 $query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_qry."}</records></results>";
 
 $mode = 'browse';
