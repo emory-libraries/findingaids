@@ -74,6 +74,14 @@ div#toc
 	font-weight:500;
 	text-align:left;
 }
+div#toc h1 { 
+  text-align:center;
+  margin-top:0px;
+}
+
+div#toc div.titleproper { 
+  text-align:center;
+}
 
 
 div#content
@@ -95,6 +103,18 @@ div#headingBlock
 	text-align:center;
 }
 
+div#eadheader { 
+  text-align:center;
+}
+
+/* h3/h4 size must be set explicitly - over-riding more general font-size set elsewhere  */
+div#eadheader h3 { 
+  font-size:115%;
+}
+div#eadheader h4 { 
+  font-size:110%;
+}
+
 .navbar
 {
 	font-size:12px;
@@ -102,9 +122,9 @@ div#headingBlock
 	text-align:left;
 }
 
-/* overrides a style from main marbl css */
-div#toc a:link { 
-  text-decoration: underline;
+/* overrides a style from main marbl css; loses style in some cases if not set to important */
+div#toc a { 
+  text-decoration: underline !important;
 }
 
 .current { 
@@ -153,15 +173,26 @@ div.searchinfo, div.searchinfo h2 {
   font-size:115%;
 }
 
+/* make h2s bigger than h3s */
+h2 { 
+  font-size:115%;
+}
 
 h2 a, h3 a { 
   text-decoration:none;
 }
 /* no line before text immediately after h3 heading */
-h3 { 
+h3, h4 { 
   margin-bottom:0px;
 }
 p.indent { 
   margin-top:0px;
 }
 
+
+h4.c02 { 
+  margin-left:2em;
+}
+h4.c03 { 
+  margin-left:4em;
+}
