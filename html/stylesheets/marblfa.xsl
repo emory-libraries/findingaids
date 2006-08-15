@@ -33,6 +33,8 @@
       
       <xsl:otherwise>	
         <div id="toc">	
+        <h1>Table of Contents</h1>
+        <hr/>
         <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
       </div>
       
@@ -85,7 +87,8 @@
 
 
 <xsl:template match="ead/eadheader">
-	<xsl:element name="center">
+	<xsl:element name="div">
+          <xsl:attribute name="id">eadheader</xsl:attribute>
 		<xsl:element name="h3"><xsl:apply-templates select="//publicationstmt/publisher" /></xsl:element>
 		<xsl:element name="h4"><xsl:apply-templates select="//publicationstmt/address" /></xsl:element>	
 	</xsl:element>
@@ -220,7 +223,7 @@
   <div id="headingBlock">
     <xsl:element name="span">
       <xsl:attribute name="class">content_title</xsl:attribute>
-      <xsl:value-of select="titleproper"/>
+      <xsl:apply-templates select="titleproper"/>
     </xsl:element>
     
     <xsl:element name="span">
@@ -249,7 +252,9 @@
 	Collection Description
 	</a>
 	</xsl:element>
-	<xsl:apply-templates select="bioghist | scopecontent | arrangement | controlaccess "/>
+	<xsl:apply-templates select="bioghist | scopecontent | arrangement"/>
+	<hr/>
+        <xsl:apply-templates select="controlaccess"/>
 	<hr/>
 	<xsl:apply-templates select="dsc"/>
 	</div>
@@ -319,12 +324,26 @@
 </xsl:element>
 </xsl:template>
 
+<xsl:template match="controlaccess">
+  <xsl:apply-templates select="head"/>
+  <p class="indent">
+    <xsl:apply-templates select="*[not(self::head)]"/>
+  </p>
+</xsl:template>
+
 <xsl:template match="ead/archdesc/controlaccess//controlaccess/head">
 <h4>
 <xsl:attribute name="class">indent</xsl:attribute>
 <xsl:apply-templates/>
 </h4>
 </xsl:template>
+
+<xsl:template match="controlaccess[controlaccess]/head">
+  <h2>
+    <xsl:apply-templates/>
+  </h2>
+</xsl:template>
+
 
 <xsl:template match="ead/archdesc/bioghist/bioghist">
 <h2>
@@ -361,7 +380,7 @@
 
 <xsl:template match="text()">
   <xsl:value-of select="."/>
-</xsl:template>
+</xsl:template> 
 
 <!-- used for development, to see that all elements are considered -->
 <xsl:template match="ead/eadheader/filedesc"
@@ -380,7 +399,7 @@
 
 <!-- ================ setting up the container list tables ========= -->
 <!-- Processing the highest c-level in return set -->
-<xsl:template match="c01|c02">
+<xsl:template match="c01|c02|c03">
 
 <!--
 <a>
@@ -493,6 +512,7 @@
 
 <!-- Print link if only 1 more c levels exist below this -->
 <xsl:when test="parent::node()[c02 or c03 or c04 or c05 or c06 or c07 or c08]">
+  <p>
 <xsl:element name="h4">
 <a>
 <xsl:attribute name="name"><xsl:apply-templates   select="ancestor::node()[self::c01 | self::c02| self::c03 | self::c04 | self::c05 | self::c06 | self::c07 | self::c08| self::c09]" mode="c-level-index"/>
@@ -517,8 +537,9 @@
     </span>
   </xsl:if>
 
-
 </xsl:element>
+</p>
+
 </xsl:when>
 
 <xsl:otherwise>
@@ -550,35 +571,14 @@
 
 
 <xsl:template match="exist:match">
-  <xsl:variable name="txt"><xsl:value-of select="preceding-sibling::text()[0]"/></xsl:variable>
+  <xsl:variable name="txt"><xsl:value-of select="preceding::text()[0]"/></xsl:variable>
+  <!--  DEBUG: preceding text is :<xsl:value-of select="$txt"/>:<br/>  -->
   <!-- for some reason, the single space between two matching terms is getting lost; put it back in here. -->
   <xsl:if test="preceding-sibling::exist:match and ($txt = '')">
     <xsl:text> </xsl:text>
   </xsl:if> 
 
-  <!-- create an anchor, and link to previous match (if it is not an adjacent term) -->
-  <xsl:variable name="n"><xsl:value-of select="count(preceding::exist:match)"/></xsl:variable>
-  <a class="match">
-    <xsl:attribute name="name">m<xsl:value-of select="$n"/></xsl:attribute>
-    <!-- FIXME: this test does not correctly detect an immediately following match -->
-    <!--    <xsl:if test="$n > 0 and not(preceding-sibling::exist:match)"> -->
-    <xsl:if test="$n > 0">
-      <xsl:attribute name="href">#m<xsl:value-of select="($n - 1)"/></xsl:attribute>
-      <xsl:attribute name="alt">previous match</xsl:attribute>
-      <img src="html/images/previous-match.gif" border="0"/> 
-    </xsl:if>
-  </a>
   <span class="match"><xsl:apply-templates/></span>
-  <!-- FIXME: this following-sibling test is not quite correct, either -->
-  <!--  <xsl:if test="count(following::exist:match) and not(following-sibling::exist:match)"> -->
-  <xsl:if test="count(following::exist:match)">
-    <a class="match">
-      <xsl:attribute name="href">#m<xsl:value-of select="($n + 1)"/></xsl:attribute>
-      <xsl:attribute name="alt">next match</xsl:attribute>
-      <img src="html/images/next-match.gif" border="0"/> 
-    </a>
-  </xsl:if>
-
 </xsl:template>
 
 
