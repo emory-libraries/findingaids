@@ -77,6 +77,8 @@ div#toc
 div#toc h1 { 
   text-align:center;
   margin-top:0px;
+  font-size:115%;
+  font-variant:small-caps;
 }
 
 div#toc div.titleproper { 
@@ -147,12 +149,14 @@ span.hits { color:red; padding-left:1em;font-weight:bold;}
 span.match { color:red; font-weight:bold; }
 
 .keywords
-.breadCrumbs
-{
-	font-family:arial;
-	font-size:16px;
-	color:#1c1e2d; 
-	font-weight:bold;
+.breadCrumbs {
+  font-family:arial;
+  font-size:16px;
+  color:#1c1e2d; 
+  font-weight:bold;
+}
+div.breadCrumbs { 
+  margin-bottom:10px;
 }
 
 .breadCrumbs a { 
