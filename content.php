@@ -2,9 +2,8 @@
 include_once("config.php");
 include_once("lib/xmlDbConnection.class.php");
 include_once("common_functions.php");
+include("marblcrumb.class.php");
 
-html_head("Finding Aid");
-include("template-header.inc");
 
 $id = $_GET["id"];
 $element = $_GET["el"];
@@ -17,8 +16,12 @@ if (empty($element)) {
 	      || $element == "did" || $element == "ead")) {
   // make sure that the element is something we expect
   print "DEBUG: element $el not expected, quitting.\n";
+  // FIXME: add a better error message here
   exit();
  }
+
+
+
 
 $connectionArray{"debug"} = false;
 
@@ -173,6 +176,7 @@ $connectionArray{"debug"} = false;
 		  {for \$d in \$a/archdesc/dsc
 		   return <dsc> {\$d/@*}
 		   {\$d/head}
+		   {\$d/c01[@level!='series']}
 		   {for \$c01 in \$d/c01[c02]
 		    return <c01>
 		      {\$c01/@*}
@@ -240,12 +244,31 @@ if ($kw != '')
 	$tamino->xslTransform($xsl_file, $xsl_params);
 	
 
-	$docname = $tamino->findNode('name');
-	$crumbs[2] = array ('anchor' => $docname);
-	$htmltitle .= ": $docname";
-	if ($element != "ead") 
-	  $htmltitle .= " [" . $tamino->findNode("results/ead/$element//unittitle") . "]";
-	
+	$docname = $tamino->findNode('unittitle');
+	$pagename = $docname;
+//	$crumbs[2] = array ('anchor' => $docname);
+	$htmltitle = "$docname";
+if ($element != "ead") {
+  $pagename = $tamino->findNode("results/ead/$element//unittitle");
+  $htmltitle .= " [$pagename]";
+ }
+
+// build url for breadcrumb
+$url = "content.php?";
+$args = array();
+if ($element && $element != 'ead') $args[] = "el=$element";
+if ($id) $args[] = "id=$id";
+if ($kw) $args[] = "keyword=$kw";
+$url .= implode('&', $args);
+$crumbs = new marblCrumb($pagename, $url); 
+$crumbs->store();
+
+
+
+html_head("Finding Aid : $htmltitle");
+include("template-header.inc");
+print $crumbs;
+
 print '<div class="content">';
 $tamino->printResult();
 print '</div>';

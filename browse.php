@@ -2,14 +2,27 @@
 include("common_functions.php");
 include_once("config.php");
 include_once("lib/xmlDbConnection.class.php");
+include("marblcrumb.class.php");
+
+
+$letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'A';
+
+$url = "browse.php";
+if ($letter) {
+  $url .= "?l=$letter";
+  $mode = $letter == 'all' ? "All" : "($letter)";
+}
+
+$crumbs = new marblCrumb("Browse $mode", $url);
+$crumbs->store();
 
 $connectionArray{"debug"} = false;
 
 $tamino = new xmlDbConnection($connectionArray);
 
 html_head("Browse Collections");
-
 include("template-header.inc");
+print $crumbs;
 
 
 switch ($browseBy)
@@ -37,7 +50,6 @@ $browse_qry = "
 
 
 
-$letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'A';
 if ($letter != 'all')
 {
 	$letter_search =  " where starts-with(\$a//origination/persname,'$letter') ";

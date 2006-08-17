@@ -2,6 +2,32 @@
 include("config.php");
 include("common_functions.php");
 include_once("lib/xmlDbConnection.class.php");
+include("marblcrumb.class.php");
+
+// search terms
+$kw = $_GET["keyword"];
+//$title = $_GET["title"];
+$author = $_GET["creator"];
+//$date = $_GET["date"];
+//$place= $_GET["place"];
+//$mode= $_GET["mode"];
+//$docid = $_GET["id"];		 // limit keyword search to one document
+
+// note: position & maxdisplay currently not in use
+//$position = $_GET["pos"];    // position (i.e, cursor)
+//$maxdisplay = $_GET["max"];  // maximum  # results to display
+
+
+
+$url = "search.php?";
+$args = array();
+if ($kw) $args[] = "keyword=$kw";
+if ($author) $args[] .= "creator=$author";
+$url .= implode('&', $args);
+//print "DEBUG: url is $url.<br>\n";
+$crumbs = new marblCrumb("Search Results", $url); 
+$crumbs->store();
+
 
 // use eXist settings from config file
 $connectionArray{"debug"} = false;
@@ -9,23 +35,11 @@ $tamino = new xmlDbConnection($connectionArray);
 
 //echo "<pre>";print_r($_GET);echo "</pre>";	
 
-// search terms
-$kw = $_GET["keyword"];
-$title = $_GET["title"];
-$author = $_GET["author"];
-//$date = $_GET["date"];
-//$place= $_GET["place"];
-//$mode= $_GET["mode"];
-//$docid = $_GET["id"];		 // limit keyword search to one document
-
-// note: position & maxdisplay currently not in use
-$position = $_GET["pos"];    // position (i.e, cursor)
-$maxdisplay = $_GET["max"];  // maximum  # results to display
 
 // if no position is specified, start at 1
 if ($position == '') $position = 1;
 // set a default maxdisplay
-if ($maxdisplay == '') $maxdisplay = 10;       // what is a reasonable default?
+if ($maxdisplay == '') $maxdisplay = 50;       // what is a reasonable default?
 
 // pull out exact phrase enclosed in quotation marks
 preg_match_all("/\"([^\"]+)\"/", stripslashes($kw), &$phrases);
@@ -42,6 +56,7 @@ $doctitle = "Search Results";
 
 html_head($doctitle);
 include("template-header.inc");
+print $crumbs;
 
 
 $for = ' for $a in /ead';

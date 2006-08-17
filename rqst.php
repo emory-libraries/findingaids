@@ -1,8 +1,18 @@
 <?php
 include_once("common_functions.php");
+include("marblcrumb.class.php");
+
+$crumbs = new marblCrumb("Search", "rqst.php");
+$crumbs->store();
 
 html_head("Search - Finding Aids");
 include("template-header.inc");
+
+print $crumbs;
+
+$kw = $_GET["keyword"];
+$creator = $_GET["creator"];
+
 ?>
 
 
@@ -19,7 +29,7 @@ include("template-header.inc");
 <tr><th></th><td class="info">Searches entire text of finding aid</td></tr>
 
 
-<tr><th>Creator</th><td class="input"><input type="text" size="40" name="author" value="<?php print $author ?>"></td></tr>
+<tr><th>Creator</th><td class="input"><input type="text" size="40" name="creator" value="<?php print $creator ?>"></td></tr>
 <tr><th></th><td class="info">Searches only for person, family, or organization that created or accumulated the collection [e.g., <b>Heaney, Seamus</b> or <b>Georgia Woman's Christian Temperance Union</b>]</td></tr>
 
 

@@ -113,7 +113,3 @@ $localURL = "http://biliku.library.emory.edu/rebecca/marblfa-php";
 			</table>
 
 
-<?php
-displayBreadCrumbs($crumbs);
-								
-?>

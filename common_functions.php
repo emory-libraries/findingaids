@@ -12,7 +12,7 @@ function html_head ($mode, $contentlist = false) {
   global $base_url;	// use base url as set in site-wide config file
 print "<html>
  <head>
- <title>$mode - Manuscript, Archives, and Rare Books Library</title>
+ <title>$mode : Manuscript, Archives, and Rare Books Library</title>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">
 <meta name=\"robots\" content=\"index,follow\">
  </head>";
@@ -63,28 +63,5 @@ function processterms ($str) {
 
 
 
-// display bread crumbs
-function displayBreadCrumbs($array_bc)
-{
-	$rv = '';
-	if (is_array($array_bc))
-	{
-		//foreach ($array_bc as $bc)
-		for($i=0;$i<count($array_bc);$i++)
-		{
-			$bc = $array_bc[$i];
-			if ($bc['href'] != '')
-			{
-				$rv .= " <a href=\"" . $bc['href'] . "\">" . $bc['anchor'] . "</a> ";
-			} else {
-				$rv .= " ".$bc['anchor'];
-			}
-		}
-	}
-		
-	$rv = rtrim($rv, ",");
-	
-	print "<div class=\"breadCrumbs\">$rv</div>";
-}
 
 ?>
