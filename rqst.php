@@ -45,7 +45,7 @@ $creator = $_GET["creator"];
 <li>Asterisks may be used to do a truncated search. 
 [e.g., enter <b>resign*</b> to match <b>resign</b>, <b>resigned</b>, and <b>resignation</b>.] </li>
 <li>Capitalization is ignored.</li>
-<li>Search for exact phrases using quotation marks [e.g., <b>"harlem renaissance"</b>]
+<!-- <li>Search for exact phrases using quotation marks [e.g., <b>"harlem renaissance"</b>] -->
 </ul>
 </td>
 
