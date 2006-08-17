@@ -142,7 +142,7 @@
 	<tr><td valign="top">
 	<xsl:choose>
 	<xsl:when test="$name = 'unittitle'">Title:</xsl:when>
-	<xsl:when test="$name = 'unitid'">Call no:</xsl:when>
+	<xsl:when test="$name = 'unitid'">Call Number:</xsl:when>
 	<xsl:when test="$name = 'physdesc'">Extent:</xsl:when>
 	<xsl:when test="$name = 'origination'">Creator:</xsl:when>
 	<xsl:when test="$name = 'langmaterial'">Language:</xsl:when>
@@ -340,7 +340,9 @@
 
 <xsl:template match="controlaccess[controlaccess]/head">
   <h2>
-    <xsl:apply-templates/>
+    <a name="searchTerms">
+      <xsl:apply-templates/>
+    </a>
   </h2>
 </xsl:template>
 
@@ -439,13 +441,13 @@
 
 <!-- ================ processing the c0n/did's   ========= -->
 <!-- Shows the box and folder numbers containers  -->
-<xsl:template match="did[parent::c01 | parent::c02 | parent::c03 | parent::c04 | parent::c04 | parent::c05 | parent::c06 | parent::c07 | parent::c08 | parent:: c09][container[@type='box']]" mode="table">
-<!-- if new box number, print box,folder header -->
-<xsl:if test="not(../preceding-sibling::node()[1]/did/container[@type='box']=container[@type='box'])"> 
-<xsl:if test="container[@type='folder']">
-<tr><td valign="top">
-<p/><b>Box</b></td><td><p/><b>Folder</b></td></tr>
-</xsl:if>
+<xsl:template match="did[parent::c01 | parent::c02 | parent::c03 | parent::c04 | parent::c04 | parent::c05 | parent::c06 | parent::c07 | parent::c08 | parent:: c09][container[@type='box']]" mode="table"> 
+
+
+<!-- only show box/folder once for the whole page -->
+<xsl:if test="count(../preceding-sibling::node()/did) = 0">
+  <tr><td valign="top">
+  <p/><b>Box</b></td><td><p/><b>Folder</b></td></tr> 
 </xsl:if>
 
 <tr>
