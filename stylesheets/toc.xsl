@@ -28,64 +28,65 @@
 <xsl:template match="ead/archdesc" mode="toc">
 	<!--<div class="navbar">-->
 	<!--<xsl:element name="emph">-->
-        <div class="titleproper">	<!-- so title can be centered -->
-          <a>
-            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
-            <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
-          </a>
-        </div>
+        <a>
+          <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
+          <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
+        </a>
 	<!--</xsl:element>-->
 	<xsl:element name="span">
 	<xsl:attribute name="class">toc-heading</xsl:attribute>
 	<a name="a0">
 	</a>
 	</xsl:element>
-	<xsl:element name="p">
-	<xsl:attribute name="class">navbar</xsl:attribute>
-	<a>
-          <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#descriptiveSummary</xsl:attribute>
-	
-	Descriptive Overview
-	</a>
+
+        <p class="navbar">
+          <a>
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#descriptiveSummary</xsl:attribute>
+            
+            Descriptive Summary
+          </a>
 
         <!-- display number of keyword matches in this section if in kwic mode -->
         <xsl:apply-templates select="hits"/>
         <!-- FIXME: why is this not matching the correct template? -->
         
-	</xsl:element>
+	</p>
 
 	
-	<!-- remove details of ead header in toc 
-	<a>
-	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#descriptiveSummary</xsl:attribute>
-	
-	Descriptive Summary
-	</a>
+        <p class="navbar">
+          <a>
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#adminInfo</xsl:attribute>
+            Administrative Information
+          </a>
+        </p>
+
+
+        <p class="navbar">
+          <a>
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#collectionDesc</xsl:attribute>
+            Collection Description
+          </a>
+        </p>
+
+        <p class="navbar">
+          <a>
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#searchTerms</xsl:attribute>
+            Selected Search Terms
+          </a>
+        </p>
+
+
+        <!--
+          <ul class="navbar">
+	<xsl:apply-templates select="bioghist | scopecontent | arrangement | controlaccess " mode="toc"/>
+	</ul>
 	</xsl:element>
-	
-	<xsl:element name="p">
-	<xsl:attribute name="class">navbar</xsl:attribute>
-	<a>
-	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#adminInfo</xsl:attribute>
-	
-	Administrative Information
-	</a>
+
 	<ul class="navbar">
 	<xsl:apply-templates select="acqinfo | accessrestrict | userestrict | prefercite | separatedmaterial" mode="toc"/>
 	</ul>
 	</xsl:element>
 	
-	<xsl:element name="p">
-	<xsl:attribute name="class">navbar</xsl:attribute>
-	<a>
-	<xsl:attribute name="href">section-content-<xsl:value-of select="ancestor::ead/@id"/>#collectionDesc</xsl:attribute>
-	
-	Collection Description
-	</a>
-	<ul class="navbar">
-	<xsl:apply-templates select="bioghist | scopecontent | arrangement | controlaccess " mode="toc"/>
-	</ul>
-	</xsl:element>
 	-->
 	<xsl:apply-templates select="dsc" mode="toc"/>
 	<!--</div>-->
