@@ -19,12 +19,10 @@ class marblCrumb extends breadCrumb {
   }
 
 
-  // need to override isDup - browse = search; content pages?
 
-
-    // check if a crumb is an exact duplicate (title and url both) of a current breadcrumb
+    // check if a crumb is aquivalent to a current breadcrumb
   // if yes, return index within crumb array; if not, return 0
-  function isDup ($c) {
+  function equivalent ($c) {
     for ($i = 0; $i < count($this->crumbs); $i++) {
       $myc = $this->crumbs[$i];
       // exact duplicate - either page title or url is same
