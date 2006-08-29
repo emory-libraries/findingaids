@@ -73,10 +73,14 @@
 			<xsl:value-of select="." />
 		</xsl:element>
 	</xsl:template>	
-		
-	<xsl:template match="abstract | unittitle | physdesc/extent">	
-		<xsl:value-of select="." /> <xsl:text> </xsl:text> 		
+
+	<xsl:template match="abstract | unittitle | unitdate">
+		<xsl:apply-templates/> <xsl:text> </xsl:text> 		
 	</xsl:template>		
+
+        <xsl:template match="physdesc/extent">	
+          <xsl:text> </xsl:text> <xsl:apply-templates/>
+        </xsl:template>
 	
 	<xsl:template match="matches">
 		<xsl:value-of select="total" /> matches 
