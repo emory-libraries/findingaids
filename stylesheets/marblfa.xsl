@@ -59,7 +59,7 @@
 	</a>
 	<xsl:choose>
 	<!-- if at least 2 c levels exist, do a toc display -->
-	<xsl:when test="c01/c02">
+	<xsl:when test="c01/c02 or c01[@level='series']">
 	<xsl:apply-templates mode="summary"/>
 	</xsl:when>
 	
@@ -112,7 +112,7 @@
 </xsl:template>
 
 <xsl:template match="extent">
-<xsl:text> </xsl:text><xsl:apply-templates/><xsl:text> </xsl:text>
+<xsl:text> </xsl:text><xsl:apply-templates/>
 </xsl:template>
 
 <xsl:template match="title[parent::unittitle]">
@@ -180,13 +180,16 @@
 
 <!-- =============== unitdate ===============-->
 <!-- put a comma before the unitdate if this is not a container or if it's part of the archdesc -->
+<!-- 
+2006.08.29 RSK
+removed comma before unitdate at Susan's request
 <xsl:template match="did[parent::c01 | parent::c02 | parent::c03 | parent::c04 | parent::c04 | parent::c05 | parent::c06 | parent::c07 | parent::c08 | parent:: c09]//unitdate[ancestor::did[1][not(container)]] | archdesc/did//unitdate" priority="7">
 <xsl:if test="local-name(preceding-sibling::node()[1])='unitdate'">
 <xsl:value-of select="normalize-space(',')"/><xsl:text> </xsl:text>
 </xsl:if>
 <xsl:text> </xsl:text>
 <xsl:apply-templates/>
-</xsl:template>
+</xsl:template> -->
 
 <xsl:template match="did[parent::c01 | parent::c02 | parent::c03 | parent::c04 | parent::c04 | parent::c05 | parent::c06 | parent::c07 | parent::c08 | parent:: c09]//unitdate" priority="6">
 <xsl:text> </xsl:text>
