@@ -60,25 +60,22 @@ class marblCrumb extends breadCrumb {
 
   
   // check if a specified link is equivalent to the current page
-  // simple check: compare current PHP_SELF to specified url, without query options
+  // for content page, id must match 
   // returns 1 if current page, 0 otherwise
   function currentPage ($link) {
+    // content page serves out several levels of content (top-level, c01 - c03)
     if (strstr($link->url, "content.php")) {
+      // compare the ids to check if it is the same page
       if (preg_match("/id=[^&]*/", $link->url, $matches)) {
 	if (strstr($_SERVER['QUERY_STRING'], $matches[0]))
 	  return 1;
 	else return 0;
       }
     }
-    if (strpos($link->url, '?')) {
-      $baseurl = substr($link->url, 0, strpos($link->url,'?'));
-    } else {
-      $baseurl = $link->url;
-    }
-    return strpos($_SERVER['PHP_SELF'],$baseurl);
+    // otherwise, do the default comparison (check link url without query terms against PHP_SELF)
+    return parent::currentPage($link);
   }
 
-  // need to override currentPage = content page needs to check el/id
   
 }
 
