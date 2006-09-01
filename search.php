@@ -42,7 +42,7 @@ if ($position == '') $position = 1;
 if ($maxdisplay == '') $maxdisplay = 50;       // what is a reasonable default?
 
 // pull out exact phrase enclosed in quotation marks
-preg_match_all("/\"([^\"]+)\"/", stripslashes($kw), &$phrases);
+preg_match_all("/\"([^\"]+)\"/", stripslashes($kw), $phrases);
 
 $keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", stripslashes($kw));
 
