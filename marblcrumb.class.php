@@ -9,7 +9,7 @@ class marblCrumb extends breadCrumb {
     $this->breadCrumb();
 
     // if the breadcrumb cookie was empty, add top-level crumb
-    if (count($this->crumbs) == 0) {
+    if ($this->isEmpty()) {
       // FIXME: can we use a relative url here?  try copying index.html over...
       $this->add("MARBL Finding Aids", "http://marbl.library.emory.edu/FindingAids/");
     }
@@ -23,7 +23,7 @@ class marblCrumb extends breadCrumb {
     // check if a crumb is aquivalent to a current breadcrumb
   // if yes, return index within crumb array; if not, return 0
   function equivalent ($c) {
-    for ($i = 0; $i < count($this->crumbs); $i++) {
+    for ($i = 0; $i < $this->count(); $i++) {
       $myc = $this->crumbs[$i];
       // exact duplicate - either page title or url is same
       if ($myc->url == $c->url || $myc->title == $c->title)
@@ -68,12 +68,13 @@ class marblCrumb extends breadCrumb {
       // compare the ids to check if it is the same page
       if (preg_match("/id=[^&]*/", $link->url, $matches)) {
 	if (strstr($_SERVER['QUERY_STRING'], $matches[0]))
-	  return 1;
-	else return 0;
+	  return true;
+	else return false;
       }
     }
     // otherwise, do the default comparison (check link url without query terms against PHP_SELF)
     return parent::currentPage($link);
+    
   }
 
   
