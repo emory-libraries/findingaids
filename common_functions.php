@@ -9,7 +9,6 @@ include("config.php");
 */
 
 function html_head ($mode, $contentlist = false) {
-  global $base_url;	// use base url as set in site-wide config file
 print "<html>
  <head>
  <title>$mode : Manuscript, Archives, and Rare Books Library</title>
@@ -19,15 +18,6 @@ print "<html>
 }
 
 
-
-// convert a readable xquery into a clean url
-function encode_url ($string) {
-  // get rid of multiple white spaces
-  $string = preg_replace("/\s+/", " ", $string);
-  // convert spaces to hex equivalent
-  $string = str_replace(" ", "%20", $string);
-  return $string;
-}
 
 // param arg is optional - defaults to null
 function transform ($xml_file, $xsl_file, $xsl_params = NULL) {
