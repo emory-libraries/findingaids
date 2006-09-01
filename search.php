@@ -138,7 +138,7 @@ print '<div class="content">';
 
 if ($total == 0){
  print "<p><b>No collections found.</b> You may want to broaden your search and see search tips for suggestions.</p>";
-  include ("searchoptions.php");
+  include ("searchform.php");
 } else {
 
   print "<div class='searchinfo'><h2 align='center'>Search Results</h2>";
