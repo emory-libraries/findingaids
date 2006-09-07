@@ -5,6 +5,7 @@ include_once("lib/xmlDbConnection.class.php");
 include("marblcrumb.class.php");
 
 
+// letter to browse (A by default)
 $letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'A';
 
 $url = "browse.php";
@@ -18,29 +19,29 @@ $crumbs->store();
 
 $connectionArray{"debug"} = false;
 
-$tamino = new xmlDbConnection($connectionArray);
+$xmldb = new xmlDbConnection($connectionArray);
 
 html_head("Browse Collections");
 include("template-header.inc");
 print $crumbs;
 
-
-switch ($browseBy)
-{
-	case 'unittitle':
-	default:
-		$search_path = "/archdesc/did/origination/persname";
-		// query for all volumes 
+// unused (allow browsing by something besides unittitle ?)
+switch ($browseBy) {
+ case 'unittitle':
+ default:
+   $search_path = "/archdesc/did/origination/persname";
+   // query for all volumes 
 }
 
 // note: in all cases, unit title is used as a fall-back *only* if no origination name exists
 
+// xquery to get the first letters of all titles (used to generate alpha list)
 $browse_qry = "
 	for \$b in 
-	distinct-values
-	(
+	distinct-values (
 		for \$a in (//archdesc/did/origination/persname, //archdesc/did/origination/corpname,
-			    //archdesc/did/origination/famname, //archdesc/did[not(exists(origination/*))]/unittitle)
+			    //archdesc/did/origination/famname,
+ 			    //archdesc/did[not(exists(origination/*))]/unittitle)
 		let \$l := substring(\$a,1,1)
 		return \$l
 	)
@@ -49,14 +50,15 @@ $browse_qry = "
 ";
 
 
-
-if ($letter != 'all')
-{
-	$letter_search =  " where starts-with(\$a//origination/persname,'$letter') ";
-	$letter_search .= " or starts-with(\$a//origination/corpname,'$letter') ";
-	$letter_search .= " or starts-with(\$a//origination/famname,'$letter') ";
-       	$letter_search .= " or starts-with(\$a//archdesc/did[not(exists(origination/*))]/unittitle,'$letter') ";
+// if a letter is specified, match the first letter of the origination name or title field 
+if ($letter != 'all') {
+  $letter_search = " where starts-with(\$sort-title, '$letter') ";
+  //	$letter_search =  " where starts-with(\$a//origination/persname,'$letter') ";
+  //	$letter_search .= " or starts-with(\$a//origination/corpname,'$letter') ";
+  //	$letter_search .= " or starts-with(\$a//origination/famname,'$letter') ";
+  //       	$letter_search .= " or starts-with(\$a//archdesc/did[not(exists(origination/*))]/unittitle,'$letter') ";
 } else {
+  // otherwise, no filter is needed (return all collections)
 	$letter_search = "";
 }
 
@@ -80,26 +82,20 @@ $data_qry = "
 		   </record>
 ";
 
-/*
-{ for \$i in (\" \", \"'\", \"A \", \"An \", \"The \", \"\", \"The Register of the \", \"A Register of \", \"The Register of \", \"Register of \", \"Register \") where starts-with(\$a/archdesc/did/unittitle, \$i)
-			 	return substring-after(\$a/archdesc/did/unittitle, \$i) }
-*/
-
 $query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_qry."}</records></results>";
 
 $mode = 'browse';
 
 $xsl_file 	= "stylesheets/results.xsl";
 $xsl_params = array('mode' => $mode,
-		'label_text' => "Browse Collections Alphabetically:",
-		'baseLink' => "browse.php");
+		    'label_text' => "Browse Collections Alphabetically:",
+		    'baseLink' => "browse.php");
 
-$rval = $tamino->xquery($query);
-$tamino->xslTransform($xsl_file, $xsl_params);
+$xmldb->xquery($query);
+$xmldb->xslTransform($xsl_file, $xsl_params);
 
-//echo "<link rel=\"stylesheet\" type=\"text/css\" href=\"http://biliku.library.emory.edu/rebecca/marblfa-php/html/css/marblfa.css\">\n";
 print '<div class="content">';
-$tamino->printResult();
+$xmldb->printResult();
 print '</div>';
 
 include("template-footer.inc");
