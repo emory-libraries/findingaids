@@ -7,22 +7,18 @@ include("marblcrumb.class.php");
 // search terms
 $kw = $_GET["keyword"];
 //$title = $_GET["title"];
-$author = $_GET["creator"];
-//$date = $_GET["date"];
-//$place= $_GET["place"];
-//$mode= $_GET["mode"];
-//$docid = $_GET["id"];		 // limit keyword search to one document
+$creator = $_GET["creator"];
 
-// note: position & maxdisplay currently not in use
-//$position = $_GET["pos"];    // position (i.e, cursor)
-//$maxdisplay = $_GET["max"];  // maximum  # results to display
+// note: position & maxdisplay currently not in use (but probably should be)
+$position = $_GET["pos"];    // position (i.e, cursor)
+$maxdisplay = $_GET["max"];  // maximum  # results to display
 
 
 
 $url = "search.php?";
 $args = array();
 if ($kw) $args[] = "keyword=$kw";
-if ($author) $args[] .= "creator=$author";
+if ($creator) $args[] .= "creator=$creator";
 $url .= implode('&', $args);
 //print "DEBUG: url is $url.<br>\n";
 $crumbs = new marblCrumb("Search Results", $url); 
@@ -31,7 +27,7 @@ $crumbs->store();
 
 // use eXist settings from config file
 $connectionArray{"debug"} = false;
-$tamino = new xmlDbConnection($connectionArray);
+$xmldb = new xmlDbConnection($connectionArray);
 
 //echo "<pre>";print_r($_GET);echo "</pre>";	
 
@@ -48,7 +44,7 @@ $keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", stripslashes($kw));
 
 // clean up input & convert into an array
 $kwarray = processterms($keywords);
-$autharray = processterms($author);
+$autharray = processterms($creator);
 
 
 
@@ -70,11 +66,11 @@ if ($keywords)
   $filter .= "[. &= '$keywords']";
 foreach ($phrases[1] as $p)
   $filter .= "[near(., '$p')]";	
-if ($author) {
-  $filter .= "[archdesc/did/origination &= '$author' or
- 	       (//controlaccess/persname[@encodinganalog='700'] &= '$author'
-		or //controlaccess/corpname[@encodinganalog='710'] &= '$author'
-		or //controlaccess/famname[@encodinganalog='700'] &= 'author')]";
+if ($creator) {
+  $filter .= "[archdesc/did/origination &= '$creator' or
+ 	       (//controlaccess/persname[@encodinganalog='700'] &= '$creator'
+		or //controlaccess/corpname[@encodinganalog='710'] &= '$creator'
+		or //controlaccess/famname[@encodinganalog='700'] &= '$creator')]";
 }
 
 if ($title) $filter .= "[//titlestmt &=  '$title']";
@@ -89,10 +85,6 @@ if ($mode == "exact") {
 } else {
   if ($keywords != '') {$myterms = array_merge($myterms, $kwarray); }
   if (count($phrases[1])) {$myterms = array_merge($myterms, $phrases[1]); }
-  if ($title) {$myterms = array_merge($myterms, $ttlarray); }
-  //  if ($author) {$myterms = array_merge($myterms, $autharray); }
-  if ($date) {$myterms = array_merge($myterms, $darray); }
-  if ($place) {$myterms = array_merge($myterms, $plarray); }
 }
 
 $return  = ' return
@@ -117,20 +109,14 @@ $countquery = "<total>{count($for$filter $where return \$a)}</total>";
 $query = " $for$filter $let $order $where $return </record> ";
 
 
-$tamino->xquery($query, $position, $maxdisplay); 
-//$total = $tamino->findNode("total");		// total # of matches, from count query
-$total = $tamino->count;	// total number of matches for this query
-$tamino->getCursor();
+$xmldb->xquery($query, $position, $maxdisplay); 
+//$total = $xmldb->findNode("total");		// total # of matches, from count query
+$total = $xmldb->count;	// total number of matches for this query
+$xmldb->getCursor();
 
 $xsl_file  = "stylesheets/results.xsl";
 
 // pass search terms into xslt as parameters 
-// (xslt passes on terms to browse page for highlighting)
-$term_list = urlencode(implode("|", $myterms));
-// only pass keywords, not creator search terms
-//if ($term_list != '')
-  //    $xsl_params = array("url_suffix"  => "-kw-$term_list");
-
 if ($kw != '')
   $xsl_params = array("url_suffix"  => "&keyword=$kw");
 
@@ -149,24 +135,29 @@ if ($total == 0){
 
 
   // in phonetic mode, php highlighting will be inaccurate and/or useless... 
-  // $tamino->highlightInfo($myterms); 
+  // $xmldb->highlightInfo($myterms); 
   print "<p align=\"center\">where ";
   if ($kw) print "document contains '" . stripslashes($kw) . "'";
-  if ($kw && $author) print " and ";
-  if ($author) print "creator matches \"$author\"";
+  if ($kw && $creator) print " and ";
+  if ($creator) print "creator matches \"$creator\"";
     "</p>"; 
 
   print "</div>";
-  
-  $tamino->count = $total;	// set tamino count from first (count) query, so resultLinks will work
-  //$rlinks = $tamino->resultLinks("search.php?$myopts", $position, $maxdisplay);
-  //print $rlinks;
 
-  $tamino->xslTransform($xsl_file, $xsl_params);
-  $tamino->printResult($myterms);
+  $opts = array();
+  if ($kw) array_push($opts, "keyword=$kw");
+  if ($creator) array_push($opts, "creator=$creator");
+  $myopts = implode($opts, "&amp;");
+  
+  $xmldb->count = $total;	// set tamino count from first (count) query, so resultLinks will work
+  $rlinks = $xmldb->resultLinks("search.php?$myopts", $position, $maxdisplay);
+  print $rlinks;
+
+  $xmldb->xslTransform($xsl_file, $xsl_params);
+  $xmldb->printResult($myterms);
 }
 
-//print "<p>" . $rlinks . "</p>";
+print $rlinks;
 print '</div>';		// end of content div
 
 
