@@ -200,3 +200,20 @@ h4.c02 {
 h4.c03 { 
   margin-left:4em;
 }
+
+
+div.resultlink { 
+  text-align:right;
+}
+
+/* display links to additional results inline, with lines between */
+li.resultlink { 
+  display:inline; 
+  padding-left: 7px;
+  padding-right: 7px;
+  border-left: 2px solid #666;
+}
+/* no left border on first result link */
+li.first { 
+  border-left: none;
+}
