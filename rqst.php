@@ -1,4 +1,7 @@
 <?php
+
+  // note: this page just lays out the search form; the actual work of searching is done in search.php
+
 include_once("common_functions.php");
 include("marblcrumb.class.php");
 
@@ -10,9 +13,8 @@ include("template-header.inc");
 
 print $crumbs;
 
-$kw = $_GET["keyword"];
-$creator = $_GET["creator"];
-
+// the form itself is separate, so it can be included when no matches
+// are found (allows users to edit their search terms)
 include("searchform.php");
 
 include("template-footer.inc");
