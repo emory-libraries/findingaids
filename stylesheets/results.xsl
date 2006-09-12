@@ -55,6 +55,7 @@
 			<xsl:apply-templates select="unittitle"/><br />
 			<xsl:apply-templates select="physdesc"/><br />
 			<xsl:apply-templates select="abstract"/><br />
+			<xsl:apply-templates select="author"/><br />
 			<xsl:apply-templates select="matches" />
 		</div><p />
 	</xsl:template>
@@ -83,7 +84,7 @@
         </xsl:template>
 	
 	<xsl:template match="matches">
-		<xsl:value-of select="total" /> matches 
+          <xsl:value-of select="total" /> match<xsl:if test="total > 1">es</xsl:if>
 		<!--
 		(
 		<xsl:element name="a">
