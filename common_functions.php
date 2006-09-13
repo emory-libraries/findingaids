@@ -11,7 +11,7 @@ include("config.php");
 function html_head ($mode, $contentlist = false) {
 print "<html>
  <head>
- <title>$mode : Manuscript, Archives, and Rare Books Library</title>
+ <title>$mode : Irish Literary Collections</title>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">
 <meta name=\"robots\" content=\"index,follow\">
  </head>";
