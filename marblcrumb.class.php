@@ -11,7 +11,7 @@ class marblCrumb extends breadCrumb {
     // if the breadcrumb cookie was empty, add top-level crumb
     if ($this->isEmpty()) {
       // FIXME: can we use a relative url here?  try copying index.html over...
-      $this->add("MARBL Finding Aids", "index.html");
+      $this->add("Home", "index.html");
     }
 
     // add current page
@@ -30,8 +30,8 @@ class marblCrumb extends breadCrumb {
 	return $i;
       
       // browse (any letter) is equivalent to search page in site hierarchy
-      if ((strstr($myc->title, "Browse") || $myc->title == "Search") &&
-	  (strstr($c->title, "Browse") || $c->title == "Search"))
+      if ((strstr($myc->title, "Browse") || $myc->title == "Search" || strstr($myc->url,"doc.php")) &&
+	   (strstr($c->title, "Browse") || $c->title == "Search" || strstr($c->url,"doc.php")))
 	return $i;
 
       // content documents - top level & subseries of finding aid
