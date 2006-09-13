@@ -47,8 +47,7 @@
           </a>
 
         <!-- display number of keyword matches in this section if in kwic mode -->
-        <xsl:apply-templates select="hits"/>
-        <!-- FIXME: why is this not matching the correct template? -->
+        <xsl:apply-templates select="did/hits"/>
         
 	</p>
 
@@ -66,6 +65,7 @@
             <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#collectionDesc</xsl:attribute>
             Collection Description
           </a>
+          <xsl:apply-templates select="collectiondescription/hits"/>
         </p>
 
         <p class="navbar">
@@ -73,6 +73,7 @@
             <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#searchTerms</xsl:attribute>
             Selected Search Terms
           </a>
+          <xsl:apply-templates select="controlaccess/hits"/>
         </p>
 
 
@@ -109,6 +110,9 @@
 		
 		<xsl:value-of select="head"/>
 	</xsl:element>
+
+        <xsl:apply-templates select="hits"/>
+
 	<xsl:element name="ul">			
 		<xsl:apply-templates select="c01" mode="toc"/>
 	</xsl:element>
