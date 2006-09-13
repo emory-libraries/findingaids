@@ -54,7 +54,7 @@
 	
         <p class="navbar">
           <a>
-            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#adminInfo</xsl:attribute>
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#adminInfo</xsl:attribute>
             Administrative Information
           </a>
         </p>
@@ -62,7 +62,7 @@
 
         <p class="navbar">
           <a>
-            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#collectionDesc</xsl:attribute>
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#collectionDesc</xsl:attribute>
             Collection Description
           </a>
           <xsl:apply-templates select="collectiondescription/hits"/>
@@ -70,7 +70,7 @@
 
         <p class="navbar">
           <a>
-            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/>#searchTerms</xsl:attribute>
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#searchTerms</xsl:attribute>
             Selected Search Terms
           </a>
           <xsl:apply-templates select="controlaccess/hits"/>
