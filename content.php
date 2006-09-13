@@ -94,7 +94,7 @@ $connectionArray{"debug"} = false;
 	// using filters to restrict element path in 'for' statement
 	$filter = array();
 	// only add a keyword filter if there are keywords defined
-	if ($keywords != ' ' and $keywords != '') array_push($filter, ". &= '$keywords'");
+	if ($keywords != ' ' and $keywords != '') array_push($filter, ". |= '$keywords'");
 	foreach ($phrases as $p)
 	  // eXist's near function finds the terms in this order, by default 1 word away
 	  // (it does, however count & match every occurrence of the terms in the phrase)
@@ -124,19 +124,35 @@ $connectionArray{"debug"} = false;
 					<eadheader>
 						<filedesc><titlestmt>{\$doc/eadheader/filedesc/titlestmt/titleproper}</titlestmt></filedesc>
 					</eadheader>
-					<archdesc>";
-
+					<archdesc>
+						<did>{\$ad/did/unittitle}"; 
 	if ($kw != '') {
-	  //	  $toc_query .= " <hits> { text:match-count(\$ad/*[not(c01)]) }</hits>";
-	  $toc_query .= " <hits> { let \$adm := \$ad$orfilter
-			return text:match-count(\$adm) }</hits>";
+	  $toc_query .= " <hits> { let \$didm := \$ad/did$orfilter
+			return text:match-count(\$didm) }</hits>";
 	}
 
 	$toc_query .= "
-
-						<did>{\$ad/did/unittitle}</did>
+						</did>";
+	// hit counts for top-level table of contents items;
+	// sum up multiple counts where the count needs to include multiple nodes
+	if ($kw != '') {
+	  $toc_query .= "<collectiondescription>
+			    <hits> { sum(for \$cdm in (\$ad//bioghist,\$ad//scopecontent)$orfilter
+			    return text:match-count(\$cdm)) }</hits>
+			 </collectiondescription>
+			 <controlaccess>
+			    <hits> { sum(for \$cam in \$ad//controlaccess$orfilter
+			    return text:match-count(\$cam)) }</hits>
+			 </controlaccess>
+		";
+	}
+	$toc_query .= "
 						<dsc>
-							{\$ad/dsc/head}
+							{\$ad/dsc/head}";
+	if ($kw != '') {
+	  $toc_query .= "<hits>{let \$dscm := \$ad/dsc$orfilter return text:match-count(\$dscm) }</hits>";
+	}
+	$toc_query .= "
 							{for \$c in \$ad/dsc/c01[@level='series']
 							 let \$cmatch := \$c$orfilter
 							 return  
@@ -176,7 +192,10 @@ $connectionArray{"debug"} = false;
 		  {for \$d in \$a/archdesc/dsc
 		   return <dsc> {\$d/@*}
 		   {\$d/head}
-		   {\$d/c01[@level!='series']}
+		   {for \$i in \$d/c01[@level!='series']
+		    return if (exists(\$i$orfilter))
+			  then \$i$orfilter
+			else \$i }
 		   {for \$c01 in \$d/c01[c02]
 		    return <c01>
 		      {\$c01/@*}
