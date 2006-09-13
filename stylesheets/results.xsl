@@ -11,43 +11,103 @@
 	<xsl:param name="label_text"/>
 	<xsl:param name="baseLink"/>
 	<xsl:param name="url_suffix"/>
+
+	<xsl:param name="letter"/>
+	<xsl:param name="repository"/>
+
 	
 
 	<xsl:template match="/">
-		<xsl:apply-templates select="//alpha_list" />
+          <div class="navbox">
+            <xsl:apply-templates select="//source" />
+            <xsl:apply-templates select="//alpha_list" />
+          </div>
 		
 		<xsl:apply-templates select="//record"/>
 	</xsl:template>
 
+        <xsl:template match="source">
+          <div class="repositories">
+            <h3>Filter by Repository:</h3>
+            <ul>
+              <li>
+                <xsl:choose>
+                  <xsl:when test="$repository = 'all'">
+                    View All
+                  </xsl:when>
+                  <xsl:otherwise>
+                    <a>
+                      <xsl:attribute name="href"><xsl:value-of 
+                      select="concat($baseLink, '?l=', $letter)"/></xsl:attribute>
+                      View All
+                    </a>
+                  </xsl:otherwise>
+                </xsl:choose>
+              </li>
+              <xsl:apply-templates/>
+            </ul>
+          </div>
+        </xsl:template>
+
+        <xsl:template match="repository">
+          <li>
+            <xsl:choose>
+              <xsl:when test=". = $repository">
+                <xsl:apply-templates/>
+              </xsl:when>
+              <xsl:otherwise>
+                <a>
+                  <xsl:attribute name="href"><xsl:value-of 
+                  select="concat($baseLink, '?l=', $letter, '&amp;repository=', .)"/></xsl:attribute>
+                  <xsl:apply-templates/>
+                </a>
+              </xsl:otherwise>
+            </xsl:choose>
+          </li>
+        </xsl:template>
+
 			
 	<!--<xsl:template name="alphabox">-->
 	<xsl:template match="alpha_list">
-		<div class="blueBox">
-			<span class="alphaText"><xsl:value-of select="$label_text" /></span>
-			<p />
-			<xsl:element name="span">
-				<xsl:attribute name="class">alphaList</xsl:attribute>
-				<xsl:element name="a">	
-					<xsl:attribute name="href"><xsl:value-of select="$baseLink" />?l=all</xsl:attribute>ALL
-				</xsl:element>
-				<xsl:apply-templates select="letter"/>
-			</xsl:element>
-		</div>	
-		<p />
-	</xsl:template>
+          <h3><xsl:value-of select="$label_text" /></h3>
+            <xsl:element name="p">
+              <xsl:attribute name="class">alphaList</xsl:attribute>
+              <xsl:choose>
+                <xsl:when test="$letter = 'all'">
+                  ALL
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:element name="a">	
+                    <xsl:attribute name="href"><xsl:value-of 
+                    select="concat($baseLink, '?l=all&amp;repository=', $repository)" /></xsl:attribute>
+                    ALL
+                  </xsl:element>
+                </xsl:otherwise>
+              </xsl:choose>
+              <xsl:apply-templates select="letter"/>
+            </xsl:element>
+        </xsl:template>
 	
-	<xsl:template match="letter">
-		<xsl:element name="span">
-				<xsl:attribute name="class">alphaList</xsl:attribute>
-				<xsl:element name="a">	
-					<xsl:attribute name="href">
-						<xsl:value-of select="$baseLink" />?l=<xsl:value-of select="." />
-					</xsl:attribute>
-					<xsl:value-of select="." />
-				</xsl:element>
-				<xsl:apply-templates select="letter" />
-			</xsl:element>
-	</xsl:template>
+        <xsl:template match="letter">
+          <xsl:element name="span">
+            <xsl:attribute name="class">alphaList</xsl:attribute>
+            <xsl:choose>
+              <xsl:when test=". = $letter">
+                <xsl:apply-templates/>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:element name="a">	
+                <xsl:attribute name="href">
+                  <xsl:value-of 
+                    select="concat($baseLink, '?repository=', $repository, '&amp;l=', .)" /></xsl:attribute>
+                <xsl:value-of select="." />
+              </xsl:element>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:apply-templates select="letter" />
+        </xsl:element>
+
+      </xsl:template>
 	
 	<xsl:template match="record">
 		<div>			
@@ -55,7 +115,7 @@
 			<xsl:apply-templates select="unittitle"/><br />
 			<xsl:apply-templates select="physdesc"/><br />
 			<xsl:apply-templates select="abstract"/><br />
-			<xsl:apply-templates select="author"/><br />
+			<xsl:apply-templates select="author"/>
 			<xsl:apply-templates select="matches" />
 		</div><p />
 	</xsl:template>
@@ -83,6 +143,23 @@
           <xsl:text> </xsl:text> <xsl:apply-templates/>
         </xsl:template>
 	
+        <!-- repository name -->
+        <xsl:template match="author">
+          <xsl:apply-templates/>
+          <xsl:text> </xsl:text>
+          <!-- show an icon for each school, for better visual identification -->
+          <xsl:choose>
+            <xsl:when test="contains(., 'Emory')">
+              <img src="images/emory-icon.png"/>
+            </xsl:when>
+            <xsl:when test="contains(., 'Boston')">
+              <img src="images/boston-icon.png"/>
+            </xsl:when>
+            <xsl:otherwise/>
+          </xsl:choose>
+          <br />
+        </xsl:template>
+
 	<xsl:template match="matches">
           <xsl:value-of select="total" /> match<xsl:if test="total > 1">es</xsl:if>
 		<!--
