@@ -58,25 +58,30 @@ print $crumbs;
 $for = ' for $a in /ead';
 $let = "\n" . 'let $b := $a/eadheader
 let $matchcount := text:match-count($a)';
-$order = 'order by $matchcount descending';
+$order = "order by \$matchcount descending";
 
 // filters to add onto path in 'for' statement
 $filter = "";
 if ($keywords)
   $filter .= "[. &= '$keywords']";
 foreach ($phrases[1] as $p)
-  $filter .= "[near(., '$p')]";	
+  $filter .= "[near(., '$p')]";
+
+$where = "";
 if ($creator) {
-  $filter .= "[archdesc/did/origination &= '$creator' or
- 	       (//controlaccess/persname[@encodinganalog='700'] &= '$creator'
-		or //controlaccess/corpname[@encodinganalog='710'] &= '$creator'
-		or //controlaccess/famname[@encodinganalog='700'] &= '$creator')]";
-}
+  // the simpler syntax "where x or y" should work here
+  // in this case, that syntax caused the query not to match when it should
+  $where = "
+	where (\$a/archdesc/did/origination,
+		\$a//controlaccess/persname[@encodinganalog='700'],
+		\$a//controlaccess/corpname[@encodinganalog='710'],
+		\$a//controlaccess/famname[@encodinganalog='700'])[. &= '$creator']
+";
+} 
 
 if ($title) $filter .= "[//titlestmt &=  '$title']";
 
 // formerly used 'where' for conditions; now using filters on for statement
-$where = '';
 
 // put all search terms into an array for highlighting 
 $myterms = array();
@@ -106,7 +111,7 @@ $xsl_file = "stylesheets/results.xsl";
 $countquery = "<total>{count($for$filter $where return \$a)}</total>";
 //$query = " <results>{ $countquery } { " . "$for$filter $let $order $where $return </record> " . "}</results>";
 // exist automatically calculates the total number of matches
-$query = " $for$filter $let $order $where $return </record> ";
+$query = " $for$filter $let $where $order $return </record> ";
 
 
 $xmldb->xquery($query, $position, $maxdisplay); 
