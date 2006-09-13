@@ -9,14 +9,18 @@
 	background-color:#d5d9e5;
 }
 
-.alphaList
-{
-	font-size:12px;
-	color:black;
-	padding-left:5px;
-	padding-right:5px;
-	text-decoration:none;
-	line-height:20px;
+.alphaList {
+  font-size:12px;
+  color:black;
+  padding-left:5px;
+  padding-right:5px;
+  text-decoration:none;
+  line-height:20px;
+}
+
+p.alphaList { 
+  margin-top:0px;
+  margin-left:0.5in;
 }
 
 .alphaText
@@ -66,13 +70,13 @@ div#toc
 	padding-right:10px;
 	padding-top:10px;
 	padding-bottom:10px;
-
 	float:left;
 	width:179px;
 	display:inline;
 	font-size:12px;
 	font-weight:500;
 	text-align:left;
+  	margin-bottom:0.5in;
 }
 div#toc h1 { 
   text-align:center;
