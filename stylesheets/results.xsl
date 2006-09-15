@@ -55,7 +55,6 @@
 			<xsl:apply-templates select="unittitle"/><br />
 			<xsl:apply-templates select="physdesc"/><br />
 			<xsl:apply-templates select="abstract"/><br />
-			<xsl:apply-templates select="author"/><br />
 			<xsl:apply-templates select="matches" />
 		</div><p />
 	</xsl:template>
@@ -70,7 +69,7 @@
 	
 	<xsl:template match="unittitle[not(../name/node())]">	
 		<xsl:element name="a">
-			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
+			<xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
 			<xsl:value-of select="." />
 		</xsl:element>
 	</xsl:template>	
