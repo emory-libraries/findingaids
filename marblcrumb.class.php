@@ -10,8 +10,7 @@ class marblCrumb extends breadCrumb {
 
     // if the breadcrumb cookie was empty, add top-level crumb
     if ($this->isEmpty()) {
-      // FIXME: can we use a relative url here?  try copying index.html over...
-      $this->add("Home", "index.html");
+      $this->add("Home", "index.php");
     }
 
     // add current page

@@ -49,7 +49,7 @@ $localURL = "http://biliku.library.emory.edu/rebecca/marblfa-php";
   </div>
 
   <div id="title">
-    <a href="doc-home">Irish Literary Collections Portal</a>
+    <a href="index.php">Irish Literary Collections Portal</a>
   </div>
 
 
