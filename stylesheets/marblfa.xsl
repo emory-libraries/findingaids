@@ -393,12 +393,23 @@ removed comma before unitdate at Susan's request
 <xsl:apply-templates/>
 </xsl:template>
 
-<xsl:template match="subject |corpname[not(parent::origination)] | controlaccess/persname | controlaccess/title| genreform | geogname | occupation">
+<xsl:template match="subject |corpname[not(parent::origination)] | controlaccess/persname | controlaccess/famname | controlaccess/title| genreform | geogname | occupation">
 <xsl:element name="span">
 <xsl:attribute name="class">indent</xsl:attribute>
 <xsl:apply-templates/>
 </xsl:element>
 <br/>
+</xsl:template>
+
+<!-- in case of multiple languages, spaces are getting lost around the "and"; put spaces back in here -->
+<xsl:template match="langmaterial/language">
+  <xsl:if test="preceding-sibling::language">
+    <xsl:text> </xsl:text>
+  </xsl:if>
+  <xsl:apply-templates/>
+  <xsl:if test="following-sibling::language">
+    <xsl:text> </xsl:text>
+  </xsl:if>
 </xsl:template>
 
 
