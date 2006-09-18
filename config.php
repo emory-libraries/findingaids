@@ -17,7 +17,8 @@ $server = "wilson.library.emory.edu";
 //production
 //$server = "bohr.library.emory.edu";
 $port = "8080";
-$db = "FindingAids";
+//$db = "FindingAids";
+$db = "FindingAids/emory";
 
 $connectionArray = array('host'   => $server,
 	      	    'port'   => $port,
