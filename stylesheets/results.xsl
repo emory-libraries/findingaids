@@ -49,7 +49,7 @@
           </div>
         </xsl:template>
 
-        <xsl:template match="repository">
+        <xsl:template match="source/repository">
           <li>
             <xsl:choose>
               <xsl:when test=". = $repository">
@@ -115,12 +115,12 @@
 			<xsl:apply-templates select="unittitle"/><br />
 			<xsl:apply-templates select="physdesc"/><br />
 			<xsl:apply-templates select="abstract"/><br />
-			<xsl:apply-templates select="author"/>
+			<xsl:apply-templates select="repository"/>
 			<xsl:apply-templates select="matches" />
 		</div><p />
 	</xsl:template>
 
-	<xsl:template match="persname | corpname | famname ">	
+        <xsl:template match="persname | corpname | famname ">	
 		<xsl:element name="a">
                   <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
 			<xsl:value-of select="." />
@@ -144,7 +144,7 @@
         </xsl:template>
 	
         <!-- repository name -->
-        <xsl:template match="author">
+        <xsl:template match="repository">
           <xsl:apply-templates/>
           <xsl:text> </xsl:text>
           <!-- show an icon for each school, for better visual identification -->
@@ -158,6 +158,16 @@
             <xsl:otherwise/>
           </xsl:choose>
           <br />
+        </xsl:template>
+
+        <xsl:template match="repository/subarea">
+          <xsl:text>, </xsl:text>
+          <xsl:apply-templates/>
+        </xsl:template>
+
+        <!-- Wake Forest files -->
+        <xsl:template match="repository/corpname">
+          <xsl:apply-templates/>
         </xsl:template>
 
 	<xsl:template match="matches">

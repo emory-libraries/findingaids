@@ -5,7 +5,8 @@ include_once("lib/xmlDbConnection.class.php");
 $connectionArray{"debug"} = false;
 
 $xmldb = new xmlDbConnection($connectionArray);
-$query = 'for $r in distinct-values(//eadheader/filedesc/titlestmt/author)
+$query = 'for $r in distinct-values(//archdesc/did/repository)
+order by $r
 return <repository>{$r}</repository>';
 
 $xmldb->xquery($query);

@@ -103,7 +103,7 @@ $return  = ' return
   {$a/archdesc/did/unittitle}
   {$a/archdesc/did/physdesc}
   {$a/archdesc/did/abstract}
-  {$a/eadheader/filedesc/titlestmt/author}';
+  {$a/archdes/did/repository}';
 // if this is a keyword search, return # of matches within the document
 if ($kw) $return .= "\n" . '<matches><total>{$matchcount}</total></matches>' . "\n";
 

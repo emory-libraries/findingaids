@@ -8,11 +8,19 @@ include("marblcrumb.class.php");
 // letter to browse (A by default)
 $letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'A';
 
+$repo = ($_REQUEST['repository']) ? $_REQUEST['repository'] : 'all';
+
 $url = "browse.php";
+$urlopts = array();
 if ($letter) {
-  $url .= "?l=$letter";
+  array_push($urlopts, "l=$letter");
   $mode = $letter == 'all' ? "All" : "($letter)";
 }
+if ($repo != 'all')
+  array_push($urlopts, "repository=$repo");
+
+$url .= implode('&', $urlopts);
+
 
 $crumbs = new marblCrumb("Browse $mode", $url);
 $crumbs->store();
@@ -42,12 +50,18 @@ $browse_qry = "
 		for \$a in (//archdesc/did/origination/persname, //archdesc/did/origination/corpname,
 			    //archdesc/did/origination/famname,
  			    //archdesc/did[not(exists(origination/*))]/unittitle)
-		let \$l := substring(\$a,1,1)
+	let \$l := substring(\$a,1,1)";
+if ($repo != 'all') $browse_qry .= " where root(\$a)/ead/archdesc/did/repository = '$repo' ";
+$browse_qry .= "
 		return \$l
 	)
 	order by \$b
 	return <letter>{\$b}</letter>
 ";
+
+$repository_qry = 'for $r in distinct-values(//archdesc/did/repository)
+order by $r
+return <repository>{$r}</repository>';
 
 
 // if a letter is specified, match the first letter of the origination name or title field 
@@ -62,8 +76,14 @@ if ($letter != 'all') {
 	$letter_search = "";
 }
 
+if ($repo != 'all') {
+  $repository_filter = "[archdesc/did/repository = '$repo']";
+} else {
+  $repository_filter = "";
+}
+
 $data_qry = "
-	for \$a in /ead
+	for \$a in /ead$repository_filter 
 	let \$sort-title := concat(\$a/archdesc/did/origination/persname,\$a/archdesc/did/origination/corpname,
 			\$a/archdesc/did/origination/famname,\$a/archdesc/did[not(exists(origination/*))]/unittitle) 
 	$letter_search
@@ -79,17 +99,23 @@ $data_qry = "
 			{\$a/archdesc/did/unittitle}
 			{\$a/archdesc/did/physdesc}
 			{\$a/archdesc/did/abstract}
+			{\$a/archdesc/did/repository}
 		   </record>
 ";
 
-$query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_qry."}</records></results>";
+$query = "<results><alpha_list>{".$browse_qry."}</alpha_list>
+	  <source>{" . $repository_qry . "}</source>
+ 	  <records>{".$data_qry."}</records></results>";
 
 $mode = 'browse';
+
 
 $xsl_file 	= "stylesheets/results.xsl";
 $xsl_params = array('mode' => $mode,
 		    'label_text' => "Browse Collections Alphabetically:",
-		    'baseLink' => "browse.php");
+		    'baseLink' => "browse.php",
+		    "letter" => $letter,
+		    "repository" => $repo);
 
 $xmldb->xquery($query);
 $xmldb->xslTransform($xsl_file, $xsl_params);
