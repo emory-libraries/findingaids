@@ -441,10 +441,10 @@ removed comma before unitdate at Susan's request
 <xsl:apply-templates select="arrangement"/>
 
 
-<table>
-<col width="7%" align="left" valign="top"/>
-<col width="7%" align="left" valign="top"/>
-<col width="86%"/>
+<table width="100%">
+<col width="55px" align="left" valign="top"/>
+<col width="55px" align="left" valign="top"/>
+<col/>
 <thbody valign="top"/>
 
 <!-- process sub-container -->
@@ -459,9 +459,11 @@ removed comma before unitdate at Susan's request
 
 
 <!-- only show box/folder once for the whole page -->
-<xsl:if test="count(../preceding-sibling::node()/did) = 0">
-  <tr><td valign="top">
-  <p/><b>Box</b></td><td><p/><b>Folder</b></td></tr> 
+<xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
+  <tr>
+    <th align="left" valign="top">Box</th>
+    <th align="left">Folder</th>
+  </tr> 
 </xsl:if>
 
 <tr>
