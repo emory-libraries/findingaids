@@ -1,0 +1,40 @@
+<project name="MARBL Finding Aids" default="all" basedir=".">
+
+<import file="common-targets.xml"/>
+
+<target name="all" depends="xml,add-ids,clean,final-info" 
+ description="* Add ids, convert entities to unicode, validate, and clean up"/>
+
+
+<target name="config" depends="common-targets.config">
+
+  <!-- allow user to specify ead repository on command line.
+       syntax: ant -Drepo value -->
+<!--  <property name="repo" value=""/> -->
+
+
+<!--  <condition property="repository" value="${repo}">
+	<equals arg1="${repo}" arg2=""/>
+  </condition>  -->
+
+ <!-- emory is default repository -->
+
+  <input message="What repository are you building documents for (default: emory)? "
+	addproperty="repo"
+	defaultvalue="emory"
+	validargs="emory,boston,wakeforest,"/>
+
+<!-- Note: last 'empty' validarg is neede for input to accept 'return'
+	& use default value -->
+
+  <echo level="info" message="Loading files for ${repo}"/>
+
+  <!-- define a subcollection to be used for loading data to exist -->
+  <property name="exist.subcollection" value="/${repo}"/>
+
+  <echo level="info" message="files will be loaded to ${config.db.collection}${exist.subcollection}"/>
+
+</target>
+
+
+</project>
