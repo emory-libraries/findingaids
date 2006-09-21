@@ -6,16 +6,8 @@
  description="* Add ids, convert entities to unicode, validate, and clean up"/>
 
 
-<target name="config" depends="common-targets.config">
-
-  <!-- allow user to specify ead repository on command line.
-       syntax: ant -Drepo value -->
-<!--  <property name="repo" value=""/> -->
-
-
-<!--  <condition property="repository" value="${repo}">
-	<equals arg1="${repo}" arg2=""/>
-  </condition>  -->
+<!-- set subcollection where files should be loaded -->
+<target name="exist-subcollection">
 
  <!-- emory is default repository -->
 
