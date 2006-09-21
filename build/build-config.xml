@@ -1,0 +1,17 @@
+<config>
+ <input>marbl-docs</input> 
+ <format>EAD</format>	<!-- TEI, EAD, etc -->
+
+<!-- info necessary for loading & deleting data in exist -->
+ <db>
+   <server>
+	<test>wilson.library.emory.edu</test>
+	<production>bohr.library.emory.edu</production>
+   </server>
+   <port>8080</port>
+   <collection>FindingAids</collection>
+   <user></user>
+   <password></password>
+ </db>
+
+</config>
