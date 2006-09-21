@@ -19,7 +19,7 @@
 
  <!-- emory is default repository -->
 
-  <input message="What repository are you building documents for (default: emory)? "
+  <input message="What repository are you building documents for (default: emory)?${line.separator} "
 	addproperty="repo"
 	defaultvalue="emory"
 	validargs="emory,boston,wakeforest,"/>
