@@ -4,61 +4,55 @@
 	xmlns:cti="http://cti.library.emory.edu/"
 	version="1.0">
 
-	<xsl:template match="dsc/head" mode="summary">
-		<h2><xsl:value-of select="text()"/></h2>		
-		<xsl:apply-templates select="c01" mode="summary"/>
-	</xsl:template>
+  <!-- summary mode:
+       brief display of series & subseries (hits if keyword search)
+       -->
+
+  <xsl:template match="dsc/head" mode="summary">
+    <h2><xsl:value-of select="text()"/></h2>		
+  </xsl:template>
 	
-	<xsl:template match="c01" mode="summary">
-		
-<!--	</xsl:template>	
-	<xsl:template match="unittitle"  mode="summary">	-->
-		<p>
-                  <h4>
-			<xsl:attribute name="class">indent</xsl:attribute>
-			<!--<xsl:apply-templates select="unitid" mode="summary"/>-->
+  <xsl:template match="c01|c02|c03" mode="summary">
+    <p>
+      <h4>
+        <!--        <xsl:attribute name="class"><xsl:value-of select="local-name()"/></xsl:attribute> -->
+        <xsl:element name="a">
+          <xsl:attribute name="href">content.php?el=<xsl:value-of select="local-name()"/>&amp;id=<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>			
+          <xsl:value-of select="did/unitid"/>
+          <xsl:text>. </xsl:text>
+          <xsl:value-of select="did/unittitle"/>
+        </xsl:element>
 
-			<xsl:element name="a">
-                          <xsl:attribute name="href">content.php?el=<xsl:value-of select="local-name()"/>&amp;id=<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>			
-				<xsl:value-of select="did/unitid"/>: <xsl:value-of select="did/unittitle"/>
-			</xsl:element>
-                        <xsl:apply-templates select="hits"/></h4>
-		</p>
-                <xsl:apply-templates select="c02" mode="summary"/>
-	</xsl:template>
+        <!-- note: hits are *inside* h4 to keep them on the same line -->      
 
-<!--
-	<xsl:template match="unitid" mode="summary">
-		UNITID is great<xsl:value-of select="."/>
-	</xsl:template>
--->
+        <!-- if we have the full-text, count matches under this node -->
+        <xsl:variable name="count"><xsl:value-of select="count(.//exist:match)"/> </xsl:variable>
 
-	<xsl:template match="c02|c03" mode="summary">
-          <p>
-            <h4>
-              <xsl:attribute name="class"><xsl:value-of select="local-name()"/></xsl:attribute>
-              <xsl:element name="a">
-                <xsl:attribute name="href">content.php?el=<xsl:value-of select="local-name()"/>&amp;id=<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>			
-                <xsl:apply-templates select="did/unitid"/>: <xsl:apply-templates select="did/unittitle"/>
-              </xsl:element>
-              <!-- FIXME : temporary fix because of a bug in eXist's match-count;
-                   correctly detects hits / no hits in subseries, but count is inaccurate.
-              <xsl:apply-templates select="hits"/> -->
-              <xsl:if test="hits > 0">
-                <span class="hits">hits</span>
-              </xsl:if>
+      <xsl:choose>
+        <xsl:when test="$count > 0">
+          <span class="hits"><xsl:value-of select="$count"/> hit<xsl:if test="$count > 1">s</xsl:if></span>
+        </xsl:when>
+        <!-- if not full-text, use results from exist match-count -->
+        <xsl:when test="local-name() != 'c01' and hits > 0">
+        <!-- FIXME : temporary fix because of a bug in eXist's match-count; 
+               correctly detects hits / no hits in subseries, but count is inaccurate. -->
+          <span class="hits">hits</span>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="hits"/>
+        </xsl:otherwise>
+      </xsl:choose>
 
+      </h4>            
 
-            </h4>
-            </p>
+    </p>
+    <!-- if there are subseries, indent to display hierarchy -->
+    <xsl:if test="count(c02[@level='subseries']) + count(c03[@level='subseries']) > 0">
+      <ul>
+        <xsl:apply-templates select="c02[@level='subseries']|c03[@level='subseries']" mode="summary"/>
+      </ul>
+    </xsl:if>
+  </xsl:template>
 
-            <xsl:apply-templates select="c03" mode="summary"/>
-	</xsl:template>
-
-	<xsl:template match="c04 | c05 |c06 | c07 | c08 | c09 | c10 | c11 | c12" mode="summary">
-	</xsl:template>
-	
-	<xsl:template match="scopecontent" mode="summary"></xsl:template>
-	<xsl:template match="physdec" mode="summary"></xsl:template>
 	
 </xsl:stylesheet>
