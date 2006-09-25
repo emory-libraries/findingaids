@@ -61,8 +61,8 @@
         <fo:static-content flow-name="header">
           <fo:table font-family="any" left="0in" right="0in"
             margin-left="0.5in" margin-right="0.5in">
-            <fo:table-column column-width="50%"/>
-            <fo:table-column column-width="50%"/>
+            <fo:table-column column-width="4in"/>
+            <fo:table-column column-width="3.5in"/>
             <fo:table-body> 
             <fo:table-row>
               <fo:table-cell>
@@ -455,7 +455,7 @@
          </xsl:when> 
       <!-- otherwise, display in tables -->
       <xsl:otherwise> 
-        <fo:table border-width="1px">
+        <fo:table>
           <fo:table-column column-width="0.5in"/>
           <fo:table-column column-width="0.5in"/>
           <fo:table-column column-width="5in"/>
