@@ -30,9 +30,8 @@ $xmldb->save($outfile);
 $pdf  = file_get_contents($fop . $outfile);
 
 header("Content-type: application/pdf");
-header("Content-Disposition: filename=$filename.xml");
+header("Content-Disposition: filename=$filename.pdf");
 
-//http_redirect($fop . $outfile);
 print $pdf;
 
 // remove temporary file
