@@ -7,7 +7,7 @@
 
   <!-- width of inner page (content portion), in inches 
        (used to calculate table column sizes)   -->
-  <xsl:variable name="pagewidth">7.5</xsl:variable>
+  <xsl:variable name="pagewidth">6.5</xsl:variable>
 
   <xsl:template match="/">
     <fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
