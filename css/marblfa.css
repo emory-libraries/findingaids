@@ -95,25 +95,31 @@ div#content
 }
 
 
-div#headingBlock
-{
-	background-color:#A7B8DC;
-	padding-left:10px;
-	padding-right:10px;
-	padding-top:10px;
-	padding-bottom:10px;
-	text-align:center;
+div#title {
+  background-color:#A7B8DC;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+  text-align:center;
+  font-size:15px;
+  font-weight:bold;
 }
 
-div#eadheader { 
+.content_subtitle {
+  font-weight:normal;
+}
+
+
+div#publicationstmt { 
   text-align:center;
 }
 
 /* h3/h4 size must be set explicitly - over-riding more general font-size set elsewhere  */
-div#eadheader h3 { 
+div#publicationstmt h3 { 
   font-size:115%;
 }
-div#eadheader h4 { 
+div#publicationstmt h4 { 
   font-size:110%;
 }
 
@@ -133,16 +139,6 @@ div#toc a {
   background-color:#ffffff;
 }
 
-.content_title
-{
-	font-size:15px;
-	font-weight:bold;
-}
-
-.content_subtitle
-{
-	font-size:15px;
-}
 
 
 span.hits { color:red; padding-left:1em;font-weight:bold;}
@@ -182,7 +178,7 @@ h2 {
   font-size:115%;
 }
 
-h2 a, h3 a { 
+h2 a, h3 a, a[name] { 
   text-decoration:none;
 }
 /* no line before text immediately after h3 heading */
@@ -216,4 +212,10 @@ li.resultlink {
 /* no left border on first result link */
 li.first { 
   border-left: none;
+}
+
+th {text-align:left;  }
+
+p.tight { 
+  margin:0px;
 }
