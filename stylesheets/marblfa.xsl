@@ -80,7 +80,17 @@
           Administrative Information
         </a> 
       </xsl:element>
-      <xsl:apply-templates select="acqinfo | accessrestrict | userestrict | prefercite | separatedmaterial"/>
+      <!-- display the following fields, in this specific order -->
+      <xsl:apply-templates select="accessrestrict"/>
+      <xsl:apply-templates select="userestrict"/>
+      <xsl:apply-templates select="altformavail"/>
+      <xsl:apply-templates select="originalsloc"/>
+      <xsl:apply-templates select="bibliography"/>
+      <xsl:apply-templates select="relatedmaterial"/>
+      <xsl:apply-templates select="separatedmaterial"/>
+      <xsl:apply-templates select="acqinfo"/>
+      <xsl:apply-templates select="custodhist"/>
+      <xsl:apply-templates select="prefercite"/>
       <hr/>
       <xsl:element name="h2">
         <a>
@@ -88,7 +98,11 @@
           Collection Description
         </a>
       </xsl:element>
-      <xsl:apply-templates select="bioghist | scopecontent | arrangement"/>
+      <!-- display the following fields, in this specific order -->
+      <xsl:apply-templates select="bioghist"/>
+      <xsl:apply-templates select="scopecontent"/>
+      <xsl:apply-templates select="arrangement"/>
+      <xsl:apply-templates select="otherfindaid"/>
       <hr/>
       <xsl:apply-templates select="controlaccess"/>
       <hr/>
@@ -281,10 +295,15 @@
       <xsl:value-of select="did/physdesc"/>
     </xsl:element>
     
-    <xsl:apply-templates select="scopecontent"/>
-    <xsl:apply-templates select="bibliography"/>
     <xsl:apply-templates select="bioghist"/>
+    <xsl:apply-templates select="scopecontent"/>
     <xsl:apply-templates select="arrangement"/>
+    <xsl:apply-templates select="otherfindaid"/>
+    <xsl:apply-templates select="accessrestrict"/>
+    <xsl:apply-templates select="userestrict"/>
+    <xsl:apply-templates select="altformavail"/>
+    <xsl:apply-templates select="originalsloc"/>
+    <xsl:apply-templates select="bibliography"/>
 
     <xsl:choose>
       <!-- if there are subseries, use summary mode -->
@@ -360,11 +379,12 @@
   </xsl:template>
 
   <!-- scope and content and arrangement -->
-  <xsl:template match="c01/scopecontent | c01/arrangement">
+  <!--   <xsl:template match="c01/scopecontent | c01/arrangement">
     <xsl:apply-templates />
-  </xsl:template>
+  </xsl:template> -->
 
-  <xsl:template match="scopecontent[parent::c01|parent::c02]/head | arrangement[parent::c01|parent::c02]/head">
+  <!--  <xsl:template match="scopecontent[parent::c01|parent::c02]/head | arrangement[parent::c01|parent::c02]/head"> -->
+  <xsl:template match="c01/*/head | c02/*/head | c03/*/head">
     <h3><xsl:value-of select="."/></h3>
   </xsl:template>
 
@@ -393,7 +413,7 @@
 
 <!-- display number of keyword matches -->
 <xsl:template match="hits">
- <!-- don't display anything if there are zero hits -->
+ <!-- don't display anything if there are zero hits -->http://www.stylusstudio.com/xsllist/199910/post10450.html
   <xsl:if test=". != 0">
     <span class="hits">
       <xsl:apply-templates/> hit<xsl:if test=". > 1">s</xsl:if>
