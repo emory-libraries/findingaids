@@ -40,7 +40,7 @@ if ($maxdisplay == '') $maxdisplay = 50;       // what is a reasonable default?
 // pull out exact phrase enclosed in quotation marks
 preg_match_all("/\"([^\"]+)\"/", stripslashes($kw), $phrases);
 
-$keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", stripslashes($kw));
+$keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", $kw);
 
 // clean up input & convert into an array
 $kwarray = processterms($keywords);
@@ -142,9 +142,9 @@ if ($total == 0){
   // in phonetic mode, php highlighting will be inaccurate and/or useless... 
   // $xmldb->highlightInfo($myterms); 
   print "<p align=\"center\">where ";
-  if ($kw) print "document contains '" . stripslashes($kw) . "'";
+  if ($kw) print "document contains \"" . stripslashes($kw) . "\"";
   if ($kw && $creator) print " and ";
-  if ($creator) print "creator matches \"$creator\"";
+  if ($creator) print "creator matches \"" . stripslashes($creator) . "\"";
     "</p>"; 
 
   print "</div>";
