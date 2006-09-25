@@ -11,6 +11,11 @@ $tamino_server = "vip.library.emory.edu";
 $tamino_db = "EAD_TEST";
 $tamino_coll = "MARBLFindingAids";
 
+
+// settings for generating pdfs
+$tmpdir = "/tmp/findingaids/";
+$fop = "http://wilson:8080/fop/fop?fo=";
+
 /* exist settings  */
 // test
 $server = "wilson.library.emory.edu";

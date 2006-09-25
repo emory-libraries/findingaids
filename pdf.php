@@ -18,5 +18,24 @@ $params = array("mode" => "full");
 $xmldb->xslBind("stylesheets/marblfa.xsl", $params);
 $xmldb->xslBind("stylesheets/htmlpdf.xsl");
 $xmldb->transform();
-$xmldb->printResult();
+
+$filename = $xmldb->findNode("eadheader/eadid");
+$filename = basename($filename, ".xml");
+$outfile = $tmpdir . $filename . '.fo';
+mkdir($tmpdir);
+$xmldb->save($outfile);
+//print "DEBUG: saving xml (xsl-fo) to $outfile.<br>";
+
+// call fop & generate pdf ...
+$pdf  = file_get_contents($fop . $outfile);
+
+header("Content-type: application/pdf");
+header("Content-Disposition: filename=$filename.xml");
+
+//http_redirect($fop . $outfile);
+print $pdf;
+
+// remove temporary file
+unlink($outfile);
+
 ?>
