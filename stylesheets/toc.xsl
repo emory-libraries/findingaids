@@ -9,7 +9,7 @@
 
   <xsl:template match="unitid"  mode="toc">
     <xsl:apply-templates mode="toc"/>
-    <xsl:text>. </xsl:text>
+    <xsl:text>: &#x00A0;</xsl:text>
   </xsl:template>
 
   <!--  <xsl:template match="unittitle"  mode="toc">
