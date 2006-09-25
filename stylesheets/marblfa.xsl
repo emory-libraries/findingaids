@@ -25,8 +25,15 @@
           <h1>Table of Contents</h1>
           <hr/>
           <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
+
+          <hr/>
+        <a>
+          <xsl:attribute name="href">pdf.php?id=<xsl:value-of select="//ead/@id"/></xsl:attribute>
+          printable copy (PDF)
+        </a>
+
         </div>
-        
+
         <!--start content-->
         <div id="content">
           <!--          <xsl:apply-templates select="//results/ead/eadheader/filedesc/titlestmt"/>-->
