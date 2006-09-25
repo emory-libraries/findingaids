@@ -76,9 +76,12 @@
     
     <xsl:apply-templates select="hits"/>
     
-    <xsl:element name="ul">			
-      <xsl:apply-templates select="c01" mode="toc"/>
-    </xsl:element>
+    <xsl:if test="count(c01)">
+      <xsl:element name="ul">			
+        <xsl:apply-templates select="c01" mode="toc"/>
+      </xsl:element>
+    </xsl:if>
+
   </xsl:template>
 
   <!-- unused ? 
