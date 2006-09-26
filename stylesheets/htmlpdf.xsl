@@ -5,6 +5,12 @@
 
   <xsl:output method="xml"/>
 
+  <xsl:variable name="disclaimer">
+  MARBL provides copies of its finding aids for use only in research
+  and private study.  Copies supplied may not be copied for others or
+  otherwise distributed without prior consent of MARBL.
+  </xsl:variable>
+
   <!-- width of inner page (content portion), in inches 
        (used to calculate table column sizes)   -->
   <xsl:variable name="pagewidth">6.5</xsl:variable>
@@ -28,7 +34,7 @@
             margin-right="0.5in" 
             margin-top="0.5in"/>
           <fo:region-before extent="1.0in"/>
-          <fo:region-after extent="0.5in"/>
+          <fo:region-after extent="0.5in" region-name="firstpage-footer"/>
         </fo:simple-page-master>
 
         <fo:simple-page-master master-name="basic"
@@ -45,7 +51,7 @@
             margin-top="0.5in"/>
           <!-- named header region; to keep from displaying on first page -->
           <fo:region-before extent="1.0in" region-name="header"/>
-          <fo:region-after extent="0.5in"/>
+          <fo:region-after extent="0.5in" region-name="footer"/>
         </fo:simple-page-master>
         
         <!-- one first page, followed by as many basic pages as necessary -->
@@ -58,11 +64,11 @@
       
       <fo:page-sequence master-reference="all-pages">
 
+        <!-- display collection name / collection # at top of all pages after the first -->
         <fo:static-content flow-name="header">
-          <fo:table font-family="any" left="0in" right="0in"
-            margin-left="0.5in" margin-right="0.5in">
-            <fo:table-column column-width="4in"/>
-            <fo:table-column column-width="3.5in"/>
+          <fo:table font-family="any" left="0in" font-size="10pt" margin-left="0.25in">
+            <fo:table-column column-width="4.5in"/>
+            <fo:table-column column-width="2.5in"/>
             <fo:table-body> 
             <fo:table-row>
               <fo:table-cell>
@@ -80,29 +86,37 @@
         </fo:table>
         
       </fo:static-content>
+
+      <!-- display MARBL disclaimer at the foot of the first page -->
+      <fo:static-content flow-name="firstpage-footer">
+        <fo:block text-align="center" font-family="any" font-style="italic">
+          <xsl:value-of select="normalize-space($disclaimer)"/>
+        </fo:block>
+      </fo:static-content>
+
         
-        <fo:static-content flow-name="xsl-region-after">
-          <fo:block text-align="center" font-family="any">
-            <fo:page-number/>
-          </fo:block>
-        </fo:static-content>
+      <fo:static-content flow-name="footer">
+        <fo:block text-align="center" font-family="any">
+          <fo:page-number/>
+        </fo:block>
+      </fo:static-content>
+      
+      <fo:flow flow-name="xsl-region-body">
         
-        <fo:flow flow-name="xsl-region-body">
-          
-          <fo:block font-family="any">
-            <xsl:apply-templates/>
-          </fo:block>		  
-          
+        <fo:block font-family="any">
+          <xsl:apply-templates/>
+        </fo:block>		  
+        
         </fo:flow>
         
       </fo:page-sequence>	
-    
+      
     </fo:root>
 
   </xsl:template>
 
  <xsl:template match="div[@id='title']">
-   <fo:block font-size="22pt" font-family="any" text-align="center" line-height="30pt" space-after.optimum="40pt">
+   <fo:block font-size="16pt" font-family="any" text-align="center" space-after.optimum="30pt">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
@@ -146,7 +160,7 @@
  </xsl:template>
 
  <xsl:template match="div[@id='publicationstmt']">
-   <fo:block font-size="12pt" font-family="any" text-align="center" line-height="16pt" space-after.optimum="20pt"
+   <fo:block font-size="14pt" font-family="any" text-align="center" space-after.optimum="20pt"
 	font-weight="bold">
      <xsl:apply-templates/>
    </fo:block>
@@ -161,6 +175,7 @@
    <fo:block>
      <xsl:choose>
        <xsl:when test="@class = 'tight'">
+         <xsl:attribute name="space-after.optimum">0pt</xsl:attribute>
          <xsl:attribute name="space-after.optimum">0pt</xsl:attribute>
        </xsl:when>
        <xsl:when test="@class = 'bibref'">
@@ -188,8 +203,8 @@
 
 
  <xsl:template match="table">
-   <fo:table>
-     <!-- FIXME: how to get columns? use table id /class -->
+   <fo:table space-before.optimum="10pt">
+     <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths --> 
      <xsl:apply-templates select="col"/>
      <fo:table-body>
        <xsl:apply-templates select="tr"/>
@@ -223,7 +238,13 @@
  </xsl:template>
 
  <xsl:template match="tr">
-   <fo:table-row keep-together="always">
+   <fo:table-row keep-together="always" space-after.optimum="5pt">
+     <xsl:apply-templates/>
+   </fo:table-row>
+ </xsl:template>
+
+<xsl:template match="tr[th]">
+   <fo:table-row keep-together="always" keep-with-next="always" space-after.optimum="5pt">
      <xsl:apply-templates/>
    </fo:table-row>
  </xsl:template>
@@ -234,6 +255,10 @@
        <xsl:attribute name="number-columns-spanned"><xsl:value-of select="@colspan"/></xsl:attribute>
      </xsl:if>
      <fo:block>
+       <!-- box & folder labels should be smaller -->
+       <xsl:if test="../@class = 'box-folder'">
+         <xsl:attribute name="font-size">10pt</xsl:attribute>
+       </xsl:if>
        <xsl:if test="name() = 'th'">
          <xsl:attribute name="font-weight">bold</xsl:attribute>
        </xsl:if>
@@ -253,4 +278,5 @@
    <fo:block/>
  </xsl:template>
 
-</xsl:stylesheet>
+</xsl:stylesheet
+>
