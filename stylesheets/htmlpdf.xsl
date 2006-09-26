@@ -89,7 +89,8 @@
 
       <!-- display MARBL disclaimer at the foot of the first page -->
       <fo:static-content flow-name="firstpage-footer">
-        <fo:block text-align="center" font-family="any" font-style="italic">
+        <fo:block text-align="start" font-family="any" font-style="italic"
+          font-size="10pt" margin-left="0.5in" margin-right="0.5in">
           <xsl:value-of select="normalize-space($disclaimer)"/>
         </fo:block>
       </fo:static-content>
@@ -116,22 +117,25 @@
   </xsl:template>
 
  <xsl:template match="div[@id='title']">
-   <fo:block font-size="16pt" font-family="any" text-align="center" space-after.optimum="30pt">
+   <fo:block font-size="16pt" font-family="any" text-align="center"
+     space-after.optimum="30pt">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
 
 
  <xsl:template match="h2">
-   <fo:block font-size="14pt" font-family="any" line-height="16pt" space-after.optimum="10pt"
-	space-before.optimum="5pt" font-weight="bold" keep-with-next="always">
+   <fo:block font-size="14pt" font-family="any" line-height="16pt"
+   space-after.optimum="10pt" space-before.optimum="10pt"
+   font-weight="bold" keep-with-next="always">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
 
  <xsl:template match="h3">
-   <fo:block font-size="12pt" font-family="any" line-height="16pt" space-after.optimum="0pt"
-	font-weight="bold" keep-with-next="always">
+   <fo:block font-size="12pt" font-family="any" line-height="16pt"
+     space-after.optimum="0pt" space-before.optimum="10pt"
+     font-weight="bold" keep-with-next="always">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
@@ -160,8 +164,15 @@
  </xsl:template>
 
  <xsl:template match="div[@id='publicationstmt']">
-   <fo:block font-size="14pt" font-family="any" text-align="center" space-after.optimum="20pt"
-	font-weight="bold">
+   <fo:block font-size="14pt" font-family="any" text-align="center"
+     space-after.optimum="20pt">
+     <xsl:apply-templates/>
+   </fo:block>
+ </xsl:template>
+
+ <xsl:template match="div[@id='publicationstmt']/h3|div[@id='publicationstmt']/h4">
+   <!-- should inhert publicationstmt formatting -->
+   <fo:block space-after.optimum="0pt">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
@@ -175,14 +186,18 @@
    <fo:block>
      <xsl:choose>
        <xsl:when test="@class = 'tight'">
-         <xsl:attribute name="space-after.optimum">0pt</xsl:attribute>
+         <xsl:attribute name="space-before.optimum">0pt</xsl:attribute>
          <xsl:attribute name="space-after.optimum">0pt</xsl:attribute>
        </xsl:when>
        <xsl:when test="@class = 'bibref'">
          <xsl:attribute name="space-before.optimum">5pt</xsl:attribute>
        </xsl:when>
+       <xsl:when test="@class = 'indent'">
+         <xsl:attribute name="space-before.optimum">0pt</xsl:attribute>
+         <xsl:attribute name="space-after.optimum">10pt</xsl:attribute>
+       </xsl:when>
        <xsl:otherwise>
-         <xsl:attribute name="space-after.optimum">5pt</xsl:attribute>
+         <!--         <xsl:attribute name="space-after.optimum">5pt</xsl:attribute> -->
        </xsl:otherwise>       
      </xsl:choose>
      <xsl:apply-templates/>
@@ -203,7 +218,7 @@
 
 
  <xsl:template match="table">
-   <fo:table space-before.optimum="10pt">
+   <fo:table padding-before="10pt">
      <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths --> 
      <xsl:apply-templates select="col"/>
      <fo:table-body>
@@ -238,7 +253,7 @@
  </xsl:template>
 
  <xsl:template match="tr">
-   <fo:table-row keep-together="always" space-after.optimum="5pt">
+   <fo:table-row keep-together="always">
      <xsl:apply-templates/>
    </fo:table-row>
  </xsl:template>
@@ -254,13 +269,18 @@
      <xsl:if test="@colspan">
        <xsl:attribute name="number-columns-spanned"><xsl:value-of select="@colspan"/></xsl:attribute>
      </xsl:if>
-     <fo:block>
+     <fo:block padding-after="2pt">
        <!-- box & folder labels should be smaller -->
        <xsl:if test="../@class = 'box-folder'">
          <xsl:attribute name="font-size">10pt</xsl:attribute>
        </xsl:if>
        <xsl:if test="name() = 'th'">
          <xsl:attribute name="font-weight">bold</xsl:attribute>
+       </xsl:if>
+       <xsl:if test="@class = 'content'">
+         <!-- indent secondary lines of content description -->
+         <xsl:attribute name="margin-left">20pt</xsl:attribute>
+         <xsl:attribute name="text-indent">-10pt</xsl:attribute>
        </xsl:if>
        <xsl:apply-templates/>
      </fo:block>
