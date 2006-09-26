@@ -52,13 +52,14 @@
         <xsl:template match="source/repository">
           <li>
             <xsl:choose>
-              <xsl:when test=". = $repository">
+              <xsl:when test="@agencycode = $repository">
+                <!-- if this is current repository, don't make it a link -->
                 <xsl:apply-templates/>
               </xsl:when>
               <xsl:otherwise>
                 <a>
                   <xsl:attribute name="href"><xsl:value-of 
-                  select="concat($baseLink, '?l=', $letter, '&amp;repository=', .)"/></xsl:attribute>
+                  select="concat($baseLink, '?l=', $letter, '&amp;repository=', @agencycode)"/></xsl:attribute>
                   <xsl:apply-templates/>
                 </a>
               </xsl:otherwise>

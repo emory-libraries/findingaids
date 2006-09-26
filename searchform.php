@@ -5,9 +5,15 @@ include_once("lib/xmlDbConnection.class.php");
 $connectionArray{"debug"} = false;
 
 $xmldb = new xmlDbConnection($connectionArray);
-$query = 'for $r in distinct-values(//archdesc/did/repository)
+
+$query = 'for $r in distinct-values(/ead/eadheader/eadid/@mainagencycode)
+let $rep := (/ead[eadheader/eadid/@mainagencycode = $r]/archdesc/did/repository)[1] 
+order by $rep 
+return <repository agencycode="{$r}">{$rep/@*} {$rep/node()}</repository>';
+
+/*$query = 'for $r in distinct-values(//archdesc/did/repository)
 order by $r
-return <repository>{$r}</repository>';
+return <repository>{$r}</repository>';*/
 
 $xmldb->xquery($query);
 $xsl_file 	= "stylesheets/search.xsl";
@@ -20,10 +26,8 @@ $xmldb->xslTransform($xsl_file);
 
 <div class='content' id='search'>
 
-<table name="searchtable">
-<tr><td>
 
-<h2>Search Collections</h2>
+<h3>Search Collections</h3>
 
 <form name="fa_query" action="search.php" method="get">
 <table class="searchform" border="0">
@@ -32,7 +36,7 @@ $xmldb->xslTransform($xsl_file);
 
 
 <tr><th>Creator</th><td class="input"><input type="text" size="40" name="creator" value="<?= $creator?>"></td></tr>
-<tr><th></th><td class="info">Searches only for person, family, or organization that created or accumulated the collection [e.g., <b>Heaney, Seamus</b> or <b>Georgia Woman's Christian Temperance Union</b>]</td></tr>
+<tr><th></th><td class="info">Searches only for person, family, or organization that created or accumulated the collection [e.g., <b>Heaney, Seamus</b>]</td></tr>
 
 
 <tr>

@@ -41,17 +41,21 @@ switch ($browseBy) {
    // query for all volumes 
 }
 
-// note: in all cases, unit title is used as a fall-back *only* if no origination name exists
+// query to limit finding aids to irish subjects for delmas 
+$irishfilter = "controlaccess//subject |= 'irish ireland'";
 
+
+// note: in all cases, unit title is used as a fall-back *only* if no origination name exists
 // xquery to get the first letters of all titles (used to generate alpha list)
 $browse_qry = "
 	for \$b in 
 	distinct-values (
-		for \$a in (//archdesc/did/origination/persname, //archdesc/did/origination/corpname,
-			    //archdesc/did/origination/famname,
- 			    //archdesc/did[not(exists(origination/*))]/unittitle)
+		for \$a in (//archdesc[$irishfilter]/did/origination/persname,
+			    //archdesc[$irishfilter]/did/origination/corpname,
+			    //archdesc[$irishfilter]/did/origination/famname,
+ 			    //archdesc[$irishfilter]/did[not(exists(origination/*))]/unittitle)
 	let \$l := substring(\$a,1,1)";
-if ($repo != 'all') $browse_qry .= " where root(\$a)/ead/archdesc/did/repository = '$repo' ";
+if ($repo != 'all') $browse_qry .= " where root(\$a)/ead/eadheader/eadid/@mainagencycode = '$repo' ";
 $browse_qry .= "
 		return \$l
 	)
@@ -59,10 +63,11 @@ $browse_qry .= "
 	return <letter>{\$b}</letter>
 ";
 
-$repository_qry = 'for $r in distinct-values(//archdesc/did/repository)
-order by $r
-return <repository>{$r}</repository>';
 
+$repository_qry = 'for $r in distinct-values(/ead/eadheader/eadid/@mainagencycode)
+let $rep := (/ead[eadheader/eadid/@mainagencycode = $r]/archdesc/did/repository)[1] 
+order by $rep 
+return <repository agencycode="{$r}">{$rep/@*} {$rep/node()}</repository>';
 
 // if a letter is specified, match the first letter of the origination name or title field 
 if ($letter != 'all') {
@@ -77,13 +82,13 @@ if ($letter != 'all') {
 }
 
 if ($repo != 'all') {
-  $repository_filter = "[archdesc/did/repository = '$repo']";
+  $repository_filter = "[eadheader/eadid/@mainagencycode = '$repo']";
 } else {
   $repository_filter = "";
 }
 
 $data_qry = "
-	for \$a in /ead$repository_filter 
+	for \$a in /ead[archdesc/$irishfilter]$repository_filter 
 	let \$sort-title := concat(\$a/archdesc/did/origination/persname,\$a/archdesc/did/origination/corpname,
 			\$a/archdesc/did/origination/famname,\$a/archdesc/did[not(exists(origination/*))]/unittitle) 
 	$letter_search

@@ -67,6 +67,9 @@ if ($keywords)
   $filter .= "[. &= '$keywords']";
 foreach ($phrases[1] as $p)
   $filter .= "[near(., '$p')]";
+if ($repo != 'all')
+  $filter .= "[eadheader/eadid/@mainagencycode = '$repo']";
+  
 
 $where = "";
 if ($creator) {
@@ -103,7 +106,7 @@ $return  = ' return
   {$a/archdesc/did/unittitle}
   {$a/archdesc/did/physdesc}
   {$a/archdesc/did/abstract}
-  {$a/archdes/did/repository}';
+  {$a/archdesc/did/repository}';
 // if this is a keyword search, return # of matches within the document
 if ($kw) $return .= "\n" . '<matches><total>{$matchcount}</total></matches>' . "\n";
 
@@ -147,6 +150,7 @@ if ($total == 0){
   if ($kw) print "document contains '" . stripslashes($kw) . "'";
   if ($kw && $creator) print " and ";
   if ($creator) print "creator matches \"$creator\"";
+  // FIXME: display selected repository here?
     "</p>"; 
 
   print "</div>";
