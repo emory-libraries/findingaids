@@ -90,23 +90,21 @@ div#toc div.titleproper {
 }
 
 
-div#content
-{
-	float:left;
-	padding-left:10px;	
-	display:inline;
-	width:68%
+div#content {
+  float:left;
+  padding-left:10px;	
+  display:inline;
+  width:68%
 }
 
 
-div#headingBlock
-{
-	background-color:#A7B8DC;
-	padding-left:10px;
-	padding-right:10px;
-	padding-top:10px;
-	padding-bottom:10px;
-	text-align:center;
+div#headingBlock {
+  background-color:#A7B8DC;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+  text-align:center;
 }
 
 div#eadheader { 
@@ -169,9 +167,16 @@ div.breadCrumbs {
 
 a.match { text-decoration:none; }
 
+table.searchform { 
+  font-size: 90%;
+}
+table.searchform th { 
+  font-weight:normal;
+}
 table.searchform td.info { 
   padding-bottom:10px;
 }
+
 
 ul.searchtips li {
   list-style-type: disc;
@@ -221,3 +226,4 @@ li.resultlink {
 li.first { 
   border-left: none;
 }
+
