@@ -35,25 +35,21 @@ $connectionArray{"debug"} = false;
 	{
 		case 'c01':
 		  $path = "/archdesc/dsc/c01";
-		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		  break;
 		
 		case 'c02':
 		  $path = "/archdesc/dsc/c01/c02";
-		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
 
 		case 'c03':
 		  $path = "/archdesc/dsc/c01/c02/c03";
-		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
 
 		case 'did':
 		  $path = "/archdesc/did";
-		  $mode = 'c-level-index';
 		  $wrapOutput = true;
 		break;
 		
