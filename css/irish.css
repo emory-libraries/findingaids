@@ -1,0 +1,144 @@
+body {
+  color:#000000; 
+  background:#cccc99;
+  margin-left:1in;
+  margin-right:1in;
+  font-family: verdana, arial, helvetica, sans-serif;
+  font-weight: normal;  
+  font-size: 12px; 
+}
+
+h2 {
+  font-size:1.5em;
+  font-weight:normal;
+}
+
+a:link { 
+  color:#666699;
+  text-decoration:none;
+} 
+a:visited {
+  color:#666699;
+  text-decoration:none;
+} 
+a:active {
+  color:#993300;
+}
+a:hover {
+  color:#993300
+}
+
+/* name anchors shouldn't color like links */
+a[name]:hover {
+  color:#000000;
+}
+
+
+select, input {
+  background-color:#cccc99;
+} 
+
+input.button { 
+  background:#cd9967;
+}
+
+div.header { 
+  text-align:left;
+  margin:0.25in;
+  margin-bottom:4px;
+  padding-bottom:0px;
+
+}
+
+/* logo images (emory, boston) */
+div.logo { 
+  width:38px;
+  height:40px;
+  display:inline;
+}
+
+div.logo img { 
+  background-color:#ffffff; 
+  border:0px;
+}
+
+div.logo a:hover img { 
+  background-color:#FF9933; 
+}
+
+
+div#title { 
+  background-color:#cd9967;
+  height:40px;
+  width:511px;
+  font-variant:small-caps;
+  text-align:center;
+  display:inline;
+  margin-left:3px;
+  position:absolute;
+}
+
+div#title a { 
+  color:#320000;
+  font-size:22px;
+  line-height:40px;
+}
+
+div#nav {  
+  background:#333333;
+  height:20px;
+  width:575px;
+  font-size:11pt;
+  margin-left:82px;
+  margin-top:0px;
+}
+
+div#nav a { 
+  color:#d4d4d4;
+  padding-left:25px;
+  padding-right:25px;
+  font-size:10pt;
+  text-decoration:none;
+}
+
+div#nav a:hover  { 
+  color:#FF9933; 
+}
+
+
+
+
+div.footer { 
+  margin-top:0.5in;
+  margin-left:20px;
+  font-size:10px;
+  clear:both;
+}
+
+
+
+div#headingBlock {
+  background-color:#cd9967;
+  color:#320000;
+}
+
+div#toc {
+  background-color:#F0F0F0;
+  border:0px;
+}
+
+div.navbox { 
+/*  border:1px solid blue;*/
+ }
+
+div.navbox ul { 
+  margin:0px;
+}
+
+
+
+img#frontpage { 
+  margin-top:0px;
+  margin-left: 1.1in;
+  padding:0px;
+ }
