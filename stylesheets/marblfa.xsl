@@ -124,8 +124,11 @@
      <xsl:apply-templates select="otherfindaid"/>
      
      
-     <hr/>
-     <xsl:apply-templates select="controlaccess"/>     
+     <!-- don't display search terms in full/printable (pdf) version -->
+     <xsl:if test="$mode != 'full'">
+       <hr/>
+       <xsl:apply-templates select="controlaccess"/>     
+     </xsl:if>
 
      <hr/>
      
@@ -315,7 +318,7 @@
           <xsl:apply-templates select="container[@type='folder']"/>
         </td>
       </xsl:if>
-      <td>
+      <td class="content">
         <xsl:apply-templates select="unittitle"/>
       </td>
     </tr>
@@ -328,7 +331,7 @@
 
   <!-- generic templates -->
   <xsl:template match="head">
-    <b><xsl:apply-templates/></b>
+    <h3><xsl:apply-templates/></h3>
   </xsl:template>
 
 
