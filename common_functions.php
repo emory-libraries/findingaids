@@ -14,6 +14,11 @@ print "<html>
  <title>$mode : Manuscript, Archives, and Rare Books Library</title>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">
 <meta name=\"robots\" content=\"index,follow\">
+<script language=\"Javascript\">
+function pdfnotify (url) {
+ window.open('pdfstatus.html', 'pdfstatus', 'width=300,height=125,toolbar=no,status=no,location=no,menubar=no,scrollbars=no,screenX=300,screenY=300,left=300,top=300,resizable=no');
+}
+</script>
  </head>";
 }
 
