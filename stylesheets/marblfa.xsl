@@ -58,9 +58,6 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="archdesc/did/unitid">
-    <span id="unitid"><xsl:apply-templates/></span>
-  </xsl:template>
 
   <xsl:template match="publicationstmt">
     <div id="publicationstmt">
@@ -175,7 +172,14 @@
        <xsl:value-of select="$label"/>
      </th>
      <td>
-       <xsl:apply-templates/>
+       <xsl:choose>
+         <xsl:when test="$name = 'unitid'">
+           <span id="unitid"><xsl:apply-templates/></span>           
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:apply-templates/>
+         </xsl:otherwise>
+       </xsl:choose>
      </td>
    </tr>
    
@@ -293,7 +297,7 @@
   <xsl:template match="did[container/@type='box']">
     <!-- only show box/folder once for the whole page -->
     <xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
-      <tr>
+      <tr class="box-folder">
         <th>Box</th>
         <!-- only display folder label if there are folders -->
         <xsl:if test="//container[@type='folder']">
