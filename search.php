@@ -41,7 +41,7 @@ if ($maxdisplay == '') $maxdisplay = 50;       // what is a reasonable default?
 // pull out exact phrase enclosed in quotation marks
 preg_match_all("/\"([^\"]+)\"/", stripslashes($kw), $phrases);
 
-$keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", stripslashes($kw));
+$keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", $kw);
 
 // clean up input & convert into an array
 $kwarray = processterms($keywords);
@@ -55,8 +55,11 @@ html_head($doctitle);
 include("template-header.inc");
 print $crumbs;
 
+// query to limit finding aids to irish subjects for delmas 
+$irishfilter = "controlaccess//subject |= 'irish ireland'";
 
-$for = ' for $a in /ead';
+
+$for = 'for $a in /ead';
 $let = "\n" . 'let $b := $a/eadheader
 let $matchcount := text:match-count($a)';
 $order = "order by \$matchcount descending";
@@ -70,18 +73,18 @@ foreach ($phrases[1] as $p)
 if ($repo != 'all')
   $filter .= "[eadheader/eadid/@mainagencycode = '$repo']";
   
-
-$where = "";
+$where = "where \$a/archdesc[$irishfilter]";
 if ($creator) {
   // the simpler syntax "where x or y" should work here
   // in this case, that syntax caused the query not to match when it should
-  $where = "
-	where (\$a/archdesc/did/origination,
+  $where .= "
+	and (\$a/archdesc/did/origination,
 		\$a//controlaccess/persname[@encodinganalog='700'],
 		\$a//controlaccess/corpname[@encodinganalog='710'],
 		\$a//controlaccess/famname[@encodinganalog='700'])[. &= '$creator']
 ";
 } 
+
 
 if ($title) $filter .= "[//titlestmt &=  '$title']";
 
@@ -147,9 +150,9 @@ if ($total == 0){
   // in phonetic mode, php highlighting will be inaccurate and/or useless... 
   // $xmldb->highlightInfo($myterms); 
   print "<p align=\"center\">where ";
-  if ($kw) print "document contains '" . stripslashes($kw) . "'";
+  if ($kw) print "document contains \"" . stripslashes($kw) . "\"";
   if ($kw && $creator) print " and ";
-  if ($creator) print "creator matches \"$creator\"";
+  if ($creator) print "creator matches \"" . stripslashes($creator) . "\"";
   // FIXME: display selected repository here?
     "</p>"; 
 
