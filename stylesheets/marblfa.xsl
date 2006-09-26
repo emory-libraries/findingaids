@@ -28,6 +28,7 @@
 
           <hr/>
         <a>
+          <xsl:attribute name="onclick">javascript:pdfnotify('pdf.php?id=<xsl:value-of select="//ead/@id"/>')</xsl:attribute>
           <xsl:attribute name="href">pdf.php?id=<xsl:value-of select="//ead/@id"/></xsl:attribute>
           printable copy (PDF)
         </a>
@@ -289,10 +290,10 @@
   </xsl:template>
 
 
-  <xsl:template match="c01/did[not(container)]|c02/did[not(container)]|c03/did[not(container)]">
+  <xsl:template match="c01/did[not(container)]|c02/did[not(container)]|c03/did[not(container)]|c04/did[not(container)]">
     <tr>
       <th colspan="3">
-        <xsl:apply-templates/>
+       <xsl:apply-templates/>
       </th>
     </tr>
   </xsl:template>
