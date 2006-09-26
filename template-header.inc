@@ -48,7 +48,7 @@ $localURL = "http://biliku.library.emory.edu/rebecca/marblfa-php";
     <a href="http://marbl.library.emory.edu"><img src="images/boston.png"/></a>
   </div>
 
-  <div id="title">
+  <div id="sitetitle">
     <a href="index.php">Irish Literary Collections Portal</a>
   </div>
 

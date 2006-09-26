@@ -67,7 +67,7 @@ div.logo a:hover img {
 }
 
 
-div#title { 
+div#sitetitle { 
   background-color:#cd9967;
   height:40px;
   width:511px;
@@ -78,7 +78,7 @@ div#title {
   position:absolute;
 }
 
-div#title a { 
+div#sitetitle a { 
   color:#320000;
   font-size:22px;
   line-height:40px;
