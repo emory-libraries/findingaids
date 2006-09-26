@@ -214,7 +214,14 @@ li.first {
   border-left: none;
 }
 
-th {text-align:left;  }
+th {
+  text-align:left;  
+  vertical-align:top;
+}
+
+td { 
+  vertical-align:top;
+}
 
 p.tight { 
   margin:0px;
