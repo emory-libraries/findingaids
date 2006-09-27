@@ -226,3 +226,12 @@ td {
 p.tight { 
   margin:0px;
 }
+
+/* style horizontal rules as double line */
+hr { 
+  border:0px;
+  border-top:3px double #4e5a78;
+/*  border-bottom:1px;
+  border-style:solid;*/
+  height:3px;
+}
