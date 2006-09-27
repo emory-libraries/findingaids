@@ -117,8 +117,8 @@
   </xsl:template>
 
  <xsl:template match="div[@id='title']">
-   <fo:block font-size="16pt" font-family="any" text-align="center"
-     space-after.optimum="30pt">
+   <fo:block font-size="18pt" font-family="any" text-align="center"
+     space-after="30pt" font-weight="bold">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
@@ -126,15 +126,15 @@
 
  <xsl:template match="h2">
    <fo:block font-size="14pt" font-family="any" line-height="16pt"
-   space-after.optimum="10pt" space-before.optimum="10pt"
-   font-weight="bold" keep-with-next="always">
+   space-after="10pt" space-before="10pt"
+   font-weight="bold" keep-with-next="always" font-variant="small-caps">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
 
  <xsl:template match="h3">
    <fo:block font-size="12pt" font-family="any" line-height="16pt"
-     space-after.optimum="0pt" space-before.optimum="10pt"
+     space-after="0pt" space-before="10pt"
      font-weight="bold" keep-with-next="always">
      <xsl:apply-templates/>
    </fo:block>
@@ -142,7 +142,7 @@
 
 
  <xsl:template match="h4">
-   <fo:block space-before.optimum="5pt" keep-with-next="always">
+   <fo:block space-before="5pt" keep-with-next="always">
      <xsl:choose>
        <xsl:when test="@class = 'c01' or @class = 'c02' or @class = 'c03'">
        </xsl:when>
@@ -172,29 +172,33 @@
 
  <xsl:template match="div[@id='publicationstmt']/h3|div[@id='publicationstmt']/h4">
    <!-- should inhert publicationstmt formatting -->
-   <fo:block space-after.optimum="0pt">
+   <fo:block space-after="0pt">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
 
-<xsl:template match="hr">
-  <fo:block border-bottom-color="grey" border-bottom-style="solid"
-    border-bottom-width="0.1mm" space-after.optimum="5pt" space-before.optimum="5pt"/>
+ <xsl:template match="hr">
+   <!-- simulate a double-line by using two blocks with borders -->
+   <fo:block border-top-color="black" border-top-style="solid"
+     border-top-width="0.1mm" space-before="5pt" space-after="1pt"
+     keep-with-next="always"/>
+   <fo:block border-bottom-color="black" border-bottom-style="solid"
+     border-bottom-width="0.1mm" space-after.optimum="5pt" />
  </xsl:template> 
 
  <xsl:template match="p">
    <fo:block>
      <xsl:choose>
        <xsl:when test="@class = 'tight'">
-         <xsl:attribute name="space-before.optimum">0pt</xsl:attribute>
-         <xsl:attribute name="space-after.optimum">0pt</xsl:attribute>
+         <xsl:attribute name="space-before">0pt</xsl:attribute>
+         <xsl:attribute name="space-after">0pt</xsl:attribute>
        </xsl:when>
        <xsl:when test="@class = 'bibref'">
-         <xsl:attribute name="space-before.optimum">5pt</xsl:attribute>
+         <xsl:attribute name="space-before">5pt</xsl:attribute>
        </xsl:when>
        <xsl:when test="@class = 'indent'">
-         <xsl:attribute name="space-before.optimum">0pt</xsl:attribute>
-         <xsl:attribute name="space-after.optimum">10pt</xsl:attribute>
+         <xsl:attribute name="space-before">0pt</xsl:attribute>
+         <xsl:attribute name="space-after">10pt</xsl:attribute>
        </xsl:when>
        <xsl:otherwise>
          <!--         <xsl:attribute name="space-after.optimum">5pt</xsl:attribute> -->
@@ -218,7 +222,10 @@
 
 
  <xsl:template match="table">
-   <fo:table padding-before="10pt">
+   <fo:table>
+     <xsl:if test="@id != 'descriptivesummary'">
+       <xsl:attribute name="padding-before">10pt</xsl:attribute>
+     </xsl:if>
      <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths --> 
      <xsl:apply-templates select="col"/>
      <fo:table-body>
@@ -259,7 +266,7 @@
  </xsl:template>
 
 <xsl:template match="tr[th]">
-   <fo:table-row keep-together="always" keep-with-next="always" space-after.optimum="5pt">
+   <fo:table-row keep-together="always" keep-with-next="always" space-after="5pt">
      <xsl:apply-templates/>
    </fo:table-row>
  </xsl:template>
@@ -277,6 +284,9 @@
        <xsl:if test="name() = 'th'">
          <xsl:attribute name="font-weight">bold</xsl:attribute>
        </xsl:if>
+       <xsl:if test="@class = 'section'">
+         <xsl:attribute name="padding-before">5pt</xsl:attribute>
+       </xsl:if>
        <xsl:if test="@class = 'content'">
          <!-- indent secondary lines of content description -->
          <xsl:attribute name="margin-left">20pt</xsl:attribute>
@@ -289,7 +299,7 @@
 
 
  <xsl:template match="ul">
-   <fo:block margin-left="0.5in">
+   <fo:block margin-left="0.25in">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
