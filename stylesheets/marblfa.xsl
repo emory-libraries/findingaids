@@ -139,7 +139,9 @@
  </xsl:template>
 
  <xsl:template match="archdesc/did">
+   <hr/>
     <xsl:element name="h2">
+
       <a>
         <xsl:attribute name="name">descriptiveSummary</xsl:attribute>	
         Descriptive Summary
@@ -153,6 +155,9 @@
     </table>
 
  </xsl:template>
+
+ <!-- don't display repository; redundant information -->
+ <xsl:template match="archdesc/did/repository"/>
 
  <xsl:template match="archdesc/did/*">
    <xsl:variable name="name"><xsl:value-of select="local-name()"/></xsl:variable>
@@ -292,7 +297,7 @@
 
   <xsl:template match="c01/did[not(container)]|c02/did[not(container)]|c03/did[not(container)]|c04/did[not(container)]">
     <tr>
-      <th colspan="3">
+      <th colspan="3" class="section">
        <xsl:apply-templates/>
       </th>
     </tr>
@@ -307,6 +312,7 @@
         <xsl:if test="//container[@type='folder']">
           <th>Folder</th>
         </xsl:if>
+        <th class="content">Content</th>
       </tr>
     </xsl:if>
     
@@ -365,7 +371,21 @@
   <!-- display c0# series -->
   <xsl:template match="c01[@level='series']|c02[@level='subseries']|c03[@level='subseries']">
     <div>
-      <xsl:attribute name="class">pagebreak <xsl:value-of select="@level"/></xsl:attribute>
+      <xsl:choose>
+          <!-- if this node is the first in a subseries and parent does
+               not have any content to display, then don't insert pagebreak -->
+          <xsl:when test="name() = 'c02'  and not(preceding-sibling::c02) 
+                        and (not(../scopecontent) and not(../arrangement) and not(../bioghist))">
+        </xsl:when>
+          <xsl:when test="name() = 'c03' and not(preceding-sibling::c03)
+                          and (not(../scopecontent) and not(../arrangement) and not(../bioghist))">
+            <!-- most likely to happen at the c03 level -->
+        </xsl:when>
+        <xsl:otherwise>
+          <!-- default: pagebreak before new series/subseries -->
+          <xsl:attribute name="class">pagebreak <xsl:value-of select="@level"/></xsl:attribute>
+        </xsl:otherwise>
+      </xsl:choose>
       
       <h2>
         <xsl:apply-templates select="did/unitid"/>
@@ -406,6 +426,16 @@
       </xsl:otherwise>
     </xsl:choose> 
     </div>
+  </xsl:template>
+
+  <!-- display number of keyword matches -->
+  <xsl:template match="hits">
+    <!-- don't display anything if there are zero hits -->
+    <xsl:if test=". != 0">
+      <span class="hits">
+        <xsl:apply-templates/> hit<xsl:if test=". > 1">s</xsl:if>
+      </span>
+    </xsl:if>
   </xsl:template>
 
 
