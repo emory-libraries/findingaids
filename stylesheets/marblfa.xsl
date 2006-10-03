@@ -21,17 +21,12 @@
         <xsl:apply-templates/>
       </xsl:when>
       <xsl:otherwise>
+
         <div id="toc">	
           <h1>Table of Contents</h1>
           <hr/>
           <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
 
-          <hr/>
-        <a>
-          <xsl:attribute name="onclick">javascript:pdfnotify('pdf.php?id=<xsl:value-of select="//ead/@id"/>')</xsl:attribute>
-          <xsl:attribute name="href">pdf.php?id=<xsl:value-of select="//ead/@id"/></xsl:attribute>
-          printable copy (PDF)
-        </a>
 
         </div>
 
@@ -47,6 +42,19 @@
 
   <xsl:template match="titlestmt">
     <div id="title">
+      <xsl:if test="$mode != 'full'">
+        <!-- print link 
+             (kind of a hack: inside title div to float above title bar lined up at the right)
+             -->
+        <div id="printable">
+          <a>
+            <xsl:attribute name="onclick">javascript:pdfnotify('pdf.php?id=<xsl:value-of select="//ead/@id"/>')</xsl:attribute>
+            <xsl:attribute name="href">pdf.php?id=<xsl:value-of select="//ead/@id"/></xsl:attribute>
+            Print finding aid (PDF)
+          </a>
+        </div>
+      </xsl:if>
+
       <xsl:apply-templates select="titleproper | subtitle"/>
     </div>
   </xsl:template>
@@ -166,6 +174,8 @@
      <xsl:choose>
        <xsl:when test="$name = 'unittitle'">Title:</xsl:when>
        <xsl:when test="$name = 'unitid'">Call Number:</xsl:when>
+       <!-- only display extent label once even if there are multiple physdesc elements -->
+       <xsl:when test="$name = 'physdesc' and preceding-sibling::physdesc"></xsl:when>
        <xsl:when test="$name = 'physdesc'">Extent:</xsl:when>
        <xsl:when test="$name = 'origination'">Creator:</xsl:when>
        <xsl:when test="$name = 'langmaterial'">Language:</xsl:when>
@@ -194,6 +204,11 @@
    
  </xsl:template>
 
+ <!-- add a space before unitdate (bulk date or circa) -->
+ <xsl:template match="unitdate">
+   <xsl:text> </xsl:text> <xsl:apply-templates/>
+ </xsl:template>		
+ 
   <xsl:template match="physdesc">
     <xsl:element name="h3">
       <xsl:apply-templates/>
@@ -409,6 +424,9 @@
 
       <xsl:choose>
          <xsl:when test="(c02[@level='subseries'] or c03[@level='subseries']) and $mode != 'full'">
+           <!-- make subseries summary display consistent with top-level summary display -->
+           <hr/>
+           <h2>Description of Subseries</h2>
            <xsl:apply-templates select="c02|c03" mode="summary"/>
          </xsl:when> 
          <xsl:when test="(c02[@level='subseries'] or c03[@level='subseries']) and $mode = 'full'">
