@@ -21,6 +21,8 @@ $xmldb->transform();
 
 $filename = $xmldb->findNode("eadheader/eadid");
 $filename = basename($filename, ".xml");
+// if a filename has spaces, replace with underscores
+$filename = str_replace(' ', '_', $filename);
 $outfile = $tmpdir . $filename . '.fo';
 mkdir($tmpdir);
 $xmldb->save($outfile);
