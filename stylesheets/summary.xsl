@@ -13,8 +13,8 @@
   </xsl:template>
 	
   <xsl:template match="c01|c02|c03" mode="summary">
-    <h4>
-      <xsl:attribute name="class"><xsl:value-of select="local-name()"/></xsl:attribute> 
+    <p> 
+    <xsl:attribute name="class"><xsl:value-of select="local-name()"/></xsl:attribute>  
       <xsl:element name="a">
         <xsl:attribute name="href">content.php?el=<xsl:value-of select="local-name()"/>&amp;id=<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>			
         <xsl:value-of select="did/unitid"/>
@@ -41,8 +41,8 @@
           <xsl:apply-templates select="hits"/>
         </xsl:otherwise>
       </xsl:choose>
-    </h4>            
-    
+    </p>             
+
       <!-- FIXME: how to get did/physdesc here for pdf output ?
            output with id & hide with css? -->
 
