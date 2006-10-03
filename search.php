@@ -63,7 +63,7 @@ $order = "order by \$matchcount descending";
 // filters to add onto path in 'for' statement
 $filter = "";
 if ($keywords)
-  $filter .= "[. &= '$keywords']";
+  $filter .= "[. &= \"$keywords\"]";
 foreach ($phrases[1] as $p)
   $filter .= "[near(., '$p')]";
 
@@ -75,7 +75,7 @@ if ($creator) {
 	where (\$a/archdesc/did/origination,
 		\$a//controlaccess/persname[@encodinganalog='700'],
 		\$a//controlaccess/corpname[@encodinganalog='710'],
-		\$a//controlaccess/famname[@encodinganalog='700'])[. &= '$creator']
+		\$a//controlaccess/famname[@encodinganalog='700'])[. &= \"$creator\"]
 ";
 } 
 
