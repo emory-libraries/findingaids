@@ -74,8 +74,13 @@
 		</xsl:element>
 	</xsl:template>	
 
-	<xsl:template match="abstract | unittitle | unitdate">
+	<xsl:template match="abstract | unittitle">
 		<xsl:apply-templates/> <xsl:text> </xsl:text> 		
+	</xsl:template>		
+
+        <!-- add a space before unitdate (bulk date or circa) -->
+	<xsl:template match="unitdate">
+		 <xsl:text> </xsl:text> <xsl:apply-templates/>
 	</xsl:template>		
 
         <xsl:template match="physdesc">
