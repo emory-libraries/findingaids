@@ -1,3 +1,8 @@
+/* override default font-size to make content font sizes a little larger */
+.content, td, th { 
+  font-size:10pt;
+}
+
 .blueBox
 {	width:90%; 
 	border-style:solid; 
@@ -28,7 +33,7 @@
 .browse_text
 {
 	color:black;
-	font-size:10px;
+	font-size:10pt;
 	padding_left:5px;
 }
 
@@ -70,7 +75,7 @@ div#toc
 	float:left;
 	width:179px;
 	display:inline;
-	font-size:12px;
+	font-size:10pt;
 	font-weight:500;
 	text-align:left;
 }
@@ -102,7 +107,7 @@ div#title {
   padding-top:10px;
   padding-bottom:10px;
   text-align:center;
-  font-size:15px;
+  font-size:120%;
   font-weight:bold;
 }
 
@@ -123,11 +128,10 @@ div#publicationstmt h4 {
   font-size:110%;
 }
 
-.navbar
-{
-	font-size:12px;
-	font-weight:500;
-	text-align:left;
+.navbar {
+  /*	font-size:95%;*/
+  font-weight:500;
+  text-align:left;
 }
 
 /* overrides a style from main marbl css; loses style in some cases if not set to important */
@@ -140,6 +144,13 @@ div#toc a {
 }
 
 
+div#printable { 
+  float:right;
+  margin-top:-30pt;
+  font-size:10pt;
+  font-weight:normal;
+}
+
 
 span.hits { color:red; padding-left:1em;font-weight:bold;}
 span.match { color:red; font-weight:bold; }
@@ -147,7 +158,7 @@ span.match { color:red; font-weight:bold; }
 .keywords
 .breadCrumbs {
   font-family:arial;
-  font-size:16px;
+  font-size:105%;
   color:#1c1e2d; 
   font-weight:bold;
 }
@@ -178,24 +189,23 @@ h2 {
   font-size:115%;
 }
 
+
 h2 a, h3 a, a[name] { 
   text-decoration:none;
 }
 /* no line before text immediately after h3 heading */
 h3, h4 { 
   margin-bottom:0px;
+  font-size:100%;
 }
 p.indent { 
   margin-top:0px;
 }
 
 
-h4.c02 { 
-  margin-left:2em;
-}
-h4.c03 { 
-  margin-left:4em;
-}
+/*h4.c01, h4.c02, h4.c03 { 
+  font-size:95%; font-weight:normal;
+}*/
 
 
 div.resultlink { 
