@@ -259,7 +259,10 @@ if ($kw != '')
 	$tamino->xslTransform($xsl_file, $xsl_params);
 	
 
-	$docname = $tamino->findNode('unittitle');
+// get unittitle, but add spaces before any unitdates 
+$docname = $tamino->findNode('archdesc/did/unittitle/text()') . " " . $tamino->findNode('archdesc/did/unittitle/unitdate[1]') . " " . $tamino->findNode('archdesc/did/unittitle/unitdate[2]'); 
+//$docname = $tamino->findNode('archdesc/did/unittitle/text()'); 
+
 	$pagename = $docname;
 //	$crumbs[2] = array ('anchor' => $docname);
 	$htmltitle = "$docname";
