@@ -76,18 +76,18 @@ foreach $f (@infiles){
     if ($_ =~ m/^\s*$/) {
       # if previous mode was ref, close the loast indexentry
       if ($state eq "ref") {
-	print OUT "</indexentry>\n\n";
+	print OUT "  <ptrgrp>\n</indexentry>\n\n";
       }
       $state = "start";
       next;
     }
     if ($state eq "start") {
       # first content line after a blank line
-      print OUT "<indexentry>\n<persname>$_</persname>\n";
+      print OUT "<indexentry>\n  <persname>$_</persname>\n  <ptrgrp>\n";
       # all subsequent non-blank lines are refs
       $state = "ref";
     } elsif ($state eq "ref") {
-      print OUT "<ref>$_</ref>\n";
+      print OUT "    <ref>$_</ref>\n";
       $state = "ref";
     }
   }
