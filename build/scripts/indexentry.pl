@@ -9,8 +9,11 @@
 ##
 ## resulting output is formatted like this:
 ##
-## <indexentry<persname>NAME</persname>
-## <ref>ref</ref>
+## <indexentry>
+##   <persname>NAME</persname>
+##   <ptrgrp>
+##     <ref>ref</ref>
+##   </ptrgrp>
 ## </indexentry>
 
 
