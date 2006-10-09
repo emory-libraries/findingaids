@@ -76,7 +76,7 @@ foreach $f (@infiles){
     if ($_ =~ m/^\s*$/) {
       # if previous mode was ref, close the loast indexentry
       if ($state eq "ref") {
-	print OUT "  <ptrgrp>\n</indexentry>\n\n";
+	print OUT "  </ptrgrp>\n</indexentry>\n\n";
       }
       $state = "start";
       next;
