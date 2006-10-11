@@ -9,7 +9,6 @@ $id = $_GET["id"];
 $element = $_GET["el"];
 $kw = $_GET["keyword"];
 
-
 if (empty($element)) {
   $element = "ead";		// default element to retrieve
  } else if (!($element == "c01" || $element ==  "c02" || $element == "c03"
@@ -70,12 +69,12 @@ $connectionArray{"debug"} = false;
 	foreach (explode('|', $kw) as $k) {
 	  if (preg_match("/_/", $k)) {
 	    $k = preg_replace("/_/", " ", $k);
-	    array_push($phrases, $k);
+	    array_push($phrases, addslashes($k));
 	  } else {
 	    array_push($kwarray, $k);
-	    $keywords .= " $k";
+	    $keywords .= " " . addslashes($k);
 	  }
-	}
+	  }
 	  //	$kwarray = explode('|', $kw);
 	  //	$kw = preg_replace("/\|/", " ", $kw);  // multiple white spaces become one space
 	
