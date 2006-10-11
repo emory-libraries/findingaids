@@ -167,7 +167,7 @@
  <!-- don't display repository; redundant information -->
  <xsl:template match="archdesc/did/repository"/>
 
- <xsl:template match="archdesc/did/*">
+ <xsl:template match="archdesc/did/*[not(self::hits)]">
    <xsl:variable name="name"><xsl:value-of select="local-name()"/></xsl:variable>
    
    <xsl:variable name="label">
