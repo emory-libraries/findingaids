@@ -304,9 +304,36 @@
    </fo:block>
  </xsl:template>
 
+ <xsl:template match="div[@class='indexentry']">
+   <fo:block margin-top="10pt">
+     <xsl:apply-templates/>
+   </fo:block>
+ </xsl:template>
+
+ <xsl:template match="ul[li]">
+   <fo:list-block>
+     <xsl:apply-templates/>
+   </fo:list-block>
+ </xsl:template>
+
+ <xsl:template match="li">
+   <fo:list-item>
+     <fo:list-item-label>
+       <fo:block/>
+     </fo:list-item-label>
+     <fo:list-item-body>
+       <fo:block>
+         <!-- indent any secondary lines -->
+         <xsl:attribute name="margin-left">10pt</xsl:attribute>
+         <xsl:attribute name="text-indent">-10pt</xsl:attribute>
+         <xsl:apply-templates/>
+       </fo:block>
+     </fo:list-item-body>
+   </fo:list-item>
+ </xsl:template>
+
  <xsl:template match="br">
    <fo:block/>
  </xsl:template>
 
-</xsl:stylesheet
->
+</xsl:stylesheet>
