@@ -6,7 +6,8 @@ include("marblcrumb.class.php");
 
 
 $id = $_GET["id"];
-$element = $_GET["el"];
+if (isset($_GET["el"])) 
+  $element = $_GET["el"];
 $kw = $_GET["keyword"];
 
 if (empty($element)) {
@@ -141,7 +142,12 @@ $connectionArray{"debug"} = false;
 			 </controlaccess>
 		";
 	}
-	$toc_query .= "
+	$toc_query .= "<index>{\$ad/index/head} ";
+	if ($kw != '') {
+	  $toc_query .= "<hits> { text:match-count(\$ad/index$orfilter) }</hits>";
+	}
+	$toc_query .= "	</index>  
+
 						<dsc>
 							{\$ad/dsc/head}";
 	if ($kw != '') {
@@ -174,6 +180,7 @@ $connectionArray{"debug"} = false;
 	// addition to query for highlighting (when there are search terms)
 	$hquery = "";
 	$rval = "\$a";
+        $hitcount = "";
 	if ($kw != '') { 
 	  $hitcount .= "{let \$m := \$c01$orfilter return <hits>{text:match-count(\$m)}</hits>}\n";
 	}
@@ -183,7 +190,11 @@ $connectionArray{"debug"} = false;
 		  {\$a/eadheader}
 		  {\$a/frontmatter}
 		 <archdesc>
-		  {\$a/archdesc/*[not(self::dsc)]}
+		  {for \$el in \$a/archdesc/*[not(self::dsc)]
+		    let $rval := ( if (exists(\$el$orfilter)) then
+			\$el$orfilter
+		     else \$el)
+  		   return $rval }
 		  {for \$d in \$a/archdesc/dsc
 		   return <dsc> {\$d/@*}
 		   {\$d/head}
@@ -210,7 +221,7 @@ $connectionArray{"debug"} = false;
 				       </c03>}
 			      </c02> }
 		     </c01> }
-		     </dsc>} 
+		     </dsc>}
 		 </archdesc></ead> ";
 	}
 
@@ -259,7 +270,11 @@ if ($kw != '')
 	
 
 // get unittitle, but add spaces before any unitdates 
-$docname = $tamino->findNode('archdesc/did/unittitle/text()') . " " . $tamino->findNode('archdesc/did/unittitle/unitdate[1]') . " " . $tamino->findNode('archdesc/did/unittitle/unitdate[2]'); 
+$docname = $tamino->findNode('archdesc/did/unittitle/text()');
+if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[1]'))
+  $docname .= " " . $ud;
+if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[2]'))
+  $docname .= " " . $ud;
 //$docname = $tamino->findNode('archdesc/did/unittitle/text()'); 
 
 	$pagename = $docname;
