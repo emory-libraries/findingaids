@@ -142,6 +142,8 @@
      <hr/>
      
      <xsl:apply-templates select="dsc"/>     
+
+     <xsl:apply-templates select="index"/>     
      
    </div>
  </xsl:template>
@@ -446,6 +448,40 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="archdesc/index">
+    <div class="pagebreak">
+      <hr/> <!-- FIXME: why is this hr not getting styled? -->
+      <a name="index"/>
+      <xsl:apply-templates/>
+    </div>
+  </xsl:template>
+
+  <xsl:template match="index/head">
+    <h2><xsl:apply-templates/></h2>
+  </xsl:template>
+
+  <xsl:template match="indexentry">
+    <div class="indexentry">
+      <xsl:apply-templates/>
+    </div>
+  </xsl:template>
+
+
+  <xsl:template match="indexentry/persname">
+    <b><xsl:value-of select="."/></b>
+  </xsl:template>
+
+  <xsl:template match="indexentry/ptrgrp">
+    <ul>
+      <xsl:apply-templates/>
+    </ul>
+  </xsl:template>
+
+  <xsl:template match="indexentry/ptrgrp/ref">
+    <li><xsl:apply-templates/></li>
+  </xsl:template>
+
+
   <!-- display number of keyword matches -->
   <xsl:template match="hits">
     <!-- don't display anything if there are zero hits -->
@@ -455,6 +491,18 @@
       </span>
     </xsl:if>
   </xsl:template>
+
+
+ <!-- highlight keyword matches -->
+ <xsl:template match="exist:match">
+   <xsl:variable name="txt"><xsl:value-of select="preceding::text()[0]"/></xsl:variable>
+   <!-- for some reason, the single space between two matching terms is getting lost; put it back in here. -->
+   <xsl:if test="preceding-sibling::exist:match and ($txt = '')">
+     <xsl:text> </xsl:text>
+   </xsl:if>
+
+   <span class="match"><xsl:apply-templates/></span>
+ </xsl:template>
 
 
 </xsl:stylesheet>  
