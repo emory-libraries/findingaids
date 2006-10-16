@@ -9,12 +9,21 @@ include("config.php");
 */
 
 function html_head ($mode, $contentlist = false) {
-print "<html>
+  $baseURL  = "http://marbl.library.emory.edu";
+  // FIXME: this is the doctype from the template, but template html is NOT valid XHTML
+  //  print "<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'
+  //    'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+print " 
+<html>
  <head>
  <title>$mode : Manuscript, Archives, and Rare Books Library</title>
+<link href='$baseURL/includes/css/main.css' rel='stylesheet' type='text/css'>
+<link href='$baseURL/includes/css/web.css' rel='stylesheet' type='text/css'>
+<link href='css/marblfa.css' rel='stylesheet' type='text/css'>
+<script src='$baseURL/includes/js/common.js' type='text/javascript' language='javascript'></script>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">
 <meta name=\"robots\" content=\"index,follow\">
-<script language=\"Javascript\">
+<script language=\"Javascript\" type=\"text/javascript\">
 function pdfnotify (url) {
  window.open('pdfstatus.html', 'pdfstatus', 'width=300,height=125,toolbar=no,status=no,location=no,menubar=no,scrollbars=no,screenX=300,screenY=300,left=300,top=300,resizable=no');
 }

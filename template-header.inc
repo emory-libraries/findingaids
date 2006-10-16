@@ -4,43 +4,15 @@ include_once("common_functions.php");
 $baseURL  = "http://marbl.library.emory.edu";
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-	<html xmlns="http://www.w3.org/1999/xhtml"><!-- InstanceBegin template="/templates/sub_woodruff.dwt" codeOutsideHTMLIsLocked="false" -->
-
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<link href="<?= $baseURL ?>/includes/css/main.css" rel="stylesheet" type="text/css" />
-<link href="<?= $baseURL ?>/includes/css/web.css" rel="stylesheet" type="text/css" />
-<link href="css/marblfa.css" rel="stylesheet" type="text/css" />
-
-<script src="<?= $baseURL ?>/includes/js/common.js" type="text/javascript" language="javascript"></script>
-<!-- InstanceBeginEditable name="doctitle" -->
-<!-- InstanceEndEditable -->
-
-
-<!-- InstanceParam name="show_leftnav" type="boolean" value="true" -->
-<!-- InstanceParam name="show_toolBar" type="boolean" value="true" -->
-<!-- InstanceBeginEditable name="head" -->
-<!-- InstanceEndEditable -->
-
-
-
-
-
-
-
-</head>
-
-<body bottommargin="0" leftmargin="4" marginheight="4" marginwidth="4" rightmargin="4" topmargin="4" background="<?= $baseURL ?>/images/common/global_bg.jpg">
+<body background="<?= $baseURL ?>/images/common/global_bg.jpg">
 <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
 	<!-- ~~~~~~~~~~~~~~~~~~~~~~~  HEADER - VERY TOP ~~~~~~~~~~~~~~~~~~~~~~~ -->
 	<tr>
 		<td colspan="3">
 			<table border="0" cellpadding="0" cellspacing="0" width="100%" background="<?= $baseURL ?>/images/subpage/subtop_bg.gif">
 				<tr>
-					<td align="left"><img src="<?= $baseURL ?>/images/subpage/subtop_1.gif" width="619" height="4" alt=""></td>
-					<td align="right"><img src="<?= $baseURL ?>/images/subpage/subtop_2.gif" width="87" height="4" alt=""></td>
+					<td align="left"><img src="<?= $baseURL ?>/images/subpage/subtop_1.gif" width="619" height="4" alt=""/></td>
+					<td align="right"><img src="<?= $baseURL ?>/images/subpage/subtop_2.gif" width="87" height="4" alt=""/></td>
 				</tr>
 			</table>
 		</td>
@@ -87,8 +59,9 @@ $baseURL  = "http://marbl.library.emory.edu";
 				</tr>
 				<tr>
 					<td background="<?= $baseURL ?>/images/common/tbl_search_bg.gif" align="left">
+  <form method="get" action="http://web.library.emory.edu/search/reURL.php">
+
 						<table border="0" cellpadding="0" cellspacing="0" width="696" height="33">
-                                                        <form method="GET" action="http://web.library.emory.edu/search/reURL.php">
                                                         <tr>
                                                                 <td background="<?= $baseURL ?>/images/common/search_field_bg.gif" width="328" class="searchText">
                                                                         &nbsp;&nbsp;&nbsp;&nbsp;
@@ -102,8 +75,9 @@ $baseURL  = "http://marbl.library.emory.edu";
                                                                 <td width="279">
 								</td>
                                                         </tr>
-                                                        </form>
 						</table>
+									                                                        </form>
+									
 					</td>
 				</tr>
 				<tr>
