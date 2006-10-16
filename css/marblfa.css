@@ -71,7 +71,6 @@ div#toc
 	padding-right:10px;
 	padding-top:10px;
 	padding-bottom:10px;
-
 	float:left;
 	width:179px;
 	display:inline;
@@ -244,4 +243,21 @@ hr {
 /*  border-bottom:1px;
   border-style:solid;*/
   height:3px;
+}
+
+
+
+div.indexentry { 
+  margin-bottom:10px;
+}
+
+div.indexentry ul{ 
+  margin:0px;
+  padding:0px;
+}
+
+div.indexentry li { 
+  padding-left:2em;
+  text-indent:-2em;  
+  list-style-type:none;
 }
