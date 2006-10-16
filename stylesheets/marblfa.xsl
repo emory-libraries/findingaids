@@ -79,7 +79,8 @@
   </xsl:template>
 
   <xsl:template match="publicationstmt/address">
-    <h4><xsl:apply-templates/></h4>
+    <!--    <h4><xsl:apply-templates/></h4> -->
+    <h3><xsl:apply-templates/></h3>
   </xsl:template>
 
  <xsl:template match="addressline">
@@ -254,9 +255,8 @@
 
   <!-- sub-level control access headings -->
   <xsl:template match="controlaccess/controlaccess/head">
-    <h4>
-      <xsl:apply-templates/>
-    </h4>
+    <!--    <h4><xsl:apply-templates/></h4> -->
+    <h3><xsl:apply-templates/></h3>
   </xsl:template>
 
   <xsl:template match="controlaccess/persname | controlaccess/famname | controlaccess/title">
@@ -449,15 +449,16 @@
   </xsl:template>
 
   <xsl:template match="archdesc/index">
+    <hr/> 
     <div class="pagebreak">
-      <hr/> <!-- FIXME: why is this hr not getting styled? -->
-      <a name="index"/>
       <xsl:apply-templates/>
     </div>
   </xsl:template>
 
   <xsl:template match="index/head">
-    <h2><xsl:apply-templates/></h2>
+    <a name="index">
+      <h2><xsl:apply-templates/></h2>
+    </a>
   </xsl:template>
 
   <xsl:template match="indexentry">

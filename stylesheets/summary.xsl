@@ -1,7 +1,4 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-	xmlns:ino="http://namespaces.softwareag.com/tamino/response2"
-	xmlns:xql="http://metalab.unc.edu/xql/"
-	xmlns:cti="http://cti.library.emory.edu/"
 	version="1.0">
 
   <!-- summary mode:
@@ -22,7 +19,7 @@
         <xsl:value-of select="did/unittitle"/>
       </xsl:element>
       
-      <!-- note: hits are *inside* h4 to keep them on the same line -->      
+      <!-- note: hits are *inside* heading to keep them on the same line -->      
       
       <!-- if we have the full-text, count matches under this node -->
       <xsl:variable name="count"><xsl:value-of select="count(.//exist:match)"/> </xsl:variable>
@@ -48,9 +45,9 @@
 
     <!-- if there are subseries, indent to display hierarchy -->
     <xsl:if test="count(c02[@level='subseries']) + count(c03[@level='subseries']) > 0">
-      <ul>
+      <div class="indent">
         <xsl:apply-templates select="c02[@level='subseries']|c03[@level='subseries']" mode="summary"/>
-      </ul>
+      </div>
     </xsl:if>
   </xsl:template>
 

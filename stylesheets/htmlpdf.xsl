@@ -297,13 +297,6 @@
    </fo:table-cell>
  </xsl:template>
 
-
- <xsl:template match="ul">
-   <fo:block margin-left="0.25in">
-     <xsl:apply-templates/>
-   </fo:block>
- </xsl:template>
-
  <xsl:template match="div[@class='indexentry']">
    <fo:block margin-top="10pt">
      <xsl:apply-templates/>

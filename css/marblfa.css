@@ -1,4 +1,12 @@
 /* override default font-size to make content font sizes a little larger */
+body { 
+ margin-bottom:0px;
+ margin-left:4px;
+ margin-right:4px;
+ margin-top:4px;
+ background:url("http://marbl.library.emory.edu/images/common/global_bg.jpg");
+}
+
 .content, td, th { 
   font-size:10pt;
 }
@@ -34,7 +42,7 @@
 {
 	color:black;
 	font-size:10pt;
-	padding_left:5px;
+	padding-left:5px;
 }
 
 .collection-header {
@@ -245,8 +253,6 @@ hr {
   height:3px;
 }
 
-
-
 div.indexentry { 
   margin-bottom:10px;
 }
@@ -260,4 +266,8 @@ div.indexentry li {
   padding-left:2em;
   text-indent:-2em;  
   list-style-type:none;
+}
+
+div.indent { 
+  margin-left:0.25in;
 }
