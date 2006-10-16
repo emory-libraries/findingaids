@@ -36,7 +36,7 @@ header("Content-Disposition: filename=$filename.pdf");
 
 print $pdf;
 
-// remove temporary file
+// remove temporary file  (NOTE: to debug xsl-fo, comment this out and use temporary .fo file with fop)
 unlink($outfile);
 
 ?>
