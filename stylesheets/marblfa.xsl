@@ -144,7 +144,10 @@
      
      <xsl:apply-templates select="dsc"/>     
 
-     <xsl:apply-templates select="index"/>     
+     <!-- index is displayed on a separate page in the website view -->
+     <xsl:if test="$mode = 'full'">
+       <xsl:apply-templates select="index"/>     
+     </xsl:if>
      
    </div>
  </xsl:template>
@@ -320,7 +323,7 @@
     </tr>
   </xsl:template>
   
-  <xsl:template match="did[container/@type='box']">
+  <xsl:template match="did[container/@type='box']|did[container/@type='volume']">
     <!-- only show box/folder once for the whole page -->
     <xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
       <tr class="box-folder">
@@ -336,6 +339,7 @@
     <tr>
       <td>
         <xsl:apply-templates select="container[@type='box']"/>
+        <xsl:apply-templates select="container[@type='volume']"/>
       </td>
       <xsl:if test="//container[@type='folder']">
         <td>

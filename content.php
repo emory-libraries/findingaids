@@ -13,7 +13,7 @@ $kw = $_GET["keyword"];
 if (empty($element)) {
   $element = "ead";		// default element to retrieve
  } else if (!($element == "c01" || $element ==  "c02" || $element == "c03"
-	      || $element == "did" || $element == "ead")) {
+	      || $element == "did" || $element == "ead" || $element == "index")) {
   // make sure that the element is something we expect
   print "DEBUG: element $el not expected, quitting.\n";
   // FIXME: add a better error message here
@@ -52,7 +52,12 @@ $connectionArray{"debug"} = false;
 		  $path = "/archdesc/did";
 		  $wrapOutput = true;
 		break;
-		
+
+		case 'index':
+		  $path = "/archdesc/index";
+		  $wrapOutput = true;
+		break;
+
 		case 'ead':
 		default:
 		  // query for all volumes 
@@ -142,7 +147,7 @@ $connectionArray{"debug"} = false;
 			 </controlaccess>
 		";
 	}
-	$toc_query .= "<index>{\$ad/index/head} ";
+	$toc_query .= "<index>{\$ad/index/@id}{\$ad/index/head} ";
 	if ($kw != '') {
 	  $toc_query .= "<hits> { text:match-count(\$ad/index$orfilter) }</hits>";
 	}
@@ -280,7 +285,10 @@ if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[2]'))
 	$pagename = $docname;
 //	$crumbs[2] = array ('anchor' => $docname);
 	$htmltitle = "$docname";
-if ($element != "ead") {
+if ($element == 'index') {
+  $pagename = $tamino->findNode("results/ead/$element/head");
+  $htmltitle .= " [$pagename]";
+} else if ($element != "ead") {
   $pagename = $tamino->findNode("results/ead/$element//unittitle");
   $htmltitle .= " [$pagename]";
  }

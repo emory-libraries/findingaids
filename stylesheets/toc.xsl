@@ -67,7 +67,8 @@
 
     <p class="navbar">
       <a>
-        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#index</xsl:attribute>
+        <!--        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#index</xsl:attribute> -->
+        <xsl:attribute name="href">content.php?el=index&amp;id=<xsl:value-of select="index/@id"/></xsl:attribute>
         <xsl:value-of select="index/head"/>
       </a>
       <xsl:apply-templates select="index/hits"/>
