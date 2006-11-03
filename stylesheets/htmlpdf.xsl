@@ -159,6 +159,9 @@
      <xsl:if test="contains(@class, 'pagebreak')">
        <xsl:attribute name="break-before">page</xsl:attribute>
      </xsl:if>
+     <xsl:if test="contains(@class, 'indent')">
+       <xsl:attribute name="text-indent">10pt</xsl:attribute>
+     </xsl:if>
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
