@@ -159,9 +159,6 @@
      <xsl:if test="contains(@class, 'pagebreak')">
        <xsl:attribute name="break-before">page</xsl:attribute>
      </xsl:if>
-     <xsl:if test="contains(@class, 'indent')">
-       <xsl:attribute name="text-indent">10pt</xsl:attribute>
-     </xsl:if>
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
@@ -202,6 +199,12 @@
        <xsl:when test="@class = 'indent'">
          <xsl:attribute name="space-before">0pt</xsl:attribute>
          <xsl:attribute name="space-after">10pt</xsl:attribute>
+       </xsl:when>
+       <xsl:when test="@class = 'c02'">
+         <xsl:attribute name="text-indent">10pt</xsl:attribute>
+       </xsl:when>
+       <xsl:when test="@class = 'c03'">
+         <xsl:attribute name="text-indent">20pt</xsl:attribute>
        </xsl:when>
        <xsl:otherwise>
          <!--         <xsl:attribute name="space-after.optimum">5pt</xsl:attribute> -->
