@@ -38,7 +38,7 @@
                   <xsl:otherwise>
                     <a>
                       <xsl:attribute name="href"><xsl:value-of 
-                      select="concat($baseLink, '?l=', $letter)"/></xsl:attribute>
+                      select="$baseLink"/></xsl:attribute>
                       View All
                     </a>
                   </xsl:otherwise>
@@ -59,7 +59,7 @@
               <xsl:otherwise>
                 <a>
                   <xsl:attribute name="href"><xsl:value-of 
-                  select="concat($baseLink, '?l=', $letter, '&amp;repository=', @agencycode)"/></xsl:attribute>
+                  select="concat($baseLink, '?repository=', @agencycode)"/></xsl:attribute>
                   <xsl:apply-templates/>
                 </a>
               </xsl:otherwise>
