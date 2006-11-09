@@ -460,7 +460,7 @@
   </xsl:template>
 
   <xsl:template match="index/head">
-    <a name="index">
+    <a name="index">http://libraries.mit.edu/archives/thesis-specs/subcat.html
       <h2><xsl:apply-templates/></h2>
     </a>
   </xsl:template>
