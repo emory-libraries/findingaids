@@ -114,7 +114,7 @@
 		<div>			
 			<xsl:apply-templates select="name"/>
 			<xsl:apply-templates select="unittitle"/><br />
-			<xsl:apply-templates select="physdesc"/><br />
+			<xsl:apply-templates select="physdesc"/>
 			<xsl:apply-templates select="abstract"/><br />
 			<xsl:apply-templates select="repository"/>
 			<xsl:apply-templates select="matches" />
@@ -131,14 +131,24 @@
 	
 	<xsl:template match="unittitle[not(../name/node())]">	
 		<xsl:element name="a">
-			<xsl:attribute name="href">tamino-<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
+			<xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
 			<xsl:value-of select="." />
 		</xsl:element>
 	</xsl:template>	
 
-	<xsl:template match="abstract | unittitle | unitdate">
+	<xsl:template match="abstract | unittitle">
 		<xsl:apply-templates/> <xsl:text> </xsl:text> 		
 	</xsl:template>		
+
+        <!-- add a space before unitdate (bulk date or circa) -->
+	<xsl:template match="unitdate">
+		 <xsl:text> </xsl:text> <xsl:apply-templates/>
+	</xsl:template>		
+
+        <xsl:template match="physdesc">
+          <xsl:apply-templates/>
+          <br />
+        </xsl:template>
 
         <xsl:template match="physdesc/extent">	
           <xsl:text> </xsl:text> <xsl:apply-templates/>

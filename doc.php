@@ -13,7 +13,7 @@ $connectionArray{"debug"} = false;
 
 $xmldb = new xmlDbConnection($connectionArray);
 
-$query = "document('db/$db/delmas-docs/$docid.xml')/div";
+$query = "document('/db/$db/delmas-docs/$docid.xml')/div";
 
 $xmldb->xquery($query);
 $doctitle = $xmldb->findNode("h1");

@@ -5,8 +5,8 @@ include_once("lib/xmlDbConnection.class.php");
 include("marblcrumb.class.php");
 
 
-// letter to browse (A by default)
-$letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'A';
+// letter to browse (all by default)
+$letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'all';
 
 $repo = ($_REQUEST['repository']) ? $_REQUEST['repository'] : 'all';
 
@@ -19,7 +19,7 @@ if ($letter) {
 if ($repo != 'all')
   array_push($urlopts, "repository=$repo");
 
-$url .= implode('&', $urlopts);
+$url .= "?" . implode('&', $urlopts);
 
 
 $crumbs = new marblCrumb("Browse $mode", $url);

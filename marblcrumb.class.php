@@ -42,6 +42,11 @@ class marblCrumb extends breadCrumb {
 	     && (!(strstr($c->url, "el=")) || strpos($c->url, "el=ead"))) 
 	  return $i;
 
+	// index : same level as to c01 
+	if ((strpos($myc->url, "el=index") || strpos($myc->url, "el=c01"))
+	     && (strstr($c->url, "el=index") || strpos($c->url, "el=c01"))) 
+	  return $i;
+
 	// documents at the same c0n level should be considered equivalent
 	if (preg_match("/el=c0([123])/", $myc->url, $mymatch)) {
 	  preg_match("/el=c0([123])/", $c->url, $newmatch);

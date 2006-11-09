@@ -67,7 +67,7 @@ $order = "order by \$matchcount descending";
 // filters to add onto path in 'for' statement
 $filter = "";
 if ($keywords)
-  $filter .= "[. &= '$keywords']";
+  $filter .= "[. &= \"$keywords\"]";
 foreach ($phrases[1] as $p)
   $filter .= "[near(., '$p')]";
 if ($repo != 'all')
@@ -77,14 +77,13 @@ $where = "where \$a/archdesc[$irishfilter]";
 if ($creator) {
   // the simpler syntax "where x or y" should work here
   // in this case, that syntax caused the query not to match when it should
-  $where .= "
-	and (\$a/archdesc/did/origination,
+  $where = "
+	where (\$a/archdesc/did/origination,
 		\$a//controlaccess/persname[@encodinganalog='700'],
 		\$a//controlaccess/corpname[@encodinganalog='710'],
-		\$a//controlaccess/famname[@encodinganalog='700'])[. &= '$creator']
+		\$a//controlaccess/famname[@encodinganalog='700'])[. &= \"$creator\"]
 ";
 } 
-
 
 if ($title) $filter .= "[//titlestmt &=  '$title']";
 

@@ -1,3 +1,15 @@
+@import "irish.css";
+
+/* override default font-size to make content font sizes a little larger */
+.content, td, th { 
+  font-size:10pt;
+}
+
+
+.content, td, th { 
+  font-size:10pt;
+}
+
 .blueBox
 {	width:90%; 
 	border-style:solid; 
@@ -32,8 +44,8 @@ p.alphaList {
 .browse_text
 {
 	color:black;
-	font-size:10px;
-	padding_left:5px;
+	font-size:10pt;
+	padding-left:5px;
 }
 
 .collection-header {
@@ -61,22 +73,22 @@ li
 	text-align: left;
 }
 
-div#toc
-{
-	background-color:#F0F0F0;
-	border-style:solid; 
-	border-width:1px; 
-	padding-left:10px;
-	padding-right:10px;
-	padding-top:10px;
-	padding-bottom:10px;
-	float:left;
-	width:179px;
-	display:inline;
-	font-size:12px;
-	font-weight:500;
-	text-align:left;
-  	margin-bottom:0.5in;
+div#toc {
+  background:#cccc99;
+  border:1px solid black;
+  /*	border-style:solid; 
+     border-width:1px; */
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+  float:left;
+  width:179px;
+  display:inline;
+  font-size:12px;
+  font-weight:500;
+  text-align:left;
+  margin-bottom:0.5in;
 }
 div#toc h1 { 
   text-align:center;
@@ -98,13 +110,25 @@ div#content {
 }
 
 div#title {
-  background-color:#A7B8DC;
+  background-color:#cd9967;
+  color:#320000;
   padding-left:10px;
   padding-right:10px;
   padding-top:10px;
   padding-bottom:10px;
   text-align:center;
   font-size:15px;
+  font-weight:bold;
+}
+
+div#title {
+  background-color:#cd9967;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+  text-align:center;
+  font-size:120%;
   font-weight:bold;
 }
 
@@ -125,11 +149,10 @@ div#publicationstmt h4 {
   font-size:110%;
 }
 
-.navbar
-{
-	font-size:12px;
-	font-weight:500;
-	text-align:left;
+.navbar {
+  /*	font-size:95%;*/
+  font-weight:500;
+  text-align:left;
 }
 
 /* overrides a style from main marbl css; loses style in some cases if not set to important */
@@ -138,9 +161,16 @@ div#toc a {
 }
 
 .current { 
-  background-color:#ffffff;
+  background-color:#ffffbb;
 }
 
+
+div#printable { 
+  float:right;
+  margin-top:-30pt;
+  font-size:10pt;
+  font-weight:normal;
+}
 
 
 span.hits { color:red; padding-left:1em;font-weight:bold;}
@@ -149,7 +179,7 @@ span.match { color:red; font-weight:bold; }
 .keywords
 .breadCrumbs {
   font-family:arial;
-  font-size:16px;
+  font-size:105%;
   color:#1c1e2d; 
   font-weight:bold;
 }
@@ -182,29 +212,25 @@ div.searchinfo, div.searchinfo h2 {
   font-size:115%;
 }
 
-/* make h2s bigger than h3s */
-h2 { 
+h2 {
   font-size:115%;
 }
 
-h2 a, h3 a, a[name] { 
   text-decoration:none;
 }
 /* no line before text immediately after h3 heading */
 h3, h4 { 
   margin-bottom:0px;
+  font-size:100%;
 }
 p.indent { 
   margin-top:0px;
 }
 
 
-h4.c02 { 
-  margin-left:2em;
-}
-h4.c03 { 
-  margin-left:4em;
-}
+/*h4.c01, h4.c02, h4.c03 { 
+  font-size:95%; font-weight:normal;
+}*/
 
 
 div.resultlink { 
@@ -234,4 +260,32 @@ td {
 
 p.tight { 
   margin:0px;
+}
+
+/* style horizontal rules as double line */
+hr { 
+  border:0px;
+  border-top:3px double #000000;
+/*  border-bottom:1px;
+  border-style:solid;*/
+  height:3px;
+}
+
+div.indexentry { 
+  margin-bottom:10px;
+}
+
+div.indexentry ul{ 
+  margin:0px;
+  padding:0px;
+}
+
+div.indexentry li { 
+  padding-left:2em;
+  text-indent:-2em;  
+  list-style-type:none;
+}
+
+div.indent { 
+  margin-left:0.25in;
 }

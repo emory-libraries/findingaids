@@ -1,17 +1,13 @@
 body {
   color:#000000; 
   background:#cccc99;
-  margin-left:1in;
-  margin-right:1in;
-  font-family: verdana, arial, helvetica, sans-serif;
+  margin-left:10px;
+  margin-right:10px;
+/*  font-family: verdana, arial, helvetica, sans-serif;*/
   font-weight: normal;  
   font-size: 12px; 
 }
 
-h2 {
-  font-size:1.5em;
-  font-weight:normal;
-}
 
 a:link { 
   color:#666699;
@@ -33,7 +29,6 @@ a[name]:hover {
   color:#000000;
 }
 
-
 select, input {
   background-color:#cccc99;
 } 
@@ -45,9 +40,7 @@ input.button {
 div.header { 
   text-align:left;
   margin:0.25in;
-  margin-bottom:4px;
-  padding-bottom:0px;
-
+  padding-left:0.25in;
 }
 
 /* logo images (emory, boston) */
@@ -91,6 +84,7 @@ div#nav {
   font-size:11pt;
   margin-left:82px;
   margin-top:0px;
+  white-space:no-wrap;
 }
 
 div#nav a { 
@@ -106,37 +100,16 @@ div#nav a:hover  {
 }
 
 
-
-
 div.footer { 
-  margin-top:0.5in;
+  padding-top:0.5in;
   margin-left:20px;
-  font-size:10px;
+  font-size:100%;
   clear:both;
 }
-
-
-
-div#headingBlock {
-  background-color:#cd9967;
-  color:#320000;
-}
-
-div#toc {
-  background:#cccc99;
-  border:1px solid black;
-}
-
-
-div.navbox { 
-/*  border:1px solid blue;*/
- }
 
 div.navbox ul { 
   margin:0px;
 }
-
-
 
 img#frontpage { 
   margin-top:0px;

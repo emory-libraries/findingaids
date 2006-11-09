@@ -6,14 +6,14 @@ include("marblcrumb.class.php");
 
 
 $id = $_GET["id"];
-$element = $_GET["el"];
+if (isset($_GET["el"])) 
+  $element = $_GET["el"];
 $kw = $_GET["keyword"];
-
 
 if (empty($element)) {
   $element = "ead";		// default element to retrieve
  } else if (!($element == "c01" || $element ==  "c02" || $element == "c03"
-	      || $element == "did" || $element == "ead")) {
+	      || $element == "did" || $element == "ead" || $element == "index")) {
   // make sure that the element is something we expect
   print "DEBUG: element $el not expected, quitting.\n";
   // FIXME: add a better error message here
@@ -52,7 +52,12 @@ $connectionArray{"debug"} = false;
 		  $path = "/archdesc/did";
 		  $wrapOutput = true;
 		break;
-		
+
+		case 'index':
+		  $path = "/archdesc/index";
+		  $wrapOutput = true;
+		break;
+
 		case 'ead':
 		default:
 		  // query for all volumes 
@@ -70,12 +75,12 @@ $connectionArray{"debug"} = false;
 	foreach (explode('|', $kw) as $k) {
 	  if (preg_match("/_/", $k)) {
 	    $k = preg_replace("/_/", " ", $k);
-	    array_push($phrases, $k);
+	    array_push($phrases, addslashes($k));
 	  } else {
 	    array_push($kwarray, $k);
-	    $keywords .= " $k";
+	    $keywords .= " " . addslashes($k);
 	  }
-	}
+	  }
 	  //	$kwarray = explode('|', $kw);
 	  //	$kw = preg_replace("/\|/", " ", $kw);  // multiple white spaces become one space
 	
@@ -126,7 +131,6 @@ $connectionArray{"debug"} = false;
 	  $toc_query .= " <hits> { let \$didm := \$ad/did$orfilter
 			return text:match-count(\$didm) }</hits>";
 	}
-
 	$toc_query .= "
 						</did>";
 	// hit counts for top-level table of contents items;
@@ -142,7 +146,12 @@ $connectionArray{"debug"} = false;
 			 </controlaccess>
 		";
 	}
-	$toc_query .= "
+	$toc_query .= "<index>{\$ad/index/@id}{\$ad/index/head} ";
+	if ($kw != '') {
+	  $toc_query .= "<hits> { text:match-count(\$ad/index$orfilter) }</hits>";
+	}
+	$toc_query .= "	</index>  
+
 						<dsc>
 							{\$ad/dsc/head}";
 	if ($kw != '') {
@@ -175,6 +184,7 @@ $connectionArray{"debug"} = false;
 	// addition to query for highlighting (when there are search terms)
 	$hquery = "";
 	$rval = "\$a";
+        $hitcount = "";
 	if ($kw != '') { 
 	  $hitcount .= "{let \$m := \$c01$orfilter return <hits>{text:match-count(\$m)}</hits>}\n";
 	}
@@ -184,7 +194,11 @@ $connectionArray{"debug"} = false;
 		  {\$a/eadheader}
 		  {\$a/frontmatter}
 		 <archdesc>
-		  {\$a/archdesc/*[not(self::dsc)]}
+		  {for \$el in \$a/archdesc/*[not(self::dsc)]
+		    let $rval := ( if (exists(\$el$orfilter)) then
+			\$el$orfilter
+		     else \$el)
+  		   return $rval }
 		  {for \$d in \$a/archdesc/dsc
 		   return <dsc> {\$d/@*}
 		   {\$d/head}
@@ -211,7 +225,7 @@ $connectionArray{"debug"} = false;
 				       </c03>}
 			      </c02> }
 		     </c01> }
-		     </dsc>} 
+		     </dsc>}
 		 </archdesc></ead> ";
 	}
 
@@ -259,11 +273,21 @@ if ($kw != '')
 	$tamino->xslTransform($xsl_file, $xsl_params);
 	
 
-	$docname = $tamino->findNode('unittitle');
+// get unittitle, but add spaces before any unitdates 
+$docname = $tamino->findNode('archdesc/did/unittitle/text()');
+if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[1]'))
+  $docname .= " " . $ud;
+if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[2]'))
+  $docname .= " " . $ud;
+//$docname = $tamino->findNode('archdesc/did/unittitle/text()'); 
+
 	$pagename = $docname;
 //	$crumbs[2] = array ('anchor' => $docname);
 	$htmltitle = "$docname";
-if ($element != "ead") {
+if ($element == 'index') {
+  $pagename = $tamino->findNode("results/ead/$element/head");
+  $htmltitle .= " [$pagename]";
+} else if ($element != "ead") {
   $pagename = $tamino->findNode("results/ead/$element//unittitle");
   $htmltitle .= " [$pagename]";
  }
