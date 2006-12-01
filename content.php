@@ -13,7 +13,7 @@ $kw = $_GET["keyword"];
 if (empty($element)) {
   $element = "ead";		// default element to retrieve
  } else if (!($element == "c01" || $element ==  "c02" || $element == "c03"
-	      || $element == "did" || $element == "ead" || $element == "index")) {
+	      || $element == "did" || $element == "ead" || $element == "index" || $element == "odd")) {
   // make sure that the element is something we expect
   print "DEBUG: element $el not expected, quitting.\n";
   // FIXME: add a better error message here
@@ -55,6 +55,11 @@ $connectionArray{"debug"} = false;
 
 		case 'index':
 		  $path = "/archdesc/index";
+		  $wrapOutput = true;
+		break;
+		
+		case 'odd':
+		  $path = "/archdesc/odd";
 		  $wrapOutput = true;
 		break;
 
@@ -123,7 +128,12 @@ $connectionArray{"debug"} = false;
 						{string(\$doc/archdesc/did/origination/famname)}
 					</name>
 					<eadheader>
-						<filedesc><titlestmt>{\$doc/eadheader/filedesc/titlestmt/titleproper}</titlestmt></filedesc>
+						<filedesc>
+					      <titlestmt>
+                            {\$doc/eadheader/filedesc/titlestmt/titleproper}
+                            {\$doc/eadheader/filedesc/titlestmt/subtitle}
+						  </titlestmt>
+ 					    </filedesc>
 					</eadheader>
 					<archdesc>
 						<did>{\$ad/did/unittitle}"; 
@@ -140,18 +150,31 @@ $connectionArray{"debug"} = false;
 			    <hits> { sum(for \$cdm in (\$ad//bioghist,\$ad//scopecontent)$orfilter
 			    return text:match-count(\$cdm)) }</hits>
 			 </collectiondescription>
-			 <controlaccess>
-			    <hits> { sum(for \$cam in \$ad//controlaccess$orfilter
-			    return text:match-count(\$cam)) }</hits>
-			 </controlaccess>
 		";
 	}
+
+	$toc_query .= "	 <controlaccess>
+			     {\$ad/controlaccess/head}
+		";
+	if ($kw != '') {
+	  $toc_query .= "    <hits> { sum(for \$cam in \$ad//controlaccess$orfilter
+			    return text:match-count(\$cam)) }</hits>  
+		";
+	}
+	$toc_query .= "	 </controlaccess>
+		";
+
 	$toc_query .= "<index>{\$ad/index/@id}{\$ad/index/head} ";
 	if ($kw != '') {
 	  $toc_query .= "<hits> { text:match-count(\$ad/index$orfilter) }</hits>";
 	}
-	$toc_query .= "	</index>  
+	$toc_query .= "	</index>  ";
 
+	$toc_query .= "{for \$odd in \$ad/odd return <odd>{\$odd/@id}{\$odd/head} ";
+	if ($kw != '') {
+	  $toc_query .= "<hits> { text:match-count(\$odd$orfilter) }</hits>";
+	}
+	$toc_query .= "	</odd>  }
 						<dsc>
 							{\$ad/dsc/head}";
 	if ($kw != '') {
@@ -284,7 +307,7 @@ if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[2]'))
 	$pagename = $docname;
 //	$crumbs[2] = array ('anchor' => $docname);
 	$htmltitle = "$docname";
-if ($element == 'index') {
+if ($element == 'index' || $element == 'odd') {
   $pagename = $tamino->findNode("results/ead/$element/head");
   $htmltitle .= " [$pagename]";
 } else if ($element != "ead") {
