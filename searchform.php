@@ -6,10 +6,16 @@ $connectionArray{"debug"} = false;
 
 $xmldb = new xmlDbConnection($connectionArray);
 
-$query = 'for $r in distinct-values(/ead/eadheader/eadid/@mainagencycode)
-let $rep := (/ead[eadheader/eadid/@mainagencycode = $r]/archdesc/did/repository)[1] 
-order by $rep 
-return <repository agencycode="{$r}">{$rep/@*} {$rep/node()}</repository>';
+/* organize by exist collection structure */
+$query = 'for $r in ("' . implode('", "', $collections) . '")  
+let $coll := concat("/db/FindingAids/", $r) 
+let $code := distinct-values(collection($coll)//ead/eadheader/eadid/@mainagencycode) 
+let $rep := (collection($coll)/ead/archdesc/did/repository)[1] 
+order by $rep  
+return <repository collection="{if ($r = \'emory/irish\') then \'emory\' else $r}" agencycode="{$code}">
+	{$rep/@*}
+	{$rep/node()}
+</repository>';
 
 /*$query = 'for $r in distinct-values(//archdesc/did/repository)
 order by $r
