@@ -50,21 +50,24 @@
         </xsl:template>
 
         <xsl:template match="source/repository">
+            <!-- only display if the collection actually has content loaded -->
+          <xsl:if test="@agencycode != ''">
           <li>
             <xsl:choose>
-              <xsl:when test="@agencycode = $repository">
+              <xsl:when test="@collection = $repository">
                 <!-- if this is current repository, don't make it a link -->
                 <xsl:apply-templates/>
               </xsl:when>
               <xsl:otherwise>
                 <a>
                   <xsl:attribute name="href"><xsl:value-of 
-                  select="concat($baseLink, '?repository=', @agencycode)"/></xsl:attribute>
+                  select="concat($baseLink, '?repository=', @collection)"/></xsl:attribute>
                   <xsl:apply-templates/>
                 </a>
               </xsl:otherwise>
             </xsl:choose>
           </li>
+          </xsl:if>
         </xsl:template>
 
 			
