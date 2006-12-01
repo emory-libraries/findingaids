@@ -5,10 +5,9 @@
 
   <xsl:output method="xml"/>
 
+  <!-- generic disclaimer for Delmas pdfs -->
   <xsl:variable name="disclaimer">
-  MARBL provides copies of its finding aids for use only in research
-  and private study.  Copies supplied may not be copied for others or
-  otherwise distributed without prior consent of MARBL.
+  This finding aid is for research use only and may not be reproduced or distributed without consent. 
   </xsl:variable>
 
   <!-- width of inner page (content portion), in inches 
