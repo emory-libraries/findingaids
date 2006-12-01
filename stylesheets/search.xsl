@@ -4,22 +4,21 @@
 
   <xsl:output method="xml"/>
 
+  <xsl:include href="results.xsl"/>
+
   <xsl:template match="/">
     <xsl:apply-templates select="//repository"/>
   </xsl:template>
 
   <xsl:template match="repository">
-    <option>
-      <xsl:attribute name="value"><xsl:value-of select="."/></xsl:attribute>
-      <xsl:apply-templates/>
-    </option>
+    <!-- only display if the collection actually has content loaded -->
+    <xsl:if test="@agencycode != ''">
+      <option>
+        <xsl:attribute name="value"><xsl:value-of select="@collection"/></xsl:attribute>
+        <xsl:apply-templates/>
+      </option>
+    </xsl:if>
   </xsl:template>
 
-  <!--
-        <xsl:choose>
-          <xsl:when test=". = 'Boston College, John J. Burns Library, Archives and Manuscripts'">boston</xsl:when>
-          <xsl:otherwise>emory</xsl:otherwise>
-        </xsl:choose>
--->
 
 </xsl:stylesheet>
