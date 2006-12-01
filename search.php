@@ -15,6 +15,23 @@ $position = $_GET["pos"];    // position (i.e, cursor)
 $maxdisplay = $_GET["max"];  // maximum  # results to display
 
 
+switch($repo) {
+ case "emory":
+   $coll = "'/db/FindingAids/emory/irish'";
+   break;
+ case "boston":
+ case "wakeforest":
+ case "wash-sl":
+ case "ransom":
+ case "delaware":
+   $coll = "'/db/FindingAids/$repo'";
+   break;
+ case "all":
+ default:
+   $coll = "'/db/FindingAids/" . implode("', '/db/FindingAids/", $collections) . "'";
+   break;
+ }
+
 
 $url = "search.php?";
 $args = array();
@@ -56,10 +73,10 @@ include("template-header.inc");
 print $crumbs;
 
 // query to limit finding aids to irish subjects for delmas 
-$irishfilter = "controlaccess//subject |= 'irish ireland'";
+//$irishfilter = "controlaccess//subject |= 'irish ireland'";
 
 
-$for = 'for $a in /ead';
+$for = 'for $a in collection(' . $coll . ')/ead';
 $let = "\n" . 'let $b := $a/eadheader
 let $matchcount := text:match-count($a)';
 $order = "order by \$matchcount descending";
@@ -70,10 +87,10 @@ if ($keywords)
   $filter .= "[. &= \"$keywords\"]";
 foreach ($phrases[1] as $p)
   $filter .= "[near(., '$p')]";
-if ($repo != 'all')
-  $filter .= "[eadheader/eadid/@mainagencycode = '$repo']";
+/*if ($repo != 'all')
+ $filter .= "[eadheader/eadid/@mainagencycode = '$repo']";*/
   
-$where = "where \$a/archdesc[$irishfilter]";
+//$where = "where \$a/archdesc
 if ($creator) {
   // the simpler syntax "where x or y" should work here
   // in this case, that syntax caused the query not to match when it should
