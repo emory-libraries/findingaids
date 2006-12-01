@@ -14,8 +14,10 @@
     <xsl:attribute name="class"><xsl:value-of select="local-name()"/></xsl:attribute>  
       <xsl:element name="a">
         <xsl:attribute name="href">content.php?el=<xsl:value-of select="local-name()"/>&amp;id=<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>			
-        <xsl:value-of select="did/unitid"/>
-        <xsl:text>: &#x00A0;</xsl:text>
+        <xsl:if test="did/unitid">
+          <xsl:value-of select="did/unitid"/>
+          <xsl:text>: &#x00A0;</xsl:text>
+        </xsl:if>
         <xsl:value-of select="did/unittitle"/>
       </xsl:element>
       
