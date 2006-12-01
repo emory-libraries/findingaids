@@ -25,6 +25,7 @@
     <a>
       <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
       <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
+      <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/subtitle"/>
     </a>
 
     <!-- link to top-level information sections -->
@@ -55,13 +56,13 @@
     <p class="navbar">
       <a>
         <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#searchTerms</xsl:attribute>
-        Selected Search Terms
+        <xsl:value-of select="controlaccess/head"/>
       </a>
       <!-- FIXME: could be called something else? value is here; include in toc query ? 
         <xsl:value-of select="//archdesc/controlaccess/head"/>
         -->
       <xsl:apply-templates select="controlaccess/hits"/>
-    </p>
+    </p> 
 
     <xsl:apply-templates select="dsc" mode="toc"/>
 
@@ -74,8 +75,20 @@
       <xsl:apply-templates select="index/hits"/>
     </p>
 
+
+    <xsl:apply-templates select="odd" mode="toc"/>
+
   </xsl:template>
 
+
+  <xsl:template match="odd" mode="toc">
+    <p class="navbar">
+      <a>
+        <xsl:attribute name="href">content.php?el=odd&amp;id=<xsl:value-of select="@id"/></xsl:attribute>
+        <xsl:value-of select="head"/>
+      </a>
+    </p>
+  </xsl:template>
 
   <!-- description of series / container list -->
   <xsl:template match="ead/archdesc/dsc" mode="toc">	
