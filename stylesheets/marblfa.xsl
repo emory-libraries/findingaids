@@ -165,7 +165,16 @@
     <table id="descriptivesummary">
       <col width="20%" align="left" valign="top"/>
       <col width="80%" align="left" valign="top"/>
-      <xsl:apply-templates/>
+
+     <!-- display the following fields, in this specific order -->
+      <xsl:apply-templates select="origination"/>
+      <xsl:apply-templates select="unittitle"/>
+      <xsl:apply-templates select="unitid"/>
+      <xsl:apply-templates select="physdesc"/>
+      <xsl:apply-templates select="physloc"/>		
+      <xsl:apply-templates select="abstract"/>
+      <xsl:apply-templates select="langmaterial"/>
+
     </table>
 
  </xsl:template>
