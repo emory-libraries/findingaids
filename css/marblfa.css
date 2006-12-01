@@ -1,4 +1,10 @@
 @import "irish.css";
+body { 
+/*  font-family: Arial, Helvetica, sans-serif;*/
+  font-family:Arial,Verdana; 
+  font-weight: normal;  
+  font-size: 12px; 
+ }
 
 /* override default font-size to make content font sizes a little larger */
 .content, td, th { 
@@ -85,7 +91,7 @@ div#toc {
   float:left;
   width:179px;
   display:inline;
-  font-size:12px;
+  font-size:10pt;
   font-weight:500;
   text-align:left;
   margin-bottom:0.5in;
@@ -161,7 +167,7 @@ div#toc a {
 }
 
 .current { 
-  background-color:#ffffbb;
+  background-color:#ffffaa;
 }
 
 
@@ -214,8 +220,6 @@ div.searchinfo, div.searchinfo h2 {
 
 h2 {
   font-size:115%;
-}
-
   text-decoration:none;
 }
 /* no line before text immediately after h3 heading */
@@ -258,6 +262,16 @@ td {
   vertical-align:top;
 }
 
+/* make box & folder labels smaller than actual content */
+tr.box-folder  th { 
+ font-size: 80%;
+}
+
+/* extra space to set off section labels in box/folder contents */
+th.section { 
+  padding-top:10px;
+}
+
 p.tight { 
   margin:0px;
 }
@@ -287,5 +301,9 @@ div.indexentry li {
 }
 
 div.indent { 
+  margin-left:0.25in;
+}
+
+span.indent { 
   margin-left:0.25in;
 }
