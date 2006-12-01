@@ -26,6 +26,8 @@ $filename = str_replace(' ', '_', $filename);
 $outfile = $tmpdir . $filename . '.fo';
 
 mkdir($tmpdir);
+// make sure previous file is gone
+unlink($outfile);
 $xmldb->save($outfile);
 
 // call fop & generate pdf ...
@@ -36,7 +38,8 @@ header("Content-Disposition: filename=$filename.pdf");
 
 print $pdf;
 
-// remove temporary file  (NOTE: to debug xsl-fo, comment this out and use temporary .fo file with fop)
+// clean up : remove temporary file
+//NOTE: to debug xsl-fo, comment this out and use temporary .fo file with fop)
 unlink($outfile);
 
 ?>
