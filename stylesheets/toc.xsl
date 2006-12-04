@@ -9,7 +9,15 @@
 
   <xsl:template match="unitid"  mode="toc">
     <xsl:apply-templates mode="toc"/>
-    <xsl:text>: &#x00A0;</xsl:text>
+    <xsl:choose>
+      <xsl:when test="not(contains(., '.'))">
+        <!-- only add a colon if the unitid doesn't contain a period (some non-emory EADs) -->
+        <xsl:text>: &#x00A0;</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text> &#x00A0;</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <!--  <xsl:template match="unittitle"  mode="toc">
@@ -66,9 +74,13 @@
 
     <xsl:apply-templates select="dsc" mode="toc"/>
 
-    <p class="navbar">
+    <p>
+      <xsl:attribute name="class">navbar
+      <!-- highlight this entry as the current one (currently displayed content)
+           if the main content is this node or a child node -->
+        <xsl:if test="//results/ead/index/@id = ./@id"> current</xsl:if>
+      </xsl:attribute>
       <a>
-        <!--        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#index</xsl:attribute> -->
         <xsl:attribute name="href">content.php?el=index&amp;id=<xsl:value-of select="index/@id"/></xsl:attribute>
         <xsl:value-of select="index/head"/>
       </a>
@@ -82,7 +94,12 @@
 
 
   <xsl:template match="odd" mode="toc">
-    <p class="navbar">
+    <p>
+      <xsl:attribute name="class">navbar
+      <!-- highlight this entry as the current one (currently displayed content)
+           if the main content is this node or a child node -->
+        <xsl:if test="//results/ead/odd/@id = ./@id"> current</xsl:if>
+      </xsl:attribute>
       <a>
         <xsl:attribute name="href">content.php?el=odd&amp;id=<xsl:value-of select="@id"/></xsl:attribute>
         <xsl:value-of select="head"/>
