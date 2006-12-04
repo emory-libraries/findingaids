@@ -494,13 +494,15 @@
            <xsl:apply-templates select="c02|c03"/>
          </xsl:when> 
       <!-- otherwise, display in tables -->
+
       <xsl:otherwise> 
         <table width="100%">
           <col width="7%" align="left" valign="top"/>
           <col width="7%" align="left" valign="top"/>
           <col width="86%" align="left" valign="top"/>
           <!-- process sub-container (only one level down) -->
-          <xsl:apply-templates select="c02[@level='file']|c03[@level='file']|c04[@level='file']|c02[not(@level)]|c03[not(@level)]|c04[not(@level)]"/>
+          <xsl:apply-templates select="c02[@level='file'] | c03[@level='file'] | c04[@level='file'] |
+				       c02[not(@level)] | c03[not(@level)] | c04[not(@level)]"/>
         </table>
       </xsl:otherwise>
     </xsl:choose> 
