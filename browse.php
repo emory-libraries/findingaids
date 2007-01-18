@@ -19,6 +19,7 @@ switch($repo) {
  case "wash-sl":
  case "ransom":
  case "delaware":
+ case "southernillinois":
    $coll = "'/db/FindingAids/$repo'";
    break;
  case "all":

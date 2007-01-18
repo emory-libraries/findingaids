@@ -31,7 +31,8 @@ $connectionArray = array('host'   => $server,
 		    'dbtype' => "exist");
 
 // all the subcollections in exist for irish finding aids
-$collections = array('emory/irish', 'boston', 'wakeforest', 'wash-sl', 'ransom', 'delaware');
+$collections = array('emory/irish', 'boston', 'wakeforest', 'wash-sl', 'ransom', 'delaware',
+		     'southernillinois');
 
 
 ?>
