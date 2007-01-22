@@ -32,8 +32,7 @@
     <!-- title : link back to top-level of finding aid -->
     <a>
       <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
-      <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
-      <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/subtitle"/>
+      <xsl:apply-templates select="//toc/ead/eadheader/filedesc/titlestmt" mode="toc"/>
     </a>
 
     <!-- link to top-level information sections -->
@@ -81,7 +80,7 @@
         <xsl:if test="//results/ead/index/@id = ./@id"> current</xsl:if>
       </xsl:attribute>
       <a>
-        <xsl:attribute name="href">content.php?el=index&amp;id=<xsl:value-of select="index/@id"/></xsl:attribute>
+        <xsl:attribute name="href">content.php?el=index&amp;id=<xsl:value-of select="index/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
         <xsl:value-of select="index/head"/>
       </a>
       <xsl:apply-templates select="index/hits"/>
@@ -92,6 +91,15 @@
 
   </xsl:template>
 
+  <xsl:template match="filedesc/titlestmt" mode="toc">
+    <!-- only display main & subtitles, nothing else -->
+    <xsl:apply-templates select="titleproper" mode="toc"/>
+    <xsl:apply-templates select="subtitle" mode="toc"/>
+  </xsl:template>
+
+  <xsl:template match="titleproper" mode="toc">
+    <xsl:apply-templates/>
+  </xsl:template>
 
   <xsl:template match="odd" mode="toc">
     <p>

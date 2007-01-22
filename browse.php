@@ -49,6 +49,8 @@ $xmldb = new xmlDbConnection($connectionArray);
 
 html_head("Browse Collections");
 include("template-header.inc");
+// custom style for browse page only
+print "<style> div.content { margin-right:1in; } </style>";
 print $crumbs;
 
 // unused (allow browsing by something besides unittitle ?)
@@ -72,6 +74,7 @@ $browse_qry = "
 		for \$a in (collection($coll)//archdesc/did/origination/persname,
 			    collection($coll)//archdesc/did/origination/corpname,
 			    collection($coll)//archdesc/did/origination/famname,
+			    collection($coll)//archdesc/did/origination/title,
  			    collection($coll)//archdesc/did[not(exists(origination/*))]/unittitle)
 	let \$l := substring(\$a,1,1)";
 //if ($repo != 'all') $browse_qry .= " where root(\$a)/ead/eadheader/eadid/@mainagencycode = '$repo' ";
@@ -120,11 +123,14 @@ if ($letter != 'all') {
   $repository_filter = "";
   }*/
 
-//	for \$a in /ead[archdesc/$irishfilter]$repository_filter 
+//	for \$a in /ead[archdesc/$irishfilter]$repository_filter
+
+// note: using unittitle as secondary sorting for finding aids with repeated originations
 $data_qry = "
 	for \$a in collection($coll)/ead
 	let \$sort-title := concat(\$a/archdesc/did/origination/persname,\$a/archdesc/did/origination/corpname,
-			\$a/archdesc/did/origination/famname,\$a/archdesc/did[not(exists(origination/*))]/unittitle) 
+			\$a/archdesc/did/origination/famname,\$a/archdesc/did/origination/title,
+			\$a/archdesc/did/unittitle) 
 	$letter_search
 	order by \$sort-title
 	return <record>
@@ -134,6 +140,7 @@ $data_qry = "
 				{\$a/archdesc/did/origination/persname}
 				{\$a/archdesc/did/origination/corpname}
 				{\$a/archdesc/did/origination/famname}
+				<origination>{\$a/archdesc/did/origination/title}</origination>
 			</name>
 			{\$a/archdesc/did/unittitle}
 			{\$a/archdesc/did/physdesc}

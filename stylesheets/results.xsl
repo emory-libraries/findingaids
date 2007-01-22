@@ -124,20 +124,31 @@
 		</div><p />
 	</xsl:template>
 
-        <xsl:template match="persname | corpname | famname ">	
+        <xsl:template match="persname | corpname | famname" name="origination">	
 		<xsl:element name="a">
                   <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
 			<xsl:value-of select="." />
 		</xsl:element>
 		<br />
 	</xsl:template>	
+
+        <xsl:template match="origination/title">
+          <i><xsl:call-template name="origination"/></i>
+        </xsl:template>
 	
+
+
 	<xsl:template match="unittitle[not(../name/node())]">	
 		<xsl:element name="a">
 			<xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
-			<xsl:value-of select="." />
+                        <xsl:apply-templates/>
 		</xsl:element>
 	</xsl:template>	
+
+  <xsl:template match="unittitle/title">
+    <i><xsl:apply-templates/></i> <xsl:text> </xsl:text>
+  </xsl:template>
+
 
 	<xsl:template match="abstract | unittitle">
 		<xsl:apply-templates/> <xsl:text> </xsl:text> 		

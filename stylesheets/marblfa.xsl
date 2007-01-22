@@ -196,6 +196,10 @@
 
  </xsl:template>
 
+ <xsl:template match="unittitle/title">
+   <i><xsl:apply-templates/></i><xsl:text> </xsl:text>
+ </xsl:template>
+
 
  <!-- don't display repository; redundant information -->
  <xsl:template match="archdesc/did/repository"/>
@@ -388,6 +392,7 @@
     </tr>
   </xsl:template>
 
+
   <!-- generic physdesc (not under archdesc) -->
   <xsl:template match="physdesc">
     <xsl:text> </xsl:text>
@@ -545,7 +550,7 @@
 
 
   <xsl:template match="indexentry/persname">
-    <b><xsl:value-of select="."/></b>
+    <b><xsl:apply-templates/></b>
   </xsl:template>
 
   <xsl:template match="indexentry/ptrgrp">

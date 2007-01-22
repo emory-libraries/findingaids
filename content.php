@@ -296,8 +296,15 @@ if ($kw != '')
 	$tamino->xslTransform($xsl_file, $xsl_params);
 	
 
-// get unittitle, but add spaces before any unitdates 
-$docname = $tamino->findNode('archdesc/did/unittitle/text()');
+// get unittitle, but with proper formatting for subnodes
+// FIXME: possibly this should be done in xslt (pick up all standard formatting elsewhere),
+//        perhaps with a special mode (title/crumb)?
+$docname = "";
+// possible title at beginning of unittitle
+if ($title = $tamino->findNode('archdesc/did/unittitle/title'))
+  $docname .= "<i>" . $title . "</i> ";
+$docname .= $tamino->findNode('archdesc/did/unittitle/text()');
+// add spaces before any unitdates
 if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[1]'))
   $docname .= " " . $ud;
 if ($ud = $tamino->findNode('archdesc/did/unittitle/unitdate[2]'))
