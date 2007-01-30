@@ -46,10 +46,14 @@ $xmldb->xslTransform($xsl_file);
 
 
 <tr>
-  <th>Filter by</th>
+<th class="label">Filter by:</th>
+</tr>
+
+<tr>
+  <th>Repository</th>
   <td class="input">
 <select name="repository">
- <option selected value="all">--repository--</option>
+ <option selected value="all">--Search All--</option>
 <? $xmldb->printResult(); ?>
 </select>
 </td>

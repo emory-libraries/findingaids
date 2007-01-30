@@ -52,10 +52,10 @@ $baseURL  = "http://marbl.library.emory.edu";
 
 
   <div id="nav">
-      <a href="doc.php?id=generalinfo">General Information</a>
-    <a href="doc.php?id=collections">The Collections</a>
+    <a href="doc.php?id=generalinfo">General Information</a>
     <a href="rqst.php">Search</a>
     <a href="browse.php">Browse</a>
+    <a href="doc.php?id=resources">Other Resources</a>
   </div>
 
 

@@ -19,8 +19,10 @@
 
 	<xsl:template match="/">
           <div class="navbox">
-            <xsl:apply-templates select="//source" />
+            <!-- limit by first letter -->
             <xsl:apply-templates select="//alpha_list" />
+            <!-- limit by source repository -->
+            <xsl:apply-templates select="//source" />
           </div>
 		
 		<xsl:apply-templates select="//record"/>
@@ -171,17 +173,6 @@
         <!-- repository name -->
         <xsl:template match="repository">
           <xsl:apply-templates/>
-          <xsl:text> </xsl:text>
-          <!-- show an icon for each school, for better visual identification -->
-          <xsl:choose>
-            <xsl:when test="contains(., 'Emory')">
-              <img src="images/emory-icon.png"/>
-            </xsl:when>
-            <xsl:when test="contains(., 'Boston')">
-              <img src="images/boston-icon.png"/>
-            </xsl:when>
-            <xsl:otherwise/>
-          </xsl:choose>
           <br />
         </xsl:template>
 

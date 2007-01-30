@@ -39,7 +39,7 @@ header("Content-Disposition: filename=$filename.pdf");
 print $pdf;
 
 // clean up : remove temporary file
-//NOTE: to debug xsl-fo, comment this out and use temporary .fo file with fop)
+//NOTE: to debug xsl-fo, comment this out and use temporary .fo file with fop
 unlink($outfile);
 
 ?>
