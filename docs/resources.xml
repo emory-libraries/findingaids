@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xm-well_formed path="F:\Special Collections\EADXML\web text\webtext2006\generalinfo2006.dtd"?>
+<div> <h1>General Information</h1> <ol> <li> <a href="#intro">Introduction</a>
+</li> <li> <a href="#hist">Project History</a> </li> <li> <a
+href="#access">Participating Institutions</a> </li> <li> <a
+href="#tech">Technical Information</a> </li> </ol> <h2> <a
+name="intro">Introduction</a> </h2> <p>The Irish Literary Collections Portal
+provides access to the finding aids of over 100 of North America's Irish
+literary manuscript collections. The collections represented in the portal
+range in date from the Irish Literary Renaissance to the present and contain a
+wide variety of materials including correspondence, manuscripts and typescripts
+of literary works, photographs, and printed material. Researchers should note
+that this site contains descriptions of collections rather than electronic
+versions of the individual items within these collections.</p> <p>Finding aids
+are tools created by archivists to present detailed information about the
+content and organization of a collection. This information enables researchers
+to browse a collection and to locate specific materials of interest. Though
+finding aids vary in length and level of detail, they generally consist of the
+following: a biographical or historical sketch, a scope and content note, an
+outline of the collection’s organization or series arrangement, relevant
+administrative information about copyright and restrictions, and a detailed
+container list of numbered boxes and folders along with a description of their
+contents. </p> <p>This portal brings together finding aids from a number of
+institutions into a single searchable database. The "Search" function allows
+researchers to conduct keyword searches within the finding aids and to filter
+those searches by creator and/or repository. By using the "Browse" function,
+researchers may quickly view an alphabetical listing of all the collections
+available through the portal. Entire finding aids may be downloaded and printed
+in PDF-format.</p> <h2> <a name="hist">Project History</a></h2> <p>In 2001, a
+two-year grant from the <a HREF="http://www.delmas.org/">The Gladys Krieble
+Delmas Foundation</a> helped Emory University and Boston College to digitize
+finding aids and develop a search interface that allows scholars both on- and
+off-site to explore the collections and quickly find relevant materials. In
+2006, a second grant from the Delmas Foundation allowed the project to
+incorporate the finding aids of Irish literary manuscript collections at
+several additional repositories.</p><h2> <a name="access">Participating
+institutions</a></h2> <p>General information on the hours, location, and access
+to the collections contained in the Irish Literary Collections Portal may be
+found at the following web sites: </p> <h3><a
+href="http://www.bc.edu/libraries/centers/burns/">Boston College, John J. Burns
+Library, Archives and Manuscripts</a></h3><h3><a
+href="http://specialcollections.library.emory.edu/">Emory University,
+Manuscript, Archives, and Rare Book Library</a></h3><h3><a
+href="http://www.libraries.psu.edu/speccolls/rbm/">Pennsylvania State
+University, Special Collections Library, Rare Books and
+Manuscripts</a></h3><h3><a
+href="http://www.lib.siu.edu/departments/speccoll">Southern Illinois University
+Carbondale, Morris Library, Special Collections Research Center</a></h3><h3><a
+href="http://www.lib.udel.edu/ud/spec/">University of Delaware Library, Special
+Collections</a></h3><h3><a href="http://www.hrc.utexas.edu/">University of
+Texas at Austin, Harry Ransom Humanities Research Center</a></h3><h3><a
+href="http://zsr.wfu.edu/collections/special/">Wake Forest University, Z. Smith
+Reynolds Library</a></h3><h3><a
+href="http://library.wustl.edu/units/spec/">Washington University at St. Louis,
+Department of Special Collections</a></h3><h2> <a name="tech">Technical
+Information</a> </h2> <p>The findings aids for this project have been encoded
+using the <a href="http://www.loc.gov/ead/">Encoded Archival Description</a>
+document type definition (EAD.DTD), Version 2002, an XML-compliant data
+structure developed and maintained jointly by the Society of American
+Archivists and the Library of Congress. </p> <p>Three EAD templates based on
+the complexity of the finding aid were created in X-Metal: a non-series
+template, a series template, and a subseries template. Using the
+<a href="http://www.rlg.org/rlgead/eadguides.html">RLG Best Practice Guidelines
+for Encoded Archival Description</a> (RLG EAD Advisory Group, August 2002), we
+incorporated recommended ID attributes, encoding analogs and the normalization
+of dates in each EAD document. </p> <p>The finding aids were created in
+Microsoft Word and the high-level elements were cut and pasted into the
+appropriate X-Metal template. Each component-level container list was converted
+to a text file and then run through a perl script which applied the appropriate
+tagging. The container lists were then cut and pasted back into the template in
+X-Metal.</p> <p>Further transformations of the X-Metal data were made through a
+process written in <a href="http://ant.apache.org/">Apache Ant</a>: replacing
+bad data (invalid utf-8 characters introduced by Microsoft Word), changing
+entities to unicode, adding a unique id for most elements, and creating
+<a href="http://exist.sourceforge.net/">eXist</a> database load files.</p>
+<p>The data was loaded into a eXist database and was then retrieved with Tamino
+X-Query calls. X-Query implements a subset of the
+<a href="http://www.w3.org/TR/xpath">XPath</a> specification (a W3C
+recommendation). Web pages were dynamically generated with
+<a href="http://www.w3.org/TR/xslt">XSL</a> Transformations (a W3C
+recommendation) using the <a href="http://cocoon.apache.org/">Apache Cocoon</a>
+XML publishing framework. Cocoon is run as a java servlet within the
+<a href="http://jakarta.apache.org/tomcat/">Apache Tomcat</a> servlet engine.
+</p></div>
