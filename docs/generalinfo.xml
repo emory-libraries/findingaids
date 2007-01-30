@@ -56,31 +56,33 @@ manuscript collections at several additional repositories.</p>
 collections contained in the Irish Literary Collections Portal may be
 found at the following web sites: </p>
 
-<h3><a href="http://www.bc.edu/libraries/centers/burns/">Boston
-College, John J. Burns Library, Archives and Manuscripts</a></h3>
+<ol>
+<li><a href="http://www.bc.edu/libraries/centers/burns/">Boston
+College, John J. Burns Library, Archives and Manuscripts</a></li>
 
-<h3><a href="http://specialcollections.library.emory.edu/">Emory
-University, Manuscript, Archives, and Rare Book Library</a></h3>
+<li><a href="http://specialcollections.library.emory.edu/">Emory
+University, Manuscript, Archives, and Rare Book Library</a></li>
 
-<h3><a href="http://www.libraries.psu.edu/speccolls/rbm/">Pennsylvania
+<li><a href="http://www.libraries.psu.edu/speccolls/rbm/">Pennsylvania
 State University, Special Collections Library, Rare Books and
-Manuscripts</a></h3>
+Manuscripts</a></li>
 
-<h3><a href="http://www.lib.siu.edu/departments/speccoll">Southern
+<li><a href="http://www.lib.siu.edu/departments/speccoll">Southern
 Illinois University Carbondale, Morris Library, Special Collections
-Research Center</a></h3>
+Research Center</a></li>
 
-<h3><a href="http://www.lib.udel.edu/ud/spec/">University of Delaware
-Library, Special Collections</a></h3>
+<li><a href="http://www.lib.udel.edu/ud/spec/">University of Delaware
+Library, Special Collections</a></li>
 
-<h3><a href="http://www.hrc.utexas.edu/">University of Texas at
-Austin, Harry Ransom Humanities Research Center</a></h3>
+<li><a href="http://www.hrc.utexas.edu/">University of Texas at
+Austin, Harry Ransom Humanities Research Center</a></li>
 
-<h3><a href="http://zsr.wfu.edu/collections/special/">Wake Forest
-University, Z. Smith Reynolds Library</a></h3>
+<li><a href="http://zsr.wfu.edu/collections/special/">Wake Forest
+University, Z. Smith Reynolds Library</a></li>
 
-<h3><a href="http://library.wustl.edu/units/spec/">Washington
-University at St. Louis, Department of Special Collections</a></h3>
+<li><a href="http://library.wustl.edu/units/spec/">Washington
+University at St. Louis, Department of Special Collections</a></li>
+</ol>
 
 <h2> <a name="tech">Technical Information</a> </h2>
 
@@ -120,6 +122,6 @@ X-Query calls. X-Query implements a subset of the <a
 href="http://www.w3.org/TR/xpath">XPath</a> specification (a W3C
 recommendation). Web pages were dynamically generated with <a
 href="http://www.w3.org/TR/xslt">XSL</a> Transformations (a W3C
-recommendation) with <a href="http://www.php.net/">PHP</a>.</p>
+recommendation) and <a href="http://www.php.net/">PHP</a>.</p>
 
 </div>
