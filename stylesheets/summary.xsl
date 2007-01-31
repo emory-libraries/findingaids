@@ -54,6 +54,11 @@
                 <span class="hits">hits</span>
               </xsl:if>
 
+              <!-- if the actual content is returned, count any exist:match tags -->
+              <xsl:if test=".//exist:match">
+                <span class="hits"><xsl:value-of select="count(.//exist:match)"/> hits</span>
+              </xsl:if>
+
 
             </h4>
             </p>
