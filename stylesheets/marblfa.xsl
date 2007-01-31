@@ -549,7 +549,7 @@
   </xsl:template>
 
 
-  <xsl:template match="indexentry/persname">
+  <xsl:template match="indexentry/persname|indexentry/name">
     <b><xsl:apply-templates/></b>
   </xsl:template>
 
@@ -614,7 +614,6 @@
    <xsl:if test="preceding-sibling::exist:match and ($txt = '')">
      <xsl:text> </xsl:text>
    </xsl:if>
-
    <span class="match"><xsl:apply-templates/></span>
  </xsl:template>
 
