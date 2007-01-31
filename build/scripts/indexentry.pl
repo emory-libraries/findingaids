@@ -86,7 +86,7 @@ foreach $f (@infiles){
     }
     if ($state eq "start") {
       # first content line after a blank line
-      print OUT "<indexentry>\n  <persname>$_</persname>\n  <ptrgrp>\n";
+      print OUT "<indexentry>\n  <name>$_</name>\n  <ptrgrp>\n";
       # all subsequent non-blank lines are refs
       $state = "ref";
     } elsif ($state eq "ref") {
