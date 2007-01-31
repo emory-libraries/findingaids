@@ -14,7 +14,7 @@
   <input message="What repository are you building documents for (default: emory)?${line.separator} "
 	addproperty="repo"
 	defaultvalue="emory"
-	validargs="emory,emory/irish,boston,wakeforest,ransom,delaware,wash-sl,southernillinois,"/>
+	validargs="emory,boston,wakeforest,ransom,delaware,wash-sl,southernillinois,pennstate,berg,"/>
 
 <!-- Note: last 'empty' validarg is neede for input to accept 'return'
 	& use default value -->
