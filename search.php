@@ -14,23 +14,13 @@ $repo = $_GET["repository"];
 $position = $_GET["pos"];    // position (i.e, cursor)
 $maxdisplay = $_GET["max"];  // maximum  # results to display
 
-
-switch($repo) {
- case "emory":
-   $coll = "'/db/FindingAids/emory/irish'";
-   break;
- case "boston":
- case "wakeforest":
- case "wash-sl":
- case "ransom":
- case "delaware":
-   $coll = "'/db/FindingAids/$repo'";
-   break;
- case "all":
- default:
-   $coll = "'/db/FindingAids/" . implode("', '/db/FindingAids/", $collections) . "'";
-   break;
- }
+// by default, search all 
+$coll = "/db/FindingAids";
+if (($repo != "all") && (in_array($repo, $collections))) {
+      $coll .= "/$repo";
+    }
+// put quotes around collection for use in xquery collection statement
+$coll = "'$coll'";
 
 
 $url = "search.php?";
@@ -76,7 +66,7 @@ print $crumbs;
 //$irishfilter = "controlaccess//subject |= 'irish ireland'";
 
 
-$for = 'for $a in collection(' . $coll . ')/ead';
+$for = 'for $a in collection(' . $coll . ')/ead[' . $irishfilter . ']';
 $let = "\n" . 'let $b := $a/eadheader
 let $matchcount := text:match-count($a)';
 $order = "order by \$matchcount descending";
@@ -166,10 +156,12 @@ if ($total == 0){
   // in phonetic mode, php highlighting will be inaccurate and/or useless... 
   // $xmldb->highlightInfo($myterms); 
   print "<p align=\"center\">where ";
-  if ($kw) print "document contains \"" . stripslashes($kw) . "\"";
-  if ($kw && $creator) print " and ";
-  if ($creator) print "creator matches \"" . stripslashes($creator) . "\"";
-  // FIXME: display selected repository here?
+  $useropts = array();
+  if ($kw) array_push($useropts, "document contains \"" . stripslashes($kw) . "\"");
+  if ($creator) array_push($useropts, "creator matches \"" . stripslashes($creator) . "\"");
+  // FIXME: display selected repository here? if so, what wording / display name to use?
+  //  if ($repo != 'all') array_push($useropts, "repository is $repo");
+  print implode($useropts, " and ");
     "</p>"; 
 
   print "</div>";

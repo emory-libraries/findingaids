@@ -20,7 +20,9 @@ if (empty($element)) {
   exit();
  }
 
-
+// Note: this page does not use the irish filter, but it should only
+// be called with ids from the browse or search (which do use the
+// irish filter)
 
 
 $connectionArray{"debug"} = false;

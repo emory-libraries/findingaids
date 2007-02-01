@@ -10,23 +10,14 @@ $letter = ($_REQUEST['l']) ? $_REQUEST['l'] : 'all';
 
 $repo = ($_REQUEST['repository']) ? $_REQUEST['repository'] : 'all';
 
-switch($repo) {
- case "emory":
-   $coll = "'/db/FindingAids/emory/irish'";
-   break;
- case "boston":
- case "wakeforest":
- case "wash-sl":
- case "ransom":
- case "delaware":
- case "southernillinois":
-   $coll = "'/db/FindingAids/$repo'";
-   break;
- case "all":
- default:
-   $coll = "'/db/FindingAids/" . implode("', '/db/FindingAids/", $collections) . "'";
-   break;
- }
+// by default, search all 
+$coll = "/db/FindingAids";
+if (($repo != "all") && (in_array($repo, $collections))) {
+      $coll .= "/$repo";
+    }
+// put quotes around collection for use in xquery collection statement
+$coll = "'$coll'";
+
 
 $url = "browse.php";
 $urlopts = array();
@@ -62,8 +53,6 @@ switch ($browseBy) {
 }
 
 
-// query to limit finding aids to irish subjects for delmas 
-$irishfilter = "controlaccess//subject |= 'irish ireland'";
 
 
 // note: in all cases, unit title is used as a fall-back *only* if no origination name exists
@@ -71,11 +60,11 @@ $irishfilter = "controlaccess//subject |= 'irish ireland'";
 $browse_qry = "
 	for \$b in 
 	distinct-values (
-		for \$a in (collection($coll)//archdesc/did/origination/persname,
-			    collection($coll)//archdesc/did/origination/corpname,
-			    collection($coll)//archdesc/did/origination/famname,
-			    collection($coll)//archdesc/did/origination/title,
- 			    collection($coll)//archdesc/did[not(exists(origination/*))]/unittitle)
+		for \$a in (collection($coll)$eadfilter//archdesc/did/origination/persname,
+			    collection($coll)$eadfilter//archdesc/did/origination/corpname,
+			    collection($coll)$eadfilter//archdesc/did/origination/famname,
+			    collection($coll)$eadfilter//archdesc/did/origination/title,
+ 			    collection($coll)$eadfilter//archdesc/did[not(exists(origination/*))]/unittitle)
 	let \$l := substring(\$a,1,1)";
 //if ($repo != 'all') $browse_qry .= " where root(\$a)/ead/eadheader/eadid/@mainagencycode = '$repo' ";
 $browse_qry .= "
@@ -98,7 +87,7 @@ let $coll := concat("/db/FindingAids/", $r)
 let $code := distinct-values(collection($coll)//ead/eadheader/eadid/@mainagencycode) 
 let $rep := (collection($coll)/ead/archdesc/did/repository)[1] 
 order by $rep  
-return <repository collection="{if ($r = \'emory/irish\') then \'emory\' else $r}" agencycode="{$code}">
+return <repository collection="{$r}" agencycode="{$code}">
 	{$rep/@*}
 	{$rep/node()}
 </repository>';
@@ -127,7 +116,7 @@ if ($letter != 'all') {
 
 // note: using unittitle as secondary sorting for finding aids with repeated originations
 $data_qry = "
-	for \$a in collection($coll)/ead
+	for \$a in collection($coll)/ead[$irishfilter]
 	let \$sort-title := concat(\$a/archdesc/did/origination/persname,\$a/archdesc/did/origination/corpname,
 			\$a/archdesc/did/origination/famname,\$a/archdesc/did/origination/title,
 			\$a/archdesc/did/unittitle) 
