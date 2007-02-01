@@ -2,6 +2,9 @@
 include_once("config.php");
 include_once("lib/xmlDbConnection.class.php");
 
+//php ajax/scriptaculous
+include("projax/projax.php");
+
 $connectionArray{"debug"} = false;
 
 $xmldb = new xmlDbConnection($connectionArray);
@@ -9,7 +12,7 @@ $xmldb = new xmlDbConnection($connectionArray);
 /* organize by exist collection structure */
 $query = 'for $r in ("' . implode('", "', $collections) . '")  
 let $coll := concat("/db/FindingAids/", $r) 
-let $code := distinct-values(collection($coll)//ead/eadheader/eadid/@mainagencycode) 
+let $code := distinct-values(collection($coll)//ead[' . $irishfilter . ']/eadheader/eadid/@mainagencycode) 
 let $rep := (collection($coll)/ead/archdesc/did/repository)[1] 
 order by $rep  
 return <repository collection="{if ($r = \'emory/irish\') then \'emory\' else $r}" agencycode="{$code}">
@@ -26,6 +29,7 @@ $xsl_file 	= "stylesheets/search.xsl";
 $xmldb->xslTransform($xsl_file);
 
 
+$script = new Scriptaculous();
 
 
 ?>
@@ -41,8 +45,23 @@ $xmldb->xslTransform($xsl_file);
 <tr><th></th><td class="info">Searches entire text of finding aid</td></tr>
 
 
-<tr><th>Creator</th><td class="input"><input type="text" size="40" name="creator" value="<?= $creator?>"></td></tr>
+<tr><th>Creator</th>
+<td class="input">
+  <?
+$ajaxopts = array("url" => "creatorlist.php", "indicator" => "loading");
+$inputopts = array("size" => "40", "value" => $creator);
+//print $script->auto_complete_field('creator', $opts);
+print $script->text_field_with_auto_complete('creator', $inputopts, $ajaxopts);
+
+?>
+
+<!-- <input type="text" size="40" id="creator" name="creator" value="<?= $creator?>" autocomplete="off"> -->
+<span id="loading" style="display:none;">Loading...</span>
+<!-- <div id="creator_auto_complete" class="autocomplete"></div> -->
+  </td></tr>
+
 <tr><th></th><td class="info">Searches only for person, family, or organization that created or accumulated the collection [e.g., <b>Heaney, Seamus</b>]</td></tr>
+
 
 
 <tr>
