@@ -30,9 +30,13 @@ $connectionArray = array('host'   => $server,
 		    'db'     => $db,
 		    'dbtype' => "exist");
 
-// all the subcollections in exist for irish finding aids
-$collections = array('emory/irish', 'boston', 'wakeforest', 'wash-sl', 'ransom', 'delaware',
-		     'southernillinois');
+// all the Finding Aid subcollections in eXist that contain Irish finding aids
+$collections = array('emory', 'boston', 'wakeforest', 'wash-sl', 'ransom', 'delaware',
+		     'southernillinois', 'pennstate', 'berg');
+
+// xpath to limit finding aids to irish subjects for delmas 
+$irishfilter = "eadheader/filedesc/titlestmt/titleproper/@type='Irish'";
+$eadfilter = "/ead[$irishfilter]";
 
 
 ?>
