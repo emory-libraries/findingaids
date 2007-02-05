@@ -42,14 +42,14 @@ $script = new Scriptaculous();
 <form name="fa_query" action="search.php" method="get">
 <table class="searchform" border="0">
 <tr><th>Keyword</th><td class="input"><input type="text" size="40" name="keyword" value="<?= $kw?>"></td></tr>
-<tr><th></th><td class="info">Searches entire text of finding aid</td></tr>
+<tr><th></th><td class="info">Searches full text of all finding aids.</td></tr>
 
 
 <tr><th>Creator</th>
 <td class="input">
   <?
-$ajaxopts = array("url" => "creatorlist.php", "indicator" => "loading");
-$inputopts = array("size" => "40", "value" => $creator);
+$ajaxopts = array("url" => "creatorlist.php", "indicator" => "loading", "select" => "value");
+$inputopts = array("size" => "40", "value" => $creator, "autocomplete" => "off");
 //print $script->auto_complete_field('creator', $opts);
 print $script->text_field_with_auto_complete('creator', $inputopts, $ajaxopts);
 
@@ -85,7 +85,10 @@ print $script->text_field_with_auto_complete('creator', $inputopts, $ajaxopts);
 
 <div class="searchtips">
 <ul class ="searchtips"><b>Search tips:</b>
-<li>You can enter words in more than one search box.</li>
+<li>You can enter words in both the keyword and creator search boxes
+[e.g., keyword = <b>confetti</b> and creator = <b>carson, ciaran</b>].</li>
+<li>Use <b>Filter by Repository</b> to limit your search to finding aids from a single instution
+[e.g., keyword = <b>spreading</b>, creator = <b>Abbey</b>, Repository = <b>University of Delaware</b> ]</li>
 <li>Asterisks may be used to do a truncated search. 
 [e.g., enter <b>resign*</b> to match <b>resign</b>, <b>resigned</b>, and <b>resignation</b>.] </li>
 <li>Capitalization is ignored.</li>
