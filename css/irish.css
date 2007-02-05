@@ -37,6 +37,7 @@ input.button {
 div.header { 
   text-align:left;
   margin:0.25in;
+  margin-bottom:0px;
   padding-left:0.25in;
 }
 
@@ -96,6 +97,13 @@ div#nav a:hover  {
   color:#FF9933; 
 }
 
+div#index { 
+  margin:0px;
+  margin-left:1in;
+  margin-top:3px;
+  width:600px;
+  text-align:center;
+}
 
 div.footer { 
   padding-top:0.5in;
@@ -110,6 +118,6 @@ div.navbox ul {
 
 img#frontpage { 
   margin-top:0px;
-  margin-left: 1.1in;
+/*  margin-left: 1.1in;*/
   padding:0px;
  }
