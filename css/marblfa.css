@@ -163,7 +163,7 @@ div#publicationstmt h4 {
 }
 
 div.navbox {  
-  margin-bottom:15px;
+  margin-bottom:30px;
 }
 
 /* overrides a style from main marbl css; loses style in some cases if not set to important */
@@ -316,4 +316,11 @@ div.indent {
 
 span.indent { 
   margin-left:0.25in;
+}
+
+
+span.count { 
+  font-size:80%;
+  float:right;
+  color:#565656;
 }

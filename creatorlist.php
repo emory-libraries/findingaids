@@ -11,15 +11,23 @@ $creator = $_REQUEST["creator"];
 //$coll = "'/db/FindingAids/" . implode("', '/db/FindingAids/", $collections) . "'";
 $coll = "'/db/FindingAids'";
 
-$query = "for \$b in distinct-values (  
-		for \$a in (collection($coll)$eadfilter//archdesc/did/origination,
-			collection($coll)$eadfilter//controlaccess/persname[@encodinganalog='700'],
-			collection($coll)$eadfilter//controlaccess/corpname[@encodinganalog='710'],
-			collection($coll)$eadfilter//controlaccess/famname[@encodinganalog='700'])[. &= '$creator*']
-		return normalize-space(\$a)) 
-return <li>{\$b}</li>";    
+// currently alphabetizing results;
+// note: possibly privilege lastname matches?
+
+// Susan requested that the creator list be limited to origination field, even though
+// the creator search actually also searches controlled access fields as well
+
+$query = "for \$b in distinct-values (
+		for \$a in (collection($coll)$eadfilter//archdesc/did/origination)[. &= '$creator*']
+		return normalize-space(\$a))
+let \$c := count(collection($coll)${eadfilter}[.//archdesc/did/origination = \$b])
+return <li>
+<span class='count'>{\$c} collection{if (\$c !=1) then 's' else ()}</span>
+<span class='value'>{\$b}</span>
+</li>";    
 
 // for some reason, count is not returning accurate results
+
 
 /*
 let \$c := count(collection($coll)$eadfilter[.//archdesc/did/origination &= '\$b' or 
