@@ -193,9 +193,11 @@ span.match { color:red; font-weight:bold; }
   font-size:105%;
   color:#1c1e2d; 
   font-weight:bold;
+
 }
 div.breadCrumbs { 
   margin-bottom:10px;
+  margin-top:10px;
 }
 
 .breadCrumbs a { 
