@@ -85,12 +85,17 @@ if ($creator) {
   // the simpler syntax "where x or y" should work here
   // in this case, that syntax caused the query not to match when it should
   $where = "
+	where \$a/archdesc/did/origination[. &= \"$creator\"]
+";
+} 
+/*	old creator search - used control access fields also
+  $where = "
 	where (\$a/archdesc/did/origination,
 		\$a//controlaccess/persname[@encodinganalog='700'],
 		\$a//controlaccess/corpname[@encodinganalog='710'],
 		\$a//controlaccess/famname[@encodinganalog='700'])[. &= \"$creator\"]
 ";
-} 
+} */
 
 if ($title) $filter .= "[//titlestmt &=  '$title']";
 
