@@ -53,7 +53,7 @@
 
         <xsl:template match="source/repository">
             <!-- only display if the collection actually has content loaded -->
-          <xsl:if test="@agencycode != ''">
+            <!--          <xsl:if test="@agencycode != ''"> -->
           <li>
             <xsl:choose>
               <xsl:when test="@collection = $repository">
@@ -69,7 +69,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </li>
-          </xsl:if>
+          <!--          </xsl:if> -->
         </xsl:template>
 
 			

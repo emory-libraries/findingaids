@@ -336,7 +336,7 @@
           <table>
             <xsl:attribute name="border">0</xsl:attribute>
             <col width="7%" align="left" valign="top"/>
-            <xsl:if test="//container[@type='folder']">
+            <xsl:if test="//container[@type='folder' or @type='Folder']">
               <col width="7%" align="left" valign="top"/>
             </xsl:if>
             <col width="86%"/>
@@ -362,7 +362,8 @@
   </xsl:template>
   
   <xsl:template match="did[container/@type='box'] | did[container/@type='Box'] 
-                       | did[container/@type='volume'] | did[container/@type='Volume']">
+                       | did[container/@type='volume'] | did[container/@type='Volume']
+                       | did[container/@type='Book'] ">
     <!-- only show box/folder once for the whole page -->
     <xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
       <tr class="box-folder">
@@ -377,7 +378,7 @@
     
     <tr>
       <td>
-        <xsl:apply-templates select="container[@type='box' or @type='Box']"/>
+        <xsl:apply-templates select="container[@type='box' or @type='Box' or @type='Book']"/>
         <xsl:apply-templates select="container[@type='volume' or @type='Volume']"/>
       </td>
       <xsl:if test="//container[@type='folder' or @type='Folder']">
@@ -393,6 +394,14 @@
   </xsl:template>
 
 
+  <xsl:template match="c01[@level='file' or @level='item']/scopecontent 
+                       | c02[@level='file' or @level='item']/scopecontent 
+                       | c03[@level='file' or @level='item']/scopecontent 
+                       | c04[@level='file' or @level='item']/scopecontent">
+    <tr><td></td><td></td>	<!-- line up with unittitle, note -->
+    <td><xsl:apply-templates/></td></tr>
+  </xsl:template>
+
   <!-- generic physdesc (not under archdesc) -->
   <xsl:template match="physdesc">
     <xsl:text> </xsl:text>
@@ -405,7 +414,7 @@
     <span class="indent"><xsl:apply-templates/></span>
   </xsl:template>
 
-  <xsl:template match="container|c01[@level='file']/did/unittitle|c01[not(@level)]/did/unittitle">
+  <xsl:template match="container|c01[@level='file' or @level='item']/did/unittitle|c01[not(@level)]/did/unittitle">
     <xsl:apply-templates/>
   </xsl:template>
 
@@ -506,8 +515,11 @@
           <col width="7%" align="left" valign="top"/>
           <col width="86%" align="left" valign="top"/>
           <!-- process sub-container (only one level down) -->
-          <xsl:apply-templates select="c02[@level='file'] | c03[@level='file'] | c04[@level='file'] |
-				       c02[not(@level)] | c03[not(@level)] | c04[not(@level)]"/>
+          <xsl:apply-templates select="c02[@level='file' or @level='item'] 
+                                       | c03[@level='file' or @level='item']
+                                       | c04[@level='file' or @level='item'] 
+                                       | c02[not(@level)] | c03[not(@level)] 
+                                       | c04[not(@level)]"/>
         </table>
       </xsl:otherwise>
     </xsl:choose> 
