@@ -54,7 +54,7 @@
 			<xsl:apply-templates select="name"/>
 			<xsl:apply-templates select="unittitle"/><br />
 			<xsl:apply-templates select="physdesc"/>
-			<xsl:apply-templates select="abstract"/><br />
+			<xsl:apply-templates select="abstract"/>
 			<xsl:apply-templates select="matches" />
 		</div><p />
 	</xsl:template>
@@ -74,9 +74,14 @@
 		</xsl:element>
 	</xsl:template>	
 
-	<xsl:template match="abstract | unittitle">
+	<xsl:template match="unittitle">
 		<xsl:apply-templates/> <xsl:text> </xsl:text> 		
 	</xsl:template>		
+
+        <xsl:template match="abstract">	<!-- break is here so it won't appear if there is no abstract -->
+		<xsl:apply-templates/> <xsl:text> </xsl:text><br />
+	</xsl:template>		
+
 
         <!-- add a space before unitdate (bulk date or circa) -->
 	<xsl:template match="unitdate">
@@ -104,5 +109,11 @@
 		-->
 		<br />
 	</xsl:template>
+
+
+        <!-- italicize titles anywhere in result summary -->
+        <xsl:template match="title">
+          <i><xsl:apply-templates/></i>
+        </xsl:template>
 	
 </xsl:stylesheet>
