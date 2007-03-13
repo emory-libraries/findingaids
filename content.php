@@ -207,7 +207,7 @@ $connectionArray{"debug"} = false;
 		    return if (exists(\$i$orfilter))
 			  then \$i$orfilter
 			else \$i }
-		   {for \$c01 in \$d/c01[c02]
+		   {for \$c01 in \$d/c01[c02 or @level='series']
 		    return <c01>
 		      {\$c01/@*}
 		      {\$c01/did}

@@ -118,7 +118,7 @@
 
 
   <!-- series -->
-  <xsl:template match="c01[c02]" mode="toc">
+  <xsl:template match="c01[c02]|c01[@level='series']" mode="toc">
     <xsl:element name="li">
       <xsl:attribute name="class">navbar 
       <!-- highlight this entry as the current one (currently displayed content)
