@@ -20,12 +20,13 @@ $tmpdir = "/tmp/findingaids/";
 $fop = "http://wilson:8080/fop/fop?fo=";
 
 /* exist settings  */
-// test
-$server = "wilson.library.emory.edu";
-//production
-//$server = "bohr.library.emory.edu";
+if ($in_production) {
+  $server = "bohr.library.emory.edu";		//production
+} else {
+  $server = "wilson.library.emory.edu";  	// test
+}
+
 $port = "8080";
-//$db = "FindingAids";
 $db = "FindingAids/emory";
 
 $connectionArray = array('host'   => $server,
