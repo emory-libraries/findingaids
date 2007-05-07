@@ -341,7 +341,7 @@
             </xsl:if>
             <col width="86%"/>
             <!-- process container c01s -->
-            <xsl:apply-templates select="c01/did"/>
+            <xsl:apply-templates select="c01/did | c01/scopecontent"/>
           </table>
         </xsl:otherwise>
       </xsl:choose>
@@ -365,7 +365,8 @@
                        | did[container/@type='volume'] | did[container/@type='Volume']
                        | did[container/@type='Book'] ">
     <!-- only show box/folder once for the whole page -->
-    <xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
+     <xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
+                   <!--                    count(../../preceding-sibling::node()//did[container]) = 0">   -->
       <tr class="box-folder">
         <th>Box</th>
         <!-- only display folder label if there are folders -->
