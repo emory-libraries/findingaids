@@ -53,7 +53,7 @@
 
         <xsl:template match="source/repository">
             <!-- only display if the collection actually has content loaded -->
-            <!--          <xsl:if test="@agencycode != ''"> -->
+         <xsl:if test=". != ''"> 
           <li>
             <xsl:choose>
               <xsl:when test="@collection = $repository">
@@ -69,7 +69,7 @@
               </xsl:otherwise>
             </xsl:choose>
           </li>
-          <!--          </xsl:if> -->
+        </xsl:if> 
         </xsl:template>
 
 			
@@ -140,7 +140,8 @@
 	
 
 
-	<xsl:template match="unittitle[not(../name/node())]">	
+        <!-- if there is no text in the name (any origination name or title), make unit title the link -->
+        <xsl:template match="unittitle[not(../name//text())]">	
 		<xsl:element name="a">
 			<xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::record/@id" /><xsl:value-of select="$url_suffix" /></xsl:attribute>			
                         <xsl:apply-templates/>
