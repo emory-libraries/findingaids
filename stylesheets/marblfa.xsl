@@ -197,6 +197,10 @@
 
  </xsl:template>
 
+ <xsl:template match="unittitle/text()">
+   <xsl:value-of select="normalize-space(.)"/>
+ </xsl:template>
+
  <xsl:template match="unittitle/title">
    <i><xsl:apply-templates/></i><xsl:text> </xsl:text>
  </xsl:template>
@@ -407,7 +411,7 @@
 
   <!-- generic physdesc (not under archdesc) -->
   <xsl:template match="physdesc">
-    <xsl:text> </xsl:text>
+    <xsl:text>, </xsl:text>
     <xsl:apply-templates/>
   </xsl:template>
 
