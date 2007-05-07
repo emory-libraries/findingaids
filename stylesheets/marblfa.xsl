@@ -124,25 +124,26 @@
      <!-- Note: Wake Forest nested these fields under desgrp;
           using .// to pick up these fields anywhere under this node -->
      
+     <xsl:if test="bioghist or bibliography or scopecontent or arrangement or otherfindaid">
      <hr/>
-     
-     <xsl:element name="h2">
-       <a>
-         <xsl:attribute name="name">collectionDesc</xsl:attribute>
-         Collection Description
-       </a>
-     </xsl:element>
-     <!-- display the following fields, in this specific order -->
-     <xsl:apply-templates select="bioghist"/>
-     <xsl:apply-templates select="bibliography"/>
-     <xsl:apply-templates select="scopecontent"/>
-     <xsl:apply-templates select="arrangement"/>
-     <xsl:apply-templates select="otherfindaid"/>
+       <xsl:element name="h2">
+         <a>
+           <xsl:attribute name="name">collectionDesc</xsl:attribute>
+           Collection Description
+         </a>
+       </xsl:element>
+       <!-- display the following fields, in this specific order -->
+       <xsl:apply-templates select="bioghist"/>
+       <xsl:apply-templates select="bibliography"/>
+       <xsl:apply-templates select="scopecontent"/>
+       <xsl:apply-templates select="arrangement"/>
+       <xsl:apply-templates select="otherfindaid"/>
+       
+     </xsl:if>
      
      
      <!-- don't display search terms in full/printable (pdf) version -->
      <xsl:if test="$mode != 'full'">
-       <hr/>
        <xsl:apply-templates select="controlaccess"/>     
      </xsl:if>
 
@@ -287,6 +288,7 @@
 
   <!-- top-level control access heading -->
   <xsl:template match="archdesc/controlaccess/head">
+    <hr/>
     <h2>
       <a name="searchTerms">
         <xsl:apply-templates/>
