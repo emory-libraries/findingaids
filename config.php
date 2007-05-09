@@ -34,4 +34,9 @@ $connectionArray = array('host'   => $server,
 		    'db'     => $db,
 		    'dbtype' => "exist");
 
+
+// shortcut to include common ead xquery functions
+$eadxq = "import module namespace eadxq='http://www.library.emory.edu/xquery/eadxq' at
+'xmldb:exist:///db/xquery-modules/ead.xqm'; ";
+
 ?>
