@@ -46,6 +46,12 @@ $keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", $kw);
 $kwarray = processterms($keywords);
 $autharray = processterms($creator);
 
+// filters to add onto path in 'for' statement
+$filter = "";
+if ($keywords)
+  $filter .= "[. &= \"$keywords\"]";
+foreach ($phrases[1] as $p)
+  $filter .= "[near(., '$p')]";
 
 
 $doctitle = "Search Results";
@@ -54,18 +60,34 @@ html_head($doctitle);
 include("template-header.inc");
 print $crumbs;
 
-
+$declare = 'import module namespace phrase="http://www.library.emory.edu/xquery/phrase" at
+"xmldb:exist:///db/xquery-modules/phrase.xqm"; ';
 $for = ' for $a in /ead';
-$let = "\n" . 'let $b := $a/eadheader
-let $matchcount := text:match-count($a)';
+$let = "\n" . 'let $b := $a/eadheader ' . "\n";
+if (count($phrases[0])) {
+  //FIXME: only currently handles one phrase
+  $phr = strtolower(implode($phrases[0], ''));  // includes quotes
+  // only do phrase cleaning on the lowest-level node that needs it (faster response time)
+  $let .= 'let $phrasecount := sum(for $i in $a//*[near(., ' . $phr . ')][. &= ' . $phr . ']
+let $phr := phrase:clean-matches($i, ' . $phr . ')
+return count($phr//exist:match) ) ' . "\n";
+} else {
+  $let .= 'let $phrasecount := 0 ' . "\n";
+}
+
+if ($kw) {
+  // get the total of keyword matches *without* counting phrase term matches
+  $let .= 'let $akw := root($a)/ead[. &= "' . $keywords . '"]
+let $kwcount := text:match-count($akw)' . "\n";
+} else {
+  $let .= 'let $kwcount := 0' . "\n";
+}
+
+$let .= 'let $matchcount := ($phrasecount + $kwcount) ' . "\n";
+
 $order = "order by \$matchcount descending";
 
-// filters to add onto path in 'for' statement
-$filter = "";
-if ($keywords)
-  $filter .= "[. &= \"$keywords\"]";
-foreach ($phrases[1] as $p)
-  $filter .= "[near(., '$p')]";
+
 
 $where = "";
 if ($creator) {
@@ -103,7 +125,11 @@ $return  = ' return
   {$a/archdesc/did/physdesc}
   {$a/archdesc/did/abstract}';
 // if this is a keyword search, return # of matches within the document
-if ($kw) $return .= "\n" . '<matches><total>{$matchcount}</total></matches>' . "\n";
+if ($kw) $return .= "\n" . '<matches>
+<total>{$matchcount}</total>
+<kw>{$kwcount}</kw>
+<phrase>{$phrasecount}</phrase>
+</matches>' . "\n";
 
 
 $xsl_file = "stylesheets/results.xsl";
@@ -111,7 +137,7 @@ $xsl_file = "stylesheets/results.xsl";
 $countquery = "<total>{count($for$filter $where return \$a)}</total>";
 //$query = " <results>{ $countquery } { " . "$for$filter $let $order $where $return </record> " . "}</results>";
 // exist automatically calculates the total number of matches
-$query = " $for$filter $let $where $order $return </record> ";
+$query = "$declare $for$filter $let $where $order $return </record> ";
 
 
 $xmldb->xquery($query, $position, $maxdisplay); 
