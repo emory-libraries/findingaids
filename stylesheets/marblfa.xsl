@@ -430,6 +430,33 @@
     <span class="indent"><xsl:apply-templates/></span>
   </xsl:template>
 
+
+  <!-- scopecontent within c levels -->
+  <xsl:template match="c01/scopecontent | c02/scopecontent | c03/scopecontent">
+    <xsl:choose>
+      <xsl:when test="../did/container">
+        <tr>
+          <td></td>
+          <td></td>
+          <td class="indent">
+            <xsl:apply-templates/>
+          </td>
+        </tr>
+      </xsl:when>
+      <xsl:otherwise>
+        <tr>
+          <td colspan="3">
+            <xsl:apply-templates/>
+          </td>
+        </tr>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="scopecontent/p">
+    <xsl:apply-templates/>
+  </xsl:template>
+
   <xsl:template match="container|c01[@level='file' or @level='item']/did/unittitle|c01[not(@level)]/did/unittitle">
     <xsl:apply-templates/>
   </xsl:template>
