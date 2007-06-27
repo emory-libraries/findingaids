@@ -120,7 +120,7 @@ declare function eadxq:content-ead($ead as element(ead),
 		  {phrase:tag-matches($ead/frontmatter, $phrase)}
 		 <archdesc>
 	 	{phrase:tag-matches($ead/archdesc/*[not(self::dsc)], $phrase)}
-		{eadxq:dsc($ead/archdesc/dsc, $keyword, $phrase)}
+		{for $dsc in $ead/archdesc/dsc return eadxq:dsc($dsc, $keyword, $phrase)}
 	 </archdesc>
 	</ead> 
 };
