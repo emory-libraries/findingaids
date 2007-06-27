@@ -17,7 +17,7 @@ $tamino_coll = "MARBLFindingAids";
 
 // settings for generating pdfs
 $tmpdir = "/tmp/findingaids/";
-$fop = "http://wilson:8080/fop/fop?fo=";
+$fop = "http://localhost:8080/fop/fop?fo=";
 
 /* exist settings  */
 if ($in_production) {
