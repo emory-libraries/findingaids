@@ -236,6 +236,17 @@ th {
   vertical-align:top;
 }
 
+/* make box & folder labels smaller than actual content */
+tr.boxfolder  { 
+ font-size: 60%;
+  color:green;
+}
+
+/* extra space to set off section labels in box/folder contents */
+th.section { 
+  padding-top:10px;
+}
+
 td { 
   vertical-align:top;
 }
