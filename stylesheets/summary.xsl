@@ -18,7 +18,7 @@
           <xsl:value-of select="did/unitid"/>
           <xsl:text>: &#x00A0;</xsl:text>
         </xsl:if>
-        <xsl:value-of select="did/unittitle"/>
+        <xsl:apply-templates select="did/unittitle"/>
       </xsl:element>
       
       <!-- note: hits are *inside* heading to keep them on the same line -->      
