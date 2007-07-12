@@ -312,14 +312,13 @@ div.indexentry li {
   list-style-type:none;
 }
 
-div.indent { 
+div.indent, span.indent { 
   margin-left:0.25in;
 }
 
-span.indent { 
-  margin-left:0.25in;
+td.indent { 
+ padding-left:0.25in;
 }
-
 
 span.count { 
   font-size:80%;
