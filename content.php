@@ -1,6 +1,6 @@
 <?
 include_once("config.php");
-include_once("lib/xmlDbConnection.class.php");
+include_once("lib/xml-utilities/xmlDbConnection.class.php");
 include_once("common_functions.php");
 include("marblcrumb.class.php");
 

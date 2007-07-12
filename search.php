@@ -1,7 +1,7 @@
 <?php
 include("config.php");
 include("common_functions.php");
-include_once("lib/xmlDbConnection.class.php");
+include_once("lib/xml-utilities/xmlDbConnection.class.php");
 include("marblcrumb.class.php");
 
 // search terms
