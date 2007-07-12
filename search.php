@@ -168,9 +168,9 @@ if ($total == 0){
   // in phonetic mode, php highlighting will be inaccurate and/or useless... 
   // $xmldb->highlightInfo($myterms); 
   print "<p align=\"center\">where ";
-  if ($kw) print "document contains \"" . stripslashes($kw) . "\"";
+  if ($kw) print "document contains <b>" . stripslashes($kw) . "</b>";
   if ($kw && $creator) print " and ";
-  if ($creator) print "creator matches \"" . stripslashes($creator) . "\"";
+  if ($creator) print "creator matches <b>" . stripslashes($creator) . "</b>";
     "</p>"; 
 
   print "</div>";
