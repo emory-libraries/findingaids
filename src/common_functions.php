@@ -25,7 +25,7 @@ print "
 <meta name=\"robots\" content=\"index,follow\">
 <script language=\"Javascript\" type=\"text/javascript\">
 function pdfnotify (url) {
- window.open('pdfstatus.html', 'pdfstatus', 'width=300,height=125,toolbar=no,status=no,location=no,menubar=no,scrollbars=no,screenX=300,screenY=300,left=300,top=300,resizable=no');
+ window.open('web/html/pdfstatus.html', 'pdfstatus', 'width=300,height=125,toolbar=no,status=no,location=no,menubar=no,scrollbars=no,screenX=300,screenY=300,left=300,top=300,resizable=no');
 }
 </script>
  </head>";
