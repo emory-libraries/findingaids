@@ -10,13 +10,13 @@ $connectionArray{"debug"} = false;
 
 $xmldb = new xmlDbConnection($connectionArray);
 
-$xsl = "stylesheets/marblpdf.xsl";
+$xsl = "xsl/marblpdf.xsl";
 
 $xmldb->xquery($query);
 //$xmldb->xslTransform($xsl);
 $params = array("mode" => "full");
-$xmldb->xslBind("stylesheets/marblfa.xsl", $params);
-$xmldb->xslBind("stylesheets/htmlpdf.xsl");
+$xmldb->xslBind("xslt/marblfa.xsl", $params);
+$xmldb->xslBind("xslt/htmlpdf.xsl");
 $xmldb->transform();
 
 $filename = $xmldb->findNode("eadheader/eadid");

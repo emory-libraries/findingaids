@@ -1,6 +1,6 @@
 <?php
 
-include("lib/breadcrumb.class.php");
+include("breadcrumb.class.php");
 
 class marblCrumb extends breadCrumb {
 

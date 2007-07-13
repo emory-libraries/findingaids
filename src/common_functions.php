@@ -19,7 +19,7 @@ print "
  <title>$mode : Manuscript, Archives, and Rare Books Library</title>
 <link href='$baseURL/includes/css/main.css' rel='stylesheet' type='text/css'>
 <link href='$baseURL/includes/css/web.css' rel='stylesheet' type='text/css'>
-<link href='css/marblfa.css' rel='stylesheet' type='text/css'>
+<link href='web/css/marblfa.css' rel='stylesheet' type='text/css'>
 <script src='$baseURL/includes/js/common.js' type='text/javascript' language='javascript'></script>
 <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\">
 <meta name=\"robots\" content=\"index,follow\">

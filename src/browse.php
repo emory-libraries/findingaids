@@ -2,7 +2,7 @@
 include("common_functions.php");
 include_once("config.php");
 include_once("lib/xml-utilities/xmlDbConnection.class.php");
-include("marblcrumb.class.php");
+include("lib/marblcrumb.class.php");
 
 
 // letter to browse (A by default)
@@ -22,7 +22,7 @@ $connectionArray{"debug"} = false;
 $xmldb = new xmlDbConnection($connectionArray);
 
 html_head("Browse Collections");
-include("template-header.inc");
+include("web/html/template-header.inc");
 print $crumbs;
 
 // unused (allow browsing by something besides unittitle ?)
@@ -86,7 +86,7 @@ $query = "<results><alpha_list>{".$browse_qry."}</alpha_list> <records>{".$data_
 
 $mode = 'browse';
 
-$xsl_file 	= "stylesheets/results.xsl";
+$xsl_file 	= "xslt/results.xsl";
 $xsl_params = array('mode' => $mode,
 		    'label_text' => "Browse Collections Alphabetically:",
 		    'baseLink' => "browse.php");
@@ -98,6 +98,6 @@ print '<div class="content">';
 $xmldb->printResult();
 print '</div>';
 
-include("template-footer.inc");
+include("web/html/template-footer.inc");
 
 ?>
