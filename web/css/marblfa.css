@@ -1,0 +1,327 @@
+@import "irish.css";
+body { 
+/*  font-family: Arial, Helvetica, sans-serif;*/
+  font-family:Arial,Verdana; 
+  font-weight: normal;  
+  font-size: 12px; 
+ }
+
+
+/* override default font-size to make content font sizes a little larger */
+.content, td, th { 
+  font-size:10pt;
+}
+
+
+.content, td, th { 
+  font-size:10pt;
+}
+
+.blueBox
+{	width:90%; 
+	border-style:solid; 
+	border-width:2px; 
+	padding-left:10px;
+	padding-right:10px;
+	padding-top:10px;
+	padding-bottom:10px;
+	background-color:#d5d9e5;
+}
+
+.alphaList {
+  font-size:12px;
+  color:black;
+  padding-left:5px;
+  padding-right:5px;
+  text-decoration:none;
+  line-height:20px;
+}
+
+p.alphaList { 
+  margin-top:0px;
+  margin-left:0.5in;
+}
+
+.alphaText
+{
+	color:red;
+	font-size:15px;
+}
+
+.browse_text
+{
+	color:black;
+	font-size:10pt;
+	padding-left:5px;
+}
+
+.collection-header {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: small;
+	background-color:#A7B8DC;
+	border-style:solid; 
+	border-width:2px; 
+	padding-left:10px;
+	padding-right:10px;
+	padding-top:10px;
+	padding-bottom:10px;
+	width:90%; 
+}
+
+.support_text
+{
+	font-size: x-small; 
+	color: #003399
+}
+
+li
+{
+	list-style-type: none;
+	text-align: left;
+}
+
+div#toc {
+  background:#cccc99;
+  border:1px solid black;
+  /*	border-style:solid; 
+     border-width:1px; */
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+  float:left;
+  width:179px;
+  display:inline;
+  font-size:10pt;
+  font-weight:500;
+  text-align:left;
+  margin-bottom:0.5in;
+}
+div#toc h1 { 
+  text-align:center;
+  margin-top:0px;
+  font-size:115%;
+  font-variant:small-caps;
+}
+
+div#toc div.titleproper { 
+  text-align:center;
+}
+
+
+div#content {
+  float:left;
+  padding-left:10px;	
+  display:inline;
+  width:68%
+}
+
+div#title {
+  background-color:#cd9967;
+  color:#320000;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+  text-align:center;
+  font-size:15px;
+  font-weight:bold;
+}
+
+div#title {
+  background-color:#cd9967;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+  text-align:center;
+  font-size:120%;
+  font-weight:bold;
+}
+
+.content_subtitle {
+  font-weight:normal;
+}
+
+
+div#publicationstmt { 
+  text-align:center;
+}
+
+/* h3/h4 size must be set explicitly - over-riding more general font-size set elsewhere  */
+div#publicationstmt h3 { 
+  font-size:115%;
+}
+div#publicationstmt h4 { 
+  font-size:110%;
+}
+
+.navbar {
+  /*	font-size:95%;*/
+  font-weight:500;
+  text-align:left;
+}
+
+div.navbox {  
+  margin-bottom:30px;
+}
+
+/* overrides a style from main marbl css; loses style in some cases if not set to important */
+div#toc a { 
+  text-decoration: underline !important;
+}
+
+.current { 
+  background-color:#e7d5a5;
+}
+
+
+div#printable { 
+  float:right;
+  margin-top:-30pt;
+  font-size:10pt;
+  font-weight:normal;
+}
+
+
+span.hits { color:red; padding-left:1em;font-weight:bold;}
+span.match { color:red; font-weight:bold; }
+
+.keywords
+.breadCrumbs {
+  font-family:arial;
+  font-size:105%;
+  color:#1c1e2d; 
+  font-weight:bold;
+
+}
+div.breadCrumbs { 
+  margin-bottom:10px;
+  margin-top:10px;
+}
+
+.breadCrumbs a { 
+  padding-right:5px;
+}
+
+a.match { text-decoration:none; }
+
+table.searchform { 
+  font-size: 90%;
+}
+table.searchform th { 
+  font-weight:normal;
+}
+table.searchform td.info { 
+  padding-bottom:10px;
+}
+
+table.searchform th.label { 
+  padding-top:15px;
+  font-weight:bold;
+}
+
+
+ul.searchtips li {
+  list-style-type: disc;
+}
+
+div.searchinfo, div.searchinfo h2 { 
+  font-size:115%;
+}
+
+h2 {
+  font-size:115%;
+  text-decoration:none;
+}
+/* no line before text immediately after h3 heading */
+h3, h4 { 
+  margin-bottom:0px;
+  font-size:100%;
+}
+p.indent { 
+  margin-top:0px;
+}
+
+
+/*h4.c01, h4.c02, h4.c03 { 
+ font-size:95%; font-weight:normal;
+}*/
+
+
+div.resultlink { 
+  text-align:right;
+}
+
+/* display links to additional results inline, with lines between */
+li.resultlink { 
+  display:inline; 
+  padding-left: 7px;
+  padding-right: 7px;
+  border-left: 2px solid #666;
+}
+/* no left border on first result link */
+li.first { 
+  border-left: none;
+}
+
+th {
+  text-align:left;  
+  vertical-align:top;
+}
+
+td { 
+  vertical-align:top;
+}
+
+/* make box & folder labels smaller than actual content */
+tr.box-folder  th { 
+ font-size: 80%;
+}
+
+/* extra space to set off section labels in box/folder contents */
+th.section { 
+  padding-top:10px;
+}
+
+p.tight { 
+  margin:0px;
+}
+
+/* style horizontal rules as double line */
+hr { 
+  border:0px;
+  border-top:3px double #000000;
+/*  border-bottom:1px;
+  border-style:solid;*/
+  height:3px;
+}
+
+div.indexentry { 
+  margin-bottom:10px;
+}
+
+div.indexentry ul{ 
+  margin:0px;
+  padding:0px;
+}
+
+div.indexentry li { 
+  padding-left:2em;
+  text-indent:-2em;  
+  list-style-type:none;
+}
+
+div.indent, span.indent { 
+  margin-left:0.25in;
+}
+
+td.indent { 
+ padding-left:0.25in;
+}
+
+span.count { 
+  font-size:80%;
+  float:right;
+  color:#565656;
+}
