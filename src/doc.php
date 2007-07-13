@@ -1,8 +1,8 @@
 <?php
 include("common_functions.php");
 include_once("config.php");
-include_once("lib/xmlDbConnection.class.php");
-include("marblcrumb.class.php");
+include_once("lib/xml-utilities/xmlDbConnection.class.php");
+include("lib/marblcrumb.class.php");
 
 // name of document to retrieve
 $docid = $_REQUEST['id'];
@@ -23,13 +23,13 @@ $crumbs = new marblCrumb($doctitle, $url);
 $crumbs->store();
 
 html_head($doctitle);
-include("template-header.inc");
+include("web/html/template-header.inc");
 print $crumbs;
 
 print '<div class="content">';
 print $xmldb->getXML();
 print '</div>';
 
-include("template-footer.inc");
+include("web/html/template-footer.inc");
 
 

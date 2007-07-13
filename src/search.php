@@ -2,7 +2,7 @@
 include("config.php");
 include("common_functions.php");
 include_once("lib/xml-utilities/xmlDbConnection.class.php");
-include("marblcrumb.class.php");
+include("lib/marblcrumb.class.php");
 
 // search terms
 $kw = $_GET["keyword"];
@@ -59,7 +59,7 @@ $autharray = processterms($creator);
 $doctitle = "Search Results";
 
 html_head($doctitle);
-include("template-header.inc");
+include("web/html/template-header.inc");
 print $crumbs;
 
 // query to limit finding aids to irish subjects for delmas 
@@ -125,7 +125,8 @@ $return  = ' return
 if ($kw) $return .= "\n" . '<matches><total>{$matchcount}</total></matches>' . "\n";
 
 
-$xsl_file = "stylesheets/results.xsl";
+
+$xsl_file  = "xslt/results.xsl";
 
 $countquery = "<total>{count($for$filter $where return \$a)}</total>";
 //$query = " <results>{ $countquery } { " . "$for$filter $let $order $where $return </record> " . "}</results>";
@@ -138,7 +139,6 @@ $xmldb->xquery($query, $position, $maxdisplay);
 $total = $xmldb->count;	// total number of matches for this query
 $xmldb->getCursor();
 
-$xsl_file  = "stylesheets/results.xsl";
 
 // pass search terms into xslt as parameters 
 if ($kw != '')
@@ -189,7 +189,7 @@ print '</div>';		// end of content div
 
 
 
-include("template-footer.inc");
+include("web/html/template-footer.inc");
 ?>
 
 </body>

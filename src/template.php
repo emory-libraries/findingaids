@@ -1,5 +1,5 @@
 <?
-include("template-header.inc");
+include("web/html/template-header.inc");
 
 	displayBreadCrumbs($crumbs); 
 	echo "<br />";
@@ -12,5 +12,5 @@ include("template-header.inc");
 
 	echo $content;
 
-include("template-footer.inc");
+include("web/html/template-footer.inc");
 ?>	

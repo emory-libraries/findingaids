@@ -1,8 +1,8 @@
 <?php
 include("config.php");
 include("common_functions.php");
-include_once("lib/xmlDbConnection.class.php");
-include("marblcrumb.class.php");
+include_once("lib/xml-utilities/xmlDbConnection.class.php");
+include("lib/marblcrumb.class.php");
 
 $connectionArray{"debug"} = false;
 
@@ -37,7 +37,7 @@ let \$c := count(collection($coll)$eadfilter[.//archdesc/did/origination &= '\$b
 */
 $xmldb = new xmlDbConnection($connectionArray);
 
-$xsl = "stylesheets/list.xsl";
+$xsl = "xslt/list.xsl";
 
 // max to return ?
 $xmldb->xquery($query, 1, 20);

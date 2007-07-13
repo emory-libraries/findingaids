@@ -14,7 +14,7 @@ $baseURL  = "http://marbl.library.emory.edu";
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <!-- <link href="<?= $baseURL ?>/includes/css/main.css" rel="stylesheet" type="text/css" />
 <link href="<?= $baseURL ?>/includes/css/web.css" rel="stylesheet" type="text/css" /> -->
-<link href="css/marblfa.css" rel="stylesheet" type="text/css" />
+<link href="web/css/marblfa.css" rel="stylesheet" type="text/css" />
 
 <script src="<?= $baseURL ?>/includes/js/common.js" type="text/javascript" language="javascript"></script>
 <!-- InstanceBeginEditable name="doctitle" -->
@@ -39,11 +39,11 @@ $baseURL  = "http://marbl.library.emory.edu";
 <div class="header">
   
   <div id="emory" class="logo">
-    <a href="http://marbl.library.emory.edu"><img src="images/emory.png"/></a>
+    <a href="http://marbl.library.emory.edu"><img src="web/images/emory.png"/></a>
   </div>
 
   <div id="boston" class="logo">
-    <a href="http://marbl.library.emory.edu"><img src="images/boston.png"/></a>
+    <a href="http://marbl.library.emory.edu"><img src="web/images/boston.png"/></a>
   </div>
 
   <div id="sitetitle">
