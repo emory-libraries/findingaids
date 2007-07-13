@@ -2,7 +2,7 @@
 include("common_functions.php");
 include_once("config.php");
 include_once("lib/xml-utilities/xmlDbConnection.class.php");
-include("marblcrumb.class.php");
+include("lib/marblcrumb.class.php");
 
 
 // letter to browse (all by default)
@@ -39,7 +39,7 @@ $connectionArray{"debug"} = false;
 $xmldb = new xmlDbConnection($connectionArray);
 
 html_head("Browse Collections");
-include("template-header.inc");
+include("web/html/template-header.inc");
 // custom style for browse page only
 print "<style> div.content { margin-right:1in; } </style>";
 print $crumbs;
@@ -145,7 +145,7 @@ $query = "<results><alpha_list>{".$browse_qry."}</alpha_list>
 $mode = 'browse';
 
 
-$xsl_file 	= "stylesheets/results.xsl";
+$xsl_file 	= "xslt/results.xsl";
 $xsl_params = array('mode' => $mode,
 		    'label_text' => "Browse Collections Alphabetically:",
 		    'baseLink' => "browse.php",
@@ -159,6 +159,6 @@ print '<div class="content">';
 $xmldb->printResult();
 print '</div>';
 
-include("template-footer.inc");
+include("web/html/template-footer.inc");
 
 ?>

@@ -3,7 +3,7 @@ include_once("config.php");
 include_once("lib/xml-utilities/xmlDbConnection.class.php");
 
 //php ajax/scriptaculous
-include("projax/projax.php");
+include("lib/projax/projax.php");
 
 $connectionArray{"debug"} = false;
 
@@ -25,7 +25,7 @@ order by $r
 return <repository>{$r}</repository>';*/
 
 $xmldb->xquery($query);
-$xsl_file 	= "stylesheets/search.xsl";
+$xsl_file 	= "xslt/search.xsl";
 $xmldb->xslTransform($xsl_file);
 
 

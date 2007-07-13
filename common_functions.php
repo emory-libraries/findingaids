@@ -16,11 +16,11 @@ print "<html>
 <meta name=\"robots\" content=\"index,follow\">
 <script language=\"Javascript\">
 function pdfnotify (url) {
- window.open('pdfstatus.html', 'pdfstatus', 'width=300,height=125,toolbar=no,status=no,location=no,menubar=no,scrollbars=no,screenX=300,screenY=300,left=300,top=300,resizable=no');
+ window.open('web/html/pdfstatus.html', 'pdfstatus', 'width=300,height=125,toolbar=no,status=no,location=no,menubar=no,scrollbars=no,screenX=300,screenY=300,left=300,top=300,resizable=no');
 }
 </script>
-<script src='projax/js/prototype.js' type='text/javascript'></script>
-<script src='projax/js/scriptaculous.js' type='text/javascript'></script>
+<script src='lib/projax/js/prototype.js' type='text/javascript'></script>
+<script src='lib/projax/js/scriptaculous.js' type='text/javascript'></script>
  </head>";
 }
 

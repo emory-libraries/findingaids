@@ -2,7 +2,7 @@
 include_once("config.php");
 include_once("lib/xml-utilities/xmlDbConnection.class.php");
 include_once("common_functions.php");
-include("marblcrumb.class.php");
+include("lib/marblcrumb.class.php");
 
 
 $id = $_GET["id"];
@@ -284,7 +284,7 @@ $connectionArray{"debug"} = false;
 		     return $rval";
 	//		  return if (exist$rval";
 
-	$xsl_file 	= "stylesheets/marblfa.xsl";
+	$xsl_file 	= "xslt/marblfa.xsl";
 	// xslt passes on keywords to subsections of document via url
 	$term_list = urlencode(implode("|", array_merge($kwarray, $phrases)));
 if ($kw != '') 
@@ -337,13 +337,13 @@ $crumbs->store();
 
 
 html_head("Finding Aid : $htmltitle");
-include("template-header.inc");
+include("web/html/template-header.inc");
 print $crumbs;
 
 print '<div class="content">';
 $tamino->printResult();
 print '</div>';
 
-include("template-footer.inc");
+include("web/html/template-footer.inc");
 	
 ?>
