@@ -237,9 +237,8 @@ th {
 }
 
 /* make box & folder labels smaller than actual content */
-tr.boxfolder  { 
- font-size: 60%;
-  color:green;
+tr.box-folder th { 
+ font-size: 8pt;
 }
 
 /* extra space to set off section labels in box/folder contents */
