@@ -6,6 +6,16 @@
  description="* Add ids, convert entities to unicode, validate, and clean up"/>
 
 
+<target name="input" depends="common-targets.input">
+
+<!-- remove any doctype (xmetal is setting it wrong) -->
+  <replaceregexp match="^.!DOCTYPE.*$" replace="" flags="im">
+    <fileset dir="${xmldir}" includes="*.xml"/>
+  </replaceregexp>
+
+</target>
+
+
 <!-- set subcollection where files should be loaded -->
 <target name="exist-subcollection">
 
