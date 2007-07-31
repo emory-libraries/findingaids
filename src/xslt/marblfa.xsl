@@ -197,21 +197,8 @@
 
  </xsl:template>
 
- <xsl:template match="unittitle/text()">
-   <xsl:if test="starts-with(., ' ')">
-     <xsl:text> </xsl:text>
-   </xsl:if>
-
-   <xsl:value-of select="normalize-space(.)"/>
-
-   <xsl:if test="substring(., string-length(.), 1) = ' '">
-     <xsl:text> </xsl:text>
-   </xsl:if>
-
- </xsl:template>
-
  <xsl:template match="unittitle/title">
-   <i><xsl:apply-templates/></i><xsl:text> </xsl:text>
+   <i><xsl:apply-templates/></i>
  </xsl:template>
 
 
