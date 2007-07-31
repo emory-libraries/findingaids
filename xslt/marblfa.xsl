@@ -409,15 +409,6 @@
     </tr>
   </xsl:template>
 
-
-  <xsl:template match="c01[@level='file' or @level='item']/scopecontent 
-                       | c02[@level='file' or @level='item']/scopecontent 
-                       | c03[@level='file' or @level='item']/scopecontent 
-                       | c04[@level='file' or @level='item']/scopecontent">
-    <tr><td></td><td></td>	<!-- line up with unittitle, note -->
-    <td><xsl:apply-templates/></td></tr>
-  </xsl:template>
-
   <!-- generic physdesc (not under archdesc) -->
   <xsl:template match="physdesc">
     <xsl:text>, </xsl:text>
@@ -432,23 +423,20 @@
 
 
   <!-- scopecontent within c levels -->
-  <xsl:template match="c01/scopecontent | c02/scopecontent | c03/scopecontent">
+  <xsl:template match="c01/scopecontent | c02/scopecontent | c03/scopecontent | c04/scopecontent">
     <xsl:choose>
-      <xsl:when test="../did/container">
+      <!-- output as a table row when at item level -->
+      <xsl:when test="parent::node()/@level = 'file' or parent::node()/@level='item'">
         <tr>
           <td></td>
-          <td></td>
-          <td class="indent">
-            <xsl:apply-templates/>
-          </td>
+          <td></td>	<!-- line up with unittitle, note -->
+          <td class="indent"> 
+          <xsl:apply-templates/>
+        </td>
         </tr>
       </xsl:when>
-      <xsl:otherwise>
-        <tr>
-          <td colspan="3">
-            <xsl:apply-templates/>
-          </td>
-        </tr>
+      <xsl:otherwise>	<!-- not inside a table -->
+        <p><xsl:apply-templates/></p>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>

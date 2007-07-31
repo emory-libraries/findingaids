@@ -314,6 +314,21 @@
    </fo:list-block>
  </xsl:template>
 
+ <xsl:template match="ul/h3">
+   <fo:list-item>
+     <fo:list-item-label>
+       <fo:block>
+         
+       </fo:block>
+     </fo:list-item-label>
+     <fo:list-item-body>
+       <fo:block font-weight="bold">
+         <xsl:apply-templates/>
+       </fo:block>
+     </fo:list-item-body>
+   </fo:list-item>
+ </xsl:template>
+
  <xsl:template match="li">
    <fo:list-item>
      <fo:list-item-label>
