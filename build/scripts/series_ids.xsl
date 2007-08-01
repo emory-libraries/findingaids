@@ -35,6 +35,10 @@
     </xsl:copy>
   </xsl:template>
 
+  <!-- ignore any existing ids : they should be replaced  -->
+  <xsl:template match="c01[@level='series']/@id | c02[@level='subseries']/@id | 
+                       c03[@level='subseries']/@id"/>
+
 
   <!-- strings for translating case -->
   <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'"/>
