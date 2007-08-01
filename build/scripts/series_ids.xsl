@@ -40,11 +40,30 @@
   <xsl:variable name="lowercase" select="'abcdefghijklmnopqrstuvwxyz'"/>
   <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
 
-  <xsl:variable name="space" select="' '"/>
-  <xsl:variable name="nospace" select="''"/>
 
+  <!-- convert unitid into a usable format for id and url -->
   <xsl:template match="unitid" mode="id">
-    <xsl:value-of select="translate(translate(., $uppercase, $lowercase), $space, $nospace)"/>
+
+    <xsl:variable name="space" select="' '"/>
+    <xsl:variable name="nospace" select="''"/>
+
+    <!-- if the unitid ends with a period, remove it (for clean urls) -->
+    <xsl:variable name="id1">
+      <xsl:choose>
+        <xsl:when test="substring(., string-length(.), 1) = '.'">
+          <xsl:value-of select="substring(., 1, string-length(.) - 1)"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="."/>
+       </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+
+    <!-- remove spaces -->
+    <xsl:value-of select="translate($id1, $space, $nospace)"/>
+
+    <!-- note: not translating to lower-case because it makes roman numerals look strange -->
+    <!--    <xsl:value-of select="translate(translate($id1, $space, $nospace), $uppercase, $lowercase)"/> -->
   </xsl:template>
 
 </xsl:stylesheet>
