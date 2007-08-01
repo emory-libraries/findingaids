@@ -2,9 +2,11 @@
 
 <import file="common-targets.xml"/>
 
-<target name="all" depends="xml,series-ids,add-ids,clean,final-info" 
+<target name="all" depends="xml,series-ids,add-ids,validate,clean,final-info" 
  description="* Add ids, convert entities to unicode, validate, and clean up"/>
 
+<!-- note: validating twice, but series-ids must be checked to be
+unique -->
 
 <target name="input" depends="common-targets.input">
 
