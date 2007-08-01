@@ -2,7 +2,7 @@
 
 <import file="common-targets.xml"/>
 
-<target name="all" depends="xml,add-ids,clean,final-info" 
+<target name="all" depends="xml,series-ids,add-ids,clean,final-info" 
  description="* Add ids, convert entities to unicode, validate, and clean up"/>
 
 
@@ -36,6 +36,59 @@
   <property name="exist.subcollection" value="/${repo}"/>
 
   <echo level="info" message="files will be loaded to ${config.db.collection}${exist.subcollection}"/>
+
+</target>
+
+
+
+
+<target name="series-ids" depends="config" description="* set human-readable series ids">
+
+ <echo level="info" message="Making c01, c02, c03 series ids human-readable"/>
+ <echo level="info" message="**********************************************"/>
+
+
+ <!-- check out series ids script from svn -->
+  <property name="series_ids" value="series_ids.xsl"/>
+
+ <taskdef resource="svntask.properties"/> 
+  <property name="path" value="https://arachne.library.emory.edu/svn/findingaids/trunk/build"/>
+
+  <!-- check out white space script -->
+
+  <svn>
+   <export srcUrl="${path}/scripts/${series_ids}" destPath="${basedir}/scripts/${series_ids}"/>
+  </svn>
+
+
+  <property name="workdir.series_ids" value="${workdir}/series-ids"/>
+ <mkdir dir="${workdir}"/>
+ <!-- delete whitespace dir just in case, to get rid of any old files -->
+ <delete dir="${workdir.series_ids}"/>
+ <mkdir dir="${workdir.series_ids}"/>
+
+
+  <!-- replace & with || so entities will not get resolved -->
+  <replace dir="${xmldir}" value="||">
+    <include name="*.xml"/>
+    <replacetoken><![CDATA[&]]></replacetoken>
+  </replace>
+
+  <!-- set the series ids -->
+  <xslt style="${scriptdir}/${series_ids}" 
+	destdir="${workdir.series_ids}" basedir="${xmldir}"
+	includes="*.xml" extension=".xml"/> 
+
+  <!-- convert || back to & -->
+  <replace dir="${workdir.series_ids}" token="||" includes="*.xml">
+    <replacevalue><![CDATA[&]]></replacevalue>
+  </replace> 
+
+  <!-- copy files back to main xml dir and replace earlier version of files -->
+  <copy todir="${xmldir}" overwrite="true">
+    <fileset dir="${workdir.series_ids}" includes="*.xml"/>
+  </copy>
+
 
 </target>
 
