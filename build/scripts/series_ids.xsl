@@ -64,10 +64,10 @@
     </xsl:variable>
 
     <!-- remove spaces -->
-    <xsl:value-of select="translate($id1, $space, $nospace)"/>
+    <!--    <xsl:value-of select="translate($id1, $space, $nospace)"/>-->
 
-    <!-- note: not translating to lower-case because it makes roman numerals look strange -->
-    <!--    <xsl:value-of select="translate(translate($id1, $space, $nospace), $uppercase, $lowercase)"/> -->
+    <!-- note: translating to lower-case makes roman numerals look strange..  -->
+    <xsl:value-of select="translate(translate($id1, $space, $nospace), $uppercase, $lowercase)"/> 
   </xsl:template>
 
 </xsl:stylesheet>
