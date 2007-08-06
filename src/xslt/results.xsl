@@ -203,5 +203,11 @@
 		-->
 		<br />
 	</xsl:template>
+
+
+        <!-- italicize titles anywhere in result summary -->
+        <xsl:template match="title">
+          <i><xsl:apply-templates/></i>
+        </xsl:template>
 	
 </xsl:stylesheet>
