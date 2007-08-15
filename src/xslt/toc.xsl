@@ -65,15 +65,19 @@
 
     <xsl:apply-templates select="dsc" mode="toc"/>
 
+    <xsl:apply-templates select="index" mode="toc"/>
+
+  </xsl:template>
+
+
+  <xsl:template match="ead/archdesc/index" mode="toc">
     <p class="navbar">
       <a>
-        <!--        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#index</xsl:attribute> -->
-        <xsl:attribute name="href">content.php?el=index&amp;id=<xsl:value-of select="index/@id"/></xsl:attribute>
-        <xsl:value-of select="index/head"/>
+        <xsl:attribute name="href">content.php?el=index&amp;id=<xsl:value-of select="@id"/></xsl:attribute>
+        <xsl:value-of select="head"/>
       </a>
-      <xsl:apply-templates select="index/hits"/>
+      <xsl:apply-templates select="hits"/>
     </p>
-
   </xsl:template>
 
 
