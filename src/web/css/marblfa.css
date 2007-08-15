@@ -237,7 +237,7 @@ th {
 }
 
 /* make box & folder labels smaller than actual content */
-tr.box-folder th { 
+tr.box-folder th, tr.box-folder th.content { 
  font-size: 8pt;
 }
 
