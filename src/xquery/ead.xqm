@@ -44,11 +44,12 @@ declare function eadxq:toc($ead as element(ead),
                {eadxq:hits($archdesc//controlaccess, $keyword, $phrase)}
              </controlaccess>
 
+		{for $index in $archdesc/index return 
 		  <index>
-	    	    {$archdesc/index/@id}
-                    {$archdesc/index/head}
-                    {eadxq:hits($archdesc/index, $keyword, $phrase)}
-	          </index>
+	    	    {$index/@id}
+                    {$index/head}
+                    {eadxq:hits($index, $keyword, $phrase)}
+	          </index>}
 
 			<dsc>
 				{$archdesc/dsc/head}
