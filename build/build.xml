@@ -54,7 +54,7 @@ unique -->
   <property name="series_ids" value="series_ids.xsl"/>
 
  <taskdef resource="svntask.properties"/> 
-  <property name="path" value="https://arachne.library.emory.edu/svn/findingaids/trunk/build"/>
+  <property name="path" value="https://svn.library.emory.edu/svn/findingaids/trunk/build"/>
 
   <!-- check out white space script -->
 
