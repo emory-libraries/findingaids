@@ -1,15 +1,15 @@
 /* override default font-size to make content font sizes a little larger */
-body { 
+/*body { 
  margin-bottom:0px;
  margin-left:4px;
  margin-right:4px;
  margin-top:4px;
  background:url("http://marbl.library.emory.edu/images/common/global_bg.jpg");
-}
+}*/
 
-.content, td, th { 
+/*.content, td, th { 
   font-size:10pt;
-}
+}*/
 
 .blueBox
 {	width:90%; 
@@ -21,7 +21,7 @@ body {
 	padding-bottom:10px;
 	background-color:#d5d9e5;
 }
-
+/*
 .alphaList
 {
 	font-size:12px;
@@ -37,14 +37,14 @@ body {
 	color:red;
 	font-size:15px;
 }
-
+*/
 .browse_text
 {
 	color:black;
 	font-size:10pt;
 	padding-left:5px;
 }
-
+/*
 .collection-header {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: small;
@@ -126,42 +126,42 @@ div#title {
 div#publicationstmt { 
   text-align:center;
 }
-
+*/
 /* h3/h4 size must be set explicitly - over-riding more general font-size set elsewhere  */
-div#publicationstmt h3 { 
+/*div#publicationstmt h3 { 
   font-size:115%;
 }
 div#publicationstmt h4 { 
   font-size:110%;
 }
-
-.navbar {
+*/
+/*.navbar {*/
   /*	font-size:95%;*/
-  font-weight:500;
+/*  font-weight:500;
   text-align:left;
-}
+}*/
 
 /* overrides a style from main marbl css; loses style in some cases if not set to important */
-div#toc a { 
+/*div#toc a { 
   text-decoration: underline !important;
-}
+}*/
 
 .current { 
   background-color:#ffffff;
 }
 
-
+/*
 div#printable { 
   float:right;
   margin-top:-30pt;
   font-size:10pt;
   font-weight:normal;
 }
-
+*/
 
 span.hits { color:red; padding-left:1em;font-weight:bold;}
 span.match { color:red; font-weight:bold; }
-
+/*
 .keywords
 .breadCrumbs {
   font-family:arial;
@@ -172,10 +172,7 @@ span.match { color:red; font-weight:bold; }
 div.breadCrumbs { 
   margin-bottom:10px;
 }
-
-.breadCrumbs a { 
-  padding-right:5px;
-}
+*/
 
 a.match { text-decoration:none; }
 
@@ -192,12 +189,13 @@ div.searchinfo, div.searchinfo h2 {
 }
 
 /* make h2s bigger than h3s */
-h2 { 
+/*h2 { 
   font-size:115%;
-}
+}*/
 
 
 h2 a, h3 a, a[name] { 
+  color:#4E5A78;
   text-decoration:none;
 }
 /* no line before text immediately after h3 heading */
@@ -261,6 +259,9 @@ hr {
 /*  border-bottom:1px;
   border-style:solid;*/
   height:3px;
+/* additions from macquarium */
+  clear:both;
+  margin: 1em 0;
 }
 
 div.indexentry { 
@@ -280,4 +281,71 @@ div.indexentry li {
 
 div.indent { 
   margin-left:0.25in;
+}
+
+/** new styles from macquarium for reskin,  September 2008 */
+
+.searchFindingAidsForm {margin:10px 10px 30px 10px;}
+.searchFindingAidsForm .radio {vertical-align:middle;margin:0 5px 3px 0;}
+.searchFindingAidsForm .searchInput {width:130px;}
+.searchFindingAidsForm p {margin:0;}
+
+div#relatedLinks {margin-left:5px;}
+div.breadCrumbs {font-size:1em;font-weight:bold;margin-bottom:1.5em;}
+div#titleAndSummary {position:relative;float:left;width:550px;line-height:2em;}
+div#titleAndSummary h2 {margin-bottom:.5em;}
+
+div#printOptions {position:relative;float:right;width:102px;}
+div#printOptions li {margin-bottom:.5em;}
+div#printOptions a {display:block;height:16px;padding-left:25px;}
+div#printOptions li#pdfVersion a {background:transparent url("../img/finding-aids-pdf-icon.gif") 0 0 no-repeat;}
+div#printOptions li#pdfVersion a:hover {background:transparent url("../img/finding-aids-pdf-icon.gif") 0 -16px no-repeat;}
+div#printOptions li#printVersion a {background:transparent url("../img/finding-aids-print-icon.gif") 0 0 no-repeat;}
+div#printOptions li#printVersion a:hover {background:transparent url("../img/finding-aids-print-icon.gif") 0 -16px no-repeat;}
+div#printOptions a span {border-bottom:1px solid #069;font-weight:bold;font-size:.9em;white-space:nowrap;}
+div#printOptions a:hover span {border-bottom:1px solid #39c;}
+
+div#tocAndDesc {position:relative;float:left;width:683px;padding:15px;background-color:#edf3f7;line-height:2em;margin-bottom:1em;}
+div#tocAndDesc .bullet li {line-height:1em;margin-left:15px;}
+div#tocAndDesc div#toc {position:relative;float:left;width:300px !important;font-weight:bold;}
+div#tocAndDesc div#descOfSeries {position:relative;float:left;width:340px !important;font-weight:bold;}
+div#tocAndDesc div#descOfSeries li {padding:0px;margin:0px;padding-left:20px;text-indent:-20px;line-height:2em !important;}
+div#tocAndDesc div#descOfSeries li a {font-weight:normal;}
+
+table#descSummary {clear:both;text-align:left;font-size:1.1em;color:#4E5A78;}
+table#descSummary h2 {font-size:1.3em;margin-bottom:5px;}
+table#descSummary td, th {padding:2px 0;vertical-align:top;}
+table#descSummary th {width:150px;}
+
+div#adminInfo {font-size:1.1em;color:#4E5A78;}
+div#adminInfo h2 {font-size:1.3em;margin-bottom:5px;}
+div#adminInfo h3 {font-size:1em;margin-bottom:0;}
+div#adminInfo p {line-height:1.5em;}
+
+
+/* make alphalist look similar to the one on the marbl page */
+div#alphalist {
+/* border:1px solid red;*/
+  margin:5px;
+  height:35px;	  
+}
+
+div#alphalist a {
+  margin-right:4px;font-weight:bold;
+  color:#125a7d;
+  width:22px;
+  height:20px;
+  display:block;
+  float:left;
+  text-align:center;
+  line-height:22px;
+  background:url("../img/sort.gif") no-repeat;
+}
+
+div#alphalist a:hover {
+  background:url("../img/sort.gif") 0px -20px no-repeat;
+}
+
+div#alphalist a.current {
+  background:url("../img/sort.gif") 0px -20px no-repeat;	
 }

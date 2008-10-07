@@ -1,88 +1,101 @@
 <?
 include_once("common_functions.php");
 
-$baseURL  = "http://marbl.library.emory.edu";
+global $baseURL;
 
 ?>
-<body background="<?= $baseURL ?>/images/common/global_bg.jpg">
-<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
-	<!-- ~~~~~~~~~~~~~~~~~~~~~~~  HEADER - VERY TOP ~~~~~~~~~~~~~~~~~~~~~~~ -->
-	<tr>
-		<td colspan="3">
-			<table border="0" cellpadding="0" cellspacing="0" width="100%" background="<?= $baseURL ?>/images/subpage/subtop_bg.gif">
-				<tr>
-					<td align="left"><img src="<?= $baseURL ?>/images/subpage/subtop_1.gif" width="619" height="4" alt=""/></td>
-					<td align="right"><img src="<?= $baseURL ?>/images/subpage/subtop_2.gif" width="87" height="4" alt=""/></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
+<body id="findingAids">
+	
+	<!-- begin container -->
+	<div id="container">
+	
+<!-- begin header --><!-- #BeginLibraryItem "/Library/header.lbi" -->
+        <div id="header">
+            <div id="headerPics">
+                <a href="index.html" title="Emory MARBL"><img src="<?= $baseURL ?>/img/marbl-logo.jpg" id="marblLogo" alt="MARBL - Manuscript, Archives &amp; Rare Book Library" /></a>
+                <div id="utilityLinks">
+                    <a href="<?= $baseURL ?>/support-marbl.html" title="SUPPORT MARBL">SUPPORT MARBL</a>
+                    <a href="<?= $baseURL ?>/contact-marbl.html" title="CONTACT US">CONTACT US</a>
+                </div>
+                <form action="http://search.emory.edu/search" method="get" id="searchForm">
+                    <p>
+                        <input type="text" size="20" class="searchInput" value="Search The Site" id="q" name="q" />
+                        <input type="image" src="<?= $baseURL ?>/img/search-btn.gif" name="Submit" alt="Submit" value="Submit" id="searchbutton" class="searchBtn" />
+                    		<input type="hidden" name="site" value="marbl_library" /> 
+      						<input type="hidden" name="ud" value="1" /> 
+    						<input type="hidden" name="oe" value="UTF-8" /> 
+      						<input type="hidden" name="ie" value="UTF-8" />   
+      						<input type="hidden" name="proxystylesheet" value="library_frontend" />  
+      						<input type="hidden" name="output" value="xml_no_dtd" />
+      						<input type="hidden" name="client" value="library_frontend" />  
+                    
+                    </p>
+                    <p>
+                        <a href="<?= $baseURL ?>/search-marbl-collections.html" title="Search MARBL Collections">Search MARBL Collections</a>
+                    </p>
+                </form>
+            </div>
+        </div>
+<!-- #EndLibraryItem --><!-- end header -->
+	
+<!-- begin global navigation --><!-- #BeginLibraryItem "/Library/globalNav.lbi" -->
+        <div id="globalNav">
+            <ul id="menu">
+                <li id="skip"><a href="#skip-nav" title="Skip Navigation">Skip Navigation</a></li>
+                <li id="homeNav"><a href="<?= $baseURL ?>/index.html" title="Home"><span>Home</span></a></li>
+                <li id="aboutNav"><a href="<?= $baseURL ?>/vision.html" title="About MARBL"><span>About MARBL</span></a></li>
+              <li id="collectionNav"><a href="<?= $baseURL ?>/marbl-collections.html" title="Collection Overview"><span>Collection Overview</span></a></li>
+                <li id="researchNav"><a href="<?= $baseURL ?>/search-marbl-collections.html" title="Conduct Research"><span>Conduct Research</span></a></li>
+                <li id="eventsNav"><a href="<?= $baseURL ?>/events-and-exhibitions.html" title="Events &amp; Exhibitions"><span>Events &amp; Exhibitions</span></a></li>
+                <li id="visitNav"><a href="<?= $baseURL ?>/directions-and-hours.html" title="Visit MARBL"><span>Visit MARBL</span></a></li>
+          </ul>
+        </div>
+        <a name="skip-nav" title="Skip Navigation"></a>
+<!-- #EndLibraryItem --><!-- end global navigation -->     
 
-	<tr>
-		<td valign="top" width="5" background="<?= $baseURL ?>/images/common/shadow_left_bg.gif"><img src="<?= $baseURL ?>/images/subpage/sub_shadow_left.gif" width="5" height="225" alt=""></td>
-		<td valign="top" width="100%" bgcolor="#FFFFFF">
+		<!-- begin interiorContainer -->
+        <div id="interiorContainer">
+		
+			<!-- begin leftColumn -->
+			<div id="leftCol">
 
-			<!-- ~~~~~~~~~~~~~~~~~~~~~~~  LOGO & STRETCH PICTURE  ~~~~~~~~~~~~~~~~~~~~~~~ -->
-			<table border="0" cellpadding="0" cellspacing="0" width="100%" class="subLogoBg">
-				<tr>
-					<td align="left"><a href="http://www.emory.edu/libraries.cfm"><img src="<?= $baseURL ?>/images/subpage/sublogo.gif" alt="" width="252" height="118" border="0"></a></td>
-					<td align="right"><img src="<?= $baseURL ?>/images/subpage/top_photo_MARBL.jpg" width="459" height="118" alt="" usemap="#_stretch" border="0"></td>
-				</tr>
-			</table>
-
-			<!-- ~~~~~~~~~~~~~~~~~~~~~~~  NAVIGATION & SEARCH  ~~~~~~~~~~~~~~~~~~~~~~~ -->
-			<table border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tr>
-					<td bgcolor="#FFFFFF"><img src="<?= $baseURL ?>/images/common/spacer.gif" width="1" height="1" alt=""></td>
-				</tr>
-				<tr>
-					<td bgcolor="#465074" align="left">
- 
-						<table border="0" cellpadding="0" cellspacing="0">
-							<tr>
-								<td><a href="http://web.library.emory.edu/" onmouseover="swapImg('navmain','<?= $baseURL ?>/images/nav/main_off.gif');" onmouseout="swapImg('navmain','<?= $baseURL ?>/images/nav/main_on.gif');"><img src="<?= $baseURL ?>/images/nav/main_on.gif" width="75" height="25" alt="" border="0" name="navmain"></a></td>
-								<td><a href="http://chemistry.library.emory.edu/" onmouseover="swapImg('navchemistry','<?= $baseURL ?>/images/nav/chemistry_on.gif');" onmouseout="swapImg('navchemistry','<?= $baseURL ?>/images/nav/chemistry_off.gif');"><img src="<?= $baseURL ?>/images/nav/chemistry_off.gif" width="86" height="25" alt="" border="0" name="navchemistry"></a></td>
-								<td><a href="http://musicmedia.library.emory.edu/" onmouseover="swapImg('navmusicmedia','<?= $baseURL ?>/images/nav/musicmedia_on.gif');" onmouseout="swapImg('navmusicmedia','<?= $baseURL ?>/images/nav/musicmedia_off.gif');"><img src="<?= $baseURL ?>/images/nav/musicmedia_off.gif" width="106" height="25" alt="" border="0" name="navmusicmedia"></a></td>
-								<td><a href="http://marbl.library.emory.edu/" onmouseover="swapImg('navmarbl','<?= $baseURL ?>/images/nav/marbl_on.gif');" onmouseout="swapImg('navmarbl','<?= $baseURL ?>/images/nav/marbl_off.gif');"><img src="<?= $baseURL ?>/images/nav/marbl_off.gif" width="63" height="25" alt="" border="0" name="navmarbl"></a></td>
-								<td><a href="http://www.emory.edu/OXFORD/Library/" onmouseover="swapImg('navoxford','<?= $baseURL ?>/images/nav/oxford_on.gif');" onmouseout="swapImg('navoxford','<?= $baseURL ?>/images/nav/oxford_off.gif');"><img src="<?= $baseURL ?>/images/nav/oxford_off.gif" width="72" height="25" alt="" border="0" name="navoxford"></a></td>
-								<td><a href="http://business.library.emory.edu/" onmouseover="swapImg('navbusiness','<?= $baseURL ?>/images/nav/business_on.gif');" onmouseout="swapImg('navbusiness','<?= $baseURL ?>/images/nav/business_off.gif');"><img src="<?= $baseURL ?>/images/nav/business_off.gif" width="81" height="25" alt="" border="0" name="navbusiness"></a></td>
-								<td><a href="http://www.healthlibrary.emory.edu/" onmouseover="swapImg('navhealth','<?= $baseURL ?>/images/nav/health_on.gif');" onmouseout="swapImg('navhealth','<?= $baseURL ?>/images/nav/health_off.gif');"><img src="<?= $baseURL ?>/images/nav/health_off.gif" width="74" height="25" alt="" border="0" name="navhealth"></a></td>
-								<td><a href="http://www.law.emory.edu/library/" onmouseover="swapImg('navlaw','<?= $baseURL ?>/images/nav/law_on.gif');" onmouseout="swapImg('navlaw','<?= $baseURL ?>/images/nav/law_off.gif');"><img src="<?= $baseURL ?>/images/nav/law_off.gif" width="56" height="25" alt="" border="0" name="navlaw"></a></td>
-								<td><a href="http://www.pitts.emory.edu/" onmouseover="swapImg('navtheology','<?= $baseURL ?>/images/nav/theology_on.gif');" onmouseout="swapImg('navtheology','<?= $baseURL ?>/images/nav/theology_off.gif');"><img src="<?= $baseURL ?>/images/nav/theology_off.gif" width="83" height="25" alt="" border="0" name="navtheology"></a></td>					
-							</tr>
-						</table>
-						
-					</td>
-				</tr>
-				<tr>
-					<td bgcolor="#FFFFFF"><img src="<?= $baseURL ?>/images/common/spacer.gif" width="1" height="1" alt=""></td>
-				</tr>
-				<tr>
-					<td background="<?= $baseURL ?>/images/common/tbl_search_bg.gif" align="left">
-  <form method="get" action="http://web.library.emory.edu/search/reURL.php">
-
-						<table border="0" cellpadding="0" cellspacing="0" width="696" height="33">
-                                                        <tr>
-                                                                <td background="<?= $baseURL ?>/images/common/search_field_bg.gif" width="328" class="searchText">
-                                                                        &nbsp;&nbsp;&nbsp;&nbsp;
-									<input type="text" name="search" maxlength="50" class="searchField" value="quick search" onfocus="FormSearch(this, 1)" onblur="FormSearch(this, 0)"> &nbsp;&nbsp;<input type="radio" checked name="host" value="euclid">EUCLID Catalog 
-									&nbsp;&nbsp;
-									<input type="radio" name="host" value="gl">Library Info
-                                                                </td>
-                                                                <td width="89" background="<?= $baseURL ?>/images/common/search_btn_bg.gif">
-									<input type="Image" src="<?= $baseURL ?>/images/common/btn_global_search.gif" width="45" height="10" alt="Search" name="Go" value="Go">
-								</td>
-                                                                <td width="279">
-								</td>
-                                                        </tr>
-						</table>
-									                                                        </form>
-									
-					</td>
-				</tr>
-				<tr>
-					<td bgcolor="#FFFFFF"><img src="<?= $baseURL ?>/images/common/spacer.gif" width="1" height="8" alt=""></td>
-				</tr>				
-			</table>
+				<!-- begin interiorNav -->
+				<ul id="interiorNav">
+					<li class="selected"><a href="<?= $baseURL ?>/search-marbl-collections.html" title="Search MARBL Collections">Search MARBL Collections</a></li>
+				</ul>
+				<!-- end interiorNav -->
+                
+                <form action="search.php" method="get" class="searchFindingAidsForm">
+					<h4>Search All Finding Aids</h4>
+                    <p>
+<!--						<input type="radio" name="searchFindingAidsOption" id="thisFindingAid" value="thisFindingAid" class="radio" checked="checked" /><label for="thisFindingAid">This Finding Aid</label><br />
+						<input type="radio" name="searchFindingAidsOption" id="allFindingAids" value="allFindingAids" class="radio" /><label for="allFindingAids">All Finding Aids</label> -->
+					<input name="keyword"
+						type="text" size="20"
+						class="searchInput" />
+						<input type="image"
+						src="<?= $baseURL ?>/img/go-btn.gif" class="searchBtn" />
+                    </p> 
+                    <p><a href="browse.php" title="Browse all Finding Aids" class="carrotLink">Browse All Finding Aids</a></p>
+                </form>
+                
+                <div id="relatedLinks">
+					<h2>Related Links</h2>
+					<ul>
+						<li><a href="" title="Help Using Finding Aids">Help Using Finding Aids</a></li>
+                        <li><a href="<?= $baseURL ?>/marbl-collections.html" title="Introduction to Collections">Introduction to Collections</a></li>
+                        <li><a href="<?= $baseURL ?>/using-marbl.html" title="Using MARBL">Using MARBL</a></li>
+                        <li><a href="" title="Visiting MARBL">Visiting MARBL</a></li>
+                        <li><a href="http://www.library.emory.edu" title="Emory Libraries Catalog" onclick="target='_blank'">Emory Libraries Catalog</a></li>
+					</ul>
+				</div>
+				
+			</div>
+			<!-- end left column -->
+			
+			<!-- begin rightColWide-->
+			<div id="rightColWide">
 
 
+
+															       

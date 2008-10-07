@@ -21,81 +21,91 @@
   </xsl:template>
   
   <xsl:template match="ead/archdesc" mode="toc">
-    <!-- title : link back to top-level of finding aid -->
-    <a>
-      <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
-      <xsl:value-of select="//ead/eadheader/filedesc/titlestmt/titleproper"/>
-    </a>
+    <div id="tocAndDesc">
+      <div id="toc" class="underlinedLinkBold">
+        <p>Table of Contents:</p>
 
-    <!-- link to top-level information sections -->
-    <p class="navbar">
-      <a>
-        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#descriptiveSummary</xsl:attribute>
-        Descriptive Summary
-      </a>
-      <!-- display number of keyword matches in this section if in kwic mode -->
-      <xsl:apply-templates select="did/hits"/>
-    </p>
-	
-    <p class="navbar">
-      <a>
-        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#adminInfo</xsl:attribute>
-        Administrative Information
-      </a>
-    </p>
+        <!-- No longer displayed in new layout [ title : link back to top-level of finding aid ] -->
+      
+      <!-- link to top-level information sections -->
+      <ul>
+        <li>
+          <a title="Descriptive Summary">
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#descriptiveSummary</xsl:attribute>
+            Descriptive Summary
+          </a>
+          <!-- display number of keyword matches in this section if in kwic mode -->
+          <xsl:apply-templates select="did/hits"/>
+        </li>
+        
+        <li>
+          <a title="Administrative Information">
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#adminInfo</xsl:attribute>
+            Administrative Information
+          </a>
+        </li>
+        
+        <li>
+          <a title="Collection Description">
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#collectionDesc</xsl:attribute>
+            Collection Description
+          </a>
+          <xsl:apply-templates select="collectiondescription/hits"/>
+        </li>
+        
+        <li>
+          <a title="Selected Search Terms">
+            <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#searchTerms</xsl:attribute>
+            Selected Search Terms
+          </a>
+          <!-- FIXME: could be called something else? value is here; include in toc query ? 
+               <xsl:value-of select="//archdesc/controlaccess/head"/>
+               -->
+               <xsl:apply-templates select="controlaccess/hits"/>
+             </li>
 
-    <p class="navbar">
-      <a>
-        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#collectionDesc</xsl:attribute>
-        Collection Description
-      </a>
-      <xsl:apply-templates select="collectiondescription/hits"/>
-    </p>
+             <xsl:apply-templates select="index" mode="toc"/>
 
-    <p class="navbar">
-      <a>
-        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#searchTerms</xsl:attribute>
-        Selected Search Terms
-      </a>
-      <!-- FIXME: could be called something else? value is here; include in toc query ? 
-        <xsl:value-of select="//archdesc/controlaccess/head"/>
-        -->
-      <xsl:apply-templates select="controlaccess/hits"/>
-    </p>
+           </ul>
+             
 
-    <xsl:apply-templates select="dsc" mode="toc"/>
+         </div>
+             <xsl:apply-templates select="dsc" mode="toc"/>
 
-    <xsl:apply-templates select="index" mode="toc"/>
+       </div>
 
   </xsl:template>
 
 
   <xsl:template match="ead/archdesc/index" mode="toc">
-    <p class="navbar">
+    <li>
       <a>
         <xsl:attribute name="href">content.php?el=index&amp;id=<xsl:value-of select="@id"/></xsl:attribute>
         <xsl:value-of select="head"/>
       </a>
       <xsl:apply-templates select="hits"/>
-    </p>
+    </li>
   </xsl:template>
 
 
   <!-- description of series / container list -->
   <xsl:template match="ead/archdesc/dsc" mode="toc">	
-    <xsl:element name="a">
-      <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
-      <xsl:value-of select="head"/>
-    </xsl:element>
-    
-    <xsl:apply-templates select="hits"/>
+  <div id="descOfSeries" class="underlinedLink">
+    <p>
+      <xsl:element name="a">
+        <xsl:attribute name="href">content.php?id=<xsl:value-of select="ancestor::ead/@id"/><xsl:value-of select="$url_suffix"/>#<xsl:value-of select="local-name()"/></xsl:attribute>
+        <xsl:attribute name="title"><xsl:value-of select="head"/></xsl:attribute>
+        <xsl:value-of select="head"/>
+      </xsl:element>
+      <xsl:apply-templates select="hits"/>
+    </p>
     
     <xsl:if test="count(c01)">
-      <xsl:element name="ul">			
+      <ul class="bullet">		
         <xsl:apply-templates select="c01" mode="toc"/>
-      </xsl:element>
+      </ul>
     </xsl:if>
-
+  </div>
   </xsl:template>
 
   <!-- unused ? 
@@ -112,11 +122,10 @@
   <!-- container list (no subseries -->
   <xsl:template match="c01[not(c02)]" mode="toc">
     <xsl:if test="did/unittitle">
-      <xsl:element name="p"> 
-        <xsl:attribute name="class">navbar</xsl:attribute>
+      <li>
         <xsl:apply-templates select="did/unittitle" mode="toc"/>
         <xsl:apply-templates select="did/unitdate" mode="toc"/>
-      </xsl:element>
+      </li>
     </xsl:if>
   </xsl:template>
 
@@ -124,14 +133,11 @@
   <!-- series -->
   <xsl:template match="c01[c02]|c01[@level='series']" mode="toc">
     <xsl:element name="li">
-      <xsl:attribute name="class">navbar 
       <!-- highlight this entry as the current one (currently displayed content)
            if the main content is this node or a child node -->
-        <xsl:if test="//results/ead/c01/@id = ./@id or //results/ead/parent/@id = ./@id"> current</xsl:if>
-      </xsl:attribute>
+      <!--        <xsl:if test="//results/ead/c01/@id = ./@id or //results/ead/parent/@id = ./@id"> current</xsl:if> -->
 
       <xsl:if test="did/unittitle or not(did/container)">
-        <xsl:element name="p"> 
           <xsl:attribute name="class">navbar</xsl:attribute>
           <a>
             <xsl:attribute name="href">content.php?el=<xsl:value-of select="local-name()"/>&amp;id=<xsl:value-of select="self::node()/@id"/><xsl:value-of select="$url_suffix"/></xsl:attribute>
@@ -142,7 +148,6 @@
           <!-- display number of keyword matches in this section if in kwic mode -->
           <xsl:apply-templates select="hits"/>
           
-        </xsl:element>
       </xsl:if>
     </xsl:element>		
   </xsl:template>

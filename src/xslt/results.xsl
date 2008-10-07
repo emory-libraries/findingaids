@@ -11,7 +11,7 @@
 	<xsl:param name="label_text"/>
 	<xsl:param name="baseLink"/>
 	<xsl:param name="url_suffix"/>
-	
+	<xsl:param name="letter"/>
 
 	<xsl:template match="/">
 		<xsl:apply-templates select="//alpha_list" />
@@ -22,31 +22,30 @@
 			
 	<!--<xsl:template name="alphabox">-->
 	<xsl:template match="alpha_list">
-		<div class="blueBox">
-			<span class="alphaText"><xsl:value-of select="$label_text" /></span>
-			<p />
-			<xsl:element name="span">
-				<xsl:attribute name="class">alphaList</xsl:attribute>
-				<xsl:element name="a">	
-					<xsl:attribute name="href"><xsl:value-of select="$baseLink" />?l=all</xsl:attribute>ALL
-				</xsl:element>
-				<xsl:apply-templates select="letter"/>
-			</xsl:element>
+		<div id="alphalist">
+		  <xsl:value-of select="$label_text" />
+		  
+		  <xsl:element name="a">	
+		    <xsl:if test="$letter = 'all' or $letter = ''">
+		      <xsl:attribute name="class">current</xsl:attribute>
+		    </xsl:if>
+		    <xsl:attribute name="href"><xsl:value-of select="$baseLink" />?l=all</xsl:attribute>ALL
+		    <xsl:apply-templates select="letter"/>
+		  </xsl:element>
 		</div>	
-		<p />
 	</xsl:template>
 	
 	<xsl:template match="letter">
-		<xsl:element name="span">
-				<xsl:attribute name="class">alphaList</xsl:attribute>
-				<xsl:element name="a">	
-					<xsl:attribute name="href">
-						<xsl:value-of select="$baseLink" />?l=<xsl:value-of select="." />
-					</xsl:attribute>
-					<xsl:value-of select="." />
-				</xsl:element>
-				<xsl:apply-templates select="letter" />
-			</xsl:element>
+	  <xsl:element name="a">	
+	    <xsl:if test=". = $letter">
+	      <xsl:attribute name="class">current</xsl:attribute>
+	    </xsl:if>
+	    <xsl:attribute name="href">
+	      <xsl:value-of select="$baseLink" />?l=<xsl:value-of select="." />
+	    </xsl:attribute>
+	    <xsl:value-of select="." />
+	    <xsl:apply-templates select="letter" />
+	  </xsl:element>
 	</xsl:template>
 	
 	<xsl:template match="record">

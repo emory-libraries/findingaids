@@ -89,7 +89,8 @@ $mode = 'browse';
 $xsl_file 	= "xslt/results.xsl";
 $xsl_params = array('mode' => $mode,
 		    'label_text' => "Browse Collections Alphabetically:",
-		    'baseLink' => "browse.php");
+		    'baseLink' => "browse.php",
+		    'letter' => $letter);
 
 $xmldb->xquery($query);
 $xmldb->xslTransform($xsl_file, $xsl_params);

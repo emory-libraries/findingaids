@@ -128,7 +128,7 @@ html_head("Finding Aid : $htmltitle");
 include("web/html/template-header.inc");
 print $crumbs;
 
-print '<div class="content">';
+print '<div class="content"> ';
 $xmldb->printResult();
 print '</div>';
 

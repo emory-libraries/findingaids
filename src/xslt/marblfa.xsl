@@ -16,19 +16,21 @@
   <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
   
   <xsl:template match="/">
+    <!-- on html pages, titlestmt will *always* be present in the table of contents -->
+    <xsl:apply-templates select="//toc/ead/eadheader/filedesc/titlestmt"/>		
+
     <xsl:choose>
       <xsl:when test="$mode = 'full'">
+        <!-- explicitly include title statement (excluded by default for position in new layout) -->
+        <xsl:apply-templates select="//eadheader/filedesc/titlestmt"/>
+        <!-- publication statement / address (now excluded from website view) -->
+        <xsl:apply-templates select="//eadheader/filedesc/publicationstmt" mode="full"/>
         <xsl:apply-templates/>
       </xsl:when>
       <xsl:otherwise>
 
-        <div id="toc">	
-          <h1>Table of Contents</h1>
-          <hr/>
-          <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
-
-
-        </div>
+        <!-- Table of Contents -->
+        <xsl:apply-templates select="//toc/ead/archdesc" mode="toc"/>
 
         <!--start content-->
         <div id="content">
@@ -40,23 +42,51 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template match="eadheader">
+    <xsl:apply-templates select="profiledesc"/>
+  </xsl:template>
+
+  <!-- don't display revision descriptions (Harry Ransom) -->
+  <xsl:template match="revisiondesc"/>
+
   <xsl:template match="titlestmt">
-    <div id="title">
       <xsl:if test="$mode != 'full'">
         <!-- print link 
              (kind of a hack: inside title div to float above title bar lined up at the right)
              -->
-        <div id="printable">
+        <!--  old printview links...       <div id="printable">
           <a>
             <xsl:attribute name="onclick">javascript:pdfnotify('pdf.php?id=<xsl:value-of select="//ead/@id"/>')</xsl:attribute>
             <xsl:attribute name="href">pdf.php?id=<xsl:value-of select="//ead/@id"/></xsl:attribute>
             Print finding aid (PDF)
           </a>
+        </div> -->
+
+        <div id="printOptions">
+          <ul>
+            <li id="pdfVersion">
+              <a title="PDF Version">
+                <xsl:attribute name="href">pdf.php?id=<xsl:value-of select="//ead/@id"/></xsl:attribute>
+                <xsl:attribute name="onclick">javascript:pdfnotify('pdf.php?id=<xsl:value-of select="//ead/@id"/>')</xsl:attribute>
+                <span>PDF Version</span>
+              </a>
+            </li>
+            <li id="printVersion"><a href="" onclick="window.print(); return false;" title="Print This Page"><span>Print This Page</span></a></li>
+          </ul>
         </div>
+
       </xsl:if>
 
-      <xsl:apply-templates select="titleproper | subtitle"/>
+    <div id="titleAndSummary">
+
+      <div id="title"><h2><xsl:apply-templates select="titleproper | subtitle"/></h2></div>
+
     </div>
+
+    <!-- clear this title/summary section so we don't have to worry about it elsewhere -->
+    <div style="clear:both">&#160;</div> 
+     <!-- NOTE: needs to be not empty so divs line up and css will work properly -->
+
   </xsl:template>
 
   <!-- unused in our documents? -->
@@ -67,12 +97,14 @@
     </xsl:element>
   </xsl:template>
 
-
-  <xsl:template match="publicationstmt">
+  <!-- suppress publication statement (why is this getting displayed?) -->
+  <xsl:template match="publicationstmt"/>
+ 
+  <xsl:template match="publicationstmt" mode="full">
     <div id="publicationstmt">
       <xsl:apply-templates/>
     </div>
-  </xsl:template>
+  </xsl:template> 
 
   <xsl:template match="publicationstmt/publisher">
     <h3><xsl:apply-templates/></h3>
@@ -99,44 +131,48 @@
      <xsl:apply-templates select="did" />
 
      <hr/>
-     
-     <xsl:element name="h2">
-       <a>
-         <xsl:attribute name="name">adminInfo</xsl:attribute>
-         Administrative Information
-       </a> 
-     </xsl:element>
-     
-     <!-- display the following fields, in this specific order -->
-     <xsl:apply-templates select="accessrestrict"/>
-     <xsl:apply-templates select="userestrict"/>
-     <xsl:apply-templates select="altformavail"/>
-     <xsl:apply-templates select="originalsloc"/>
-     <xsl:apply-templates select="bibliography"/>
-     <xsl:apply-templates select="relatedmaterial"/>
-     <xsl:apply-templates select="separatedmaterial"/>
-     <xsl:apply-templates select="acqinfo"/>
-     <xsl:apply-templates select="custodhist"/>
-     <xsl:apply-templates select="prefercite"/>
-     
-     <hr/>
-     
-     <xsl:element name="h2">
-       <a>
-         <xsl:attribute name="name">collectionDesc</xsl:attribute>
-         Collection Description
-       </a>
-     </xsl:element>
-     <!-- display the following fields, in this specific order -->
-     <xsl:apply-templates select="bioghist"/>
-     <xsl:apply-templates select="scopecontent"/>
-     <xsl:apply-templates select="arrangement"/>
-     <xsl:apply-templates select="otherfindaid"/>
+     <div id="adminInfo">
+       <xsl:element name="h3">
+         <a>
+           <xsl:attribute name="name">adminInfo</xsl:attribute>
+           Administrative Information
+         </a> 
+       </xsl:element>
+       
+       <!-- display the following fields, in this specific order -->
+       <xsl:apply-templates select=".//accessrestrict"/>
+       <xsl:apply-templates select=".//userestrict"/>
+       <xsl:apply-templates select=".//altformavail"/>
+       <xsl:apply-templates select=".//originalsloc"/>
+       <xsl:apply-templates select=".//relatedmaterial"/>
+       <xsl:apply-templates select=".//separatedmaterial"/>
+       <xsl:apply-templates select=".//acqinfo"/>
+       <xsl:apply-templates select=".//custodhist"/>
+       <xsl:apply-templates select=".//prefercite"/>
+       
+       <!-- Note: Wake Forest nested these fields under desgrp;
+            using .// to pick up these fields anywhere under this node -->
+
+       <xsl:if test="bioghist or bibliography or scopecontent or arrangement or otherfindaid">
+         <hr/>
+         <xsl:element name="h3">
+           <a>
+             <xsl:attribute name="name">collectionDesc</xsl:attribute>
+             Collection Description
+           </a>
+         </xsl:element>
+         <!-- display the following fields, in this specific order -->
+         <xsl:apply-templates select="bioghist"/>
+         <xsl:apply-templates select="bibliography"/>
+         <xsl:apply-templates select="scopecontent"/>
+         <xsl:apply-templates select="arrangement"/>
+         <xsl:apply-templates select="otherfindaid"/>
+       
+     </xsl:if>
      
      
      <!-- don't display search terms in full/printable (pdf) version -->
      <xsl:if test="$mode != 'full'">
-       <hr/>
        <xsl:apply-templates select="controlaccess"/>     
      </xsl:if>
 
@@ -148,21 +184,33 @@
      <xsl:if test="$mode = 'full'">
        <xsl:apply-templates select="index"/>     
      </xsl:if>
+
+     <!-- handle 'odd' similar to index -->
+     <xsl:if test="$mode = 'full'"> 
+       <xsl:apply-templates select="odd"/>     
+     </xsl:if> 
+     </div>
      
    </div>
  </xsl:template>
 
  <xsl:template match="archdesc/did">
-   <hr/>
-    <xsl:element name="h2">
+   <h2>
+     <a>
+       <xsl:attribute name="name">descriptiveSummary</xsl:attribute>	
+       <xsl:choose>
+         <xsl:when test="did/head">
+           <xsl:value-of select="did/head"/>
+         </xsl:when>
+         <xsl:otherwise>
+           Descriptive Summary
+         </xsl:otherwise>
+       </xsl:choose>
+     </a>
+   </h2>
 
-      <a>
-        <xsl:attribute name="name">descriptiveSummary</xsl:attribute>	
-        Descriptive Summary
-      </a>
-    </xsl:element>
-
-    <table id="descriptivesummary">
+    <!--    <table id="descriptivesummary">  -->
+    <table id="descSummary"> <!-- macquarium css id  -->
       <col width="20%" align="left" valign="top"/>
       <col width="80%" align="left" valign="top"/>
 
@@ -174,13 +222,19 @@
       <xsl:apply-templates select="physloc"/>		
       <xsl:apply-templates select="abstract"/>
       <xsl:apply-templates select="langmaterial"/>
-
     </table>
-
  </xsl:template>
+
+ <xsl:template match="unittitle/title">
+   <i><xsl:apply-templates/></i>
+ </xsl:template>
+
 
  <!-- don't display repository; redundant information -->
  <xsl:template match="archdesc/did/repository"/>
+
+ <!-- don't display archdesc title separately (already displayed above) -->
+ <xsl:template match="archdesc/did/head" priority="1"/>
 
  <xsl:template match="archdesc/did/*[not(self::hits)]">
    <xsl:variable name="name"><xsl:value-of select="local-name()"/></xsl:variable>
@@ -189,11 +243,15 @@
      <xsl:choose>
        <xsl:when test="$name = 'unittitle'">Title:</xsl:when>
        <xsl:when test="$name = 'unitid'">Call Number:</xsl:when>
-       <!-- only display extent label once even if there are multiple physdesc elements -->
-       <xsl:when test="$name = 'physdesc' and preceding-sibling::physdesc"></xsl:when>
        <xsl:when test="$name = 'physdesc'">Extent:</xsl:when>
+       <xsl:when test="$name = 'physloc'">Location:</xsl:when>
        <xsl:when test="$name = 'origination'">Creator:</xsl:when>
        <xsl:when test="$name = 'langmaterial'">Language:</xsl:when>
+
+       <!-- only display label once when these elements repeat -->
+       <xsl:when test="$name = 'physdesc' and preceding-sibling::physdesc"></xsl:when>
+       <xsl:when test="$name = 'abstract' and preceding-sibling::abstract"></xsl:when>
+
        <xsl:otherwise>
          <!-- use element name for label; capitalize the first letter -->
          <xsl:value-of select="concat(translate(substring($name,1,1),$lowercase, $uppercase),substring($name, 2, (string-length($name) - 1)))"/>: 
@@ -224,11 +282,11 @@
    <xsl:text> </xsl:text> <xsl:apply-templates/>
  </xsl:template>		
  
-  <xsl:template match="physdesc">
+ <!-- <xsl:template match="physdesc">
     <xsl:element name="h3">
       <xsl:apply-templates/>
     </xsl:element>
-  </xsl:template>
+  </xsl:template> -->
 
  <!-- separate extents with a space -->
  <xsl:template match="extent">
@@ -248,16 +306,18 @@
 
   <!-- lower-level headings within archive description -->
   <xsl:template match="archdesc//head[not(ancestor::dsc) and not(ancestor::controlaccess)]">
-    <xsl:element name="h3">
-      <a>
-        <xsl:attribute name="name"><xsl:value-of select="local-name(parent::node())"/></xsl:attribute>
+    <xsl:element name="h4">
+      <!-- FIXME: do we not want named anchors here anymore?  it messes up macquarium styles -->
+      <!--      <a>
+        <xsl:attribute name="name"><xsl:value-of select="local-name(parent::node())"/></xsl:attribute> -->
         <xsl:apply-templates/>
-      </a>
+        <!--      </a> -->
     </xsl:element>
   </xsl:template>  
 
   <!-- top-level control access heading -->
   <xsl:template match="archdesc/controlaccess/head">
+    <hr/>
     <h2>
       <a name="searchTerms">
         <xsl:apply-templates/>
@@ -277,7 +337,7 @@
     </p>
   </xsl:template>
 
-  <xsl:template match="subject |corpname[not(parent::origination)] |  genreform | geogname | occupation">
+  <xsl:template match="subject | controlaccess/corpname[not(parent::origination)] |  genreform | geogname | occupation">
     <p class="tight">
       <xsl:apply-templates/>
     </p>
@@ -307,12 +367,12 @@
           <table>
             <xsl:attribute name="border">0</xsl:attribute>
             <col width="7%" align="left" valign="top"/>
-            <xsl:if test="//container[@type='folder']">
+            <xsl:if test="//container[@type='folder' or @type='Folder']">
               <col width="7%" align="left" valign="top"/>
             </xsl:if>
             <col width="86%"/>
             <!-- process container c01s -->
-            <xsl:apply-templates select="c01/did"/>
+            <xsl:apply-templates select="c01/did | c01/scopecontent"/>
           </table>
         </xsl:otherwise>
       </xsl:choose>
@@ -332,13 +392,16 @@
     </tr>
   </xsl:template>
   
-  <xsl:template match="did[container/@type='box']|did[container/@type='volume']">
+  <xsl:template match="did[container/@type='box'] | did[container/@type='Box'] 
+                       | did[container/@type='volume'] | did[container/@type='Volume']
+                       | did[container/@type='Book'] ">
     <!-- only show box/folder once for the whole page -->
-    <xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
+     <xsl:if test="count(../preceding-sibling::node()/did[container]) = 0">
+                   <!--                    count(../../preceding-sibling::node()//did[container]) = 0">   -->
       <tr class="box-folder">
         <th>Box</th>
         <!-- only display folder label if there are folders -->
-        <xsl:if test="//container[@type='folder']">
+        <xsl:if test="//container[@type='folder' or @type='Folder']">
           <th>Folder</th>
         </xsl:if>
         <th class="content">Content</th>
@@ -347,22 +410,58 @@
     
     <tr>
       <td>
-        <xsl:apply-templates select="container[@type='box']"/>
-        <xsl:apply-templates select="container[@type='volume']"/>
+        <xsl:apply-templates select="container[@type='box' or @type='Box' or @type='Book']"/>
+        <xsl:apply-templates select="container[@type='volume' or @type='Volume']"/>
       </td>
-      <xsl:if test="//container[@type='folder']">
+      <xsl:if test="//container[@type='folder' or @type='Folder']">
         <td>
-          <xsl:apply-templates select="container[@type='folder']"/>
+          <xsl:apply-templates select="container[@type='folder' or @type='Folder']"/>
         </td>
       </xsl:if>
       <td class="content">
         <xsl:apply-templates select="unittitle"/>
+        <xsl:apply-templates select="physdesc|abstract|note"/>
       </td>
     </tr>
   </xsl:template>
 
+  <!-- generic physdesc (not under archdesc) -->
+  <xsl:template match="physdesc">
+    <xsl:text>, </xsl:text>
+    <xsl:apply-templates/>
+  </xsl:template>
 
-  <xsl:template match="container|c01[@level='file']/did/unittitle">
+  <!-- abstract -->
+  <xsl:template match="abstract">
+    <br/>
+    <span class="indent"><xsl:apply-templates/></span>
+  </xsl:template>
+
+
+  <!-- scopecontent within c levels -->
+  <xsl:template match="c01/scopecontent | c02/scopecontent | c03/scopecontent | c04/scopecontent">
+    <xsl:choose>
+      <!-- output as a table row when at item level -->
+      <xsl:when test="parent::node()/@level = 'file' or parent::node()/@level='item'">
+        <tr>
+          <td></td>
+          <td></td>	<!-- line up with unittitle, note -->
+          <td class="indent"> 
+          <xsl:apply-templates/>
+        </td>
+        </tr>
+      </xsl:when>
+      <xsl:otherwise>	<!-- not inside a table -->
+        <p><xsl:apply-templates/></p>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  
+  <xsl:template match="scopecontent/p">
+    <p><xsl:apply-templates/></p>
+  </xsl:template>
+
+  <xsl:template match="container|c01[@level='file' or @level='item']/did/unittitle|c01[not(@level)]/did/unittitle">
     <xsl:apply-templates/>
   </xsl:template>
 
@@ -373,7 +472,15 @@
 
 
   <xsl:template match="title">
-    <i><xsl:apply-templates/></i>
+    <xsl:choose>
+      <!-- if render is doublequote, don't italicize -->
+      <xsl:when test="@render = 'doublequote'">
+        <xsl:text>"</xsl:text><xsl:apply-templates/><xsl:text>" </xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <i><xsl:apply-templates/></i>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="p">
@@ -448,13 +555,18 @@
            <xsl:apply-templates select="c02|c03"/>
          </xsl:when> 
       <!-- otherwise, display in tables -->
+
       <xsl:otherwise> 
         <table width="100%">
           <col width="7%" align="left" valign="top"/>
           <col width="7%" align="left" valign="top"/>
           <col width="86%" align="left" valign="top"/>
           <!-- process sub-container (only one level down) -->
-          <xsl:apply-templates select="c02[@level='file']|c03[@level='file']|c04[@level='file']"/>
+          <xsl:apply-templates select="c02[@level='file' or @level='item'] 
+                                       | c03[@level='file' or @level='item']
+                                       | c04[@level='file' or @level='item'] 
+                                       | c02[not(@level)] | c03[not(@level)] 
+                                       | c04[not(@level)]"/>
         </table>
       </xsl:otherwise>
     </xsl:choose> 
@@ -463,13 +575,28 @@
 
   <xsl:template match="archdesc/index">
     <hr/> 
+    <div>
+      <xsl:attribute name="class">pagebreak</xsl:attribute>
+      <xsl:apply-templates/>
+    </div>
+  </xsl:template>
+
+  <!-- archdesc is needed to force this template instead of archdesc/* -->
+  <xsl:template match="archdesc/odd">
+    <hr/> 
     <div class="pagebreak">
       <xsl:apply-templates/>
     </div>
   </xsl:template>
 
+  <!-- same level heading as c0# series headings -->
+  <xsl:template match="odd/head">
+    <h3><xsl:apply-templates/></h3>
+  </xsl:template>
+
+
   <xsl:template match="index/head">
-    <a name="index">http://libraries.mit.edu/archives/thesis-specs/subcat.html
+    <a name="index">
       <h2><xsl:apply-templates/></h2>
     </a>
   </xsl:template>
@@ -481,8 +608,8 @@
   </xsl:template>
 
 
-  <xsl:template match="indexentry/persname">
-    <b><xsl:value-of select="."/></b>
+  <xsl:template match="indexentry/persname|indexentry/name">
+    <b><xsl:apply-templates/></b>
   </xsl:template>
 
   <xsl:template match="indexentry/ptrgrp">
@@ -495,6 +622,38 @@
     <li><xsl:apply-templates/></li>
   </xsl:template>
 
+
+  <xsl:template match="list">
+    <ul>
+      <xsl:apply-templates/>
+    </ul>
+  </xsl:template>
+
+  <xsl:template match="item">
+    <li><xsl:apply-templates/></li>
+  </xsl:template>
+
+  <!-- ignore bold formatting under index -->
+  <xsl:template match="odd//emph[@render='bold']">
+    <xsl:apply-templates/>
+  </xsl:template> 
+
+  <xsl:template match="emph">
+    <xsl:choose>
+      <xsl:when test="@render = 'doublequote'">
+        <xsl:text>"</xsl:text>
+        <xsl:apply-templates/>
+        <xsl:text>"</xsl:text>
+      </xsl:when>
+      <xsl:when test="@render = 'bold'">
+        <b><xsl:apply-templates/></b>
+      </xsl:when>
+      <xsl:when test="@render = 'italic'">
+        <i><xsl:apply-templates/></i>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:text> </xsl:text>
+  </xsl:template>
 
   <!-- display number of keyword matches -->
   <xsl:template match="hits">
@@ -514,7 +673,6 @@
    <xsl:if test="preceding-sibling::exist:match and ($txt = '')">
      <xsl:text> </xsl:text>
    </xsl:if>
-
    <span class="match"><xsl:apply-templates/></span>
  </xsl:template>
 
