@@ -132,7 +132,7 @@
 
      <hr/>
      <div id="adminInfo">
-       <xsl:element name="h3">
+       <xsl:element name="h2">
          <a>
            <xsl:attribute name="name">adminInfo</xsl:attribute>
            Administrative Information
@@ -155,7 +155,7 @@
 
        <xsl:if test="bioghist or bibliography or scopecontent or arrangement or otherfindaid">
          <hr/>
-         <xsl:element name="h3">
+         <xsl:element name="h2">
            <a>
              <xsl:attribute name="name">collectionDesc</xsl:attribute>
              Collection Description
@@ -195,6 +195,7 @@
  </xsl:template>
 
  <xsl:template match="archdesc/did">
+   <hr/>
    <h2>
      <a>
        <xsl:attribute name="name">descriptiveSummary</xsl:attribute>	
@@ -306,12 +307,11 @@
 
   <!-- lower-level headings within archive description -->
   <xsl:template match="archdesc//head[not(ancestor::dsc) and not(ancestor::controlaccess)]">
-    <xsl:element name="h4">
-      <!-- FIXME: do we not want named anchors here anymore?  it messes up macquarium styles -->
-      <!--      <a>
-        <xsl:attribute name="name"><xsl:value-of select="local-name(parent::node())"/></xsl:attribute> -->
+    <xsl:element name="h3">
+      <a>
+        <xsl:attribute name="ame"><xsl:value-of select="local-name(parent::node())"/></xsl:attribute> 
         <xsl:apply-templates/>
-        <!--      </a> -->
+      </a> 
     </xsl:element>
   </xsl:template>  
 
