@@ -3,7 +3,7 @@
 include("breadcrumb.class.php");
 
 class marblCrumb extends breadCrumb {
-
+  
   function marblCrumb ($title = NULL, $url = NULL) {
     // do default initialization
     $this->breadCrumb();
@@ -31,8 +31,8 @@ class marblCrumb extends breadCrumb {
 	return $i;
       
       // browse (any letter) is equivalent to search page in site hierarchy
-      if ((strstr($myc->title, "Browse") || $myc->title == "Search") &&
-	  (strstr($c->title, "Browse") || $c->title == "Search"))
+      if ((strstr($myc->title, "Browse") || $myc->title == "Search Results") &&
+	  (strstr($c->title, "Browse") || $c->title == "Search Results"))
 	return $i;
 
       // content documents - top level & subseries of finding aid
