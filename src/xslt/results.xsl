@@ -23,7 +23,7 @@
 	<!--<xsl:template name="alphabox">-->
 	<xsl:template match="alpha_list">
 		<div id="alphalist">
-		  <xsl:value-of select="$label_text" />
+                  <h4><xsl:value-of select="$label_text" /></h4>
 		  
 		  <xsl:element name="a">	
 		    <xsl:if test="$letter = 'all' or $letter = ''">
