@@ -201,7 +201,7 @@ h2 a, h3 a, a[name] {
 /* no line before text immediately after h3 heading */
 h3, h4 { 
   margin-bottom:0px;
-  font-size:100%;
+  font-size:100% !important;
 }
 p.indent { 
   margin-top:0px;
@@ -249,7 +249,7 @@ td {
 }
 
 p.tight { 
-  margin:0px;
+  margin:0px !important;
 }
 
 /* style horizontal rules as double line */
