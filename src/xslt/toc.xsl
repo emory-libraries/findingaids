@@ -68,9 +68,17 @@
 
            </ul>
              
+           <!-- display container list (no c01s) on left side column -->
+           <xsl:if test="count(dsc/c01) = 0">
+             <xsl:apply-templates select="dsc" mode="toc"/>
+           </xsl:if>
 
          </div>
-             <xsl:apply-templates select="dsc" mode="toc"/>
+
+         <!-- if there are subseries, display on right side column -->
+         <xsl:if test="count(dsc/c01)">
+           <xsl:apply-templates select="dsc" mode="toc"/>
+         </xsl:if>
 
        </div>
 
