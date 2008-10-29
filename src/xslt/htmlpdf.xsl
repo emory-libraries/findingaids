@@ -123,6 +123,11 @@
    </fo:block>
  </xsl:template>
 
+ <!-- don't use normal h2 formatting for title -->
+ <xsl:template match="div[@id='title']/h2">
+   <xsl:apply-templates/>
+ </xsl:template>
+
 
  <xsl:template match="h2">
    <fo:block font-size="14pt" font-family="any" line-height="16pt"
@@ -207,7 +212,7 @@
          <xsl:attribute name="text-indent">20pt</xsl:attribute>
        </xsl:when>
        <xsl:otherwise>
-         <!--         <xsl:attribute name="space-after.optimum">5pt</xsl:attribute> -->
+         <xsl:attribute name="space-after">5pt</xsl:attribute> 
        </xsl:otherwise>       
      </xsl:choose>
      <xsl:apply-templates/>
