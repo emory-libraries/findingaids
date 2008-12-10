@@ -3,7 +3,7 @@
 // php functions & variables used by more than one ILN php page
 include("config.php");
 
-$baseURL  = "http://marbl-dev.library.emory.edu";
+$baseURL  = "http://marbl.library.emory.edu";
 
 
 /* 12.10.2004 - Added robots meta line to header, partially as a test
@@ -26,12 +26,11 @@ print '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.o
 	<meta name="MSSmartTagsPreventParsing" content="true" />
 	
 	<style type="text/css" media="all">
-		@import url( "../css/mq_standardstyles_0.1.css" );
-		@import url( "../css/marbl.css" );
-		@import url( "web/css/marblfa.css" );    
+		@import url( "http://marbl.library.emory.edu/css/mq_standardstyles_0.1.css" );
+		@import url( "http://marbl.library.emory.edu/css/marbl_fa.css" );    
 	</style>
 	
-	<link rel="stylesheet" type="text/css" media="print" href="../css/print.css" />
+	<link rel="stylesheet" type="text/css" media="print" href="http://marbl.library.emory.edu/css/print.css" />
 
 	<script language="Javascript" type="text/javascript">
 	  function pdfnotify (url) {
