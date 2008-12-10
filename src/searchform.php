@@ -1,8 +1,5 @@
 <div class='content' id='search'>
 
-<table name="searchtable">
-<tr><td>
-
 <h2 class="alphaText">Search Collections</h2>
 
 <form name="fa_query" action="search.php" method="get">
