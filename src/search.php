@@ -149,13 +149,22 @@ $xmldb->getCursor();
 if ($kw != '')
   $xsl_params = array("url_suffix"  => "&keyword=$kw");
 
-print '<div class="content">';
-
+  print '<div class="content">';
 if ($total == 0){
- print "<p><b>No collections found.</b> You may want to broaden your search and see search tips for suggestions.</p>";
-  include ("searchform.php");
-} else {
+ print '<p><b>No collections found.</b> You may want to broaden your search and see search tips for suggestions.</p> 
 
+ <h3>Search tips:</h3>
+<ul>
+<li>You can enter multiple words.</li>
+<li>Asterisks may be used to do a truncated search. 
+[e.g., enter <b>resign*</b> to match <b>resign</b>, <b>resigned</b>, and <b>resignation</b>.] </li>
+<li>Capitalization is ignored.</li>
+<!-- <li>Search for exact phrases using quotation marks [e.g., <b>"harlem renaissance"</b>] -->
+</ul>
+
+';
+ //include ("searchform.php");
+} else {
   print "<div class='searchinfo'><h2 align='center'>Search Results</h2>";
 
   // # of documents found
@@ -184,10 +193,10 @@ if ($total == 0){
 
   $xmldb->xslTransform($xsl_file, $xsl_params);
   $xmldb->printResult($myterms);
+  print $rlinks;
 }
-
-print $rlinks;
 print '</div>';		// end of content div
+
 
 
 
