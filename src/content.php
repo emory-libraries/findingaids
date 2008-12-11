@@ -94,7 +94,8 @@ else $xsl_params = array();
 //$xquery = "$declare <results>{ $toc_query } { $query }</results>";
 //echo "$xquery<hr>";
 $rval = $xmldb->xquery(trim($xquery));
-$xmldb->xslTransform($xsl_file, $xsl_params);
+$xmldb->xslBind($xsl_file, $xsl_params);
+$xmldb->transform();
 
 
 // get unittitle, but add spaces before any unitdates 
