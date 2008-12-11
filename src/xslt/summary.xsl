@@ -24,7 +24,16 @@
       <!-- note: hits are *inside* heading to keep them on the same line -->      
       
       <!-- if we have the full-text, count matches under this node -->
-      <xsl:variable name="count"><xsl:value-of select="count(.//exist:match)"/> </xsl:variable>
+      <xsl:variable name="count">
+        <xsl:choose>
+          <xsl:when test=".//exist:match">
+            <xsl:value-of select="count(.//exist:match)"/>            
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>0</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
       
       <xsl:choose>
         <xsl:when test="$count > 0">
