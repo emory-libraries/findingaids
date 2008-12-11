@@ -10,7 +10,9 @@ $connectionArray{"debug"} = false;
 $id = $_GET["id"];
 if (isset($_GET["el"])) 
   $element = $_GET["el"];
-$kw = $_GET["keyword"];
+if (isset($_GET["keyword"]))
+  $kw = $_GET["keyword"];
+ else $kw = "";
 
 $acceptable_els = array("c01", "c02", "c03", "did", "ead", "index");
 
@@ -62,7 +64,9 @@ if (count($filter)) {	// keyword/phrase mode (at least one filter)
 
 // pull out exact phrase enclosed in quotation marks
 preg_match_all("/\"([^\"]+)\"/", stripslashes($kw), $phrases);
-$phrase = $phrases[1][0];
+if (isset($phrases[1]) && isset($phrases[1][0]))
+  $phrase = $phrases[1][0];
+else $phrase = '';
 
 $keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", $kw);
 
@@ -78,13 +82,13 @@ return <results>
 // note: doesn't yet handle highlighting, hit counts completely 
   
 
-
 $xsl_file = "xslt/marblfa.xsl";
 
 // xslt passes on keywords to subsections of document via url
 $term_list = urlencode(implode("|", array_merge($kwarray, $phrases)));
 if ($kw != '') 
   $xsl_params = array("url_suffix"  => "&keyword=$kw");
+else $xsl_params = array();
 	
 //$xquery = "$declare <results>{ $toc_query } { $query }</results>";
 //$xquery = "$declare <results>{ $toc_query } { $query }</results>";
