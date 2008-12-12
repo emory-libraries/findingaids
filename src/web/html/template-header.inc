@@ -17,23 +17,29 @@ global $baseURL;
                     <a href="<?= $baseURL ?>/support-marbl.html" title="SUPPORT MARBL">SUPPORT MARBL</a>
                     <a href="<?= $baseURL ?>/contact-marbl.html" title="CONTACT US">CONTACT US</a>
                 </div>
-                <form action="http://search.emory.edu/search" method="get" id="searchForm">
+
+
+
+<form action="http://search.emory.edu/search" method="get" id="searchForm">
                     <p>
-                        <input type="text" size="20" class="searchInput" value="Search The Site" id="q" name="q" />
+                        <input type="text" size="20" class="searchInput" value="Search The Site" id="q" name="q" onfocus="if(this.value == 'Search The Site') { this.value = ''; }" onblur="if(this.value == '') { this.value = 'Search The Site'; }"/>
+
                         <input type="image" src="<?= $baseURL ?>/img/search-btn.gif" name="Submit" alt="Submit" value="Submit" id="searchbutton" class="searchBtn" />
                     		<input type="hidden" name="site" value="marbl_library" /> 
       						<input type="hidden" name="ud" value="1" /> 
     						<input type="hidden" name="oe" value="UTF-8" /> 
       						<input type="hidden" name="ie" value="UTF-8" />   
-      						<input type="hidden" name="proxystylesheet" value="library_frontend" />  
+      						<input type="hidden" name="proxystylesheet" value="marbl_frontend" />  
       						<input type="hidden" name="output" value="xml_no_dtd" />
-      						<input type="hidden" name="client" value="library_frontend" />  
+      						<input type="hidden" name="client" value="marbl_frontend" />  
                     
                     </p>
                     <p>
                         <a href="<?= $baseURL ?>/search-marbl-collections.html" title="Search MARBL Collections">Search MARBL Collections</a>
+
                     </p>
                 </form>
+
             </div>
         </div>
 <!-- #EndLibraryItem --><!-- end header -->
@@ -82,7 +88,7 @@ global $baseURL;
                 <div id="relatedLinks">
 					<h2>Related Links</h2>
 					<ul>
-						<li><a href="" title="Help Using Finding Aids">Help Using Finding Aids</a></li>
+<!--			<li><a href="" title="Help Using Finding Aids">Help Using Finding Aids</a></li> -->
                         <li><a href="<?= $baseURL ?>/introduction-to-collections.html" title="Introduction to Collections">Introduction to Collections</a></li>
                         <li><a href="<?= $baseURL ?>/using-marbl.html" title="Using MARBL">Using MARBL</a></li>
                         <li><a href="<?= $baseURL ?>/for-visiting-researchers.html" title="Visiting MARBL">Visiting MARBL</a></li>
