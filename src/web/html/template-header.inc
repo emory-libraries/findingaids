@@ -83,9 +83,9 @@ global $baseURL;
 					<h2>Related Links</h2>
 					<ul>
 						<li><a href="" title="Help Using Finding Aids">Help Using Finding Aids</a></li>
-                        <li><a href="<?= $baseURL ?>/marbl-collections.html" title="Introduction to Collections">Introduction to Collections</a></li>
+                        <li><a href="<?= $baseURL ?>/introduction-to-collections.html" title="Introduction to Collections">Introduction to Collections</a></li>
                         <li><a href="<?= $baseURL ?>/using-marbl.html" title="Using MARBL">Using MARBL</a></li>
-                        <li><a href="" title="Visiting MARBL">Visiting MARBL</a></li>
+                        <li><a href="<?= $baseURL ?>/for-visiting-researchers.html" title="Visiting MARBL">Visiting MARBL</a></li>
                         <li><a href="http://www.library.emory.edu" title="Emory Libraries Catalog" onclick="target='_blank'">Emory Libraries Catalog</a></li>
 					</ul>
 				</div>
