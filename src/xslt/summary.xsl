@@ -1,4 +1,5 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+  xmlns:exist="http://exist.sourceforge.net/NS/exist" 
 	version="1.0">
 
   <!-- summary mode:
