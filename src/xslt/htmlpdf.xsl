@@ -269,15 +269,18 @@
      <xsl:attribute name="column-width"><xsl:value-of select="$colwidth"/>in</xsl:attribute>
    </fo:table-column>
  </xsl:template>
-
+ 
+ <!-- NOTE: setting keep-together="always" implicitly sets 
+      keep-together.within-line="always" as of FOP 0.94, which keeps table contents from wrapping.
+      Hopefully a keep-together strength of 5 is sufficient for our needs.  -->
  <xsl:template match="tr">
-   <fo:table-row keep-together="always">
+   <fo:table-row keep-together="5">
      <xsl:apply-templates/>
    </fo:table-row>
  </xsl:template>
 
 <xsl:template match="tr[th]">
-   <fo:table-row keep-together="always" keep-with-next="always" space-after="5pt">
+   <fo:table-row keep-together="5" keep-with-next="always" space-after="5pt">
      <xsl:apply-templates/>
    </fo:table-row>
  </xsl:template>
