@@ -12,7 +12,7 @@ global $baseURL;
 <!-- begin header --><!-- #BeginLibraryItem "/Library/header.lbi" -->
         <div id="header">
             <div id="headerPics">
-                <a href="index.html" title="Emory MARBL"><img src="<?= $baseURL ?>/img/marbl-logo.jpg" id="marblLogo" alt="MARBL - Manuscript, Archives &amp; Rare Book Library" /></a>
+                <a href="<?= $baseURL ?>/index.html" title="Emory MARBL"><img src="<?= $baseURL ?>/img/marbl-logo.jpg" id="marblLogo" alt="MARBL - Manuscript, Archives &amp; Rare Book Library" /></a>
                 <div id="utilityLinks">
                     <a href="<?= $baseURL ?>/support-marbl.html" title="SUPPORT MARBL">SUPPORT MARBL</a>
                     <a href="<?= $baseURL ?>/contact-marbl.html" title="CONTACT US">CONTACT US</a>
