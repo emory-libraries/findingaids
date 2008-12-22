@@ -49,7 +49,7 @@
 	</xsl:template>
 	
 	<xsl:template match="record">
-		<div>			
+		<div id="record">			
 			<xsl:apply-templates select="name"/>
 			<xsl:apply-templates select="unittitle"/><br />
 			<xsl:apply-templates select="physdesc"/>
