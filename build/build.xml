@@ -26,7 +26,7 @@ unique -->
   <input message="What repository are you building documents for (default: emory)?${line.separator} "
 	addproperty="repo"
 	defaultvalue="emory"
-	validargs="emory,boston,wakeforest,ransom,delaware,wash-sl,southernillinois,pennstate,berg,"/>
+	validargs="emory,boston,wakeforest,ransom,delaware,wash-sl,southernillinois,pennstate,berg,emory/pitts,emory/emoryarchives,"/>
 
 <!-- Note: last 'empty' validarg is neede for input to accept 'return'
 	& use default value -->
