@@ -60,7 +60,8 @@ html_head($doctitle);
 include("web/html/template-header.inc");
 print $crumbs;
 
-$declare = 'import module namespace phrase="http://www.library.emory.edu/xquery/phrase" at
+$declare = "declare option exist:serialize 'highlight-matches=all';";
+$declare .= 'import module namespace phrase="http://www.library.emory.edu/xquery/phrase" at
 "xmldb:exist:///db/xquery-modules/phrase.xqm"; ';
 $for = ' for $a in /ead';
 $let = "\n" . 'let $b := $a/eadheader ' . "\n";

@@ -1,6 +1,7 @@
 module namespace eadxq = "http://www.library.emory.edu/xquery/eadxq";
 
 declare namespace text = "http://exist-db.org/xquery/text";
+declare option exist:serialize 'highlight-matches=all';
 
 import module namespace phrase="http://www.library.emory.edu/xquery/phrase" at
     "xmldb:exist:///db/xquery-modules/phrase.xqm";

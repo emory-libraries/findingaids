@@ -62,7 +62,8 @@ if ($letter != 'all') {
 	$letter_search = "";
 }
 
-$data_qry = "
+$data_qry = "declare option exist:serialize 'highlight-matches=all';";
+$data_qry .= "
 	for \$a in /ead
 	let \$sort-title := concat(\$a/archdesc/did/origination/persname,\$a/archdesc/did/origination/corpname,
 			\$a/archdesc/did/origination/famname,\$a/archdesc/did[not(exists(origination/*))]/unittitle) 

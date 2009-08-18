@@ -71,9 +71,9 @@ else $phrase = '';
 $keywords = preg_replace("/\s*\"[^\"]+\"\s*/", "", $kw);
 
 
-
+$xquery = "declare option exist:serialize 'highlight-matches=all';";
 //$xquery = $eadxq . 'let $a := ' . "/ead${orfilter}${path}[@id = '$id'] " . '
-$xquery = $eadxq . "\n" .  'let $a := ' . "//${element}[@id = '$id'] " . '
+$xquery .= $eadxq . "\n" .  'let $a := ' . "//${element}[@id = '$id'] " . '
 let $ead := root($a)/ead  
 return <results> 
    {eadxq:toc($ead, "' . $keywords . '", "' . $phrase . '") } 
