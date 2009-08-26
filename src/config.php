@@ -2,7 +2,7 @@
 
 /* Configuration settings for entire site */
 
-$in_production = false;
+$in_production = true;
 
 // set level of php error reporting (warnings should be turned off in production)
 if (! $in_production) {
@@ -26,7 +26,7 @@ if ($in_production) {
   $server = "wilson.library.emory.edu";  	// test
 }
 
-$port = "8080";
+$port = "7080";
 $db = "FindingAids/emory";
 
 $connectionArray = array('host'   => $server,
