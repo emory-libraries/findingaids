@@ -2,7 +2,7 @@
 
 /* Configuration settings for entire site */
 
-$in_production = false;
+$in_production = true;
 
 // set level of php error reporting (warnings should be turned off in production)
 if (! $in_production) {
@@ -20,12 +20,13 @@ $tmpdir = "/tmp/findingaids/";
 $fop = "http://localhost:8080/fop/fop?fo=";
 
 /* exist settings  */
+$port = "8080";
 if ($in_production) {
   $server = "bohr.library.emory.edu";		//production
+  $port = "8080";
 } else {
   $server = "wilson.library.emory.edu";  	// test
 }
-$port = "8080";
 $db = "FindingAids";
 
 $connectionArray = array('host'   => $server,
