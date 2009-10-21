@@ -290,9 +290,11 @@ $connectionArray{"debug"} = false;
 if ($kw != '') 
   $xsl_params = array("url_suffix"  => "&keyword=$kw");
 	
-	
+//adding highlighting for eXist 1.2.6
+
+        $hi = "declare option exist:serialize 'highlight-matches=all';";
 	//$xquery = "$declare <results>{ $toc_query } { $query }</results>";
-	$xquery = "<results>{ $toc_query } { $query }</results>";
+	$xquery = "$hi <results>{ $toc_query } { $query }</results>";
 	//echo "$xquery<hr>";
 	$rval = $tamino->xquery(trim($xquery));
 	$tamino->xslTransform($xsl_file, $xsl_params);

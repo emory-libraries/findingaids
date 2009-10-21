@@ -65,7 +65,7 @@ print $crumbs;
 // query to limit finding aids to irish subjects for delmas 
 //$irishfilter = "controlaccess//subject |= 'irish ireland'";
 
-
+$hi = 'declare option exist:serialize "highlight-matches=all";';
 $for = 'for $a in collection(' . $coll . ')/ead[' . $irishfilter . ']';
 $let = "\n" . 'let $b := $a/eadheader
 let $matchcount := text:match-count($a)';
@@ -131,7 +131,7 @@ $xsl_file  = "xslt/results.xsl";
 $countquery = "<total>{count($for$filter $where return \$a)}</total>";
 //$query = " <results>{ $countquery } { " . "$for$filter $let $order $where $return </record> " . "}</results>";
 // exist automatically calculates the total number of matches
-$query = " $for$filter $let $where $order $return </record> ";
+$query = " $hi $for$filter $let $where $order $return </record> ";
 
 
 $xmldb->xquery($query, $position, $maxdisplay); 
