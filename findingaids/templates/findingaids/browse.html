@@ -1,0 +1,33 @@
+{% if findingaids %}
+    <ul>
+    {% for fa in findingaids.object_list %}
+        <li>
+	    title: {{ fa.title }} <br/>
+	    author:{{ fa.author }} <br/>
+	    unit title: {{ fa.unittitle }} <br/>
+	    abstract: {{ fa.abstract }} <br/>	
+	    phys desc: {{ fa.physical_desc }} <br/>		
+        </li>
+    {% endfor %}
+   </ul>
+{% else %}
+    <p>No finding aids found.</p>
+{% endif %}
+
+
+{# copied from django pagination documentation  #}
+<div class="pagination">
+    <span class="step-links">
+        {% if findingaids.has_previous %}
+            <a href="?page={{ findingaids.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ findingaids.number }} of {{ findingaids.paginator.num_pages }}.
+        </span>
+
+        {% if findingaids.has_next %}
+            <a href="?page={{ findingaids.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
