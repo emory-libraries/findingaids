@@ -12,10 +12,12 @@ def browse_by_letter(request, letter):
     "Paginated list of finding aids by first letter in list title"
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['id',
                     'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc'])
-    return _paginated_browse(request, fa)
+    first_letters = FindingAid.objects.only(['first_letter']).order_by('list_title').distinct()
+    return _paginated_browse(request, fa, letters=first_letters)
+    return _paginated_browse(request, fa, letters=first_letters, current_letter=letter)
 
 # object pagination - adapted directly from django paginator documentation
-def _paginated_browse(request, fa):
+def _paginated_browse(request, fa, letters=None, current_letter=None):
     paginator = Paginator(fa, 10)	# FIXME: should num per page be configurable?
      # Make sure page request is an int. If not, deliver first page.
     try:
@@ -31,7 +33,9 @@ def _paginated_browse(request, fa):
 
 
     return render_to_response('findingaids/list.html', { 'findingaids' : findingaids,
-                                                           'xquery': fa.query.getQuery() })
+                                                         'xquery': fa.query.getQuery(),
+                                                         'letters': letters,
+                                                         'current_letter': current_letter})
     
 def view_fa(request, id):
     "View a single finding aid"

@@ -1,3 +1,7 @@
+{% if letters %}
+  {% include "findingaids/browse_letters.html" %}
+{% endif %}
+
 <p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found, 
 displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
 
