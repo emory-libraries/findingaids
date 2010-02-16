@@ -1,0 +1,45 @@
+{{ findingaid.title }}
+
+<p>Table of contents:</p>
+<ul>
+ <li>Descriptive Summary</li>
+ <li>Administrative Information</li>
+ <li>Collection Description</li> 
+ <li>Selected Search Terms</li>
+</ul>
+
+<p>Description of Series</p>
+
+<hr/>
+
+<p>Descriptive Summary</p>
+
+  <table id="descSummary"> <!-- macquarium css id  -->
+    <col width="20%" align="left" valign="top"/>
+    <col width="80%" align="left" valign="top"/>
+
+     <!-- display the following fields, in this specific order -->
+{# FIXME: which fields may not always be present? #}
+      <tr><td>Creator:</td><td>{{ findingaid.archdesc.origination }}</td></tr>
+      <tr><td>Title:</td><td> {{ findingaid.unittitle }} </td></tr>
+      <tr><td>Call Number:</td><td>{{ findingaid.archdesc.unitid }}</td></tr>
+      <tr><td>Extent:</td><td>{{ findingaid.archdesc.extent }}</td></tr>
+   {% if findingaid.archdesc.location %}
+      <tr><td>Location:</td><td>{{ findingaid.archdesc.location }}</td></tr>
+   {% endif %}
+      <tr><td>Abstract:</td><td>{{ findingaid.abstract }}</td></tr>
+      <tr><td>Language:</td><td>{{ findingaid.archdesc.langmaterial }} </td></tr>
+  </table>
+
+<hr/>
+
+<p>Administrative Information</p>
+ {% for section in findingaid.admin_info %}
+   <div>
+   	<h3>{{ section.label }}</h3>
+	{% for para in section.content %}
+	    <p>{{para}}</p>
+	{% endfor %}
+   </div>
+ {% endfor %}
+

@@ -6,11 +6,10 @@ def browse(request):
     fa = FindingAid.objects.only(['title', 'author', 'unittitle', 'abstract', 'physical_desc']).all()
     return _paginated_browse(request, fa)       
 
-def letter_browse(request, letter):  
-    fa = FindingAid.objects.filter(title__startswith=letter).order_by('title').only(['title', 'author', 'unittitle', 'abstract', 'physical_desc'])
+def browse_by_letter(request, letter):  
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['id',
+                    'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc'])
     return _paginated_browse(request, fa)
-    return render_to_response('findingaids/browse.html', { 'findingaids' : fa,
-                                                           'xquery': fa.query.getQuery() })
 
 
 # object pagination - adapted directly from django paginator documentation
@@ -29,6 +28,10 @@ def _paginated_browse(request, fa):
         findingaids = paginator.page(paginator.num_pages)
 
 
-    return render_to_response('findingaids/browse.html', { 'findingaids' : findingaids,
+    return render_to_response('findingaids/list.html', { 'findingaids' : findingaids,
                                                            'xquery': fa.query.getQuery() })
     
+def view_fa(request, id):
+    "View a single finding aid."
+    fa = FindingAid.objects.get(id=id)
+    return render_to_response('findingaids/view.html', { 'findingaid' : fa })

@@ -1,0 +1,33 @@
+<p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found, 
+displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
+
+{% for fa in findingaids.object_list %}
+  <div>
+    <p><a href="{% url findingaids.fa.views.view_fa fa.id %}">{{ fa.list_title }}</a> </p>	
+    {% ifnotequal fa.title fa.list_title %} {# FIXME: whitespace variations breaking this?? #}
+	<p>{{ fa.title }}</p>
+    {% endifnotequal %}
+    <p>{{ fa.physical_desc }}</p>
+    <p class="abstract">{{ fa.abstract }}</p>	
+  </div>
+{% empty %}
+ <div>No finding aids found.</div>
+{% endfor %}
+
+
+{# copied from django pagination documentation ... probably should be better styled  #}
+<div class="pagination">
+    <span class="step-links">
+        {% if findingaids.has_previous %}
+            <a href="?page={{ findingaids.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ findingaids.number }} of {{ findingaids.paginator.num_pages }}.
+        </span>
+
+        {% if findingaids.has_next %}
+            <a href="?page={{ findingaids.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
