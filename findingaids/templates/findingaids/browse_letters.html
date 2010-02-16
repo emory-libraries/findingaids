@@ -1,0 +1,9 @@
+<p>Browse Finding Aids:</p>
+
+<ul>
+ {% for l in letters %}
+   <li><a href="{% url findingaids.fa.views.browse_by_letter l %}">{{ l }}</li>
+  {% empty %}
+   <li>No letters found</li>
+{% endfor %}
+</ul>

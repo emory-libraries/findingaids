@@ -2,19 +2,21 @@ from django.shortcuts import render_to_response
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from findingaids.fa.models import FindingAid
 
-def browse(request):  
-    fa = FindingAid.objects.only(['title', 'author', 'unittitle', 'abstract', 'physical_desc']).all()
-    return _paginated_browse(request, fa)       
+def browse(request):
+    "List all first letters in finding aid list title, link to browse by letter."
+    first_letters = FindingAid.objects.only(['first_letter']).order_by('list_title').distinct()
+    return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
+                                                           'xquery': first_letters.query.getQuery() })
 
-def browse_by_letter(request, letter):  
+def browse_by_letter(request, letter):
+    "Paginated list of finding aids by first letter in list title"
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['id',
                     'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc'])
     return _paginated_browse(request, fa)
 
-
 # object pagination - adapted directly from django paginator documentation
 def _paginated_browse(request, fa):
-    paginator = Paginator(fa, 10)
+    paginator = Paginator(fa, 10)	# FIXME: should num per page be configurable?
      # Make sure page request is an int. If not, deliver first page.
     try:
         page = int(request.GET.get('page', '1'))
@@ -32,6 +34,6 @@ def _paginated_browse(request, fa):
                                                            'xquery': fa.query.getQuery() })
     
 def view_fa(request, id):
-    "View a single finding aid."
+    "View a single finding aid"
     fa = FindingAid.objects.get(id=id)
     return render_to_response('findingaids/view.html', { 'findingaid' : fa })

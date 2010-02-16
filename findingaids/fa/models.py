@@ -9,9 +9,13 @@ from eulcore.django.existdb.db import ExistDB
 # currently just a wrapper around ead xmlmap object,
 # with a exist queryset initialized using django-exist settings and ead model
 
+
 class FindingAid(ead):
+    list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(exists(origination/node()))]/unittitle"
+    
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
-    list_title = xmlmap.XPathString("./archdesc/did/origination/node()|./archdesc/did[not(exists(origination/node()))]/unittitle")
+    list_title = xmlmap.XPathString(list_title_xpath)
+    first_letter = xmlmap.XPathString("substring(%s,1,1)" % list_title_xpath)
     objects = QuerySet(model=ead, xpath="/ead", using=ExistDB(),
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
