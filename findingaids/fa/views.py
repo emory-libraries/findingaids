@@ -13,7 +13,6 @@ def browse_by_letter(request, letter):
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['id',
                     'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc'])
     first_letters = FindingAid.objects.only(['first_letter']).order_by('list_title').distinct()
-    return _paginated_browse(request, fa, letters=first_letters)
     return _paginated_browse(request, fa, letters=first_letters, current_letter=letter)
 
 # object pagination - adapted directly from django paginator documentation

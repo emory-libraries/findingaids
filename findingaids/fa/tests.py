@@ -45,7 +45,6 @@ class FindingAidTestCase(TestCase):
         self.assertEqual("B", self.findingaid['bailey807'].first_letter)
 
 
-
 class FaViewsTest(TestCase):
 
     def setUp(self):
@@ -64,7 +63,7 @@ class FaViewsTest(TestCase):
     def tearDown(self):
         self.db.removeCollection(settings.EXISTDB_ROOT_COLLECTION)
         
-    def test_browse(self):
+    def test_browse_letter_list(self):
         response = self.client.get('/browse')
         self.assertEquals(response.status_code, 200)
 
@@ -79,11 +78,18 @@ class FaViewsTest(TestCase):
         # should not include first letters not present in the data
         self.assertContains(response, 'href="/browse/Z"', 0)
 
+    def test_browse_by_letter(self):
+        response = self.client.get('/browse/A')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, 'href="/view/abbey244')
+        self.assertContains(response, '<p class="abstract">Collection of play scripts')
+        # test pagination ?
+        
+        # test current letter
+        # TODO regex test?  remove whitespace to test better?
+        self.assertContains(response, "<li class='active'>")
 
-#    def test_basic_get(self):
-#        data = {'var': u'\xf2'}
-#        response = self.client.get('/search/', data)
-#        self.assertEquals(response.status_code, 200)
-
-
+        # no finding aids
+        response = self.client.get('/browse/Z')
+        self.assertContains(response, '<div>No finding aids found.</div>')
 

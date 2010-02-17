@@ -2,7 +2,7 @@
 
 <ul>
  {% for l in letters %}
-   <li {% ifequal l current_letter %} class='active' {% endifequal %}>
+   <li{% ifequal l current_letter %} class='active'{% endifequal %}>
 	<a href="{% url findingaids.fa.views.browse_by_letter l %}">{{ l }}</a>
    </li>
   {% empty %}
