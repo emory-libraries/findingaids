@@ -1,6 +1,6 @@
 from django.conf import settings
 from eulcore import xmlmap
-from eulcore.xmlmap.eadmap import ead
+from eulcore.xmlmap.eadmap import EncodedArchivalDescription as ead
 from eulcore.existdb.query import QuerySet
 from eulcore.django.existdb.db import ExistDB 
 
@@ -10,12 +10,19 @@ from eulcore.django.existdb.db import ExistDB
 # with a exist queryset initialized using django-exist settings and ead model
 
 
+class XPathBareString(xmlmap.XPathString):
+    # extend xpath string to create a version that does *no* node conversion at all
+    # (e.g., xpath returns string and not node)
+    def convert_node(self, node):
+        return node
+
 class FindingAid(ead):
-    list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(exists(origination/node()))]/unittitle"
+    list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
     
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
     list_title = xmlmap.XPathString(list_title_xpath)
-    first_letter = xmlmap.XPathString("substring(%s,1,1)" % list_title_xpath)
+    # first letter of title field - using generic descriptor because no string() conversion is needed
+    first_letter = XPathBareString("substring(%s,1,1)" % list_title_xpath)
     objects = QuerySet(model=ead, xpath="/ead", using=ExistDB(),
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
@@ -39,6 +46,22 @@ class FindingAid(ead):
         if self.archdesc.preferred_citation:
             info.append(self.archdesc.preferred_citation)
         return info
+
+    def collection_description(self):
+        # generate a list of collection description fields - to be displayed, in the proper order
+        fields = []
+        if self.archdesc.biography_history:
+            fields.append(self.archdesc.biography_history)
+        if self.archdesc.bibliography:
+            fields.append(self.archdesc.bibliography)
+        if self.archdesc.scope_content:
+            fields.append(self.archdesc.scope_content)
+        if self.archdesc.arrangement:
+            fields.append(self.archdesc.arrangement)
+        if self.archdesc.other:
+            fields.append(self.archdesc.other)
+
+        return fields
 
 
 FindingAid.objects.model = FindingAid
