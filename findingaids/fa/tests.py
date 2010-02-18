@@ -50,7 +50,6 @@ class FaViewsTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.db = ExistDB()
-        self.db.createCollection(settings.EXISTDB_ROOT_COLLECTION, True)
 
         #traverse exist_fixtures and load all xml files
         module_path = path.split(__file__)[0]
@@ -61,7 +60,7 @@ class FaViewsTest(TestCase):
             self.db.load(open(fixture), exist_fname, True)
 
     def tearDown(self):
-        self.db.removeCollection(settings.EXISTDB_ROOT_COLLECTION)
+        pass
         
     def test_browse_letter_list(self):
         response = self.client.get('/browse')
