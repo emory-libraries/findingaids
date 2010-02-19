@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response
+from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from findingaids.fa.models import FindingAid
 
@@ -10,7 +11,7 @@ def browse(request):
 
 def browse_by_letter(request, letter):
     "Paginated list of finding aids by first letter in list title"
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['id',
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['eadid',
                     'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc'])
     first_letters = FindingAid.objects.only(['first_letter']).order_by('list_title').distinct()
     return _paginated_browse(request, fa, letters=first_letters, current_letter=letter)
@@ -33,10 +34,14 @@ def _paginated_browse(request, fa, letters=None, current_letter=None):
 
     return render_to_response('findingaids/list.html', { 'findingaids' : findingaids,
                                                          'xquery': fa.query.getQuery(),
+                                                         'querytime': fa.queryTime(),
                                                          'letters': letters,
                                                          'current_letter': current_letter})
     
 def view_fa(request, id):
     "View a single finding aid"
-    fa = FindingAid.objects.get(id=id)
+    try:
+        fa = FindingAid.objects.get(eadid=id)
+    except Exception:       # FIXME: need queryset to raise a specific exception here?
+        raise Http404
     return render_to_response('findingaids/view.html', { 'findingaid' : fa })

@@ -7,7 +7,7 @@ displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
 
 {% for fa in findingaids.object_list %}
   <div>
-    <p><a href="{% url findingaids.fa.views.view_fa fa.id %}">{{ fa.list_title }}</a> </p>	
+    <p><a href="{% url findingaids.fa.views.view_fa fa.eadid %}">{{ fa.list_title }}</a> </p>	
     {% ifnotequal fa.title fa.list_title %} {# FIXME: whitespace variations breaking this?? #}
 	<p>{{ fa.title }}</p>
     {% endifnotequal %}
@@ -35,3 +35,6 @@ displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
         {% endif %}
     </span>
 </div>
+
+
+{% if querytime %} <p>Query took {{ querytime }}ms </p> {% endif %}

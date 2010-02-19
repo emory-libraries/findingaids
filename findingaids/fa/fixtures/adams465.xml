@@ -1,0 +1,140 @@
+<ead id="adams465_10078" relatedencoding="MARC21">
+    <eadheader countryencoding="iso3166-1" dateencoding="iso8601" id="adams465_10018" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
+        <eadid countrycode="us" identifier="adams465.xml" mainagencycode="geu-s">adams465.xml</eadid>
+        <filedesc id="adams465_10012">
+            <titlestmt id="adams465_1003">
+                <titleproper encodinganalog="Title" id="adams465_1001">W.H. Adams reminiscences,
+			 1861-1865</titleproper>
+                <author encodinganalog="Creator" id="adams465_1002">Manuscript, Archives, and Rare Book
+			 Library, Emory University</author>
+            </titlestmt>
+            <publicationstmt id="adams465_10011">
+                <publisher encodinganalog="Publisher" id="adams465_1004">Emory University</publisher>
+                <address id="adams465_1009">
+                    <addressline id="adams465_1005">Manuscript, Archives, and Rare Book
+				Library</addressline>
+                    <addressline id="adams465_1006">Atlanta, GA 30322</addressline>
+                    <addressline id="adams465_1007">404-727-6887</addressline>
+                    <addressline id="adams465_1008">Fax: 404-727-0360</addressline>
+                </address>
+                <date encodinganalog="Date" id="adams465_10010" normal="2006-02-22">February 22,
+			 2006</date>
+            </publicationstmt>
+        </filedesc>
+        <profiledesc id="adams465_10017">
+            <creation id="adams465_10014">Finding aid encoded, 
+		  <date encodinganalog="Date" id="adams465_10013" normal="2006-02-22">February 22,
+			 2006</date>
+            </creation>
+            <langusage id="adams465_10016">
+                <language encodinganalog="Language" id="adams465_10015" langcode="eng" scriptcode="latn">English</language>
+            </langusage>
+        </profiledesc>
+    </eadheader>
+    <archdesc id="adams465_10077" level="collection" relatedencoding="MARC21">
+        <did id="adams465_10031">
+            <origination id="adams465_10020">
+                <persname encodinganalog="100" id="adams465_10019" source="lcnaf">Adams, W.
+			 H.</persname>
+            </origination>
+            <unittitle encodinganalog="245$a" id="adams465_10022">W.H. Adams reminiscences, 
+		  <unitdate encodinganalog="245$f" id="adams465_10021" normal="1861/1865" type="inclusive">1861-1865</unitdate>
+            </unittitle>
+            <unitid countrycode="us" id="adams465_10023" repositorycode="geu-s">Manuscript Collection No.
+		  465</unitid>
+            <physdesc encodinganalog="300" id="adams465_10025">
+                <extent id="adams465_10024">1 microfilm reel
+		  (MF)</extent>
+            </physdesc>
+            <abstract id="adams465_10026">Microfilm copy of the Civil War reminiscences written in verse
+		  by W.H. Adams of Loudoun County, Virginia, who served in the 8th Virginia
+		  Infantry Regiment.</abstract>
+            <langmaterial encodinganalog="546" id="adams465_10028">Materials entirely in
+		  <language id="adams465_10027" langcode="eng">English</language>.</langmaterial>
+            <repository encodinganalog="852" id="adams465_10030">Emory University<subarea id="adams465_10029">Manuscript,
+		  Archives, and Rare Book Library</subarea>
+            </repository>
+        </did>
+        <acqinfo encodinganalog="541" id="adams465_10034">
+            <head id="adams465_10032">Source</head>
+            <p id="adams465_10033">Loaned for microfilming, 1965.</p>
+        </acqinfo>
+        <accessrestrict encodinganalog="506" id="adams465_10037">
+            <head id="adams465_10035">Restrictions on Access</head>
+            <p id="adams465_10036">Unrestricted access.</p>
+        </accessrestrict>
+        <userestrict encodinganalog="540">
+            <head id="adams465_10038">Terms Governing Use and Reproduction</head>
+            <p id="adams465_10039">All requests subject to limitations noted in departmental policies on
+		  reproduction.</p>
+        </userestrict>
+        <prefercite encodinganalog="524" id="adams465_10042">
+            <head id="adams465_10040">Citation</head>
+            <p id="adams465_10041">[after identification of item(s)], W.H. Adams reminiscences,
+		  Manuscript, Archives and Rare Book Library, Emory University.</p>
+        </prefercite>
+        <processinfo id="adams465_10049">
+            <head id="adams465_10043">Processing</head>
+            <p id="adams465_10044">Processed by MRD, 1965.</p>
+            <note id="adams465_10046">
+                <p id="adams465_10045">Control level 2</p>
+            </note>
+            <note id="adams465_10048">
+                <p id="adams465_10047">File name: adams465.doc</p>
+            </note>
+        </processinfo>
+        <bioghist encodinganalog="545" id="adams465_10052">
+            <head id="adams465_10050">Biographical Note</head>
+            <p id="adams465_10051">W. H. Adams was a private in the Confederate States of America Army,
+		  Virginia Infantry Regiment, 8th, Company D during the Civil War and
+		  participated in battles from First Manassas through Appomattox. He lived in or
+		  near the Waunkopin Valley in Loudoun County, Virginia. He joined the Champe
+		  Rifles (recruited from Middleburg and Aldie) and went with that outfit to
+		  Leesburg to become part of the 8th Regiment. There they went into camp and
+		  drilled, each of the companies numbering about eighty men, but had no actual
+		  practice with guns until their participation at Manassas.</p>
+        </bioghist>
+        <scopecontent encodinganalog="520" id="adams465_10055">
+            <head id="adams465_10053">Scope and Content Note</head>
+            <p id="adams465_10054">The collection consists of a microfilm copy of two manuscript volumes
+		  of reminiscences of W.H. Adams from 1861-1865, each volume containing
+		  approximately 50 written pages. The reminiscences are in verse, each group of
+		  stanzas bearing as a title the name of a place, a river, or a battle, beginning
+		  with his home community in Loudoun Valley, "Waunkopin Valley", then running
+		  from "First Manassas" through "Appomattox" and ending with "Homeward Bound" and
+		  "Waunkopin Valley" again.</p>
+        </scopecontent>
+        <controlaccess id="adams465_10076">
+            <head id="adams465_10056">Selected Search Terms</head>
+            <controlaccess id="adams465_10059">
+                <head id="adams465_10057">Corporate Names</head>
+                <corpname encodinganalog="610" id="adams465_10058" source="lcnaf">Confederate States of
+			 America. Army. Virginia Infantry Regiment, 8th. Company D.</corpname>
+            </controlaccess>
+            <controlaccess id="adams465_10064">
+                <head id="adams465_10060">Topical Terms</head>
+                <subject encodinganalog="650" id="adams465_10061" source="lcsh">Appomattox Campaign,
+			 1865.</subject>
+                <subject encodinganalog="650" id="adams465_10062" source="lcsh">Bull Run, 1st Battle of,
+			 Va., 1861.</subject>
+                <subject encodinganalog="650" id="adams465_10063" source="lcsh">American poetry.</subject>
+            </controlaccess>
+            <controlaccess id="adams465_10068">
+                <head id="adams465_10065">Geographic Names</head>
+                <geogname encodinganalog="651" id="adams465_10066">United States--History--Civil War,
+			 1861-1865--Campaigns.</geogname>
+                <geogname encodinganalog="651" id="adams465_10067">United States--History--Civil War,
+			 1861-1865--Personal narratives, Confederate.</geogname>
+            </controlaccess>
+            <controlaccess id="adams465_10072">
+                <head id="adams465_10069">Form/Genre Terms</head>
+                <genreform encodinganalog="655" id="adams465_10070" source="aat">Poems.</genreform>
+                <genreform encodinganalog="655" id="adams465_10071" source="aat">Reminiscences.</genreform>
+            </controlaccess>
+            <controlaccess id="adams465_10075">
+                <head id="adams465_10073">Occupation</head>
+                <occupation encodinganalog="656" id="adams465_10074" source="aat">Soldier.</occupation>
+            </controlaccess>
+        </controlaccess>
+    </archdesc>
+</ead>
