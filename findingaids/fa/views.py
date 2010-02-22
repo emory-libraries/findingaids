@@ -3,13 +3,13 @@ from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from findingaids.fa.models import FindingAid, Series, Subseries
 
-def browse(request):
+def browse_titles(request):
     "List all first letters in finding aid list title, link to browse by letter."
     first_letters = FindingAid.objects.only(['first_letter']).order_by('list_title').distinct()
     return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
                                                            'xquery': first_letters.query.getQuery() })
 
-def browse_by_letter(request, letter):
+def titles_by_letter(request, letter):
     "Paginated list of finding aids by first letter in list title"
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['eadid',
                     'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc'])

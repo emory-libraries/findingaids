@@ -64,25 +64,25 @@ class FaViewsTest(TestCase):
     def tearDown(self):
         pass
         
-    def test_browse_letter_list(self):
-        response = self.client.get('/browse')
+    def test_title_letter_list(self):
+        response = self.client.get('/titles')
         self.assertEquals(response.status_code, 200)
 
-        response = self.client.get('/browse/')
+        response = self.client.get('/titles/')
         self.assertEquals(response.status_code, 200)
 
         # first letters from 4 test documents
-        self.assertContains(response, 'href="/browse/A"')
-        self.assertContains(response, 'href="/browse/B"')
-        self.assertContains(response, 'href="/browse/L"')
-        self.assertContains(response, 'href="/browse/R"')
+        self.assertContains(response, 'href="/titles/A"')
+        self.assertContains(response, 'href="/titles/B"')
+        self.assertContains(response, 'href="/titles/L"')
+        self.assertContains(response, 'href="/titles/R"')
         # should not include first letters not present in the data
-        self.assertContains(response, 'href="/browse/Z"', 0)
+        self.assertContains(response, 'href="/titles/Z"', 0)
 
-    def test_browse_by_letter(self):
-        response = self.client.get('/browse/A')
+    def test_titles_by_letter(self):
+        response = self.client.get('/titles/A')
         self.assertEquals(response.status_code, 200)
-        self.assertContains(response, 'href="/view/abbey244')
+        self.assertContains(response, 'href="/documents/abbey244')
         self.assertContains(response, '<p class="abstract">Collection of play scripts')
         self.assertContains(response, '2 finding aids found')
         # test pagination ?
@@ -92,15 +92,15 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "<li class='active'>")
 
         # no finding aids
-        response = self.client.get('/browse/Z')
+        response = self.client.get('/titles/Z')
         self.assertContains(response, '<div>No finding aids found.</div>')
 
     def test_view_notfound(self):
-        response = self.client.get('/view/nonexistent')
+        response = self.client.get('/documents/nonexistent')
         self.assertEquals(response.status_code, 404)
 
     def test_view_simple(self):
-        response = self.client.get('/view/leverette135.xml')
+        response = self.client.get('/documents/leverette135')
         self.assertEquals(response.status_code, 200)
         # title
         self.assert_(re.search('|<h1>Fannie Lee Leverette scrapbooks,\w+circa 1900-1948</h1>|',
@@ -150,7 +150,7 @@ class FaViewsTest(TestCase):
         self.assert_(re.search('|MF1.*4.*Family and personal photos|', response.content))
 
     def test_view_series(self):
-        response = self.client.get('/view/abbey244.xml')
+        response = self.client.get('/documents/abbey244')
         self.assertEquals(response.status_code, 200)
 
         # admin info fields not present in leverette
@@ -168,7 +168,7 @@ class FaViewsTest(TestCase):
         self.assert_(re.search('|<a href.*>Series 3: Other material, 1935-1941.*</a>|', response.content))
 
     def test_view_subseries(self):
-        response = self.client.get('/view/raoul548.xml')
+        response = self.client.get('/documents/raoul548')
         self.assertEquals(response.status_code, 200)
 
         # admin info fields not present in previous fixtures
@@ -192,7 +192,7 @@ class FaViewsTest(TestCase):
 
 
     def test_view_nodsc(self):
-        response = self.client.get('/view/adams465.xml')
+        response = self.client.get('/documents/adams465')
         self.assertEquals(response.status_code, 200)
 
         # record with no dsc - no container list or series

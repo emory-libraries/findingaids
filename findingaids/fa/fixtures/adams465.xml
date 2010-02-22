@@ -1,6 +1,6 @@
 <ead id="adams465_10078" relatedencoding="MARC21">
     <eadheader countryencoding="iso3166-1" dateencoding="iso8601" id="adams465_10018" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
-        <eadid countrycode="us" identifier="adams465.xml" mainagencycode="geu-s">adams465.xml</eadid>
+        <eadid countrycode="us" identifier="adams465.xml" mainagencycode="geu-s">adams465</eadid>
         <filedesc id="adams465_10012">
             <titlestmt id="adams465_1003">
                 <titleproper encodinganalog="Title" id="adams465_1001">W.H. Adams reminiscences,
