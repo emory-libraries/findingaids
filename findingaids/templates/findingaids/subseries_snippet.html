@@ -1,0 +1,21 @@
+{# expects series as component, eadid #}
+          <ul>	
+            {% for subcomponent in component.c %}   {# c02 #}
+            <li><a href="{% url findingaids.fa.views.view_subseries  id=eadid,series_id=component.id,subseries_id=subcomponent.id %}"> 
+		{% if subcomponent.did.unitid %}{{ subcomponent.did.unitid }}: {% endif %}
+                {{ subcomponent.did.unittitle }}</a>
+                {% if subcomponent.hasSubseries %}
+                  <ul>
+                    {% for subsub in subcomponent.c %}  {# c03 #}
+                    <li>{% if subsub.did.unitid %}{{ subsub.did.unitid }}: {% endif %}
+                        {{ subsub.did.unittitle }}
+
+                        {# FIXME: how many levels deep do we need to go?  how to handle more gracefully? #}
+
+                     </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+             </li>
+            {% endfor %}
+          </ul>

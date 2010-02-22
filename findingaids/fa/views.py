@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response
 from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Series, Subseries
 
 def browse(request):
     "List all first letters in finding aid list title, link to browse by letter."
@@ -45,3 +45,20 @@ def view_fa(request, id):
     except Exception:       # FIXME: need queryset to raise a specific exception here?
         raise Http404
     return render_to_response('findingaids/view.html', { 'findingaid' : fa })
+
+def view_series(request, id, series_id):
+    "View a single series (c01) from a finding aid"
+    try:
+        series = Series.objects.also(['eadid']).get(eadid=id,id=series_id)
+    except Exception:    
+        raise Http404
+    return render_to_response('findingaids/view_series.html', { 'series' : series })
+
+def view_subseries(request, id, series_id, subseries_id):
+    "View a single subseries (c02) from a finding aid"
+#    try:
+#        series = Subseries.objects.also(['eadid']).get(eadid=id,id=subseries_id)
+#    except Exception:    
+#        raise Http404
+    series = Subseries.objects.also(['eadid']).get(eadid=id,id=subseries_id)
+    return render_to_response('findingaids/view_series.html', { 'series' : series })

@@ -1,0 +1,31 @@
+{# display a single series or subseries of a finding aid #}
+<h1><a href="{% url findingaids.fa.views.view_fa series.eadid %}">{{ series.eadid }}</a></h1>
+
+{{ series.id }}<br/>
+top-level info/toc here...
+
+<h2>
+  {{ series.did.unitid }}<br/>
+  {{ series.did.unittitle }}  {{ series.did.unitdate|default:'' }} <br/>
+  {{ series.did.physdesc }}
+</h2>
+
+{% for section in series.series_info %}
+   <div>
+   	<h3>{{ section.head }}</h3>
+	{% for para in section.content %}
+	    <p>{{para}}</p>
+	{% endfor %}
+   </div>
+{% endfor %}
+
+{# container list or series/subseries listing #}
+{% if series.hasSubseries %}       {# list series/subseries here, display on separate page #}
+  {% with series as component %}
+    {% with series.eadid as eadid %}
+      {% include "findingaids/subseries_snippet.html" %}
+    {% endwith %}  {# eadid #}
+  {% endwith %}  {# series as component #}
+{% else %}
+  {% include "findingaids/containerlist_snippet.html" %}
+{% endif %}

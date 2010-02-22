@@ -1,6 +1,6 @@
 from django.conf import settings
 from eulcore import xmlmap
-from eulcore.xmlmap.eadmap import EncodedArchivalDescription as ead
+from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component
 from eulcore.existdb.query import QuerySet
 from eulcore.django.existdb.db import ExistDB 
 
@@ -16,14 +16,14 @@ class XPathBareString(xmlmap.XPathString):
     def convert_node(self, node):
         return node
 
-class FindingAid(ead):
+class FindingAid(EncodedArchivalDescription):
     list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
     
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
     list_title = xmlmap.XPathString(list_title_xpath)
     # first letter of title field - using generic descriptor because no string() conversion is needed
     first_letter = XPathBareString("substring(%s,1,1)" % list_title_xpath)
-    objects = QuerySet(model=ead, xpath="/ead", using=ExistDB(),
+    objects = QuerySet(model=EncodedArchivalDescription, xpath="/ead", using=ExistDB(),
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
     def admin_info(self):
@@ -67,3 +67,45 @@ class FindingAid(ead):
 FindingAid.objects.model = FindingAid
 
 
+class Series(Component):
+    eadid = xmlmap.XPathString("ancestor::ead/eadheader/eadid") 
+    objects = QuerySet(model=Component, xpath="//c01", using=ExistDB(), 
+                       collection=settings.EXISTDB_ROOT_COLLECTION)
+
+    def series_info(self):
+        fields = []
+        if self.biography_history:
+            fields.append(self.biography_history)
+        if self.scope_content:
+            fields.append(self.scope_content)
+        if self.arrangement:
+            fields.append(self.arrangement)
+        if self.other:
+            fields.append(self.other)
+        if self.use_restriction:
+            fields.append(self.use_restrict)
+        if self.access_restriction:
+            fields.append(self.access_restriction)
+        if self.alternate_form:
+            fields.append(self.alternate_form)
+        if self.originals_location:
+            fields.append(self.originals_location)
+        if self.bibliography:
+            fields.append(self.bibliography)
+
+        print fields
+        return fields
+
+
+# FIXME/TODO: inverse relation to ead object so we can use/filter on related fields like ead__eadid='x' ?
+
+# TODO: how to configure base ead class so component classtype can be overridden ?
+
+Series.objects.model = Series
+
+
+class Subseries(Series):
+    objects = QuerySet(model=Component, xpath="//c02", using=ExistDB(), 
+                       collection=settings.EXISTDB_ROOT_COLLECTION)
+
+Subseries.objects.model = Subseries

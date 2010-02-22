@@ -1,3 +1,4 @@
+{# main display page for a single finding aid; links to series & subseries, if any #}
 <h1>{{ findingaid.title }}</h1>
 
 <h2>Table of contents:</h2>
@@ -69,72 +70,14 @@
 
 {# container list or series/subseries listing #}
 <h2><a name="dsc">{{ findingaid.dsc.head }}</a></h2>
-{% if findingaid.dsc.hasSeries %}       {# list series/subseries here, display on separate page #}
-  <ul>
-  {% for component in findingaid.dsc.c %}
-    <li>{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
-        {{ component.did.unittitle }}        
-        {% if component.hasSubseries %}
-          <ul>
-            {% for subcomponent in component.c %}   {# c02 #}
-            <li>{% if subcomponent.did.unitid %}{{ subcomponent.did.unitid }}: {% endif %}
-                {{ subcomponent.did.unittitle }}
-                {% if subcomponent.hasSubseries %}
-                  <ul>
-                    {% for subsub in subcomponent.c %}  {# c03 #}
-                    <li>{% if subsub.did.unitid %}{{ subsub.did.unitid }}: {% endif %}
-                        {{ subsub.did.unittitle }}
-
-                        {# FIXME: how many levels deep do we need to go?  how to handle more gracefully? #}
-
-                     </li>
-                    {% endfor %}
-                  </ul>
-                {% endif %}
-             </li>
-            {% endfor %}
-          </ul>
-        {% endif %}
-     </li>
-  {% endfor %}
-  </ul>
+{% if findingaid.dsc.hasSeries %}       {# list series/subseries here,   display on separate page #}
+  {% with findingaid.dsc as series %}
+    {% with findingaid.eadid as eadid %}
+      {% include "findingaids/series_snippet.html" %}
+    {% endwith %}  {# eadid #}
+  {% endwith %}  {# dsc as series #}
 {% else %}
-    <table>
-        <col width="7%" align="left" valign="top"/>
-        <col width="7%" align="left" valign="top"/> {# FIXME: only if there is a container folder OR 2 containers? #}
-        <col width="86%"/>
-    {% for component in findingaid.dsc.c %}
-        {# FIXME: display box/folder heading if first container... #}
-        {# FIXME2: only display if there are no titles? #}
-        {% if 0 and forloop.first  %}
-          <tr class="box-folder">
-            <th>Box</th>
-            {# FIXME: only display folder label if there are folders -- how? #}
-             <th>Folder</th>
-             <th class="content">Content</th>
-           </tr>
-         {% endif %}
-
-        <tr>
-            {% for container in component.did.container %}
-            <td>{{ container }}</td>            
-            {% endfor %}
-            <td {% if not component.did.container %} style="font-weight:bold" colspan="3" {% endif %} > {# FIXME temporary style #}
-                {{ component.did.unittitle }} 
-                {{ component.did.physdesc|default:'' }}
-                {{ component.did.abstract|default:'' }}
-                {{ component.did.note|default:'' }}
-            </td>
-        </tr>
-        {% if not component.did.container %}
-        <tr class="box-folder">
-            <th>Box</th>
-            {# FIXME: only display folder label if there are folders -- how? #}
-             <th>Folder</th>
-             <th class="content">Content</th>
-         </tr>
-        {% endif %}
-
-    {% endfor %}
-      </table>
+  {% with findingaid.dsc as series %}
+    {% include "findingaids/containerlist_snippet.html" %}
+  {% endwith %}
 {% endif %}

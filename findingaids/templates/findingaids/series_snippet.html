@@ -1,0 +1,12 @@
+{# expects dsc/c01 as series, eadid #}
+<ul>
+  {% for component in series.c %}
+    <li><a href="{% url findingaids.fa.views.view_series id=eadid,series_id=component.id %}"> 
+	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+        {{ component.did.unittitle }}</a> 
+        {% if component.hasSubseries %}
+	  {% include "findingaids/subseries_snippet.html" %}
+        {% endif %}
+     </li>
+  {% endfor %}
+</ul>
