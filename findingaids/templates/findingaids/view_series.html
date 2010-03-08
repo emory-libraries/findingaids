@@ -1,5 +1,12 @@
 {# display a single series or subseries of a finding aid #}
-<h1><a href="{% url findingaids.fa.views.view_fa series.eadid %}">{{ series.eadid }}</a></h1>
+<h1><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}">{{ series.ead.title }}</a></h1>
+
+<h2>Table of contents:</h2>
+<ul>
+ <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#descriptive_summary">Descriptive Summary</a></li>
+ <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#administrative_information">Administrative Information</a></li>
+ <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#collection_description">Collection Description</a></li>
+</ul>
 
 {{ series.id }}<br/>
 top-level info/toc here...
