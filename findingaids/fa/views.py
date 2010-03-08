@@ -5,15 +5,15 @@ from findingaids.fa.models import FindingAid, Series, Subseries
 
 def browse_titles(request):
     "List all first letters in finding aid list title, link to browse by letter."
-    first_letters = FindingAid.objects.only(['first_letter']).order_by('list_title').distinct()
+    first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
     return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
                                                            'xquery': first_letters.query.getQuery() })
 
 def titles_by_letter(request, letter):
     "Paginated list of finding aids by first letter in list title"
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(['eadid',
-                    'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc'])
-    first_letters = FindingAid.objects.only(['first_letter']).order_by('list_title').distinct()
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only('eadid',
+                    'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc')
+    first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
     return _paginated_browse(request, fa, letters=first_letters, current_letter=letter)
 
 # object pagination - adapted directly from django paginator documentation
@@ -37,7 +37,6 @@ def _paginated_browse(request, fa, letters=None, current_letter=None):
                                                          'querytime': fa.queryTime(),
                                                          'letters': letters,
                                                          'current_letter': current_letter})
-    
 def view_fa(request, id):
     "View a single finding aid"
     try:
@@ -48,17 +47,20 @@ def view_fa(request, id):
 
 def view_series(request, id, series_id):
     "View a single series (c01) from a finding aid"
-    try:
-        series = Series.objects.also(['eadid']).get(eadid=id,id=series_id)
-    except Exception:    
+    try:    
+        series = Series.objects.also('ead__eadid', 'ead__title').get(ead__eadid=id,id=series_id)
+    except Exception:       # FIXME: need a more specific exception here...
         raise Http404
     return render_to_response('findingaids/view_series.html', { 'series' : series })
 
 def view_subseries(request, id, series_id, subseries_id):
     "View a single subseries (c02) from a finding aid"
+
+    # TODO: use series id for xquery, test that bogus series id results in 404
+    
 #    try:
 #        series = Subseries.objects.also(['eadid']).get(eadid=id,id=subseries_id)
 #    except Exception:    
 #        raise Http404
-    series = Subseries.objects.also(['eadid']).get(eadid=id,id=subseries_id)
+    series = Subseries.objects.also('eadid', 'ead_title').get(eadid=id,series__id=series_id,id=subseries_id)
     return render_to_response('findingaids/view_series.html', { 'series' : series })

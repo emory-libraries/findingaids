@@ -10,19 +10,17 @@ from eulcore.django.existdb.db import ExistDB
 # with a exist queryset initialized using django-exist settings and ead model
 
 
-class XPathBareString(xmlmap.XPathString):
-    # extend xpath string to create a version that does *no* node conversion at all
-    # (e.g., xpath returns string and not node)
-    def convert_node(self, node):
-        return node
-
 class FindingAid(EncodedArchivalDescription):
+    """
+      Customized version of eulcore.xmlmap.eadmap EAD object
+    """
+    
     list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
     
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
     list_title = xmlmap.XPathString(list_title_xpath)
     # first letter of title field - using generic descriptor because no string() conversion is needed
-    first_letter = XPathBareString("substring(%s,1,1)" % list_title_xpath)
+    first_letter = xmlmap.XPathItem("substring(%s,1,1)" % list_title_xpath)
     objects = QuerySet(model=EncodedArchivalDescription, xpath="/ead", using=ExistDB(),
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
@@ -68,7 +66,7 @@ FindingAid.objects.model = FindingAid
 
 
 class Series(Component):
-    eadid = xmlmap.XPathString("ancestor::ead/eadheader/eadid") 
+    ead = xmlmap.XPathNode("ancestor::ead", FindingAid)
     objects = QuerySet(model=Component, xpath="//c01", using=ExistDB(), 
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
@@ -105,6 +103,7 @@ Series.objects.model = Series
 
 
 class Subseries(Series):
+    series = xmlmap.XPathNode("parent::c01", Series) 
     objects = QuerySet(model=Component, xpath="//c02", using=ExistDB(), 
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
