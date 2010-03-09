@@ -4,7 +4,7 @@
     <li><a href="{% url findingaids.fa.views.view_series id=eadid,series_id=component.id %}"> 
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
         {{ component.did.unittitle }}</a> 
-        {% if component.hasSubseries %}
+        {% if component.hasSubseries and not hide_subseries %}
 	  {% include "findingaids/subseries_snippet.html" %}
         {% endif %}
      </li>

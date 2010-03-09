@@ -6,10 +6,24 @@
  <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#descriptive_summary">Descriptive Summary</a></li>
  <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#administrative_information">Administrative Information</a></li>
  <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#collection_description">Collection Description</a></li>
+ <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#control_access">{{ series.ead.archdesc.controlaccess.head }}</a></li>
+ 
 </ul>
 
-{{ series.id }}<br/>
-top-level info/toc here...
+<ul>
+  {% for component in all_series %}
+    <li>
+        {% ifequal series.id component.id %}
+           {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+            {{ component.did.unittitle }}
+        {% else %}
+           <a href="{% url findingaids.fa.views.view_series id=series.ead.eadid,series_id=component.id %}">
+            {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+                {{ component.did.unittitle }}</a>
+        {% endifequal %}
+     </li>
+  {% endfor %}
+</ul>
 
 <h2>
   {{ series.did.unitid }}<br/>
@@ -29,7 +43,7 @@ top-level info/toc here...
 {# container list or series/subseries listing #}
 {% if series.hasSubseries %}       {# list series/subseries here, display on separate page #}
   {% with series as component %}
-    {% with series.eadid as eadid %}
+    {% with series.ead.eadid as eadid %}
       {% include "findingaids/subseries_snippet.html" %}
     {% endwith %}  {# eadid #}
   {% endwith %}  {# series as component #}

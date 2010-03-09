@@ -45,22 +45,28 @@ def view_fa(request, id):
         raise Http404
     return render_to_response('findingaids/view.html', { 'findingaid' : fa })
 
+# FIXME: combine series/subseries into single view?
+
 def view_series(request, id, series_id):
     "View a single series (c01) from a finding aid"
     try:    
-        series = Series.objects.also('ead__eadid', 'ead__title').get(ead__eadid=id,id=series_id)
+        series = Series.objects.also('ead__eadid', 'ead__title',
+        'ead__archdesc__controlaccess__head').get(ead__eadid=id,id=series_id)
     except Exception:       # FIXME: need a more specific exception here...
         raise Http404
-    return render_to_response('findingaids/view_series.html', { 'series' : series })
+    # get top-level info for all series in this finding aid
+    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=id).all()
+    #all_series = Series.objects.only('id', 'level').filter(ead__eadid=id).all()
+    print all_series
+    return render_to_response('findingaids/view_series.html', { 'series' : series,
+                                                                'all_series' : all_series })
 
 def view_subseries(request, id, series_id, subseries_id):
-    "View a single subseries (c02) from a finding aid"
-
-    # TODO: use series id for xquery, test that bogus series id results in 404
-    
-#    try:
-#        series = Subseries.objects.also(['eadid']).get(eadid=id,id=subseries_id)
-#    except Exception:    
-#        raise Http404
-    series = Subseries.objects.also('eadid', 'ead_title').get(eadid=id,series__id=series_id,id=subseries_id)
-    return render_to_response('findingaids/view_series.html', { 'series' : series })
+    "View a single subseries (c02) from a finding aid"   
+    try:
+        series = Subseries.objects.also('ead__eadid', 'ead__title').get(ead__eadid=id,series__id=series_id,id=subseries_id)
+    except Exception:    
+        raise Http404
+    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=id).all()
+    return render_to_response('findingaids/view_series.html', { 'series' : series,
+                                                                'all_series' : all_series })

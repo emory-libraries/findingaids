@@ -7,8 +7,23 @@
  <li><a href="#administrative_information">Administrative Information</a></li>
  <li><a href="#collection_description">Collection Description</a></li>
  <li><a href="#control_access">{{ findingaid.archdesc.controlaccess.head }}</a></li>
- {% if findingaid.dsc %} <li><a href="#dsc">{{ findingaid.dsc.head}}</a></li> {% endif %}
+ {% if findingaid.dsc and not findingaid.dsc.hasSeries %} 
+   <li><a href="#dsc">{{ findingaid.dsc.head}}</a></li> 
+ {% endif %}
 </ul>
+
+{% if findingaid.dsc.hasSeries %} {# top-level series list #}
+<h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
+{# FIXME: should use series template here-- how to make subseries display optional? #}
+<ul>
+  {% for component in findingaid.dsc.c %}
+    <li><a href="{% url findingaids.fa.views.view_series id=findingaid.eadid,series_id=component.id %}"> 
+	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+        {{ component.did.unittitle }}</a>
+     </li>
+  {% endfor %}
+</ul>
+{% endif %}
 
  {# NOTE: current site has top-level series list duplicated here for complex finding aids #}
 <hr/>
@@ -23,7 +38,7 @@
       <tr><td>Creator:</td><td>{{ findingaid.archdesc.origination }}</td></tr>
       <tr><td>Title:</td><td> {{ findingaid.unittitle }} </td></tr>
       <tr><td>Call Number:</td><td>{{ findingaid.archdesc.unitid }}</td></tr>
-      <tr><td>Extent:</td><td>{{ findingaid.archdesc.extent }}</td></tr>
+      <tr><td>Extent:</td><td>{{ findingaid.archdesc.extent|join:", " }}</td></tr>
    {% if findingaid.archdesc.location %}
       <tr><td>Location:</td><td>{{ findingaid.archdesc.location }}</td></tr>
    {% endif %}
