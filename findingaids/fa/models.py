@@ -1,8 +1,8 @@
 from django.conf import settings
 from eulcore import xmlmap
-from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component
+from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, SubordinateComponents
 from eulcore.existdb.query import QuerySet
-from eulcore.django.existdb.db import ExistDB 
+from eulcore.django.existdb.db import ExistDB
 
 
 # finding aid model
@@ -66,11 +66,13 @@ FindingAid.objects.model = FindingAid
 
 
 class Series(Component):
+    "c01 level series"
     ead = xmlmap.XPathNode("ancestor::ead", FindingAid)
     objects = QuerySet(model=Component, xpath="//c01", using=ExistDB(), 
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
     def series_info(self):
+        "Return whatever series information is present, in display order."
         fields = []
         if self.biography_history:
             fields.append(self.biography_history)
@@ -91,20 +93,35 @@ class Series(Component):
         if self.bibliography:
             fields.append(self.bibliography)
 
-        print fields
         return fields
 
-
-# FIXME/TODO: inverse relation to ead object so we can use/filter on related fields like ead__eadid='x' ?
+    def display_label(self):
+        "Series display label - *unitid : unittitle* (if unitid) or *unittitle* (no unitid)"
+        return ': '.join([u for u in [self.did.unitid, self.did.unittitle] if u])
 
 # TODO: how to configure base ead class so component classtype can be overridden ?
 
 Series.objects.model = Series
-
+# override component.c node_class
+# subcomponents need to be initialized as Series to get display_label, series list...
+# FIXME: there must be a better way to do this!
+Component.c = xmlmap.XPathNodeList("c02|c03|c04|c05|c06|c07|c08|c09|c10|c11|c12", Series)
+SubordinateComponents.c = xmlmap.XPathNodeList("c01", Series)
+Series.parent = xmlmap.XPathNode("parent::node", Series)       # arg: for subseries
 
 class Subseries(Series):
+    "c02 level series"
     series = xmlmap.XPathNode("parent::c01", Series) 
     objects = QuerySet(model=Component, xpath="//c02", using=ExistDB(), 
                        collection=settings.EXISTDB_ROOT_COLLECTION)
 
 Subseries.objects.model = Subseries
+
+class Subsubseries(Series):
+    "c03 level series"
+    subseries = xmlmap.XPathNode("parent::c02", Subseries)
+    series = xmlmap.XPathNode("ancestor::c01", Series)
+    objects = QuerySet(model=Component, xpath="//c03", using=ExistDB(),
+                       collection=settings.EXISTDB_ROOT_COLLECTION)
+
+Subsubseries.objects.model = Subsubseries

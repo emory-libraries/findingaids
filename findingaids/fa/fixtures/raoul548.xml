@@ -618,10 +618,8 @@
             <c01 id="raoul548_1003223" level="series">
                 <did id="raoul548_100191">
                     <unitid id="raoul548_100187">Series 1</unitid>
-                    <unittitle encodinganalog="245$a" id="raoul548_100189">Letters and personal papers, 
-
-				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="raoul548_100188" normal="1865/1982" type="inclusive">1865-1982</unitdate>
-                    </unittitle>
+                    <unittitle encodinganalog="245$a" id="raoul548_100189">Letters and personal papers, <unitdate
+                        calendar="gregorian" encodinganalog="245$f" era="ce" id="raoul548_100188" normal="1865/1982" type="inclusive">1865-1982</unitdate></unittitle>
                     <physdesc encodinganalog="300" id="raoul548_100190">Boxes 1-35, OP 1-2</physdesc>
                 </did>
                 <scopecontent encodinganalog="520" id="raoul548_100194">
@@ -6722,11 +6720,9 @@
             </c01>
             <c01 id="raoul548_1003798" level="series">
                 <did id="raoul548_1003654">
-                    <unitid id="raoul548_1003650">Series 3</unitid>
-                    <unittitle encodinganalog="245$a" id="raoul548_1003652">Financial and legal papers, 
-
-				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="raoul548_1003651" normal="1890/1970" type="inclusive">1890-1970</unitdate>
-                    </unittitle>
+                    <!-- <unitid id="raoul548_1003650">Series 3</unitid> -->
+                    <unittitle encodinganalog="245$a" id="raoul548_1003652">Financial and legal papers, <unitdate
+                        calendar="gregorian" encodinganalog="245$f" era="ce" id="raoul548_1003651" normal="1890/1970" type="inclusive">1890-1970</unitdate></unittitle>
                     <physdesc encodinganalog="300" id="raoul548_1003653">Boxes 42-45; OBV 1</physdesc>
                 </did>
                 <scopecontent encodinganalog="520" id="raoul548_1003660">
@@ -6996,7 +6992,7 @@
                     </did>
                 </c02>
             </c01>
-            <c01 id="raoul548_1003976" level="series">
+            <c01 id="raoul548_s4" level="series">
                 <did id="raoul548_1003803">
                     <unitid id="raoul548_1003799">Series 4</unitid>
                     <unittitle encodinganalog="245$a" id="raoul548_1003801">Miscellaneous, 
@@ -7059,19 +7055,32 @@
                     <head id="raoul548_1003810">Arrangement Note</head>
                     <p id="raoul548_1003811">Arranged by record type.</p>
                 </arrangement>
-                <c02 id="raoul548_1003815" level="file">
+                <!-- created sub-subseries for testing -->
+
+                <c02 id="raoul548_4.1" level="subseries">
+                <did>
+                    <unitid>Subseries 4.1</unitid>
+                    <unittitle encodinganalog="245$a" id="raoul548_1003801">Miscellaneous,
+
+				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="raoul548_1003800" normal="1881/1992" type="inclusive">1881-1982</unitdate>
+                    </unittitle>
+                    <physdesc encodinganalog="300" id="raoul548_1003802">Box 46; OP 7-10</physdesc>
+                </did>
+
+                <c03 id="raoul548_4.1a" level="subseries">
                     <did id="raoul548_1003814">
+                        <unitid>Subseries 4.1a</unitid>
                         <unittitle id="raoul548_1003813">Genealogy</unittitle>
                     </did>
-                </c02>
-                <c02 id="raoul548_1003820" level="file">
+                
+                <c04 id="raoul548_1003820" level="file">
                     <did id="raoul548_1003819">
                         <container id="raoul548_1003816" type="box">46</container>
                         <container id="raoul548_1003817" type="folder">1</container>
                         <unittitle id="raoul548_1003818">Raoul family journal, 1881-1899</unittitle>
                     </did>
-                </c02>
-                <c02 id="raoul548_1003825" level="file">
+                </c04>
+                <c04 id="raoul548_1003825" level="file">
                     <did id="raoul548_1003824">
                         <container id="raoul548_1003821" type="box">46</container>
                         <container id="raoul548_1003822" type="folder">2</container>
@@ -7079,17 +7088,15 @@
 
 				  Holograph copy, December 23, 1873</unittitle>
                     </did>
-                </c02>
-                <c02 id="raoul548_1003830" level="file">
+                </c04>
+                </c03>
+                <c03 id="raoul548_4.1b" level="subseries">
                     <did id="raoul548_1003829">
-                        <container id="raoul548_1003826" type="box">46</container>
-                        <container id="raoul548_1003827" type="folder">3</container>
-                        <unittitle id="raoul548_1003828">Jean Baptista Raoul de Champmanoir: Genealogical
-
-				  information: carbon typescript</unittitle>
+                        <unitid>Subseries 4.1b</unitid>
+                        <unittitle id="raoul548_1003813">Genealogy part 2</unittitle>
                     </did>
-                </c02>
-                <c02 id="raoul548_1003835" level="file">
+                
+                <c04 id="raoul548_1003835" level="file">
                     <did id="raoul548_1003834">
                         <container id="raoul548_1003831" type="box">46</container>
                         <container id="raoul548_1003832" type="folder">4</container>
@@ -7097,8 +7104,8 @@
 
 				  information</unittitle>
                     </did>
-                </c02>
-                <c02 id="raoul548_1003840" level="file">
+                </c04>
+                <c04 id="raoul548_1003840" level="file">
                     <did id="raoul548_1003839">
                         <container id="raoul548_1003836" type="box">46</container>
                         <container id="raoul548_1003837" type="folder">5</container>
@@ -7106,240 +7113,15 @@
 
 				  William Gaston Raoul to Sam, July 26</unittitle>
                     </did>
-                </c02>
-                <c02 id="raoul548_1003845" level="file">
+                </c04>
+                <c04 id="raoul548_1003845" level="file">
                     <did id="raoul548_1003844">
                         <container id="raoul548_1003841" type="box">46</container>
                         <container id="raoul548_1003842" type="folder">6</container>
                         <unittitle id="raoul548_1003843">Memorabilia - general, ca. 1886-1897</unittitle>
                     </did>
-                </c02>
-                <c02 id="raoul548_1003850" level="file">
-                    <did id="raoul548_1003849">
-                        <container id="raoul548_1003846" type="box">46</container>
-                        <container id="raoul548_1003847" type="folder">7</container>
-                        <unittitle id="raoul548_1003848">Wedding invitations, calling cards, ca.
-
-				  1890-1970</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003855" level="file">
-                    <did id="raoul548_1003854">
-                        <container id="raoul548_1003851" type="box">OP10</container>
-                        <container id="raoul548_1003852"/>
-                        <unittitle id="raoul548_1003853">Wadley family genealogical chart</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003858" level="file">
-                    <did id="raoul548_1003857">
-                        <unittitle id="raoul548_1003856">Raoul mansion</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003863" level="file">
-                    <did id="raoul548_1003862">
-                        <container id="raoul548_1003859" type="box">46</container>
-                        <container id="raoul548_1003860" type="folder">8</container>
-                        <unittitle id="raoul548_1003861">"The Old in New Atlanta," by Elizabeth M. Sawyer and
-
-				  Jane Foster Matthew, 1978</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003868" level="file">
-                    <did id="raoul548_1003867">
-                        <container id="raoul548_1003864" type="box">46</container>
-                        <container id="raoul548_1003865" type="folder">9</container>
-                        <unittitle id="raoul548_1003866">Norman Raoul Clark: Correspondence: Raoul Mansion,
-
-				  1984-1985</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003873" level="file">
-                    <did id="raoul548_1003872">
-                        <container id="raoul548_1003869" type="box">46</container>
-                        <container id="raoul548_1003870" type="folder">10</container>
-                        <unittitle id="raoul548_1003871">"The Raoul Estate: History and Preservation: A Project
-
-				  Analysis Prepared for Citizens and Southern Bank" by Urban Village Works,
-
-				  February 8, 1985 (1 original copy, 1 photocopy)</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003878" level="file">
-                    <did id="raoul548_1003877">
-                        <container id="raoul548_1003874" type="box">46</container>
-                        <container id="raoul548_1003875" type="folder">11</container>
-                        <unittitle id="raoul548_1003876">Clipping, March 4, 1985 and undated
-
-				  (photocopies)</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003883" level="file">
-                    <did id="raoul548_1003882">
-                        <container id="raoul548_1003879" type="box">46</container>
-                        <container id="raoul548_1003880" type="folder">12</container>
-                        <unittitle id="raoul548_1003881">Publicity: Printer's proof copy</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003888" level="file">
-                    <did id="raoul548_1003887">
-                        <container id="raoul548_1003884" type="box">OP7</container>
-                        <container id="raoul548_1003885"/>
-                        <unittitle id="raoul548_1003886">Plans for Raoul house at 708 Peachtree Street, 1891 and
-
-				  1914 </unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003893" level="file">
-                    <did id="raoul548_1003892">
-                        <container id="raoul548_1003889" type="box">OP8</container>
-                        <container id="raoul548_1003890"/>
-                        <unittitle id="raoul548_1003891">Plats of Raoul Family's Atlanta properties, 1913 and
-
-				  undated</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003898" level="file">
-                    <did id="raoul548_1003897">
-                        <container id="raoul548_1003894" type="box">OP9</container>
-                        <container id="raoul548_1003895"/>
-                        <unittitle id="raoul548_1003896">Plat of Druid Hills, 1926</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003901" level="file">
-                    <did id="raoul548_1003900">
-                        <unittitle id="raoul548_1003899">Writings about Raoul family</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003907" level="file">
-                    <did id="raoul548_1003906">
-                        <container id="raoul548_1003902" type="box">47</container>
-                        <container id="raoul548_1003903" type="folder">1-2</container>
-                        <unittitle id="raoul548_1003905">
-                            <title id="raoul548_1003904" linktype="simple">The Family of Raoul: A Memoir</title> by Mary Raoul
-
-				  Millis, 1943 (photocopy)</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003912" level="file">
-                    <did id="raoul548_1003911">
-                        <container id="raoul548_1003908" type="box">47</container>
-                        <container id="raoul548_1003909" type="folder">3</container>
-                        <unittitle id="raoul548_1003910">W. G. Raoul Foundation, Printed material,
-
-				  1944</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003917" level="file">
-                    <did id="raoul548_1003916">
-                        <container id="raoul548_1003913" type="box">47</container>
-                        <container id="raoul548_1003914" type="folder">4</container>
-                        <unittitle id="raoul548_1003915">Autobiography of Mary Raoul Millis, 1953 (typescript),
-
-				  Chapters 1-2</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003922" level="file">
-                    <did id="raoul548_1003921">
-                        <container id="raoul548_1003918" type="box">47</container>
-                        <container id="raoul548_1003919" type="folder">5</container>
-                        <unittitle id="raoul548_1003920">Autobiography of Mary Raoul Millis, 1953 (typescript),
-
-				  Chapters 3-4</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003927" level="file">
-                    <did id="raoul548_1003926">
-                        <container id="raoul548_1003923" type="box">47</container>
-                        <container id="raoul548_1003924" type="folder">6</container>
-                        <unittitle id="raoul548_1003925">Autobiography of Mary Raoul Millis, 1953 (typescript),
-
-				  Chapters 5-7</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003932" level="file">
-                    <did id="raoul548_1003931">
-                        <container id="raoul548_1003928" type="box">47</container>
-                        <container id="raoul548_1003929" type="folder">7</container>
-                        <unittitle id="raoul548_1003930">Autobiography of Mary Raoul Millis, 1953 (typescript),
-
-				  Chapters 8-9</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003937" level="file">
-                    <did id="raoul548_1003936">
-                        <container id="raoul548_1003933" type="box">47</container>
-                        <container id="raoul548_1003934" type="folder">8</container>
-                        <unittitle id="raoul548_1003935">Autobiography of Mary Raoul Millis, 1953 (typescript),
-
-				  Chapters 10-12</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003942" level="file">
-                    <did id="raoul548_1003941">
-                        <container id="raoul548_1003938" type="box">47</container>
-                        <container id="raoul548_1003939" type="folder">9</container>
-                        <unittitle id="raoul548_1003940">Autobiography of Mary Raoul Millis, 1953 (typescript),
-
-				  Appendices</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003947" level="file">
-                    <did id="raoul548_1003946">
-                        <container id="raoul548_1003943" type="box">47</container>
-                        <container id="raoul548_1003944" type="folder">10</container>
-                        <unittitle id="raoul548_1003945">History of Great Hill Place, Bolingbroke, Ga.,
-
-				  1973</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003953" level="file">
-                    <did id="raoul548_1003952">
-                        <container id="raoul548_1003948" type="box">47</container>
-                        <container id="raoul548_1003949" type="folder">11</container>
-                        <unittitle id="raoul548_1003951">
-                            <title id="raoul548_1003950" linktype="simple">The Atlanta Historical Bulletin</title>, v. XIX, no. 2,
-
-				  1975</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003959" level="file">
-                    <did id="raoul548_1003958">
-                        <container id="raoul548_1003954" type="box">47</container>
-                        <container id="raoul548_1003955" type="folder">12</container>
-                        <unittitle id="raoul548_1003957">"Woman Suffrage Activities in Atlanta," 
-
-				  <title id="raoul548_1003956" linktype="simple">Atlanta Historical Journal</title>, v. XXIII, no.4, winter
-
-				  1979/1980 (photocopy)</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003964" level="file">
-                    <did id="raoul548_1003963">
-                        <container id="raoul548_1003960" type="box">47</container>
-                        <container id="raoul548_1003961" type="folder">13</container>
-                        <unittitle id="raoul548_1003962">Clippings, 1886-1982</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003969" level="file">
-                    <did id="raoul548_1003968">
-                        <container id="raoul548_1003965" type="box">47</container>
-                        <container id="raoul548_1003966" type="folder">14</container>
-                        <unittitle id="raoul548_1003967">William Green Raoul: From Captain to Industry to
-
-				  Sergeant of Socialism: William Green Raoul and the Management of Southern
-
-				  Labor" by Robert J. McMath, Jr., April 9, 1987</unittitle>
-                    </did>
-                </c02>
-                <c02 id="raoul548_1003975" level="file">
-                    <did id="raoul548_1003974">
-                        <container id="raoul548_1003970" type="box">47</container>
-                        <container id="raoul548_1003971" type="folder">15</container>
-                        <unittitle id="raoul548_1003973">
-                            <title id="raoul548_1003972" linktype="simple">Atlanta Then, Atlanta Now</title> by Norman Shavin,
-
-				  undated</unittitle>
-                    </did>
+                </c04>
+                </c03>
                 </c02>
             </c01>
         </dsc>

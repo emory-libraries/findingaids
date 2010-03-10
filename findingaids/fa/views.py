@@ -1,7 +1,8 @@
 from django.shortcuts import render_to_response
 from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from findingaids.fa.models import FindingAid, Series, Subseries
+from django.core.urlresolvers import reverse
+from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
 
 def browse_titles(request):
     "List all first letters in finding aid list title, link to browse by letter."
@@ -43,29 +44,107 @@ def view_fa(request, id):
         fa = FindingAid.objects.get(eadid=id)
     except Exception:       # FIXME: need queryset to raise a specific exception here?
         raise Http404
-    return render_to_response('findingaids/view.html', { 'findingaid' : fa })
 
-# FIXME: combine series/subseries into single view?
+    series = _subseries_links(fa.dsc, url_ids=[fa.eadid])
+    
+    return render_to_response('findingaids/view.html', { 'findingaid' : fa,
+                                                         'series' : series })
 
 def view_series(request, id, series_id):
     "View a single series (c01) from a finding aid"
-    #try:
-    series = Series.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head').get(ead__eadid=id,id=series_id)
-    #except Exception:       # FIXME: need a more specific exception here...
-    #    raise Http404
-    # get top-level info for all series in this finding aid
-    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=id).all()
-    #all_series = Series.objects.only('id', 'level').filter(ead__eadid=id).all()
-    print all_series
-    return render_to_response('findingaids/view_series.html', { 'series' : series,
-                                                                'all_series' : all_series })
+    return _view_series(request, id, series_id)
 
 def view_subseries(request, id, series_id, subseries_id):
     "View a single subseries (c02) from a finding aid"   
-    try:
-        series = Subseries.objects.also('ead__eadid', 'ead__title').get(ead__eadid=id,series__id=series_id,id=subseries_id)
-    except Exception:    
-        raise Http404
-    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=id).all()
+    return _view_series(request, id, series_id, subseries_id)
+
+def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
+    "View a single subseries (c03) from a finding aid"
+    return _view_series(request, id, series_id, subseries_id, subsubseries_id)
+
+
+def _view_series(request, eadid, *series_ids):
+    print series_ids
+    #try:
+    if len(series_ids) == 1:
+        series = Series.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head').get(ead__eadid=eadid,id=series_ids[0])
+    elif len(series_ids) == 2:
+        series = Subseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id').get(ead__eadid=eadid,series__id=series_ids[0],id=series_ids[1])
+    elif len(series_ids) == 3:
+        series = Subsubseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id', 'subseries__id').get(ead__eadid=eadid,series__id=series_ids[0],subseries__id=series_ids[1],id=series_ids[2])
+    #except Exception:       # FIXME: limit to a more specific exception here...
+    #    raise Http404        
+            
+    # summary info for all top-level series in this finding aid
+    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=eadid).all()
     return render_to_response('findingaids/view_series.html', { 'series' : series,
-                                                                'all_series' : all_series })
+                                                                'all_series' : all_series,
+                                                                "subseries" : _subseries_links(series) })
+
+
+def _series_url(eadid, series_id, *ids):
+    """
+    Generate a series or subseries url when given an eadid and list of series ids.
+    Requires at least ead document id and top-level series id.  Number of additional
+    series ids provided determines type of series url generated.
+    """
+    # common args for generating all urls
+    args = {'id' : eadid, 'series_id' : series_id}
+
+    if len(ids) == 0:       # no additional args
+        view = 'findingaids.fa.views.view_series'
+    if len(ids) >= 1:       # add subseries id arg if one specified (used for sub and sub-subseries)
+        args['subseries_id'] = ids[0]
+        view = 'findingaids.fa.views.view_subseries'
+    if len(ids) == 2:       # add sub-subseries id arg if specified
+        args['subsubseries_id'] = ids[1]
+        view = 'findingaids.fa.views.view_subsubseries'
+
+    return reverse(view, kwargs=args)
+
+
+def _subseries_links(series, url_ids=None):
+    """
+    Recursive function to build a nested list of links to series and subseries
+    to simplify template display logic for complicated series.
+
+    Series element must include ead.eadid; is series is c02 or c03, must also
+    include parent c01 (and c02) id, in order to generate urls.
+    """
+    # construct url ids if none are passed
+    if url_ids is None:
+        if not (series.ead and series.ead.eadid):
+            raise Exception("Cannot construct subseries links without eadid for %s element %s"
+                        % (series.dom_node.nodeName, series.id))
+
+        url_ids = [series.ead.eadid]
+        # if c02/c03, check to ensure we have enough information to generate the correct link
+        if series.dom_node.nodeName in ['c02', 'c03']:
+            # if initial series passed in is c02 or c03, add c01 series id to url ids before current series id
+            if hasattr(series, 'series') and series.series:
+                url_ids.append(series.series.id)
+            else:
+                raise Exception("Cannot construct subseries links without c01 series id for %s element %s"
+                        % (series.dom_node.nodeName, series.id))
+
+            if series.dom_node.nodeName == 'c03':
+                # if initial series passed in is c03, add c02 series id to url ids before current series id
+                if hasattr(series, 'subseries') and series.subseries:
+                    url_ids.append(series.subseries.id)
+                else:
+                    raise Exception("Cannot construct subseries links without c02 subseries id for %s element %s"
+                        % (series.dom_node.nodeName, series.id))
+
+        #  current series id
+        if series.dom_node.nodeName in ['c01', 'c02', 'c03']:
+            url_ids.append(series.id)
+        
+    links = []
+    if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
+        for component in series.c:            
+            current_url_ids = url_ids + [component.id]
+            text = "<a href='%s'>%s</a>" % (apply(_series_url, current_url_ids), component.display_label())
+            links.append(text)
+            if component.hasSubseries():
+                links.append(_subseries_links(component, url_ids=current_url_ids))    
+    return links

@@ -1,11 +1,13 @@
 from os import path
 from glob import glob
 import re
+from types import ListType
 from django.test import Client, TestCase
 from django.conf import settings
 from eulcore.xmlmap  import load_xmlobject_from_file
 from eulcore.django.existdb.db import ExistDB
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
+from findingaids.fa.views import _series_url, _subseries_links
 
 class FindingAidTestCase(TestCase):
     # test finding aid model (customization of eulcore xmlmap ead object)
@@ -45,6 +47,25 @@ class FindingAidTestCase(TestCase):
         self.assertEqual("Bailey and Thurman families papers, circa 1882-1995",
                          self.findingaid['bailey807'].list_title)
         self.assertEqual("B", self.findingaid['bailey807'].first_letter)
+
+    # FIXME/TODO: test admin info, collection description ?  (tested in view_series to some extent)
+
+    def test_series_info(self):
+        info = self.findingaid['raoul548'].dsc.c[0].series_info()
+        self.assert_(isinstance(info, ListType))
+        self.assertEqual("Scope and Content Note", info[0].head)
+        self.assertEqual("Arrangement Note", info[1].head)
+
+        # FIXME/TODO: test other possible fields not present in this series?
+
+
+    def test_series_displaylabel(self):
+        self.assertEqual("Series 1: Letters and personal papers, 1865-1982",
+                self.findingaid['raoul548'].dsc.c[0].display_label())
+        # no unitid
+        self.assertEqual("Financial and legal papers, 1890-1970",
+                self.findingaid['raoul548'].dsc.c[2].display_label())
+
 
 
 class FaViewsTest(TestCase):
@@ -200,3 +221,99 @@ class FaViewsTest(TestCase):
         self.assert_('Description of Series' not in response.content)
 
         # FIXME: test also not listed in top-level table of contents?
+
+    def test__series_url(self):
+        self.assertEqual('/documents/docid/s1', _series_url('docid', 's1'))
+        self.assertEqual('/documents/docid/s1/s1.2', _series_url('docid', 's1', 's1.2'))
+        self.assertEqual('/documents/docid/s3/s3.5/s3.5a', _series_url('docid', 's3', 's3.5', 's3.5a'))
+
+    def test__subseries_links__dsc(self):
+        # subseries links for a top-level series that has subseries
+        fa = FindingAid.objects.get(eadid='raoul548')
+        links = _subseries_links(fa.dsc, url_ids=[fa.eadid])
+        
+        self.assert_("Series 1: Letters and personal papers" in links[0])
+        self.assert_("href='/documents/raoul548/raoul548_1003223'" in links[0])
+        # nested list for subseries
+        self.assert_(isinstance(links[1], ListType))
+        self.assert_("Subseries 1.1: William Greene" in links[1][0])
+        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100355'" in links[1][0])
+
+        # second-to-last entry - series 4
+        self.assert_("Series 4: Misc" in links[-2])
+        self.assert_("href='/documents/raoul548/raoul548_s4'" in links[-2])
+        # last entry - series 4 subseries
+        self.assert_(isinstance(links[-1], ListType))
+        self.assert_("Subseries 4.1:" in links[-1][0])
+        # series 4.1 sub-subseries
+        self.assert_(isinstance(links[-1][1], ListType))
+        self.assert_("Subseries 4.1a:" in links[-1][1][0])
+        
+
+
+    def test__subseries_links(self):
+        # subseries links for a top-level series that has subseries
+        series = Series.objects.also('ead__eadid').get(id='raoul548_1003223')
+        links = _subseries_links(series)
+        
+        self.assertEqual(13, len(links))  # raoul series has subseries 1-13
+        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100904'" in links[2])
+        self.assert_('Subseries 1.1: William Greene' in links[0])
+        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100355'" in links[0])
+        self.assert_('Subseries 1.2: Mary Wadley' in links[1])
+        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100529'" in links[1])
+        self.assert_('Subseries 1.3: Sarah Lois' in links[2])
+        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100904'" in links[2])
+        self.assert_('Subseries 1.13: Norman Raoul' in links[-1])
+        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_1003222'" in links[-1])
+
+        series = Series.objects.get(id='raoul548_1003223')
+        # should get exception when top-level ead id is not available
+        self.assertRaises(Exception, _subseries_links, series)
+
+
+    def test__subseries_links_nested(self):
+        # subseries links for a top-level series that has subseries with sub-subseries (nested list)
+        series = Series.objects.also('ead__eadid').get(id='raoul548_s4')
+        links = _subseries_links(series)
+        
+        self.assert_("Subseries 4.1: Misc" in links[0])
+        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1'" in links[0])
+        self.assert_(isinstance(links[1], ListType))
+        self.assert_("Subseries 4.1a: Genealogy" in links[1][0])
+        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1a'" in links[1][0])
+        self.assert_("Subseries 4.1b: Genealogy part 2" in links[1][1])
+        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1b'" in links[1][1])
+        
+
+    def test__subseries_links_c02(self):
+        # subseries links when not starting at c01 level
+        series = Subseries.objects.also('ead__eadid', 'series__id').get(id='raoul548_4.1')
+        links = _subseries_links(series)
+
+        self.assertEqual(2, len(links))     # test doc has two c03 subseries
+        self.assert_("Subseries 4.1a: Genealogy" in links[0])
+        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1a'" in links[0])
+        self.assert_("Subseries 4.1b: Genealogy part 2" in links[1])
+        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1b'" in links[1])
+
+        # c02 retrieved without parent c01 id should get an exception
+        series = Subseries.objects.also('ead__eadid').get(id='raoul548_4.1')        
+        self.assertRaises(Exception, _subseries_links, series)
+
+    def test__subseries_links_c03(self):
+        # c03 retrieved without parent c01 id should get an exception
+        series = Subsubseries.objects.also('ead__eadid').get(id='raoul548_4.1a')
+        self.assertRaises(Exception, _subseries_links, series)
+
+        # c03 with series but not subseries id - still exception
+        series = Subsubseries.objects.also('ead__eadid', 'series__id').get(id='raoul548_4.1a')
+        self.assertRaises(Exception, _subseries_links, series)
+
+        # all required parent ids - no exception
+        series = Subsubseries.objects.also('ead__eadid', 'series__id', 'subseries__id').get(id='raoul548_4.1a')
+        self.assertEqual([], _subseries_links(series))
+
+
+
+
