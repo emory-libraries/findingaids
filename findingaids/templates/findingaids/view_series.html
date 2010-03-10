@@ -6,8 +6,9 @@
  <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#descriptive_summary">Descriptive Summary</a></li>
  <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#administrative_information">Administrative Information</a></li>
  <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#collection_description">Collection Description</a></li>
- <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#control_access">{{ series.ead.archdesc.controlaccess.head }}</a></li>
- 
+ {% if series.ead.archdesc.controlaccess.head %}
+   <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#control_access">{{ series.ead.archdesc.controlaccess.head }}</a></li>
+ {% endif %}
 </ul>
 
 <ul>
@@ -40,13 +41,15 @@
    </div>
 {% endfor %}
 
+<hr/>
 {# container list or series/subseries listing #}
-{% if series.hasSubseries %}       {# list series/subseries here, display on separate page #}
-  {% with series as component %}
-    {% with series.ead.eadid as eadid %}
-      {% include "findingaids/subseries_snippet.html" %}
-    {% endwith %}  {# eadid #}
-  {% endwith %}  {# series as component #}
+{% if series.hasSubseries %}
+<h3>Description of Subseries</h3>
+    <ul>
+       {% autoescape off %}
+           {{ subseries|unordered_list }}
+       {% endautoescape %}
+    </ul>
 {% else %}
   {% include "findingaids/containerlist_snippet.html" %}
 {% endif %}
