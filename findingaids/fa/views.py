@@ -64,7 +64,6 @@ def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
 
 
 def _view_series(request, eadid, *series_ids):
-    print series_ids
     #try:
     if len(series_ids) == 1:
         series = Series.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head').get(ead__eadid=eadid,id=series_ids[0])

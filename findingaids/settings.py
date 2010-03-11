@@ -98,6 +98,7 @@ INSTALLED_APPS = (
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
     'eulcore.django.existdb',
+    #'test_extensions',
     'findingaids.fa'
 )
 

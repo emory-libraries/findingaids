@@ -29,7 +29,7 @@
 <h2>
   {{ series.did.unitid }}<br/>
   {{ series.did.unittitle }}  {{ series.did.unitdate|default:'' }} <br/>
-  {{ series.did.physdesc }}
+  {{ series.did.physdesc|default:'' }}
 </h2>
 
 {% for section in series.series_info %}

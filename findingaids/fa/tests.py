@@ -84,7 +84,14 @@ class FaViewsTest(TestCase):
 
     def tearDown(self):
         pass
-        
+
+# FIXME: does not generate useful error messages...
+    def assertPattern(self, regex, text, msg_prefix=''):
+        if msg_prefix != '':
+            msg_prefix += '.  '
+        self.assert_(re.search(re.compile(regex, re.DOTALL), text),
+        msg_prefix + "Should match '%s'" % regex)
+      
     def test_title_letter_list(self):
         response = self.client.get('/titles')
         self.assertEquals(response.status_code, 200)
@@ -116,6 +123,8 @@ class FaViewsTest(TestCase):
         response = self.client.get('/titles/Z')
         self.assertContains(response, '<div>No finding aids found.</div>')
 
+# view finding aid main page
+
     def test_view_notfound(self):
         response = self.client.get('/documents/nonexistent')
         self.assertEquals(response.status_code, 404)
@@ -124,92 +133,115 @@ class FaViewsTest(TestCase):
         response = self.client.get('/documents/leverette135')
         self.assertEquals(response.status_code, 200)
         # title
-        self.assert_(re.search('|<h1>Fannie Lee Leverette scrapbooks,\w+circa 1900-1948</h1>|',
-                    response.content))
+        self.assertContains(response, '<h1>Fannie Lee Leverette scrapbooks')
+        self.assertContains(response, 'circa 1900-1948</h1>')
         # descriptive summary content
-        self.assert_(re.search('|Creator:.*Leverette, Fannie Lee|', response.content))
-        self.assert_(re.search('|Title:.*Fannie Lee Leverette scrapbooks,circa 1900-1948|', response.content))
-        self.assert_(re.search('|Call Number:.*Manuscript Collection\w+No.135|', response.content))
-        self.assert_(re.search('|Extent:.*1 microfilm reel\w+MF|', response.content))
-        self.assert_(re.search('|Abstract:.*Microfilm copy of four scapbooks|', response.content))
-        self.assert_(re.search('|Language:.*Materials entirely in\w+English|', response.content))
-        self.assert_('Location:' not in response.content)       # not in xml, should not display
+        self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
+            "descriptive summary - creator")
+        self.assertPattern('Title:.*Fannie Lee Leverette scrapbooks,circa 1900-1948',
+            response.content, "descriptive summary - title")
+        self.assertPattern('Call Number:.*Manuscript Collection.+No.135', response.content,
+            "descriptive summary - call number")
+        self.assertPattern('Extent:.*1 microfilm reel.+MF', response.content,
+            "descriptive summary - extent")
+        self.assertPattern('Abstract:.*Microfilm copy of four scrapbooks', response.content,
+            "descriptive summary - abstract")
+        self.assertPattern('Language:.*Materials entirely in.+English', response.content,
+            "descriptive summary - language")
+        self.assertNotContains(response, 'Location:')       # not in xml, should not display
 
         # admin info
-        self.assert_(re.search('|Restrictions on Access.*Unrestricted access.|', response.content))
-        self.assert_(re.search('|Terms Govererning Use and Reproduction.*All requests subject to limitations.|',
-                    response.content))
-        self.assert_(re.search('|Source.*Loaned for reproduction, 1978.|', response.content))
-        self.assert_(re.search('|Citation.*[after identification of item(s)], Fannie Lee Leverette scapbooks.|',
-                    response.content))
-        self.assert_('Related Materials' not in response.content)       # not in xml, should not display
+        self.assertPattern('Restrictions on Access.*Unrestricted access.', response.content,
+            "admin info - access restrictions")
+        self.assertPattern('Terms Governing Use and Reproduction.*All requests subject to limitations.',
+            response.content, "admin info - use restrictions")
+        self.assertPattern('Source.*Loaned for reproduction, 1978.', response.content,
+            "admin info - source")
+        self.assertPattern('Citation.*\[after identification of item\(s\)\], Fannie Lee Leverette scrapbooks.',
+                    response.content, "admin info - preferred citation")
+        self.assertNotContains(response, 'Related Materials')       # not in xml, should not display
 
         # collection description
-        self.assert_(re.search('|Biographical Note.*born in Eatonton, Putnam County, Georgia|',
-                    response.content))
-        self.assert_(re.search('|Scope and Content Note.*collection consists of|',
-                    response.content))
+        self.assertPattern('Biographical Note.*born in Eatonton, Putnam County, Georgia',
+                    response.content, "collection description - biography")
+        self.assertPattern('Scope and Content Note.*collection consists of',
+                    response.content, "collection description - scope & content")
 
         # controlaccess
-        self.assert_(re.search('|<h2>.*Selected Search Terms.*</h2>|',
-                    response.content))
-        self.assert_(re.search('|Personal Names\.*Collins, M\.D\..*Farley, James A\.|',
-                    response.content))
-        self.assert_(re.search('|Topical Terms.*African Americans--Georgia--Eatonton\..*Education--Georgia\.|',
-                    response.content))
-        self.assert_(re.search('|Geographic Names.*Augusta \(Ga\.\).*Eatonton \(Ga\.\)|',
-                    response.content))
-        self.assert_(re.search('|Form\\Genre Terms.*Photographs\..*Scrapbooks\.|',
-                    response.content))
-        self.assert_(re.search('|Occupation.*Educator\..*Journalist|',
-                    response.content))
+        self.assertPattern('<h2>.*Selected Search Terms.*</h2>', response.content,
+            "control access heading")
+        self.assertPattern('<h3>Personal Names</h3>.*Collins, M\.D\..*Farley, James A\.',
+                    response.content, "control access - personal names")
+        self.assertPattern('<h3>Topical Terms</h3>.*African Americans--Georgia--Eatonton\..*Education--Georgia\.|',
+                    response.content, "control access - subjects")
+        self.assertPattern('<h3>Geographic Names</h3>.*Augusta \(Ga\.\).*Eatonton \(Ga\.\)',
+                    response.content, "control access - geography")
+        self.assertPattern('<h3>Form/Genre Terms</h3>.*Photographs\..*Scrapbooks\.',
+                    response.content, "control access - form/genre")
+        self.assertPattern('<h3>Occupation</h3>.*Educator\..*Journalist',
+                    response.content, "control access - occupation")
 
         # dsc
-        self.assert_(re.search('|<h2>.*Container List.*</h2>|', response.content))
-        self.assert_(re.search('|Scrapbook 1.*Box.*Folder.*Content.*MF1|', response.content))
-        self.assert_(re.search('|MF1.*1.*Photo and clippings re Fannie Lee Leverette|', response.content))
-        self.assert_(re.search('|MF1.*4.*Family and personal photos|', response.content))
+        self.assertPattern('<h2>.*Container List.*</h2>', response.content,
+            "simple finding aid (leverette) view includes container list")
+        self.assertPattern('Scrapbook 1.*Box.*Folder.*Content.*MF1', response.content,
+            "Scrapbook 1 in container list")
+        self.assertPattern('MF1.*1.*Photo and clippings re Fannie Lee Leverette',
+            response.content, "photo clippings in container list")
+        self.assertPattern('MF1.*4.*Family and personal photos|', response.content,
+            "family photos in container list")
 
-    def test_view_series(self):
+    def test_view__fa_with_series(self):
         response = self.client.get('/documents/abbey244')
         self.assertEquals(response.status_code, 200)
 
         # admin info fields not present in leverette
-        self.assert_(re.search('|Related Materials in This Repository.*William Butler Yeats collection|',
-            response.content))
-        self.assert_(re.search('|Historical Note.*Abbey Theatre, organized in 1904|',
-            response.content))
-        self.assert_(re.search('|Arrangement Note.*Organized into three series|',
-            response.content))
+        self.assertPattern('Related Materials in This Repository.*William Butler Yeats collection',
+            response.content, "admin info - related materials")
+        self.assertPattern('Historical Note.*Abbey Theatre, organized in 1904',
+            response.content, "admin info - historical note")
+        self.assertPattern('Arrangement Note.*Organized into three series',
+            response.content, "admin info - arrangement")
 
         # series instead of container list
-        self.assert_(re.search('|<h2>.*Description of Series.*</h2>|', response.content))
-        self.assert_(re.search('|<a href.*>Series 1: Plays</a>|', response.content))
-        self.assert_(re.search('|<a href.*>Series 2: Programs.*</a>|', response.content))
-        self.assert_(re.search('|<a href.*>Series 3: Other material, 1935-1941.*</a>|', response.content))
+        self.assertPattern('<h2>.*Description of Series.*</h2>', response.content,
+            "finding aid with series includes description of series")
+        self.assertPattern('<a href.*>Series 1: Plays</a>', response.content,
+            "series 1 link")
+        self.assertPattern('<a href.*>Series 2: Programs.*</a>', response.content,
+            "series 2 link")
+        self.assertPattern('|<a href.*>Series 3: Other material, 1935-1941.*</a>',
+            response.content, "series 3 link")
 
-    def test_view_subseries(self):
+    def test_view__fa_with_subseries(self):
         response = self.client.get('/documents/raoul548')
         self.assertEquals(response.status_code, 200)
 
         # admin info fields not present in previous fixtures
-        self.assert_(re.search('|Related Materials in Other Repositories.*original Wadley diaries|',
-            response.content))        
+        self.assertPattern('Related Materials in Other Repositories.*original Wadley diaries',
+            response.content, "admin info - related materials")
 
         # collection description - multiple paragraphs
-        self.assert_(re.search('|Biographical Note.*centered in Georgia.*eleven children.*moved to New York|',
-            response.content))      # text from first 3 paragraphs
-        self.assert_(re.search('|Scope and Content Note.*contain letters, journals.*arranged in four series.*document the life|',
-            response.content))
+        self.assertPattern('Biographical Note.*centered in Georgia.*eleven children.*moved to New York',
+            response.content, "collection description - bio with multiple paragraphs")      # text from first 3 paragraphs
+        self.assertPattern('Scope and Content Note.*contain letters, journals.*arranged in four series.*document the life',
+            response.content, "collection description - scote & content with multiple paragraphs")
 
         # series instead of container list
-        self.assert_(re.search('|<h2>.*Description of Series.*</h2>|', response.content))
-        self.assert_(re.search('|<a href.*>Series 1: Letters and personal papers.*</a>|', response.content))
-        self.assert_(re.search('|<a href.*>Subseries 1.1: William Greene Raoul paper.*</a>|', response.content))
-        self.assert_(re.search('|<a href.*>Subseries 1.2: Mary Wadley Raoul papers.*</a>|', response.content))
-        self.assert_(re.search('|<a href.*>Subseries 1.13: Normal Raoul papers.*</a>|', response.content))
-        self.assert_(re.search('|<a href.*>Series 2: Photographs, circa 1850-1960</a>|', response.content))
-        self.assert_(re.search('|<a href.*>Series 4: Miscellaneous, 1881-1982</a>|', response.content))
+        self.assertPattern('<h2>.*Description of Series.*</h2>', response.content,
+            "series instead of container list")
+        self.assertPattern('<a href.*>Series 1: Letters and personal papers.*</a>',
+            response.content, "series 1 link")
+        self.assertPattern('<a href.*>Subseries 1\.1: William Greene Raoul paper.*</a>',
+            response.content, "subseries 1.1 link")
+        self.assertPattern('<a href.*>Subseries 1\.2: Mary Wadley Raoul papers.*</a>',
+            response.content, "subseries 1.2 link")
+        self.assertPattern('<a href.*>Subseries 1\.13: .*Norman Raoul papers.*</a>',
+            response.content, "subseries 1.13 link")
+        self.assertPattern('<a href.*>Series 2:.*Photographs,.*circa.*1850-1960.*</a>',
+            response.content, "series 2 link")
+        self.assertPattern('<a href.*>Series 4:.*Miscellaneous,.*1881-1982.*</a>',
+            response.content, "series 4 link")
 
 
     def test_view_nodsc(self):
@@ -217,10 +249,115 @@ class FaViewsTest(TestCase):
         self.assertEquals(response.status_code, 200)
 
         # record with no dsc - no container list or series
-        self.assert_('Container List' not in response.content)
-        self.assert_('Description of Series' not in response.content)
+        self.assertNotContains(response, 'Container List')
+        self.assertNotContains(response, 'Description of Series')
 
         # FIXME: test also not listed in top-level table of contents?
+
+# view single series in a finding aid
+
+    def test_view_series__bailey_series1(self):
+        response = self.client.get('/documents/bailey807/bailey807_series1')
+        self.assertEquals(response.status_code, 200)
+
+        # single series page
+        # - series title
+        self.assertPattern('<h2>.*Series 1.*Correspondence,.*1855-1995.*</h2>',
+            response.content, "series title displayed")
+        # - ead title
+        self.assertPattern('<h1><a href="/documents/bailey807">Bailey and Thurman.+families papers',
+            response.content, "finding aid title displayed, links to main record page")
+        # ead toc
+        self.assertPattern('<a href="/documents/bailey807#descriptive_summary">Descriptive Summary</a>',
+            response.content, "link to main finding aid descriptive summary")
+        self.assertPattern('<a href="/documents/bailey807#administrative_information">Administrative Information</a>',
+            response.content, "link to main finding aid admin info")
+        self.assertPattern('<a href="/documents/bailey807#collection_description">Collection Description</a>',
+            response.content, "link to main finding aid collection description")
+        self.assertPattern('<a href="/documents/bailey807#control_access">Selected Search Terms</a>',
+            response.content, "link to main finding aid control access")
+        # series nav
+        self.assertPattern('<li>[^<]*Series 1:.*Correspondence.*</li>',
+            response.content, "series nav - current series not a link")
+        self.assertPattern('<li>.*<a href="/documents/bailey807/bailey807_series2">.*Series 2:.*Writings by Bailey family.*</a>.*</li>',
+            response.content, "series nav - link to series 2")
+        self.assertPattern('<li>.*<a href="/documents/bailey807/bailey807_series9">.*Series 9:.*Audiovisual material.*</a>.*</li>',
+            response.content, "series nav - link to series 9")
+
+        # series contents
+        self.assertPattern('1.*1.*I\. G\. Bailey, 1882-1901', response.content,
+            "first content of series 1")
+        self.assertPattern('2.*8.*Susie E\. Bailey, undated', response.content,
+            "sample middle content of series 1")
+        self.assertPattern('3.*13.*Miscellaneous correspondence, undated', response.content,
+            "last content of series 1")
+
+
+    def test_view_subseries__raoul_series1_6(self):
+        response = self.client.get('/documents/raoul548/raoul548_1003223/raoul548_1001928')
+        self.assertEquals(response.status_code, 200)
+
+        # single series page
+        # - series title
+        self.assertPattern('<h2>.*Subseries 1\.6.*Gaston C\. Raoul papers,.*1882-1959.*</h2>',
+            response.content, "subseries title displayed")
+        # - ead title
+        self.assertPattern('<h1><a href="/documents/raoul548">Raoul family papers,.*1865-1985',
+            response.content, "finding aid title displayed, links to main record page")
+            
+        # series nav
+        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003223">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>',
+            response.content, "series nav - series 1 link")
+        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003649">.*Series 2:.*Photographs.*</a>.*</li>',
+            response.content, "series nav - link to series 2")
+        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_s4">.*Series 4:.*Miscellaneous.*</a>.*</li>',
+            response.content, "series nav - link to series 4")
+
+        # descriptive info
+        self.assertPattern('<h3>Biographical Note</h3>.*<p>.*born March 1.*</p>',
+            response.content, "subseries biographical note")
+        self.assertPattern('<h3>Scope and Content Note</h3>.*<p>.*letters to family.*</p>.*<p>.*earliest letters.*</p>',
+            response.content, "subseries scope & content, 2 paragraphs")
+        self.assertPattern('<h3>Arrangement Note</h3>.*<p>Arranged by record type.</p>',
+            response.content, "subseries arrangment note")
+
+        # subseries contents
+        # TODO/FIXME: test for box/folder headings? test for section headings?
+        self.assertPattern('20.*1.*1886-1887', response.content,
+            "first content of subseries 1.6")
+        self.assertPattern('22.*14.*Journal,.*1888', response.content,
+            "sample middle content of subseries 1.6")
+        self.assertPattern('22.*23.*1910-1912', response.content,
+            "last content of subseries 1.6")
+
+
+    def test_view_subsubseries__raoul_series4_1a(self):
+        # NOTE: raoul series 4 broken into sub-sub-series for testing, is not in original finding aid
+        response = self.client.get('/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1a')
+        self.assertEquals(response.status_code, 200)
+        
+        # - sub-subseries title
+        self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
+            response.content, "sub-subseries title displayed, no physdesc")
+        # - ead title
+        self.assertPattern('<h1><a href="/documents/raoul548">Raoul family papers,.*1865-1985',
+            response.content, "finding aid title displayed, links to main record page")
+
+        # series nav
+        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003223">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>',
+            response.content, "series nav - series 1 link")
+        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003649">.*Series 2:.*Photographs.*</a>.*</li>',
+            response.content, "series nav - link to series 2")
+        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_s4">.*Series 4:.*Miscellaneous.*</a>.*</li>',
+            response.content, "series nav - link to series 4")
+
+        # subseries contents
+        self.assertPattern('46.*1.*Raoul family journal', response.content,
+            "first content of sub-subseries 4.1a")
+        self.assertPattern('46.*2.*Gaston Cesar Raoul', response.content,
+            "last content of sub-subseries 4.1a")
+
+# **** tests for helper functions for creating series url, list of series/subseries for display in templates
 
     def test__series_url(self):
         self.assertEqual('/documents/docid/s1', _series_url('docid', 's1'))

@@ -5956,11 +5956,9 @@
             <c01 id="raoul548_1003649" level="series">
                 <did id="raoul548_1003228">
                     <unitid id="raoul548_1003224">Series 2</unitid>
-                    <unittitle encodinganalog="245$a" id="raoul548_1003226">Photographs, 
-
-				<unitdate calendar="gregorian" certainty="circa" encodinganalog="245$f" era="ce" id="raoul548_1003225" normal="1850/1960" type="inclusive">circa
-
-				  1850-1960</unitdate>
+                    <unittitle encodinganalog="245$a" id="raoul548_1003226">Photographs, <unitdate
+                        calendar="gregorian" certainty="circa" encodinganalog="245$f" era="ce"
+                        id="raoul548_1003225" normal="1850/1960" type="inclusive">circa	1850-1960</unitdate>
                     </unittitle>
                     <physdesc encodinganalog="300" id="raoul548_1003227">Boxes 36-41; OP 3-6, 11</physdesc>
                 </did>
