@@ -107,7 +107,7 @@ def _subseries_links(series, url_ids=None):
     Recursive function to build a nested list of links to series and subseries
     to simplify template display logic for complicated series.
 
-    Series element must include ead.eadid; is series is c02 or c03, must also
+    Series element must include ead.eadid; if series is c02 or c03, must also
     include parent c01 (and c02) id, in order to generate urls.
     """
     # construct url ids if none are passed

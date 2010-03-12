@@ -12,20 +12,43 @@ from eulcore.django.existdb.db import ExistDB
 
 class FindingAid(EncodedArchivalDescription):
     """
-      Customized version of eulcore.xmlmap.eadmap EAD object
+      Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
+
+      Additional fields and methods are used for search, browse, and display.
     """
     
     list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
     
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
     list_title = xmlmap.XPathString(list_title_xpath)
+    "list title used for alphabetical browse - any origination name, or unittitle if there is none"
+    
     # first letter of title field - using generic descriptor because no string() conversion is needed
     first_letter = xmlmap.XPathItem("substring(%s,1,1)" % list_title_xpath)
+    "First letter of list title, used to generate list of first-letters for browse."
+
     objects = QuerySet(model=EncodedArchivalDescription, xpath="/ead", using=ExistDB(),
                        collection=settings.EXISTDB_ROOT_COLLECTION)
+    """:class:`eulcore.existdb.query.QuerySet` - similar to an object manager
+        for django db objects, used for finding and retrieving FindingAid objects
+        in eXist.
+
+        Configured to use */ead* as base search path and :class:`FindingAid` as model.
+    """
 
     def admin_info(self):
-        # generate a list of admin info fields - to be displayed, in the proper order
+        """
+        Generate a list of administrative information fields from the archive description.
+        Only includes MARBL-designated fields to be displayed as administrative information,
+        in a specified order.  Any fields not present in the finding aid will
+        not be included in the list returned.
+
+        These fields are included, in this order:
+        access restrictions, use restrictions, alternate form, related material,
+        separated material, acquisition info, custodial history, preferred citation
+
+        :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
+        """
         info = []
         if self.archdesc.access_restriction:
             info.append(self.archdesc.access_restriction)
@@ -46,7 +69,17 @@ class FindingAid(EncodedArchivalDescription):
         return info
 
     def collection_description(self):
-        # generate a list of collection description fields - to be displayed, in the proper order
+        """
+        Generate a list of collection description fields from the archive description.
+        Only includes MARBL-designated fields to be displayed as collection description,
+        in a specified order.  Any fields not present in the finding aid will
+        not be included in the list returned.
+
+        These fields are included, in this order:
+        biography/history, bibliography, scope & content, arrangement, other finding aid
+
+        :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
+        """
         fields = []
         if self.archdesc.biography_history:
             fields.append(self.archdesc.biography_history)
@@ -61,18 +94,41 @@ class FindingAid(EncodedArchivalDescription):
 
         return fields
 
-
 FindingAid.objects.model = FindingAid
 
 
 class Series(Component):
-    "c01 level series"
+    """
+      Top-level (c01) series.
+
+      Customized version of :class:`eulcore.xmlmap.eadmap.Component`
+    """
     ead = xmlmap.XPathNode("ancestor::ead", FindingAid)
+    ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
+
     objects = QuerySet(model=Component, xpath="//c01", using=ExistDB(), 
                        collection=settings.EXISTDB_ROOT_COLLECTION)
+    """:class:`eulcore.existdb.query.QuerySet` - similar to an object manager
+        for django db objects, used for finding and retrieving c01 series objects
+        in eXist.
+
+        Configured to use *//c01* as base search path and :class:`Series` as model.
+    """
 
     def series_info(self):
-        "Return whatever series information is present, in display order."
+        """"
+        Generate a list of sereies information fields.
+        Only includes MARBL-designated fields to be displayed as part of series 
+        description, in a specified order.  Any fields not present in the finding
+        aid will not be included in the list returned.
+
+        These fields are included, in this order:
+        biography/history, scope & content, arrangement, other finding aid,
+        use restrictions, access restrictions, alternate form, location of original,
+        bibliography
+
+        :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
+        """
         fields = []
         if self.biography_history:
             fields.append(self.biography_history)
@@ -96,7 +152,7 @@ class Series(Component):
         return fields
 
     def display_label(self):
-        "Series display label - *unitid : unittitle* (if unitid) or *unittitle* (no unitid)"
+        "Series display label - *unitid : unittitle* (if unitid) or *unittitle* (if no unitid)"
         return ': '.join([u for u in [self.did.unitid, self.did.unittitle] if u])
 
 # TODO: how to configure base ead class so component classtype can be overridden ?
@@ -110,18 +166,37 @@ SubordinateComponents.c = xmlmap.XPathNodeList("c01", Series)
 Series.parent = xmlmap.XPathNode("parent::node", Series)       # arg: for subseries
 
 class Subseries(Series):
-    "c02 level series"
-    series = xmlmap.XPathNode("parent::c01", Series) 
+    """
+      c02 level subseries
+
+      Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
+      :class:`Series`
+    """
+    series = xmlmap.XPathNode("parent::c01", Series)
+    ":class:`findingaids.fa.models.Series` access to c01 series this subseries belongs to"
     objects = QuerySet(model=Component, xpath="//c02", using=ExistDB(), 
                        collection=settings.EXISTDB_ROOT_COLLECTION)
+    """:class:`eulcore.existdb.query.QuerySet`
 
+        Configured to use *//c02* as base search path and :class:`Subseries` as model.
+    """
 Subseries.objects.model = Subseries
 
 class Subsubseries(Series):
-    "c03 level series"
+    """
+      c03 level subseries
+
+      Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
+      :class:`Series`
+    """
     subseries = xmlmap.XPathNode("parent::c02", Subseries)
+    ":class:`findingaids.fa.models.Subseries` access to c02 subseries this sub-subseries belongs to"
     series = xmlmap.XPathNode("ancestor::c01", Series)
+    ":class:`findingaids.fa.models.Series` access to c01 series this sub-subseries belongs to"
     objects = QuerySet(model=Component, xpath="//c03", using=ExistDB(),
                        collection=settings.EXISTDB_ROOT_COLLECTION)
+    """:class:`eulcore.existdb.query.QuerySet`
 
+        Configured to use *//c03* as base search path and :class:`Subsubseries` as model.
+    """
 Subsubseries.objects.model = Subsubseries
