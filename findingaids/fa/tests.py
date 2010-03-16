@@ -1,15 +1,16 @@
 from os import path
-from glob import glob
-import re
 from types import ListType
-from django.test import Client, TestCase
-from django.conf import settings
+from django.test import Client, TestCase as DjangoTestCase
 from eulcore.xmlmap  import load_xmlobject_from_file
 from eulcore.django.existdb.db import ExistDB
+from eulcore.django.test import TestCase
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
 from findingaids.fa.views import _series_url, _subseries_links
 
-class FindingAidTestCase(TestCase):
+exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
+exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
+
+class FindingAidTestCase(DjangoTestCase):
     # test finding aid model (customization of eulcore xmlmap ead object)
     FIXTURES = ['leverette135.xml',  # simple finding aid (no series/subseries), origination is a person name
                 'abbey244.xml',	     # finding aid with series (no subseries), origination is a corporate name
@@ -22,8 +23,8 @@ class FindingAidTestCase(TestCase):
         self.findingaid = dict()
         for file in self.FIXTURES:
             filebase = file.split('.')[0]
-            self.findingaid[filebase] = load_xmlobject_from_file(path.join(path.dirname(path.abspath(__file__)) ,
-                                  'fixtures', file), FindingAid)
+            self.findingaid[filebase] = load_xmlobject_from_file(path.join(exist_fixture_path,
+                                  file), FindingAid)
 
 
     def test_init(self):
@@ -69,29 +70,16 @@ class FindingAidTestCase(TestCase):
 
 
 class FaViewsTest(TestCase):
+    exist_fixtures = {'directory' : exist_fixture_path }
+    # NOTE: views that require full-text search tested separately below for response-time reasons
 
     def setUp(self):
         self.client = Client()
         self.db = ExistDB()
 
-        #traverse exist_fixtures and load all xml files
-        module_path = path.split(__file__)[0]
-        fixtures_glob = path.join(module_path, 'fixtures', '*.xml')
-        for fixture in glob(fixtures_glob):
-            fname = path.split(fixture)[-1]
-            exist_fname = path.join(settings.EXISTDB_ROOT_COLLECTION, fname)
-            self.db.load(open(fixture), exist_fname, True)
-
     def tearDown(self):
         pass
-
-# FIXME: does not generate useful error messages...
-    def assertPattern(self, regex, text, msg_prefix=''):
-        if msg_prefix != '':
-            msg_prefix += '.  '
-        self.assert_(re.search(re.compile(regex, re.DOTALL), text),
-        msg_prefix + "Should match '%s'" % regex)
-      
+     
     def test_title_letter_list(self):
         response = self.client.get('/titles')
         self.assertEquals(response.status_code, 200)
@@ -452,5 +440,29 @@ class FaViewsTest(TestCase):
         self.assertEqual([], _subseries_links(series))
 
 
+class FullTextFaViewsTest(TestCase):
+    # test for views that require eXist full-text index
+    exist_fixtures = { 'index' : exist_index_path,
+                       'directory' : exist_fixture_path }
 
+    def test_keyword_search(self):
+        response = self.client.get('/search/', { 'keywords' : 'raoul'})
+        self.assertEquals(response.status_code, 200)
 
+        self.assertPattern("<p[^>]*>Search results for : .*raoul.*</p>", response.content)
+        self.assertContains(response, "1 finding aid found")
+        self.assertContains(response, "/documents/raoul548")
+        self.assertContains(response, "relevance: ")
+
+        response = self.client.get('/search/', { 'keywords' : 'family papers'})
+        self.assertEquals(response.status_code, 200)
+        self.assertPattern("<p[^>]*>Search results for : .*family papers.*</p>", response.content)
+        self.assertContains(response, "4 finding aids found")
+        self.assertContains(response, "Fannie Lee Leverette scrapbooks")
+        self.assertContains(response, "Raoul family papers")
+        self.assertContains(response, "Bailey and Thurman families papers")
+        self.assertContains(response, "Abbey Theatre collection")
+
+        response = self.client.get('/search/', { 'keywords' : 'nonexistentshouldmatchnothing'})
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, "No finding aids matched")

@@ -99,7 +99,7 @@ INSTALLED_APPS = (
     'eulcore.django.testsetup',
     'eulcore.django.existdb',
     #'test_extensions',
-    'findingaids.fa'
+    'findingaids.fa',
 )
 
 EXTENSION_DIRS = (
