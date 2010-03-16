@@ -9,7 +9,6 @@ from eulcore.django.existdb.db import ExistDB
 # currently just a wrapper around ead xmlmap object,
 # with a exist queryset initialized using django-exist settings and ead model
 
-
 class FindingAid(EncodedArchivalDescription):
     """
       Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.

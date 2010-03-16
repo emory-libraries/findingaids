@@ -1,0 +1,10 @@
+{# list view of a single finding aid - expects FindingAid object as fa, with list fields #}
+<div>
+    <p><a href="{% url findingaids.fa.views.view_fa fa.eadid %}">{{ fa.list_title }}</a> </p>
+    {% ifnotequal fa.title fa.list_title %} {# FIXME: whitespace variations breaking this?? #}
+        <p>{{ fa.title }}</p>
+    {% endifnotequal %}
+    <p>{{ fa.physical_desc }}</p>
+    <p class="abstract">{{ fa.abstract }}</p>
+    {% if fa.fulltext_score %} <p class="relevance">relevance: {{ fa.fulltext_score }}</p> {% endif %}
+  </div>

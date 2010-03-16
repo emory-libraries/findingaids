@@ -121,7 +121,7 @@ class FaViewsTest(TestCase):
 
         # no finding aids
         response = self.client.get('/titles/Z')
-        self.assertContains(response, '<div>No finding aids found.</div>')
+        self.assertPattern('<div>No finding aids found for .*Z.*</div>', response.content)
 
 # view finding aid main page
 

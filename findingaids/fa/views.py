@@ -8,18 +8,26 @@ def browse_titles(request):
     "List all first letters in finding aid list title, link to browse by letter."
     first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
     return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
-                                                           'xquery': first_letters.query.getQuery() })
+                                                           'querytime': first_letters.queryTime() })
 
 def titles_by_letter(request, letter):
     "Paginated list of finding aids by first letter in list title"
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only('eadid',
-                    'list_title','title', 'author', 'unittitle', 'abstract', 'physical_desc')
     first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
-    return _paginated_browse(request, fa, letters=first_letters, current_letter=letter)
+
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*_fa_listfields())   
+    fa_subset = _paginate_queryset(request, fa)
+    query_times = [first_letters.queryTime(), fa.queryTime()]
+
+    return render_to_response('findingaids/titles_list.html',
+        {'findingaids' : fa_subset,
+         'querytime': query_times,
+         'letters': first_letters,
+         'current_letter': letter})
 
 # object pagination - adapted directly from django paginator documentation
-def _paginated_browse(request, fa, letters=None, current_letter=None):
-    paginator = Paginator(fa, 10)	# FIXME: should num per page be configurable?
+def _paginate_queryset(request, qs, per_page=10):
+    # FIXME: should num-per-page be configurable via local settings?
+    paginator = Paginator(qs, per_page)
      # Make sure page request is an int. If not, deliver first page.
     try:
         page = int(request.GET.get('page', '1'))
@@ -28,16 +36,13 @@ def _paginated_browse(request, fa, letters=None, current_letter=None):
 
     # If page request (9999) is out of range, deliver last page of results.
     try:
-        findingaids = paginator.page(page)
+        paginated_qs = paginator.page(page)
     except (EmptyPage, InvalidPage):
-        findingaids = paginator.page(paginator.num_pages)
+        paginated_qs = paginator.page(paginator.num_pages)
+
+    return paginated_qs
 
 
-    return render_to_response('findingaids/list.html', { 'findingaids' : findingaids,
-                                                         'xquery': fa.query.getQuery(),
-                                                         'querytime': fa.queryTime(),
-                                                         'letters': letters,
-                                                         'current_letter': current_letter})
 def view_fa(request, id):
     "View a single finding aid"
     try:
@@ -64,15 +69,15 @@ def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
 
 
 def _view_series(request, eadid, *series_ids):
-    #try:
-    if len(series_ids) == 1:
-        series = Series.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head').get(ead__eadid=eadid,id=series_ids[0])
-    elif len(series_ids) == 2:
-        series = Subseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id').get(ead__eadid=eadid,series__id=series_ids[0],id=series_ids[1])
-    elif len(series_ids) == 3:
-        series = Subsubseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id', 'subseries__id').get(ead__eadid=eadid,series__id=series_ids[0],subseries__id=series_ids[1],id=series_ids[2])
-    #except Exception:       # FIXME: limit to a more specific exception here...
-    #    raise Http404        
+    try:
+        if len(series_ids) == 1:
+            series = Series.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head').get(ead__eadid=eadid,id=series_ids[0])
+        elif len(series_ids) == 2:
+            series = Subseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id').get(ead__eadid=eadid,series__id=series_ids[0],id=series_ids[1])
+        elif len(series_ids) == 3:
+            series = Subsubseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id', 'subseries__id').get(ead__eadid=eadid,series__id=series_ids[0],subseries__id=series_ids[1],id=series_ids[2])
+    except Exception:       # FIXME: limit to a more specific exception here...
+        raise Http404
             
     # summary info for all top-level series in this finding aid
     all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=eadid).all()
@@ -80,6 +85,9 @@ def _view_series(request, eadid, *series_ids):
                                                                 'all_series' : all_series,
                                                                 "subseries" : _subseries_links(series) })
 
+def _fa_listfields():
+    "List of fields that should be returned for brief list display of a finding aid."
+    return ['eadid', 'list_title','title', 'abstract', 'physical_desc']
 
 def _series_url(eadid, series_id, *ids):
     """

@@ -2,24 +2,20 @@
   {% include "findingaids/browse_letters.html" %}
 {% endif %}
 
-<p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found, 
-displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
+{% if findingaids.paginator.count %}
+    <p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found,
+    displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
+{% endif %}
 
 {% for fa in findingaids.object_list %}
-  <div>
-    <p><a href="{% url findingaids.fa.views.view_fa fa.eadid %}">{{ fa.list_title }}</a> </p>	
-    {% ifnotequal fa.title fa.list_title %} {# FIXME: whitespace variations breaking this?? #}
-	<p>{{ fa.title }}</p>
-    {% endifnotequal %}
-    <p>{{ fa.physical_desc }}</p>
-    <p class="abstract">{{ fa.abstract }}</p>	
-  </div>
+    {% include "findingaids/listview_snippet.html" %}
 {% empty %}
- <div>No finding aids found.</div>
+ <div>No finding aids found for <b>{{current_letter}}</b>.</div>
 {% endfor %}
 
 
 {# copied from django pagination documentation ... probably should be better styled  #}
+{% if findingaids.paginator.count %}
 <div class="pagination">
     <span class="step-links">
         {% if findingaids.has_previous %}
@@ -35,6 +31,6 @@ displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
         {% endif %}
     </span>
 </div>
-
+{% endif %}
 
 {% if querytime %} <p>Query took {{ querytime }}ms </p> {% endif %}
