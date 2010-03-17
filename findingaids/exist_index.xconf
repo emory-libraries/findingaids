@@ -1,0 +1,37 @@
+<collection xmlns="http://exist-db.org/collection-config/1.0">
+    <index>
+	    <!-- Disable the standard full text index -->
+        <fulltext default="none" attributes="no"/>
+	    <!-- configure Lucene index -->
+        <lucene>
+            <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+        	<!-- index everything since we will search at top-level.   -->
+            <text qname="ead">
+                <!-- TODO: exclude/boost more fields? -->
+                <ignore qname="prefercite"/>
+                <ignore qname="container"/>
+            </text>
+
+<!-- index control access/subject headings, other common fields -->
+<!-- not yet in use; commenting out until actually needed
+            <text qname="persname"/>
+            <text qname="famname"/>
+            <text qname="corpname"/>
+            <text qname="subject"/>
+            <text qname="geogname"/>
+            <text qname="genreform"/>
+            <text qname="occupation"/>
+            <text qname="function"/>
+            <text qname="title"/>
+
+
+            <text qname="unittitle"/>
+            <text qname="unitdate"/>
+            <text qname="physdesc"/>
+            <text qname="abstract"/>
+            <text qname="bibliography"/>
+            <text qname="bioghist"/>
+-->
+        </lucene>
+    </index>
+</collection>
