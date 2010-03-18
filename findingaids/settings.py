@@ -106,6 +106,9 @@ EXTENSION_DIRS = (
     path.join(BASE_DIR, '../external/django-modules'),
 )
 
+
+EXISTDB_INDEX_CONFIGFILE = path.join(BASE_DIR, "exist_index.xconf")
+
 import sys
 try:
     sys.path.extend(EXTENSION_DIRS)

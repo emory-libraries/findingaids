@@ -31,6 +31,7 @@ EXISTDB_SERVER_URL      = EXISTDB_SERVER_PROTOCOL + EXISTDB_SERVER_USER + ":" + 
 # collection should begin with / -  e.g., /edc
 EXISTDB_ROOT_COLLECTION = ""
 EXISTDB_TEST_COLLECTION = ""
+# NOTE: EXISTDB_INDEX_CONFIGFILE is set in settings.py
 
 ADDITIONAL_DATA_INDEX   = ""
 DOI_PURL_HOST = "http://dx.doi.org/"
