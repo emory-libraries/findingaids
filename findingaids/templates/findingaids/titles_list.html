@@ -8,13 +8,14 @@
 
 {% if letters %}
   {% include "findingaids/browse_letters.html" %}
-  <hr/>
 {% endif %}
 
 {% if findingaids.paginator.count %}
     <p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found,
     displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
 {% endif %}
+
+<hr/>
 
 {% for fa in findingaids.object_list %}
     {% include "findingaids/listview_snippet.html" %}

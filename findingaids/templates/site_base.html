@@ -10,19 +10,20 @@
     <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
 {% endblock %}
 
+{% block site-name %}Finding Aids{% endblock %}
+{% block site-slogan %}Find Manuscripts & Archives{% endblock %}
+
 {% load eulcore_tags %}
-{% block navbar %}
-    <ul>
+{% block navbar-items %}
         <li><a href=""class="{% activebase request '^/search' %}">search</a></li>
         <li><a>collections</a></li>
         <li><a href="">About</a></li>
         {% if user.is_staff %}
             <li><a href="{% url admin:index %}">Admin</a></li>
         {% endif %}
-    </ul>
 {% endblock %}
 
 
 {% block content-bottom %}
-    {% if querytime %} <p>Query took {{ querytime }}ms </p> {% endif %}
+    {% if querytime %} <p class="query-time">quer{{ querytime|pluralize:"y,ies" }} took {{ querytime|join:", " }} ms </p> {% endif %}
 {% endblock %}

@@ -1,5 +1,5 @@
 {# list view of a single finding aid - expects FindingAid object as fa, with list fields #}
-<div>
+<div class="record_list">
     <p><a href="{% url findingaids.fa.views.view_fa fa.eadid %}">{{ fa.list_title }}</a> </p>
     {% ifnotequal fa.title fa.list_title %} {# FIXME: whitespace variations breaking this?? #}
         <p>{{ fa.title }}</p>
