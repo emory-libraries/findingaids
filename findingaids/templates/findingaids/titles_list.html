@@ -1,5 +1,14 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Browse : {{current_letter}}{% endblock %}
+
+{% block content-title %}Browse Finding Aids{% endblock %}
+
+{% block content-body %}
+
 {% if letters %}
   {% include "findingaids/browse_letters.html" %}
+  <hr/>
 {% endif %}
 
 {% if findingaids.paginator.count %}
@@ -33,4 +42,4 @@
 </div>
 {% endif %}
 
-{% if querytime %} <p>Query took {{ querytime }}ms </p> {% endif %}
+{% endblock %}

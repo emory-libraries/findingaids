@@ -1,5 +1,13 @@
 {# display a single series or subseries of a finding aid #}
-<h1><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}">{{ series.ead.title }}</a></h1>
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: {{ series.ead.title }} : {{ series.display_label }}{% endblock %}
+
+{% block content-title %}
+  <a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}">{{ series.ead.title }}</a>
+{% endblock %}
+
+{% block content-body %}
 
 <h2>Table of contents:</h2>
 <ul>
@@ -53,3 +61,5 @@
 {% else %}
   {% include "findingaids/containerlist_snippet.html" %}
 {% endif %}
+
+{% endblock %}

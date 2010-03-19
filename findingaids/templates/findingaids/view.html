@@ -1,6 +1,12 @@
-{# main display page for a single finding aid; links to series & subseries, if any #}
-<h1>{{ findingaid.title }}</h1>
+{% extends "site_base.html" %}
 
+{% block page-subtitle %}: {{ findingaid.title }}{% endblock %}
+
+{% block content-title %}{{ findingaid.title }}{% endblock %}
+
+{% block content-body %}
+
+{# main display page for a single finding aid; links to series & subseries, if any #}
 <h2>Table of contents:</h2>
 <ul>        {# FIXME: should section anchor names match what was used before? #}
  <li><a href="#descriptive_summary">Descriptive Summary</a></li>
@@ -96,3 +102,5 @@
     {% include "findingaids/containerlist_snippet.html" %}
   {% endwith %}
 {% endif %}
+
+{% endblock %}

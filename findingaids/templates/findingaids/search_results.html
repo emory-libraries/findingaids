@@ -1,3 +1,12 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Search Results {% endblock %}
+
+{% block content-title %}Search Results{% endblock %}
+
+{% block content-body %}
+
+
 {% if keywords %}<p>Search results for : <b>{{keywords}}</b></p>{% endif %}
 
 {# FIXME: should all paginator display be common template functionality?  base / snippet? #}
@@ -33,3 +42,5 @@
 {% endif %}
 
 {% if querytime %} <p>Query took {{ querytime }}ms </p> {% endif %}
+
+{% endblock %}

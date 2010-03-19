@@ -1,0 +1,28 @@
+{% extends "genlib_theme/site_base.xhtml" %}
+
+{% block page-title %}Finding Aids {% block page-subtitle %}: Home{% endblock %}{% endblock %}
+
+{% block style %}
+    {{ block.super }}
+    {% comment %}blue.css relates to the page links from the django pagination module.  {% endcomment %}
+    <link rel="stylesheet" type="text/css" href="/static/style/pagination/blue.css" />
+    {% comment %}Place Local changes, modifications and overrisdes in your local.css file.{% endcomment %}
+    <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
+{% endblock %}
+
+{% load eulcore_tags %}
+{% block navbar %}
+    <ul>
+        <li><a href=""class="{% activebase request '^/search' %}">search</a></li>
+        <li><a>collections</a></li>
+        <li><a href="">About</a></li>
+        {% if user.is_staff %}
+            <li><a href="{% url admin:index %}">Admin</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+
+{% block content-bottom %}
+    {% if querytime %} <p>Query took {{ querytime }}ms </p> {% endif %}
+{% endblock %}
