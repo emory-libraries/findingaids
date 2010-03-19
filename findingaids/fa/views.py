@@ -8,14 +8,14 @@ def site_index(request):
     "Site home page"
     first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
     return render_to_response('findingaids/index.html', { 'letters' : first_letters,
-                                                          'querytime': first_letters.queryTime(),
+                                                          'querytime': [first_letters.queryTime()],
                                                           'request': request })
 
 def browse_titles(request):
     "List all first letters in finding aid list title, link to browse by letter."
     first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
     return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
-                                                           'querytime': first_letters.queryTime(),
+                                                           'querytime': [first_letters.queryTime()],
                                                            'request': request })
 
 def titles_by_letter(request, letter):
@@ -28,7 +28,7 @@ def titles_by_letter(request, letter):
 
     return render_to_response('findingaids/titles_list.html',
         {'findingaids' : fa_subset,
-         'querytime': query_times,
+         'querytime': [query_times],
          'letters': first_letters,
          'current_letter': letter,
          'request': request })
@@ -113,7 +113,7 @@ def keyword_search(request):
     return render_to_response('findingaids/search_results.html',
             {'findingaids' : result_subset,
              'keywords'  : search_terms,
-             'querytime': query_times,
+             'querytime': [query_times],
              'request': request })
 
 

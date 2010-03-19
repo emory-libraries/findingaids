@@ -15,6 +15,7 @@
     displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
 {% endif %}
 
+<hr/>
 {% for fa in findingaids.object_list %}
     {% include "findingaids/listview_snippet.html" %}
 {% empty %}
