@@ -1,0 +1,33 @@
+div#alphalist {
+  width: 350px;
+  height: 75px;
+  margin:5px;
+  list-style-type: none;
+}
+
+div#alphalist li {
+  margin: 0px 4px 4px 0px;
+  padding: 0px;
+  text-indent: 0px;
+  display:block;
+  float:left;
+  text-align: center;
+  line-height:22px;  
+  background: none;
+}
+
+div#alphalist a {
+  border:1px solid black;  
+  font-weight:bold;
+  color:white;
+  width:22px;
+  height:20px;
+  display:block;
+  text-decoration:none;
+  line-height:22px;
+  background-color:#3a3a3a; /* FIXME: was using small gradient bg image */
+}
+
+div#alphalist a:hover, div#alphalist a.current {
+  background-color: #f19b62;
+}
