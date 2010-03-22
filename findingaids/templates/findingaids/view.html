@@ -6,6 +6,8 @@
 
 {% block content-body %}
 
+<div id="toc_series">
+    <div id="toc">
 {# main display page for a single finding aid; links to series & subseries, if any #}
 <h2>Table of contents:</h2>
 <ul>        {# FIXME: should section anchor names match what was used before? #}
@@ -17,8 +19,10 @@
    <li><a href="#dsc">{{ findingaid.dsc.head}}</a></li> 
  {% endif %}
 </ul>
+    </div>
 
 {% if findingaid.dsc.hasSeries %} {# top-level series list #}
+<div id="series">
 <h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
 {# FIXME: should use series template here-- how to make subseries display optional? #}
 <ul>
@@ -29,9 +33,11 @@
      </li>
   {% endfor %}
 </ul>
+</div>
 {% endif %}
+<br class="clear"/>
+</div>
 
- {# NOTE: current site has top-level series list duplicated here for complex finding aids #}
 <hr/>
 
 <h2><a name="descriptive_summary">Descriptive Summary</a></h2>
@@ -41,15 +47,15 @@
     <col width="80%" align="left" valign="top"/>
     {#  display the following fields, in this specific order  #}
 {# FIXME: which fields may not always be present? #}
-      <tr><td>Creator:</td><td>{{ findingaid.archdesc.origination }}</td></tr>
-      <tr><td>Title:</td><td> {{ findingaid.unittitle }} </td></tr>
-      <tr><td>Call Number:</td><td>{{ findingaid.archdesc.unitid }}</td></tr>
-      <tr><td>Extent:</td><td>{{ findingaid.archdesc.extent|join:", " }}</td></tr>
+      <tr><th>Creator:</th><td>{{ findingaid.archdesc.origination }}</td></tr>
+      <tr><th>Title:</th><td> {{ findingaid.unittitle }} </td></tr>
+      <tr><th>Call Number:</th><td>{{ findingaid.archdesc.unitid }}</td></tr>
+      <tr><th>Extent:</th><td>{{ findingaid.archdesc.extent|join:", " }}</td></tr>
    {% if findingaid.archdesc.location %}
-      <tr><td>Location:</td><td>{{ findingaid.archdesc.location }}</td></tr>
+      <tr><th>Location:</th><td>{{ findingaid.archdesc.location }}</td></tr>
    {% endif %}
-      <tr><td>Abstract:</td><td>{{ findingaid.abstract }}</td></tr>
-      <tr><td>Language:</td><td>{{ findingaid.archdesc.langmaterial }} </td></tr>
+      <tr><th>Abstract:</th><td>{{ findingaid.abstract }}</td></tr>
+      <tr><th>Language:</th><td>{{ findingaid.archdesc.langmaterial }} </td></tr>
   </table>
 
 <hr/>

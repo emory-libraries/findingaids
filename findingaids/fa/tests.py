@@ -102,10 +102,9 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<p class="abstract">Collection of play scripts')
         self.assertContains(response, '2 finding aids found')
         # test pagination ?
-        
+
         # test current letter
-        # TODO regex test?  remove whitespace to test better?
-        self.assertContains(response, "<li class='active'>")
+        self.assertPattern("<a *class='current'[^>]*>A<", response.content)
 
         # no finding aids
         response = self.client.get('/titles/Z')
@@ -121,7 +120,7 @@ class FaViewsTest(TestCase):
         response = self.client.get('/documents/leverette135')
         self.assertEquals(response.status_code, 200)
         # title
-        self.assertContains(response, '<h1>Fannie Lee Leverette scrapbooks')
+        self.assertPattern('<h1[^>]*>.*Fannie Lee Leverette scrapbooks', response.content)
         self.assertContains(response, 'circa 1900-1948</h1>')
         # descriptive summary content
         self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
@@ -253,7 +252,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Series 1.*Correspondence,.*1855-1995.*</h2>',
             response.content, "series title displayed")
         # - ead title
-        self.assertPattern('<h1><a href="/documents/bailey807">Bailey and Thurman.+families papers',
+        self.assertPattern('<h1[^>]*>.*<a href="/documents/bailey807">Bailey and Thurman.+families papers',
             response.content, "finding aid title displayed, links to main record page")
         # ead toc
         self.assertPattern('<a href="/documents/bailey807#descriptive_summary">Descriptive Summary</a>',
@@ -290,7 +289,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 1\.6.*Gaston C\. Raoul papers,.*1882-1959.*</h2>',
             response.content, "subseries title displayed")
         # - ead title
-        self.assertPattern('<h1><a href="/documents/raoul548">Raoul family papers,.*1865-1985',
+        self.assertPattern('<h1[^>]*>.*<a href="/documents/raoul548">Raoul family papers,.*1865-1985',
             response.content, "finding aid title displayed, links to main record page")
             
         # series nav
@@ -328,7 +327,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
             response.content, "sub-subseries title displayed, no physdesc")
         # - ead title
-        self.assertPattern('<h1><a href="/documents/raoul548">Raoul family papers,.*1865-1985',
+        self.assertPattern('<h1[^>]*>.*<a href="/documents/raoul548">Raoul family papers,.*1865-1985',
             response.content, "finding aid title displayed, links to main record page")
 
         # series nav

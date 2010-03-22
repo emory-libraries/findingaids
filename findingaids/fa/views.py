@@ -2,6 +2,7 @@ from django.shortcuts import render_to_response
 from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
+from django import forms
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
 
 def site_index(request):
@@ -28,7 +29,7 @@ def titles_by_letter(request, letter):
 
     return render_to_response('findingaids/titles_list.html',
         {'findingaids' : fa_subset,
-         'querytime': [query_times],
+         'querytime': query_times,
          'letters': first_letters,
          'current_letter': letter,
          'request': request })
@@ -79,13 +80,21 @@ def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
 
 
 def _view_series(request, eadid, *series_ids):
+    # additional fields to be returned
+    return_fields = ['ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'ead__dsc__head']
+    # common search parameters - last series id should be requested series, of whatever type
+    search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
     try:
         if len(series_ids) == 1:
-            series = Series.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head').get(ead__eadid=eadid,id=series_ids[0])
+            series = Series.objects.also(*return_fields).get(**search_fields)
         elif len(series_ids) == 2:
-            series = Subseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id').get(ead__eadid=eadid,series__id=series_ids[0],id=series_ids[1])
+            return_fields.append('series__id')
+            search_fields["series__id"] = series_ids[0]
+            series = Subseries.objects.also(*return_fields).get(**search_fields)
         elif len(series_ids) == 3:
-            series = Subsubseries.objects.also('ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'series__id', 'subseries__id').get(ead__eadid=eadid,series__id=series_ids[0],subseries__id=series_ids[1],id=series_ids[2])
+            return_fields.extend(['series__id', 'subseries__id'])
+            search_fields.update({"series__id": series_ids[0], "subseries__id" : series_ids[1]})
+            series = Subsubseries.objects.also(*return_fields).get(**search_fields)
     except Exception:       # FIXME: limit to a more specific exception here...
         raise Http404
             
@@ -94,27 +103,41 @@ def _view_series(request, eadid, *series_ids):
     return render_to_response('findingaids/view_series.html', { 'series' : series,
                                                                 'all_series' : all_series,
                                                                 "subseries" : _subseries_links(series),
+                                                                # anyway to get query time for series object?
+                                                                "querytime" : [series.queryTime(), all_series.queryTime()],
                                                                 'request': request  })
+
+
+class KeywordSearchForm(forms.Form):
+    keywords = forms.CharField()
+
 
 def keyword_search(request):
     "Simple keyword search - runs exist full-text terms query on all terms included."
-    # not yet implemented - if no search terms, display search form
-    search_terms = request.GET.get('keywords')
-    # common ead fields for list display, plus full-text relevance score
-    return_fields = _fa_listfields()
-    return_fields.append('fulltext_score')
-    results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('fulltext_score').only(*return_fields)
-    result_subset = _paginate_queryset(request, results)
+    form = KeywordSearchForm(request.GET)
+    if form.is_valid():
+        # not yet implemented - if no search terms, display search form
+        search_terms = request.GET.get('keywords')
+        # common ead fields for list display, plus full-text relevance score
+        return_fields = _fa_listfields()
+        return_fields.append('fulltext_score')
+        results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('fulltext_score').only(*return_fields)
+        result_subset = _paginate_queryset(request, results)
 
-    query_times = results.queryTime()
-    # FIXME: does not currently include keyword param in generated urls
-    # create a better browse view - display search terms, etc.
+        query_times = results.queryTime()
+        # FIXME: does not currently include keyword param in generated urls
+        # create a better browse view - display search terms, etc.
 
-    return render_to_response('findingaids/search_results.html',
-            {'findingaids' : result_subset,
-             'keywords'  : search_terms,
-             'querytime': [query_times],
-             'request': request })
+        return render_to_response('findingaids/search_results.html',
+                {'findingaids' : result_subset,
+                 'keywords'  : search_terms,
+                 'querytime': [query_times],
+                 'request': request })
+    else:
+        form = KeywordSearchForm()
+            
+    return render_to_response('findingaids/search_form.html',
+                    {'form' : form, 'request': request })
 
 
 

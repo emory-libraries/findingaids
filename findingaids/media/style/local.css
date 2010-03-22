@@ -25,11 +25,11 @@ div#alphalist a {
   display:block;
   text-decoration:none;
   line-height:22px;
-  background-color:#3a3a3a; /* FIXME: was using small gradient bg image */
+  background-color: #02266d; /*#3a3a3a; */ /* FIXME: was using small gradient bg image */
 }
 
 div#alphalist a:hover, div#alphalist a.current {
-  background-color: #f19b62;
+  background-color: #b98b02; /*#f19b62;*/
 }
 
 div.record_list {
@@ -43,4 +43,25 @@ div.record_list p {
 
 p.query-time {
     font-style:italic;
+}
+
+div#toc_series {
+    border: 1px solid #D9D9D9;
+    background-color: #f2f3f5;
+    margin: 0px 0px 30px;
+    padding: 20px;
+}
+
+div#toc {
+    float: left;
+    width: 230px;
+    margin-right:20px;
+}
+div#series {
+    float:left;
+    width:400px;
+}
+
+.clear {
+    clear:both;
 }

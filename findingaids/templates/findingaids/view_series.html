@@ -9,6 +9,8 @@
 
 {% block content-body %}
 
+<div id="toc_series">
+    <div id="toc">
 <h2>Table of contents:</h2>
 <ul>
  <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#descriptive_summary">Descriptive Summary</a></li>
@@ -18,7 +20,10 @@
    <li><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#control_access">{{ series.ead.archdesc.controlaccess.head }}</a></li>
  {% endif %}
 </ul>
+    </div>
 
+<div id="series">
+  <h2><a href="#dsc">{{ series.ead.dsc.head}}</a></h2>
 <ul>
   {% for component in all_series %}
     <li>
@@ -33,6 +38,9 @@
      </li>
   {% endfor %}
 </ul>
+</div>
+<br class="clear"/>
+</div>
 
 <h2>
   {{ series.did.unitid }}<br/>
