@@ -2,22 +2,24 @@ from django.shortcuts import render_to_response
 from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
-from django import forms
+from django.template import RequestContext
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
+from findingaids.fa.forms import KeywordSearchForm
 
 def site_index(request):
     "Site home page"
     first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
     return render_to_response('findingaids/index.html', { 'letters' : first_letters,
-                                                          'querytime': [first_letters.queryTime()],
-                                                          'request': request })
+                                                          'querytime': [first_letters.queryTime()]},
+                                                          context_instance=RequestContext(request)
+                                                          )
 
 def browse_titles(request):
     "List all first letters in finding aid list title, link to browse by letter."
     first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
     return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
-                                                           'querytime': [first_letters.queryTime()],
-                                                           'request': request })
+                                                           'querytime': [first_letters.queryTime()]},
+                                                          context_instance=RequestContext(request))
 
 def titles_by_letter(request, letter):
     "Paginated list of finding aids by first letter in list title"
@@ -31,8 +33,8 @@ def titles_by_letter(request, letter):
         {'findingaids' : fa_subset,
          'querytime': query_times,
          'letters': first_letters,
-         'current_letter': letter,
-         'request': request })
+         'current_letter': letter},
+         context_instance=RequestContext(request))
 
 # object pagination - adapted directly from django paginator documentation
 def _paginate_queryset(request, qs, per_page=10):
@@ -63,8 +65,8 @@ def view_fa(request, id):
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid])
     
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
-                                                         'series' : series,
-                                                         'request': request })
+                                                         'series' : series},
+                                                         context_instance=RequestContext(request))
 
 def view_series(request, id, series_id):
     "View a single series (c01) from a finding aid"
@@ -104,12 +106,9 @@ def _view_series(request, eadid, *series_ids):
                                                                 'all_series' : all_series,
                                                                 "subseries" : _subseries_links(series),
                                                                 # anyway to get query time for series object?
-                                                                "querytime" : [series.queryTime(), all_series.queryTime()],
-                                                                'request': request  })
+                                                                "querytime" : [series.queryTime(), all_series.queryTime()]},
+                                                                context_instance=RequestContext(request))
 
-
-class KeywordSearchForm(forms.Form):
-    keywords = forms.CharField()
 
 
 def keyword_search(request):
@@ -131,13 +130,14 @@ def keyword_search(request):
         return render_to_response('findingaids/search_results.html',
                 {'findingaids' : result_subset,
                  'keywords'  : search_terms,
-                 'querytime': [query_times],
-                 'request': request })
+                 'querytime': [query_times]},
+                 context_instance=RequestContext(request))
     else:
         form = KeywordSearchForm()
             
     return render_to_response('findingaids/search_form.html',
-                    {'form' : form, 'request': request })
+                    {'form' : form, 'request': request },
+                    context_instance=RequestContext(request))
 
 
 

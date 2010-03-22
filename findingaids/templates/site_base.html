@@ -15,7 +15,7 @@
 
 {% load eulcore_tags %}
 {% block navbar-items %}
-        <li><a href=""class="{% activebase request '^/search' %}">search</a></li>
+        <li><a href="{% url findingaids.fa.views.keyword_search %}"class="{% activebase request '^/search' %}">search</a></li>
         <li><a>collections</a></li>
         <li><a href="">About</a></li>
         {% if user.is_staff %}
@@ -23,6 +23,18 @@
         {% endif %}
 {% endblock %}
 
+{% block sidebar-left %}
+  {% if form %}
+  <div id="keyword-search">
+      Search all Finding Aids
+      <form action="{% url findingaids.fa.views.keyword_search %}" method="get">
+        {{form.keywords}}
+        <input class="form-submit" type="submit" value="Search" />
+      </form>
+  </div>
+
+  {% endif %}
+{% endblock %}
 
 {% block content-bottom %}
     {% if querytime %} <p class="query-time">quer{{ querytime|pluralize:"y,ies" }} took {{ querytime|join:", " }} ms </p> {% endif %}

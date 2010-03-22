@@ -89,6 +89,16 @@ TEMPLATE_DIRS = (
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
+TEMPLATE_CONTEXT_PROCESSORS = (
+    #django default context processors
+    "django.core.context_processors.auth",
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    # additional context processors
+    "django.core.context_processors.request", # always include request in render context
+    "findingaids.fa.context_processors.searchform",  # search form on every page
+)
 
 INSTALLED_APPS = (
 #    'django.contrib.auth',
