@@ -8,7 +8,7 @@
 
 {# main display page for a single finding aid; links to series & subseries, if any #}
 <div id="toc_series">
-    {% with series.ead as ead %}
+    {% with findingaid as ead %}
         {% include "findingaids/toc_snippet.html" %}
     {% endwith %}
     

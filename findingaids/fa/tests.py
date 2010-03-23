@@ -230,6 +230,15 @@ class FaViewsTest(TestCase):
         self.assertPattern('<a href.*>Series 4:.*Miscellaneous,.*1881-1982.*</a>',
             response.content, "series 4 link")
 
+    def test_view_indexentry(self):
+        response = self.client.get('/documents/raoul548')
+        self.assertContains(response, 'Index of Selected Correspondents')
+        # first index name and ref
+        self.assertContains(response, 'Alexander, Edwin Porter, 1835-1910')
+        self.assertContains(response, 'Series 1 - 2:1 (2); 2:5 (1)')
+        # last index name and ref
+        self.assertContains(response, 'Woolford, T. Guy')
+        self.assertContains(response, 'Series 1 - 32:4 (10); 32:5 (3)')
 
     def test_view_nodsc(self):
         response = self.client.get('/documents/adams465')
@@ -316,6 +325,9 @@ class FaViewsTest(TestCase):
             "sample middle content of subseries 1.6")
         self.assertPattern('22.*23.*1910-1912', response.content,
             "last content of subseries 1.6")
+
+        # top-level ToC on series page should include index link
+        self.assertContains(response, 'Index of Selected Correspondents')
 
 
     def test_view_subsubseries__raoul_series4_1a(self):
