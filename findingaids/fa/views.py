@@ -83,7 +83,8 @@ def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
 
 def _view_series(request, eadid, *series_ids):
     # additional fields to be returned
-    return_fields = ['ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head', 'ead__dsc__head']
+    return_fields = ['ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head',
+        'ead__dsc__head', 'ead__archdesc__index__head']
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
     try:

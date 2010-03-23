@@ -1,0 +1,16 @@
+{# table of contents for a finding aid - expects finding aid object as ead #}
+{% url findingaids.fa.views.view_fa ead.eadid as ead_url %} {# store url for main finding aid page #}
+<div id="toc">
+    <h2>Table of contents:</h2>
+    <ul>
+         <li><a href="{{ ead_url }}#descriptive_summary">Descriptive Summary</a></li>
+         <li><a href="{{ ead_url }}#administrative_information">Administrative Information</a></li>
+         <li><a href="{{ ead_url }}#collection_description">Collection Description</a></li>
+         {% if ead.archdesc.controlaccess.head %}
+           <li><a href="{{ ead_url }}#control_access">{{ ead.archdesc.controlaccess.head }}</a></li>
+         {% endif %}
+         {% if ead.archdesc.index %}
+           <li><a href="{{ ead_url }}#index">{{ ead.archdesc.index.head }}</a></li>
+         {% endif %}
+    </ul>
+</div>

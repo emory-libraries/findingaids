@@ -6,21 +6,12 @@
 
 {% block content-body %}
 
-<div id="toc_series">
-    <div id="toc">
 {# main display page for a single finding aid; links to series & subseries, if any #}
-<h2>Table of contents:</h2>
-<ul>        {# FIXME: should section anchor names match what was used before? #}
- <li><a href="#descriptive_summary">Descriptive Summary</a></li>
- <li><a href="#administrative_information">Administrative Information</a></li>
- <li><a href="#collection_description">Collection Description</a></li>
- <li><a href="#control_access">{{ findingaid.archdesc.controlaccess.head }}</a></li>
- {% if findingaid.dsc and not findingaid.dsc.hasSeries %} 
-   <li><a href="#dsc">{{ findingaid.dsc.head}}</a></li> 
- {% endif %}
-</ul>
-    </div>
-
+<div id="toc_series">
+    {% with series.ead as ead %}
+        {% include "findingaids/toc_snippet.html" %}
+    {% endwith %}
+    
 {% if findingaid.dsc.hasSeries %} {# top-level series list #}
 <div id="series">
 <h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
@@ -107,6 +98,23 @@
   {% with findingaid.dsc as series %}
     {% include "findingaids/containerlist_snippet.html" %}
   {% endwith %}
+{% endif %}
+
+{% if findingaid.archdesc.index %}
+<hr/>
+<div>
+<a name="index"><h2>{{ findingaid.archdesc.index.head }}</h2></a>
+{% for entry in  findingaid.archdesc.index.entry %}
+   <div class="indexentry">
+       <b>{{ entry.name }}</b>
+       <ul>
+       {% for ref in entry.ptrgroup.ref %}
+         <li>{{ ref }}</li>
+       {% endfor %}
+       </ul>
+    </div>
+{% endfor %}
+</div>
 {% endif %}
 
 {% endblock %}
