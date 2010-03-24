@@ -3,13 +3,15 @@ from eulcore import xmlmap
 from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, SubordinateComponents
 from eulcore.existdb.query import QuerySet
 from eulcore.django.existdb.db import ExistDB
+from eulcore.django.existdb.manager import Manager
+from eulcore.django.existdb.models import XmlModel
 
 
 # finding aid model
 # currently just a wrapper around ead xmlmap object,
 # with a exist queryset initialized using django-exist settings and ead model
 
-class FindingAid(EncodedArchivalDescription):
+class FindingAid(XmlModel, EncodedArchivalDescription):
     """
       Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
 
@@ -19,20 +21,19 @@ class FindingAid(EncodedArchivalDescription):
     list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
     
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
-    list_title = xmlmap.XPathString(list_title_xpath)
+    list_title = xmlmap.StringField(list_title_xpath)
     "list title used for alphabetical browse - any origination name, or unittitle if there is none"
     
     # first letter of title field - using generic descriptor because no string() conversion is needed
-    first_letter = xmlmap.XPathItem("substring(%s,1,1)" % list_title_xpath)
+    first_letter = xmlmap.ItemField("substring(%s,1,1)" % list_title_xpath)
     "First letter of list title, used to generate list of first-letters for browse."
 
-    objects = QuerySet(model=EncodedArchivalDescription, xpath="/ead", using=ExistDB(),
-                       collection=settings.EXISTDB_ROOT_COLLECTION)
-    """:class:`eulcore.existdb.query.QuerySet` - similar to an object manager
+    objects = Manager('/ead')
+    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving FindingAid objects
         in eXist.
 
-        Configured to use */ead* as base search path and :class:`FindingAid` as model.
+        Configured to use */ead* as base search path.
     """
 
     def admin_info(self):
@@ -93,25 +94,24 @@ class FindingAid(EncodedArchivalDescription):
 
         return fields
 
-FindingAid.objects.model = FindingAid
 
-
-class Series(Component):
+class Series(XmlModel, Component):
     """
       Top-level (c01) series.
 
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`
     """
-    ead = xmlmap.XPathNode("ancestor::ead", FindingAid)
+    ead = xmlmap.NodeField("ancestor::ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
-    objects = QuerySet(model=Component, xpath="//c01", using=ExistDB(), 
-                       collection=settings.EXISTDB_ROOT_COLLECTION)
-    """:class:`eulcore.existdb.query.QuerySet` - similar to an object manager
+    parent = xmlmap.NodeField("parent::node", "self")
+
+    objects = Manager('//c01')
+    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c01 series objects
         in eXist.
 
-        Configured to use *//c01* as base search path and :class:`Series` as model.
+        Configured to use *//c01* as base search path.
     """
 
     def series_info(self):
@@ -156,13 +156,12 @@ class Series(Component):
 
 # TODO: how to configure base ead class so component classtype can be overridden ?
 
-Series.objects.model = Series
 # override component.c node_class
 # subcomponents need to be initialized as Series to get display_label, series list...
 # FIXME: there must be a better way to do this!
-Component.c = xmlmap.XPathNodeList("c02|c03|c04|c05|c06|c07|c08|c09|c10|c11|c12", Series)
-SubordinateComponents.c = xmlmap.XPathNodeList("c01", Series)
-Series.parent = xmlmap.XPathNode("parent::node", Series)       # arg: for subseries
+Component.c.field.node_class = Series
+SubordinateComponents.c.field.node_class = Series
+
 
 class Subseries(Series):
     """
@@ -171,15 +170,14 @@ class Subseries(Series):
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
       :class:`Series`
     """
-    series = xmlmap.XPathNode("parent::c01", Series)
+    series = xmlmap.NodeField("parent::c01", Series)
     ":class:`findingaids.fa.models.Series` access to c01 series this subseries belongs to"
-    objects = QuerySet(model=Component, xpath="//c02", using=ExistDB(), 
-                       collection=settings.EXISTDB_ROOT_COLLECTION)
-    """:class:`eulcore.existdb.query.QuerySet`
+    objects = Manager('//c02')
+    """:class:`eulcore.django.existdb.manager.Manager`
 
-        Configured to use *//c02* as base search path and :class:`Subseries` as model.
+        Configured to use *//c02* as base search path.
     """
-Subseries.objects.model = Subseries
+
 
 class Subsubseries(Series):
     """
@@ -188,14 +186,12 @@ class Subsubseries(Series):
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
       :class:`Series`
     """
-    subseries = xmlmap.XPathNode("parent::c02", Subseries)
+    subseries = xmlmap.NodeField("parent::c02", Subseries)
     ":class:`findingaids.fa.models.Subseries` access to c02 subseries this sub-subseries belongs to"
-    series = xmlmap.XPathNode("ancestor::c01", Series)
+    series = xmlmap.NodeField("ancestor::c01", Series)
     ":class:`findingaids.fa.models.Series` access to c01 series this sub-subseries belongs to"
-    objects = QuerySet(model=Component, xpath="//c03", using=ExistDB(),
-                       collection=settings.EXISTDB_ROOT_COLLECTION)
-    """:class:`eulcore.existdb.query.QuerySet`
+    objects = Manager('//c03')
+    """:class:`eulcore.django.existdb.manager.Manager`
 
-        Configured to use *//c03* as base search path and :class:`Subsubseries` as model.
+        Configured to use *//c03* as base search path.
     """
-Subsubseries.objects.model = Subsubseries
