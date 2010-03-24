@@ -159,8 +159,8 @@ class Series(XmlModel, Component):
 # override component.c node_class
 # subcomponents need to be initialized as Series to get display_label, series list...
 # FIXME: there must be a better way to do this!
-Component.c.field.node_class = Series
-SubordinateComponents.c.field.node_class = Series
+Component._fields['c'].node_class = Series
+SubordinateComponents._fields['c'].node_class = Series
 
 
 class Subseries(Series):
