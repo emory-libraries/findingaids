@@ -110,6 +110,13 @@ class FaViewsTest(TestCase):
         response = self.client.get('/titles/Z')
         self.assertPattern('<div>No finding aids found for .*Z.*</div>', response.content)
 
+    def test_listview(self):
+        response = self.client.get('/titles/B')
+
+        # finding aid with no origination - unit title used as browse title & link   
+        # - unit title should only be displayed once
+        self.assertContains(response, 'Bailey and Thurman', 1)
+
 # view finding aid main page
 
     def test_view_notfound(self):
