@@ -1,0 +1,46 @@
+The following text should be used as apache rewrite rules to redirect
+urls from the current drupal-embedded finding aids urls as well as the
+previous stand-alone php finding aids.
+
+Notes:
+ - These patterns should work for both drupal-embedded versions of the
+   urls and the standalone-php urls (no longer acceptable, but still
+   getting hits in the apache log from search engines)
+   - the trailing ? on new urls is used to clear out the query string 
+     in the new urls
+ - a RewriteBase may need to be specified
+ - rewrite patterns may need to be updated if current document/series
+   format changes
+ - currently redirecting any series other than top-level to main
+   page for that finding aid; if the full url can be inferred from the
+   data available in the initial url, we should do that; if not, this
+   is an acceptable substitute,  but perhaps the series redirect
+   should not uss a permanent redirect code.
+ - assuming redirects are not needed for other portions of the site
+   (browse, search, etc.)
+
+
+-------------
+
+
+RewriteEngine on
+
+# finding aid top-level series page 
+RewriteCond %{QUERY_STRING} q=findingaids/content [OR]
+RewriteCond %{REQUEST_URI} content.php
+RewriteCond %{QUERY_STRING} el=c01
+# capture base id in query string and rewrite for document id
+RewriteCond %{QUERY_STRING} id=([^_]+)_(series[0-9]+)
+RewriteRule ^.*$ http://findingaids.library.emory.edu/documents/%1/%1_%2? [R=permanent,L]
+
+# main finding aid page - will also redirect subseries to main finding aid page
+# NOTE: redirecting subseries to main finding aid page should perhaps use a different redirect code
+RewriteCond %{QUERY_STRING} q=findingaids/content [OR]
+RewriteCond %{REQUEST_URI} content.php
+# capture base id in query string and rewrite for document id
+RewriteCond %{QUERY_STRING} id=([^_]+)_.+
+RewriteRule ^.*$ http://findingaids.library.emory.edu/documents/%1? [R=permanent,L]
+
+# redirect everything else to main finding aids page
+# marbl.library.emory.edu/findingaids/ , marbl.library.emory.edu/findingaids/index.html
+RewriteRule .* http://findingaids.library.emory.edu/? [R=permanent,L]
