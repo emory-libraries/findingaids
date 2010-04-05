@@ -1,8 +1,5 @@
-from django.conf import settings
 from eulcore import xmlmap
 from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, SubordinateComponents
-from eulcore.existdb.query import QuerySet
-from eulcore.django.existdb.db import ExistDB
 from eulcore.django.existdb.manager import Manager
 from eulcore.django.existdb.models import XmlModel
 
