@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
 
    findingaids
+   readme
 
 
 Indices and tables
@@ -21,3 +22,5 @@ Indices and tables
 * :ref:`modindex`
 * :ref:`search`
 
+
+.. todolist::

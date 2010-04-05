@@ -41,3 +41,5 @@ Views
 -----
 .. automodule:: findingaids.fa.views
    :members:
+
+.. todo:: use more specific exceptions when object is not found in exist
