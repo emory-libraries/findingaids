@@ -1,5 +1,6 @@
 {# display a single series or subseries of a finding aid #}
 {% extends "site_base.html" %}
+{% load ead %}
 
 {% block page-subtitle %}: {{ series.ead.title }} : {{ series.display_label }}{% endblock %}
 
@@ -20,11 +21,11 @@
     <li>
         {% ifequal series.id component.id %}
            {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
-            {{ component.did.unittitle }}
+            {{ component.did.unittitle|format_ead }}
         {% else %}
            <a href="{% url findingaids.fa.views.view_series id=series.ead.eadid,series_id=component.id %}">
             {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
-                {{ component.did.unittitle }}</a>
+                {{ component.did.unittitle|format_ead }}</a>
         {% endifequal %}
      </li>
   {% endfor %}
@@ -35,7 +36,7 @@
 
 <h2>
   {{ series.did.unitid }}<br/>
-  {{ series.did.unittitle }}  {{ series.did.unitdate|default:'' }} <br/>
+  {{ series.did.unittitle|format_ead }}  {{ series.did.unitdate|default:'' }} <br/>
   {{ series.did.physdesc|default:'' }}
 </h2>
 

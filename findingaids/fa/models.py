@@ -149,7 +149,7 @@ class Series(XmlModel, Component):
 
     def display_label(self):
         "Series display label - *unitid : unittitle* (if unitid) or *unittitle* (if no unitid)"
-        return ': '.join([u for u in [self.did.unitid, self.did.unittitle] if u])
+        return ': '.join([u for u in [self.did.unitid, unicode(self.did.unittitle)] if u])
 
 # TODO: how to configure base ead class so component classtype can be overridden ?
 

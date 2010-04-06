@@ -1,4 +1,5 @@
 {% extends "site_base.html" %}
+{% load ead %}
 
 {% block page-subtitle %}: {{ findingaid.title }}{% endblock %}
 
@@ -20,7 +21,7 @@
   {% for component in findingaid.dsc.c %}
     <li><a href="{% url findingaids.fa.views.view_series id=findingaid.eadid,series_id=component.id %}"> 
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
-        {{ component.did.unittitle }}</a>
+        {{ component.did.unittitle|format_ead }}</a>
      </li>
   {% endfor %}
 </ul>
@@ -39,13 +40,13 @@
     {#  display the following fields, in this specific order  #}
 {# FIXME: which fields may not always be present? #}
       <tr><th>Creator:</th><td>{{ findingaid.archdesc.origination }}</td></tr>
-      <tr><th>Title:</th><td> {{ findingaid.unittitle }} </td></tr>
+      <tr><th>Title:</th><td> {{ findingaid.unittitle|format_ead }} </td></tr>
       <tr><th>Call Number:</th><td>{{ findingaid.archdesc.unitid }}</td></tr>
       <tr><th>Extent:</th><td>{{ findingaid.archdesc.extent|join:", " }}</td></tr>
    {% if findingaid.archdesc.location %}
       <tr><th>Location:</th><td>{{ findingaid.archdesc.location }}</td></tr>
    {% endif %}
-      <tr><th>Abstract:</th><td>{{ findingaid.abstract }}</td></tr>
+      <tr><th>Abstract:</th><td>{{ findingaid.abstract|format_ead }}</td></tr>
       <tr><th>Language:</th><td>{{ findingaid.archdesc.langmaterial }} </td></tr>
   </table>
 
@@ -56,7 +57,7 @@
    <div>
    	<h3>{{ section.head }}</h3>
 	{% for para in section.content %}
-	    <p>{{para}}</p>
+	    <p>{{ para|format_ead }}</p>
 	{% endfor %}
    </div>
  {% endfor %}
@@ -68,7 +69,7 @@
    <div>
    	<h3>{{ section.head }}</h3>
 	{% for para in section.content %}
-	    <p>{{para}}</p>
+	    <p>{{ para|format_ead }}</p>
 	{% endfor %}
    </div>
  {% endfor %}

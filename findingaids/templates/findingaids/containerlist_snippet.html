@@ -1,4 +1,5 @@
 {# expects series #}
+{% load ead %}
 
     <table>
         <col width="7%" align="left" valign="top"/>
@@ -21,9 +22,9 @@
             <td>{{ container }}</td>            
             {% endfor %}
             <td {% if not component.did.container %} style="font-weight:bold" colspan="3" {% endif %} > {# FIXME temporary style #}
-                {{ component.did.unittitle }} 
+                {{ component.did.unittitle|format_ead }} 
                 {{ component.did.physdesc|default:'' }}
-                {{ component.did.abstract|default:'' }}
+                {{ component.did.abstract|format_ead }}
                 {{ component.did.note|default:'' }}
             </td>
         </tr>

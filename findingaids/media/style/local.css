@@ -71,3 +71,13 @@ div#keyword-search {
     background-color: #f2f3f5;
     padding:10px;
 }
+
+.ead-bold {
+    font-weight: bold;
+}
+.ead-italic {
+    font-style: italic;
+}
+.ead-title {
+    font-style: italic;
+}
