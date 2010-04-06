@@ -43,3 +43,9 @@ Views
    :members:
 
 .. todo:: use more specific exceptions when object is not found in exist
+
+
+Custom Template Filters
+-----------------------
+.. automodule:: findingaids.fa.templatetags.ead
+   :members:
