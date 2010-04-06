@@ -1,7 +1,6 @@
 # Django local settings for edc project.
 
 # all settings in debug section should be false in production environment
-[debug]
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEV_ENV = True
@@ -21,17 +20,10 @@ CACHE_BACKEND = 'file:///tmp/django_cache'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 #Exist DB Settings
-EXISTDB_SERVER_PROTOCOL = "http://"
-# hostname, port, & path to exist xmlrpc - e.g., "localhost:8080/exist/xmlrpc"
-EXISTDB_SERVER_HOST     = ""
-EXISTDB_SERVER_USER     = ""
-EXISTDB_SERVER_PWD      = ""
-EXISTDB_SERVER_URL      = EXISTDB_SERVER_PROTOCOL + EXISTDB_SERVER_USER + ":" + \
-    EXISTDB_SERVER_PWD + "@" + EXISTDB_SERVER_HOST
+EXISTDB_SERVER_URL      = 'http://user:password@existdb.example.com/exist/xmlrpc'
 # collection should begin with / -  e.g., /edc
 EXISTDB_ROOT_COLLECTION = ""
 EXISTDB_TEST_COLLECTION = ""
-# NOTE: EXISTDB_INDEX_CONFIGFILE is set in settings.py
 
 ADDITIONAL_DATA_INDEX   = ""
 DOI_PURL_HOST = "http://dx.doi.org/"
