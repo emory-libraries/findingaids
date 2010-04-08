@@ -1,24 +1,18 @@
 <ead id="raoul548_1004226" relatedencoding="MARC21">
-    <eadheader countryencoding="iso3166-1" dateencoding="iso8601" id="raoul548_10018" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
+    <eadheader countryencoding="iso3166-1" dateencoding="iso8601" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
         <eadid countrycode="us" identifier="raoul548.xml" mainagencycode="geu-s">raoul548</eadid>
         <filedesc id="raoul548_10012">
             <titlestmt id="raoul548_1003">
-                <titleproper encodinganalog="Title" id="raoul548_1001">Raoul family papers,
-
-			 1865-1985</titleproper>
-                <author encodinganalog="Creator" id="raoul548_1002">Manuscript, Archives, and Rare Book
-
-			 Library, Emory University</author>
+                <titleproper encodinganalog="Title">Raoul family papers, 1865-1985</titleproper>
+                <author encodinganalog="Creator">Manuscript, Archives, and Rare Book Library, Emory University</author>
             </titlestmt>
-            <publicationstmt id="raoul548_10011">
-                <publisher encodinganalog="Publisher" id="raoul548_1004">Emory University</publisher>
-                <address id="raoul548_1009">
-                    <addressline id="raoul548_1005">Manuscript, Archives, and Rare Book
-
-				Library</addressline>
-                    <addressline id="raoul548_1006">Atlanta, GA 30322</addressline>
-                    <addressline id="raoul548_1007">404-727-6887</addressline>
-                    <addressline id="raoul548_1008">Fax: 404-727-0360</addressline>
+            <publicationstmt>
+                <publisher encodinganalog="Publisher">Emory University</publisher>
+                <address>
+                    <addressline>Manuscript, Archives, and Rare Book Library</addressline>
+                    <addressline>Atlanta, GA 30322</addressline>
+                    <addressline>404-727-6887</addressline>
+                    <addressline>Fax: 404-727-0360</addressline>
                 </address>
                 <date calendar="gregorian" encodinganalog="Date" era="ce" id="raoul548_10010" normal="2006-08-09">August 9, 2006</date>
             </publicationstmt>
@@ -984,7 +978,6 @@
 					 name.</persname>
                         </origination>
                         <unittitle id="raoul548_100360" type="245$a">Mary Wadley Raoul papers, 
-
 				  <unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="raoul548_100359" normal="1865/1936" type="inclusive">1865-1936</unitdate>
                         </unittitle>
                         <physdesc encodinganalog="300" id="raoul548_100361">Boxes 3-4</physdesc>
@@ -4367,7 +4360,7 @@
                         </did>
                     </c03>
                 </c02>
-                <c02 id="raoul548_1002595" level="subseries">
+                <c02 id="raoul548_s1.10" level="subseries">
                     <did id="raoul548_1002381">
                         <unitid id="raoul548_1002375">Subseries 1.10</unitid>
                         <origination id="raoul548_1002377">

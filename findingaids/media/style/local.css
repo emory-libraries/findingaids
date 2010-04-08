@@ -46,6 +46,7 @@ p.query-time {
 }
 
 div#toc_series {
+    clear: both;
     border: 1px solid #D9D9D9;
     background-color: #f2f3f5;
     margin: 0px 0px 30px;
@@ -65,11 +66,47 @@ div#series {
 .clear {
     clear:both;
 }
+th, td {
+    text-align: left;
+    vertical-align: top;
+}
 
+table#descriptive_summary th {
+    padding-right:5px;
+    width:150px;
+}
+div.fa li {
+   list-style-type:none;
+   background: none;
+}
+
+div#control_access ul, div#control_access li, div#index ul, div#index li { 
+    margin: 0px;
+    padding: 0px;
+}
+div#control_access h3 {
+    margin-top: 5px;
+    margin-bottom: 0px;
+}
+
+table.box-folder .bf {
+    width: 50px;
+}
+
+table.box-folder .section {
+  font-weight: bold;
+}
 div#keyword-search {
     border: 1px solid #D9D9D9;
     background-color: #f2f3f5;
-    padding:10px;
+    padding: 5px;
+}
+
+div#print-links {
+    float:right;
+}
+div#print-links a {
+    text-decoration: none;
 }
 
 .ead-bold {

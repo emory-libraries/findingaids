@@ -9,13 +9,16 @@
 {% endblock %}
 
 {% block content-body %}
+<div id="print-links">
+    <p><a class="pdf" href="{% url printable-fa id=series.ead.eadid %}">PDF Version</a></p>
+</div>
 
 <div id="toc_series">
     {% with series.ead as ead %}
-        {% include "findingaids/toc_snippet.html" %}
+        {% include "findingaids/sections/toc.html" %}
     {% endwith %}
 <div id="series">
-  <h2><a href="#dsc">{{ series.ead.dsc.head}}</a></h2>
+  <h2><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#dsc">{{ series.ead.dsc.head}}</a></h2>
 <ul>
   {% for component in all_series %}
     <li>
@@ -34,32 +37,6 @@
 <br class="clear"/>
 </div>
 
-<h2>
-  {{ series.did.unitid }}<br/>
-  {{ series.did.unittitle|format_ead }}  {{ series.did.unitdate|default:'' }} <br/>
-  {{ series.did.physdesc|default:'' }}
-</h2>
-
-{% for section in series.series_info %}
-   <div>
-   	<h3>{{ section.head }}</h3>
-	{% for para in section.content %}
-	    <p>{{para}}</p>
-	{% endfor %}
-   </div>
-{% endfor %}
-
-<hr/>
-{# container list or series/subseries listing #}
-{% if series.hasSubseries %}
-<h3>Description of Subseries</h3>
-    <ul>
-       {% autoescape off %}
-           {{ subseries|unordered_list }}
-       {% endautoescape %}
-    </ul>
-{% else %}
-  {% include "findingaids/containerlist_snippet.html" %}
-{% endif %}
+{% include "findingaids/sections/series.html" %}
 
 {% endblock %}

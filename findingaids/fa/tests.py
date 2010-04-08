@@ -5,7 +5,7 @@ from eulcore.xmlmap  import load_xmlobject_from_file
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
-from findingaids.fa.views import _series_url, _subseries_links
+from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
@@ -82,7 +82,7 @@ class FaViewsTest(TestCase):
      
     def test_title_letter_list(self):
         response = self.client.get('/titles')
-        self.assertEquals(response.status_code, 200)
+        self.assertEquals(response.status_code, 301)    # redirect to titles/
 
         response = self.client.get('/titles/')
         self.assertEquals(response.status_code, 200)
@@ -178,7 +178,7 @@ class FaViewsTest(TestCase):
         # dsc
         self.assertPattern('<h2>.*Container List.*</h2>', response.content,
             "simple finding aid (leverette) view includes container list")
-        self.assertPattern('Scrapbook 1.*Box.*Folder.*Content.*MF1', response.content,
+        self.assertPattern('Box.*Folder.*Content.*Scrapbook 1.*MF1', response.content,
             "Scrapbook 1 in container list")
         self.assertPattern('MF1.*1.*Photo and clippings re Fannie Lee Leverette',
             response.content, "photo clippings in container list")
@@ -456,6 +456,49 @@ class FaViewsTest(TestCase):
         # all required parent ids - no exception
         series = Subsubseries.objects.also('ead__eadid', 'series__id', 'subseries__id').get(id='raoul548_4.1a')
         self.assertEqual([], _subseries_links(series))
+
+    def test__subseries_links_anchors(self):
+        # subseries links  - generate same-page anchors instead of full urls
+        fa = FindingAid.objects.get(eadid='raoul548')
+        links = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
+
+        self.assert_("Series 1: Letters and personal papers" in links[0])
+        self.assert_("href='#raoul548_1003223'" in links[0])
+        # subseries
+        self.assert_("href='#raoul548_100355'" in links[1][0])
+
+
+
+    def test_printable_fa(self):
+        # using 'full' html version of pdf for easier testing
+        response = self.client.get('/documents/raoul548/full')
+        self.assertEquals(response.status_code, 200)        
+        # publication info         
+        self.assertPattern('Emory University.*Manuscript, Archives, and Rare Book Library.*Atlanta, GA 30322', response.content,
+            "publication statement included")
+
+        # NOTE: using same section templates as other views, which are tested more thoroughly above
+        # here, just checking that appropriate sections are present
+
+        # description
+        self.assertContains(response, "Descriptive Summary")
+        # controlaccess not included in print copy
+        self.assertContains(response, "Selected Search Terms", 0)
+        # series list, and all series down to c03 level
+        self.assertContains(response, "Description of Series")
+        # series links are anchors in the same page
+        self.assertPattern('<a href=\'#raoul548_s1\.10\'>Subseries 1.10', response.content)
+        self.assertPattern('<h2 class="series">.*Series 1 .*Letters and personal papers,.* 1865-1982.*</h2>', response.content)
+        self.assertPattern('<h2 class="subseries">.*Subseries 1.2 .*Mary Wadley Raoul papers,.* 1865-1936.*</h2>', response.content)
+        # index
+        self.assertContains(response, "Index of Selected Correspondents")
+
+        # simple finding aid with no subseries - should have container list
+        response = self.client.get('/documents/leverette135/full')
+        self.assertContains(response, "Container List")
+
+
+
 
 
 class FullTextFaViewsTest(TestCase):

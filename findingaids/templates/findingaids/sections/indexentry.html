@@ -1,0 +1,16 @@
+{# index and index entries - expects FindingAid object as findingaid #}
+{% if findingaid.archdesc.index %}
+<div class="nextpage">
+<a name="index"><h2>{{ findingaid.archdesc.index.head }}</h2></a>
+{% for entry in  findingaid.archdesc.index.entry %}
+   <div class="indexentry">
+       <b>{{ entry.name }}</b>
+       <ul>
+       {% for ref in entry.ptrgroup.ref %}
+         <li>{{ ref }}</li>
+       {% endfor %}
+       </ul>
+    </div>
+{% endfor %}
+</div>
+{% endif %}

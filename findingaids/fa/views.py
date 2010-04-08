@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
 from findingaids.fa.forms import KeywordSearchForm
+from findingaids.fa.utils import render_to_pdf
 
 def site_index(request):
     "Site home page"
@@ -140,7 +141,22 @@ def keyword_search(request):
                     {'form' : form, 'request': request },
                     context_instance=RequestContext(request))
 
+def full_fa(request, id, mode):
+    "View the full contents of a single finding aid as PDF or plain html"
+    try:
+        fa = FindingAid.objects.get(eadid=id)
+    except Exception:       # FIXME: need queryset to raise a specific exception here?
+        raise Http404
 
+    series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
+
+    template = 'findingaids/full.html'
+    template_args = { 'findingaid' : fa, 'series' : series,
+                    'mode' : mode, 'request' : request}
+    if mode == 'html':
+        return render_to_response(template, template_args)
+    elif mode == 'pdf':
+        return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid)
 
 def _fa_listfields():
     "List of fields that should be returned for brief list display of a finding aid."
@@ -166,8 +182,12 @@ def _series_url(eadid, series_id, *ids):
 
     return reverse(view, kwargs=args)
 
+def _series_anchor(*ids):
+    """Generate a same-page id-based anchor link for a series"""
+    # only actually use the last of all ids passed in
+    return "#%s" % ids[-1]
 
-def _subseries_links(series, url_ids=None):
+def _subseries_links(series, url_ids=None, url_callback=_series_url):
     """
     Recursive function to build a nested list of links to series and subseries
     to simplify template display logic for complicated series.
@@ -207,8 +227,8 @@ def _subseries_links(series, url_ids=None):
     if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
         for component in series.c:            
             current_url_ids = url_ids + [component.id]
-            text = "<a href='%s'>%s</a>" % (apply(_series_url, current_url_ids), component.display_label())
+            text = "<a href='%s'>%s</a>" % (apply(url_callback, current_url_ids), component.display_label())
             links.append(text)
             if component.hasSubseries():
-                links.append(_subseries_links(component, url_ids=current_url_ids))    
+                links.append(_subseries_links(component, url_ids=current_url_ids, url_callback=url_callback))
     return links

@@ -7,16 +7,19 @@
 
 {% block content-body %}
 
+<div id="print-links">
+    <p><a class="pdf" href="{% url printable-fa id=findingaid.eadid %}">PDF Version</a></p>
+</div>
+
 {# main display page for a single finding aid; links to series & subseries, if any #}
 <div id="toc_series">
     {% with findingaid as ead %}
-        {% include "findingaids/toc_snippet.html" %}
+        {% include "findingaids/sections/toc.html" %}
     {% endwith %}
     
 {% if findingaid.dsc.hasSeries %} {# top-level series list #}
 <div id="series">
 <h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
-{# FIXME: should use series template here-- how to make subseries display optional? #}
 <ul>
   {% for component in findingaid.dsc.c %}
     <li><a href="{% url findingaids.fa.views.view_series id=findingaid.eadid,series_id=component.id %}"> 
@@ -30,61 +33,11 @@
 <br class="clear"/>
 </div>
 
+<div class="fa">
 <hr/>
-
-<h2><a name="descriptive_summary">Descriptive Summary</a></h2>
-  <table>
-      {# FIXME: move styles to css #}
-    <col width="20%" align="left" valign="top"/>
-    <col width="80%" align="left" valign="top"/>
-    {#  display the following fields, in this specific order  #}
-{# FIXME: which fields may not always be present? #}
-      <tr><th>Creator:</th><td>{{ findingaid.archdesc.origination }}</td></tr>
-      <tr><th>Title:</th><td> {{ findingaid.unittitle|format_ead }} </td></tr>
-      <tr><th>Call Number:</th><td>{{ findingaid.archdesc.unitid }}</td></tr>
-      <tr><th>Extent:</th><td>{{ findingaid.archdesc.extent|join:", " }}</td></tr>
-   {% if findingaid.archdesc.location %}
-      <tr><th>Location:</th><td>{{ findingaid.archdesc.location }}</td></tr>
-   {% endif %}
-      <tr><th>Abstract:</th><td>{{ findingaid.abstract|format_ead }}</td></tr>
-      <tr><th>Language:</th><td>{{ findingaid.archdesc.langmaterial }} </td></tr>
-  </table>
-
+{% include "findingaids/sections/description.html" %}
 <hr/>
-
-<h2><a name="administrative_information">Administrative Information</a></h2>
- {% for section in findingaid.admin_info %}
-   <div>
-   	<h3>{{ section.head }}</h3>
-	{% for para in section.content %}
-	    <p>{{ para|format_ead }}</p>
-	{% endfor %}
-   </div>
- {% endfor %}
-
-<hr/>
-
-<h2><a name="collection_description">Collection Description</a></h2>
- {% for section in findingaid.collection_description %}
-   <div>
-   	<h3>{{ section.head }}</h3>
-	{% for para in section.content %}
-	    <p>{{ para|format_ead }}</p>
-	{% endfor %}
-   </div>
- {% endfor %}
-
-<hr/>
-
-<h2><a name="control_access">{{ findingaid.archdesc.controlaccess.head }}</a></h2>
-{{findingaid.archdesc.controlaccess.controlaccess.head}}
-{% for ca in findingaid.archdesc.controlaccess.controlaccess %}
-   <h3>{{ ca.head}}</h3>
-   {% for term in ca.terms %}
-    {{ term }}<br/>
-   {% endfor %}
-
-{% endfor %}
+{% include "findingaids/sections/controlaccess.html" %}
 <hr/>
 
 {# container list or series/subseries listing #}
@@ -97,25 +50,14 @@
     </ul>
 {% else %}
   {% with findingaid.dsc as series %}
-    {% include "findingaids/containerlist_snippet.html" %}
+    {% include "findingaids/sections/containerlist.html" %}
   {% endwith %}
 {% endif %}
 
 {% if findingaid.archdesc.index %}
-<hr/>
-<div>
-<a name="index"><h2>{{ findingaid.archdesc.index.head }}</h2></a>
-{% for entry in  findingaid.archdesc.index.entry %}
-   <div class="indexentry">
-       <b>{{ entry.name }}</b>
-       <ul>
-       {% for ref in entry.ptrgroup.ref %}
-         <li>{{ ref }}</li>
-       {% endfor %}
-       </ul>
-    </div>
-{% endfor %}
-</div>
+    <hr/>
+    {% include "findingaids/sections/indexentry.html" %}
 {% endif %}
 
+</div>
 {% endblock %}
