@@ -77,7 +77,7 @@ table#descriptive_summary th {
 }
 div.fa li {
    list-style-type:none;
-   background: none;
+   background: none !important;
 }
 
 div#control_access ul, div#control_access li, div#index ul, div#index li { 
