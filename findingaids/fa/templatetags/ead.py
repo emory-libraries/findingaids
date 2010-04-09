@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from Ft.Xml.XPath import Compile
 from eulcore.xmlmap import XmlObject
 
-__all__ = [ 'format_ead' ]
+__all__ = [ 'format_ead', 'format_ead_children' ]
 
 register = template.Library()
 
@@ -50,6 +50,27 @@ def format_ead(value, autoescape=None):
     return mark_safe(result)
 format_ead.needs_autoescape = True
 
+@register.filter
+def format_ead_children(value, autoescape=None):
+    """
+    Custom django filter to convert structured fields in EAD objects to
+    HTML. Follows the same logic as :func:`format_ead`, but processes only
+    the children of the top-level XmlObject, ignoring rendering indicators
+    on the top-level element itself.
+    """
+
+    if autoescape:
+        escape = conditional_escape
+    else:
+        escape = lambda x: x
+    
+    node = getattr(value, 'dom_node', None)
+    children = getattr(node, 'childNodes', ())
+    parts = ( part for child in children
+                   for part in node_parts(child, escape) )
+    result = ''.join(parts)
+    return mark_safe(result)
+format_ead_children.needs_autoescape = True
 
 # Precompile XPath expressions for use in node_parts below.
 _RENDER_DOUBLEQUOTE = Compile('@render="doublequote"')

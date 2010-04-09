@@ -106,6 +106,11 @@ class FaViewsTest(TestCase):
         # test current letter
         self.assertPattern("<a *class='current'[^>]*>A<", response.content)
 
+        # format_ead
+        response = self.client.get('/titles/P')
+        self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+> research files''', response.content) # title
+        self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''', response.content) # abstract
+
         # no finding aids
         response = self.client.get('/titles/Z')
         self.assertPattern('<div>No finding aids found for .*Z.*</div>', response.content)
@@ -184,6 +189,13 @@ class FaViewsTest(TestCase):
             response.content, "photo clippings in container list")
         self.assertPattern('MF1.*4.*Family and personal photos|', response.content,
             "family photos in container list")
+
+        # format_ead
+        response = self.client.get('/documents/pomerantz890.xml')
+        self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
+        self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''', response.content) # abstract
+        self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''', response.content) # admin_info
+        self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''', response.content) # collection description
 
     def test_view__fa_with_series(self):
         response = self.client.get('/documents/abbey244')
@@ -518,11 +530,12 @@ class FullTextFaViewsTest(TestCase):
         response = self.client.get('/search/', { 'keywords' : 'family papers'})
         self.assertEquals(response.status_code, 200)
         self.assertPattern("<p[^>]*>Search results for : .*family papers.*</p>", response.content)
-        self.assertContains(response, "4 finding aids found")
+        self.assertContains(response, "5 finding aids found")
         self.assertContains(response, "Fannie Lee Leverette scrapbooks")
         self.assertContains(response, "Raoul family papers")
         self.assertContains(response, "Bailey and Thurman families papers")
         self.assertContains(response, "Abbey Theatre collection")
+        self.assertContains(response, "Pomerantz, Gary M.")
 
         response = self.client.get('/search/', { 'keywords' : 'nonexistentshouldmatchnothing'})
         self.assertEquals(response.status_code, 200)
