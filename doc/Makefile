@@ -1,11 +1,9 @@
-# Makefile for Sphinx documentation
-#
+# Makefile for Finding Aids Sphinx documentation
 
-export PYTHONPATH=.:..
-# sphinx needs django settings while loading eulcore.django.* to introspect
+export PYTHONPATH=.:..:../external/django-modules
+# sphinx needs django settings while loading findingaids.* to introspect
 # those modules for autodocs
 export DJANGO_SETTINGS_MODULE=doc_djangosettings
-
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
@@ -15,9 +13,9 @@ PAPER         =
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d _build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -d build/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
 
-.PHONY: help clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
+.PHONY: help all clean html dirhtml pickle json htmlhelp qthelp latex changes linkcheck doctest
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -32,63 +30,65 @@ help:
 	@echo "  linkcheck to check all external links for integrity"
 	@echo "  doctest   to run all doctests embedded in the documentation (if enabled)"
 
+all: html
+
 clean:
-	-rm -rf _build/*
+	-rm -rf build *.pyc
 
 html:
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) _build/html
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) build/html
 	@echo
-	@echo "Build finished. The HTML pages are in _build/html."
+	@echo "Build finished. The HTML pages are in build/html."
 
 dirhtml:
-	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) _build/dirhtml
+	$(SPHINXBUILD) -b dirhtml $(ALLSPHINXOPTS) build/dirhtml
 	@echo
-	@echo "Build finished. The HTML pages are in _build/dirhtml."
+	@echo "Build finished. The HTML pages are in build/dirhtml."
 
 pickle:
-	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) _build/pickle
+	$(SPHINXBUILD) -b pickle $(ALLSPHINXOPTS) build/pickle
 	@echo
 	@echo "Build finished; now you can process the pickle files."
 
 json:
-	$(SPHINXBUILD) -b json $(ALLSPHINXOPTS) _build/json
+	$(SPHINXBUILD) -b json $(ALLSPHINXOPTS) build/json
 	@echo
 	@echo "Build finished; now you can process the JSON files."
 
 htmlhelp:
-	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) _build/htmlhelp
+	$(SPHINXBUILD) -b htmlhelp $(ALLSPHINXOPTS) build/htmlhelp
 	@echo
 	@echo "Build finished; now you can run HTML Help Workshop with the" \
-	      ".hhp project file in _build/htmlhelp."
+	      ".hhp project file in build/htmlhelp."
 
 qthelp:
-	$(SPHINXBUILD) -b qthelp $(ALLSPHINXOPTS) _build/qthelp
+	$(SPHINXBUILD) -b qthelp $(ALLSPHINXOPTS) build/qthelp
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
-	      ".qhcp project file in _build/qthelp, like this:"
-	@echo "# qcollectiongenerator _build/qthelp/FindingAids.qhcp"
+	      ".qhcp project file in build/qthelp, like this:"
+	@echo "# qcollectiongenerator build/qthelp/FindingAids.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile _build/qthelp/FindingAids.qhc"
+	@echo "# assistant -collectionFile build/qthelp/FindingAids.qhc"
 
 latex:
-	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) _build/latex
+	$(SPHINXBUILD) -b latex $(ALLSPHINXOPTS) build/latex
 	@echo
-	@echo "Build finished; the LaTeX files are in _build/latex."
+	@echo "Build finished; the LaTeX files are in build/latex."
 	@echo "Run \`make all-pdf' or \`make all-ps' in that directory to" \
 	      "run these through (pdf)latex."
 
 changes:
-	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) _build/changes
+	$(SPHINXBUILD) -b changes $(ALLSPHINXOPTS) build/changes
 	@echo
-	@echo "The overview file is in _build/changes."
+	@echo "The overview file is in build/changes."
 
 linkcheck:
-	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) _build/linkcheck
+	$(SPHINXBUILD) -b linkcheck $(ALLSPHINXOPTS) build/linkcheck
 	@echo
 	@echo "Link check complete; look for any errors in the above output " \
-	      "or in _build/linkcheck/output.txt."
+	      "or in build/linkcheck/output.txt."
 
 doctest:
-	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) _build/doctest
+	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) build/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
-	      "results in _build/doctest/output.txt."
+	      "results in build/doctest/output.txt."
