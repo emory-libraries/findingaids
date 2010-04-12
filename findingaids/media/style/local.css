@@ -118,3 +118,10 @@ div#print-links a {
 .ead-title {
     font-style: italic;
 }
+
+.dev-note {
+  color: #aaa;
+}
+.sw-version {
+  float: right;
+}

@@ -34,6 +34,12 @@
   {% endif %}
 {% endblock %}
 
-{% block content-bottom %}
-    {% if querytime %} <p class="query-time">quer{{ querytime|pluralize:"y,ies" }} took {{ querytime|join:", " }} ms </p> {% endif %}
+{% block content-outer-bottom %}
+  {% if SW_VERSION %}
+    <div class="sw-version dev-note">v{{ SW_VERSION }}</div>
+  {% endif %}
+  {% if querytime %}
+    <div class="query-time dev-note">quer{{ querytime|pluralize:"y,ies" }} took
+      {{ querytime|join:", " }} ms</div>
+  {% endif %}
 {% endblock %}

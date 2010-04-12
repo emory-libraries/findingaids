@@ -98,6 +98,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     # additional context processors
     "django.core.context_processors.request", # always include request in render context
     "findingaids.fa.context_processors.searchform",  # search form on every page
+    "findingaids.fa.context_processors.version",     # software version on every page
 )
 
 INSTALLED_APPS = (
