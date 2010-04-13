@@ -20,6 +20,12 @@ commands::
      $ ./manage.py help existdb_index
      $ ./manage.py help existdb_reindex
 
+For a first-time install, you will should run these two steps: 
+(Note that if all finding aids are loaded, the reindex step can take quite a while)
+     $ ./manage.py existdb_index load
+     $ ./manage.py existdb_reindex  
+
+
 Install `xhtml2pdf/Pisa`_ and its dependencies. On Ubuntu, the following
 should be sufficient::
 
