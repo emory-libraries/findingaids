@@ -1,0 +1,63 @@
+{% extends "site_base.html" %}
+{% load ead %}
+
+{% block page-subtitle %}: {{ findingaid.title }}{% endblock %}
+
+{% block content-title %}{{ findingaid.title }}{% endblock %}
+
+{% block content-body %}
+
+<div id="print-links">
+    <p><a class="pdf" href="{% url printable-fa id=findingaid.eadid %}">PDF Version</a></p>
+</div>
+
+{# main display page for a single finding aid; links to series & subseries, if any #}
+<div id="toc_series">
+    {% with findingaid as ead %}
+        {% include "findingaids/sections/toc.html" %}
+    {% endwith %}
+    
+{% if findingaid.dsc.hasSeries %} {# top-level series list #}
+<div id="series">
+<h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
+<ul>
+  {% for component in findingaid.dsc.c %}
+    <li><a href="{% url findingaids.fa.views.view_series id=findingaid.eadid,series_id=component.id %}"> 
+	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+        {{ component.did.unittitle|format_ead }}</a>
+     </li>
+  {% endfor %}
+</ul>
+</div>
+{% endif %}
+<br class="clear"/>
+</div>
+
+<div class="fa">
+<hr/>
+{% include "findingaids/sections/description.html" %}
+<hr/>
+{% include "findingaids/sections/controlaccess.html" %}
+<hr/>
+
+{# container list or series/subseries listing #}
+<h2><a name="dsc">{{ findingaid.dsc.head }}</a></h2>
+{% if findingaid.dsc.hasSeries %}       {# list series/subseries here,   display on separate page #}
+    <ul>
+       {% autoescape off %}
+           {{ series|unordered_list }}
+       {% endautoescape %}
+    </ul>
+{% else %}
+  {% with findingaid.dsc as series %}
+    {% include "findingaids/sections/containerlist.html" %}
+  {% endwith %}
+{% endif %}
+
+{% if findingaid.archdesc.index %}
+    <hr/>
+    {% include "findingaids/sections/indexentry.html" %}
+{% endif %}
+
+</div>
+{% endblock %}

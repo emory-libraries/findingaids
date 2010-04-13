@@ -1,0 +1,46 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Browse : {{current_letter}}{% endblock %}
+
+{% block content-title %}Browse Finding Aids{% endblock %}
+
+{% block content-body %}
+
+{% if letters %}
+  {% include "findingaids/browse_letters.html" %}
+{% endif %}
+
+{% if findingaids.paginator.count %}
+    <p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found,
+    displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
+{% endif %}
+
+<hr/>
+
+{% for fa in findingaids.object_list %}
+    {% include "findingaids/listview_snippet.html" %}
+{% empty %}
+ <div>No finding aids found for <b>{{current_letter}}</b>.</div>
+{% endfor %}
+
+
+{# copied from django pagination documentation ... probably should be better styled  #}
+{% if findingaids.paginator.count %}
+<div class="pagination">
+    <span class="step-links">
+        {% if findingaids.has_previous %}
+            <a href="?page={{ findingaids.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ findingaids.number }} of {{ findingaids.paginator.num_pages }}.
+        </span>
+
+        {% if findingaids.has_next %}
+            <a href="?page={{ findingaids.next_page_number }}">next</a>
+        {% endif %}
+    </span>
+</div>
+{% endif %}
+
+{% endblock %}

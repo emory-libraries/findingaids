@@ -1,0 +1,42 @@
+{# display a single series or subseries of a finding aid #}
+{% extends "site_base.html" %}
+{% load ead %}
+
+{% block page-subtitle %}: {{ series.ead.title }} : {{ series.display_label }}{% endblock %}
+
+{% block content-title %}
+  <a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}">{{ series.ead.title }}</a>
+{% endblock %}
+
+{% block content-body %}
+<div id="print-links">
+    <p><a class="pdf" href="{% url printable-fa id=series.ead.eadid %}">PDF Version</a></p>
+</div>
+
+<div id="toc_series">
+    {% with series.ead as ead %}
+        {% include "findingaids/sections/toc.html" %}
+    {% endwith %}
+<div id="series">
+  <h2><a href="{% url findingaids.fa.views.view_fa series.ead.eadid %}#dsc">{{ series.ead.dsc.head}}</a></h2>
+<ul>
+  {% for component in all_series %}
+    <li>
+        {% ifequal series.id component.id %}
+           {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+            {{ component.did.unittitle|format_ead }}
+        {% else %}
+           <a href="{% url findingaids.fa.views.view_series id=series.ead.eadid,series_id=component.id %}">
+            {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+                {{ component.did.unittitle|format_ead }}</a>
+        {% endifequal %}
+     </li>
+  {% endfor %}
+</ul>
+</div>
+<br class="clear"/>
+</div>
+
+{% include "findingaids/sections/series.html" %}
+
+{% endblock %}

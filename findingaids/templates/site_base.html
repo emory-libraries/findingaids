@@ -1,0 +1,45 @@
+{% extends "genlib_templates/site_base.xhtml" %}
+
+{% block page-title %}Finding Aids {% block page-subtitle %}: Home{% endblock %}{% endblock %}
+
+{% block style %}
+    {{ block.super }}
+    {% comment %}Place Local changes, modifications and overrisdes in your local.css file.{% endcomment %}
+    <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
+{% endblock %}
+
+{% block site-name %}Finding Aids{% endblock %}
+{% block site-slogan %}Find Manuscripts & Archives{% endblock %}
+
+{% load eulcore_tags %}
+{% block navbar-items %}
+        <li><a href="{% url findingaids.fa.views.keyword_search %}"class="{% activebase request '^/search' %}">search</a></li>
+        <li><a>collections</a></li>
+        <li><a href="">About</a></li>
+        {% if user.is_staff %}
+            <li><a href="{% url admin:index %}">Admin</a></li>
+        {% endif %}
+{% endblock %}
+
+{% block sidebar-left %}
+  {% if form %}
+  <div id="keyword-search">
+      Search all Finding Aids
+      <form action="{% url findingaids.fa.views.keyword_search %}" method="get">
+        {{form.keywords}}
+        <input class="form-submit" type="submit" value="Search" />
+      </form>
+  </div>
+
+  {% endif %}
+{% endblock %}
+
+{% block content-outer-bottom %}
+  {% if SW_VERSION %}
+    <div class="sw-version dev-note">v{{ SW_VERSION }}</div>
+  {% endif %}
+  {% if querytime %}
+    <div class="query-time dev-note">quer{{ querytime|pluralize:"y,ies" }} took
+      {{ querytime|join:", " }} ms</div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,30 @@
+<collection xmlns="http://exist-db.org/collection-config/1.0">
+    <index>
+	    <!-- Disable the standard full text index -->
+        <fulltext default="none" attributes="no"/>
+	    <!-- configure Lucene index -->
+        <lucene>
+            <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+            <!-- index everything for full-text keyword search at top-level  -->
+            <text qname="ead">
+                <ignore qname="filedesc"/>
+                <ignore qname="profiledesc"/>
+                <ignore qname="physdesc"/>
+                <ignore qname="langmaterial"/>
+                <ignore qname="repository"/>
+                <ignore qname="acqinfo"/>
+                <ignore qname="accessrestrict"/>
+                <ignore qname="userestrict"/>
+                <ignore qname="prefercite"/>
+                <ignore qname="altformavail"/>
+                <ignore qname="processinfo"/>
+                <ignore qname="arrangement"/>
+                <ignore qname="otherfindaid"/>
+                <ignore qname="separatedmaterial"/>
+                <ignore qname="relatedmaterial"/>
+                <ignore qname="bibliography"/>
+                <ignore qname="container"/>
+            </text>
+        </lucene>
+    </index>
+</collection>

@@ -1,0 +1,2767 @@
+<ead id="bailey807_101744" relatedencoding="MARC21">
+    <eadheader countryencoding="iso3166-1" dateencoding="iso8601" id="bailey807_1019" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
+        <eadid countrycode="us" identifier="bailey807.xml" mainagencycode="geu-s">bailey807</eadid>
+        <filedesc id="bailey807_1013">
+            <titlestmt id="bailey807_103">
+                <titleproper encodinganalog="Title" id="bailey807_101">Bailey and Thurman
+			 families papers, circa 1882-1995</titleproper>
+                <author encodinganalog="Creator" id="bailey807_102">Manuscript, Archives, and Rare Book
+			 Library, Emory University</author>
+            </titlestmt>
+            <publicationstmt id="bailey807_1012">
+                <publisher encodinganalog="Publisher" id="bailey807_104">Emory University</publisher>
+                <address id="bailey807_1010">
+                    <addressline id="bailey807_105">Robert W. Woodruff Library</addressline>
+                    <addressline id="bailey807_106">Manuscript, Archives, and Rare Book
+				Library</addressline>
+                    <addressline id="bailey807_107">Atlanta, GA 30322</addressline>
+                    <addressline id="bailey807_108">404-727-6887</addressline>
+                    <addressline id="bailey807_109">Fax: 404-727-0360</addressline>
+                </address>
+                <date calendar="gregorian" encodinganalog="Date" era="ce" id="bailey807_1011" normal="2005-02-28">2005-02-28</date>
+            </publicationstmt>
+        </filedesc>
+        <profiledesc id="bailey807_1018">
+            <creation id="bailey807_1015">Finding aid encoded, 
+		  <date calendar="gregorian" encodinganalog="Date" era="ce" id="bailey807_1014" normal="2005-02-28">2005-02-28</date>
+            </creation>
+            <langusage id="bailey807_1017">
+                <language encodinganalog="Language" id="bailey807_1016" langcode="eng" scriptcode="latn">English</language>
+            </langusage>
+        </profiledesc>
+    </eadheader>
+    <archdesc id="bailey807_101743" level="collection" relatedencoding="MARC21">
+        <did id="bailey807_1033">
+            <unittitle encodinganalog="245$a"
+id="bailey807_1021">Bailey and Thurman families papers, <unitdate calendar="gregorian" certainty="circa" encodinganalog="245$f" era="ce" id="bailey807_1020" normal="1882/1995" type="inclusive">circa 1882-1995</unitdate></unittitle>
+            <unitid countrycode="us" id="bailey807_1022" repositorycode="geu-s">Manuscript Collection No.
+		  807</unitid>
+            <physdesc encodinganalog="300" id="bailey807_1027">
+                <extent id="bailey807_1023">9.25 linear
+		  ft.</extent>
+                <extent id="bailey807_1024">(13 boxes)</extent>, <extent id="bailey807_1025">22 oversized papers
+		  (OP)</extent>, <extent id="bailey807_1026">4 bound volumes (BV)</extent>
+            </physdesc>
+            <abstract id="bailey807_1028">Family papers of African American Baptist minister and church
+		  leader, Isaac G. and Susie E. Bailey and their daughter and son-in-law Sue
+		  Bailey and Howard Thurman and other members of the Bailey family. The
+		  collection tracks the political and religious pursuits of the family through
+		  three generations.</abstract>
+            <langmaterial encodinganalog="546" id="bailey807_1030">Materials entirely in
+		  <language id="bailey807_1029" langcode="eng">English</language>.</langmaterial>
+            <repository encodinganalog="852" id="bailey807_1032">Emory University<subarea id="bailey807_1031">Manuscript,
+		  Archives, and Rare Book Library</subarea>
+            </repository>
+        </did>
+        <acqinfo encodinganalog="541" id="bailey807_1036">
+            <head id="bailey807_1034">Source</head>
+            <p id="bailey807_1035">Gift, 1998.</p>
+        </acqinfo>
+        <accessrestrict encodinganalog="506" id="bailey807_1039">
+            <head id="bailey807_1037">Restrictions on access</head>
+            <p id="bailey807_1038">Unrestricted access. </p>
+        </accessrestrict>
+        <userestrict encodinganalog="540">
+            <head id="bailey807_1040">Terms Governing Use and Reproduction</head>
+            <p id="bailey807_1041">All requests subject to limitations noted in departmental policies on
+		  reproduction.</p>
+        </userestrict>
+        <prefercite encodinganalog="524" id="bailey807_1044">
+            <head id="bailey807_1042">Citation</head>
+            <p id="bailey807_1043">[after identification of item(s)], Bailey and Thurman families papers,
+		  Manuscript, Archives, and Rare Book Library, Emory University.</p>
+        </prefercite>
+        <processinfo id="bailey807_1051">
+            <head id="bailey807_1045">Processing</head>
+            <p id="bailey807_1046">Processed by Rian Bowie and Eldon Birthwright, May, 2001.</p>
+            <note id="bailey807_1048">
+                <p id="bailey807_1047">Control level 3</p>
+            </note>
+            <note id="bailey807_1050">
+                <p id="bailey807_1049">File name: bailey807.doc</p>
+            </note>
+        </processinfo>
+        <bioghist encodinganalog="545" id="bailey807_1060">
+            <head id="bailey807_1052">Biographical Note</head>
+            <p id="bailey807_1053">Reverend Isaac George Bailey (1847-1914) was born in Arkansas City to
+		  Perry and Virginia Bailey. Educated at Branch Normal College in Pine Bluff,
+		  Bailey served as pastor of First Baptist Church in Dermott, Arkansas, and Log
+		  Bayou Church in Tillar Station, Arkansas. He also served as president of the
+		  Southeast District Industrial Baptist Academy in Dermott and as moderator of
+		  the South-East District Baptist Association. Isaac Bailey was a major force
+		  within the Arkansas Baptist Convention and worked closely with the National
+		  Negro Business League and the Arkansas Baptist College. In 1866, he married
+		  Winnie White. They had two children: Charles H. Bailey and Maude Bailey
+		  Frazier, who served as assistant principal of the South-East Industrial
+		  Academy.</p>
+            <p id="bailey807_1054">In 1884, Bailey married Susie E. Ford. Susie E. Ford (d. 1948) was the
+		  daughter of Elvie, a slave, and T. S. Ford, a Mississippi plantation-owner.
+		  Isaac G. and Susie E. Bailey were prominent religious leaders who served as
+		  colporteurs for the American Baptist Publication Society, selling Bibles and
+		  other religious books throughout Arkansas. Susie Bailey attended Sumner High
+		  School and Normal School in St. Louis. She served as president of Southeast
+		  District Baptist Women's Association and as an agent for the Women's American
+		  Mission Baptist Home Mission Society. Susie and Isaac Bailey had nine children,
+		  six of whom died before adulthood.</p>
+            <p id="bailey807_1055">The Baileys' youngest child Sue Elvie was born on August 3, 1903. She
+		  attended a school, in Washington, D. C., operated by Nannie Helen Burroughs, an
+		  associate of her mother, and later the Lucretia Mott School in Washington. She
+		  subsequently attended Spelman Seminary and then Oberlin College, where she
+		  obtained a bachelor's degree in music in 1926. After graduation from Oberlin,
+		  Ms. Bailey joined the Music Department at Hampton Institute. In the summer of
+		  1928, she joined the staff of the Young Women's Christian Association as the
+		  National Secretary for Colleges in the South.</p>
+            <p id="bailey807_1058">On June 12, 1932, Sue Bailey married Morehouse College graduate Howard
+		  Thurman. In the fall of 1932, the couple moved to Washington, D.C., where
+		  Howard Thurman took a position as professor of Theology at Howard University.
+		  In October of 1935, the Thurmans began a seven-month tour of India, Burma, and
+		  Ceylon. On this tour, they had a three-hour conversation with Mahatma Gandhi.
+		  In 1940, Mrs. Thurman served as the founding editor of the 
+		<title id="bailey807_1056" linktype="simple">Aframerican Woman's Journal</title>, the official organ of the
+		National Council of Negro Women. She continued in that capacity until 1943. In
+		1944, the Thurmans and Presbyterian minister Alfred G. Fisk established the
+		Church for the Fellowship of All Peoples in San Francisco. In 1949, Mrs.
+		Thurman published 
+		<title id="bailey807_1057" linktype="simple">Pioneers of Negro Origin in California</title>. The Thurmans moved
+		to Boston in 1953, where Dr. Thurman served as Dean of Marsh Chapel, Boston
+		University, until 1966. </p>
+            <p id="bailey807_1059">The Thurmans retired to San Francisco where they again became active
+		  in the Church for the Fellowship of All Peoples. Howard Thurman died in 1981.
+		  Mrs. Thurman died in San Francisco on December 25, 1996.</p>
+        </bioghist>
+        <scopecontent encodinganalog="520" id="bailey807_1074">
+            <head id="bailey807_1061">Scope and Content Note</head>
+            <p id="bailey807_1062">The Bailey and Thurman families papers spans the years from 1882 to
+		  1995. The collection tracks the political and religious pursuits of the family
+		  through three generations. It includes correspondence, writings, printed
+		  material, newspaper clippings, books from the Bailey library, photographs,
+		  legal documents, financial records, and general ephemera.</p>
+            <p id="bailey807_1063">A large portion of the collection is made up of correspondence written
+		  to family members. The correspondence written to and by Isaac and Susie Bailey
+		  is of particular interest. It covers familial matters as well as those
+		  pertaining to the branches of the Baptist Missionary Association. In addition
+		  to their own letters, there is the correspondence to and from their children:
+		  Maude, vice principal of Southeast Industrial Academy; Isaac, Jr., a graduate
+		  of Howard University, printer/editor, and early member of Omega Psi Phi
+		  Fraternity; Dorcas Bailey; and Sue Bailey Thurman. The correspondence also
+		  includes a series of letters to Elias A. Morris, the son of Elias Camp Morris,
+		  prominent leader of the Arkansas Baptist Association and the National Baptist
+		  Convention. Additional material relates to Arkansas Baptist College, the
+		  Southeast Baptist Academy, the Southeast District Missionary Baptist
+		  Association, the Baptist Women's Southeastern District Association, and the
+		  Woman's American Baptist Home Mission Society.</p>
+            <p id="bailey807_1064">Within this collection there are also a number of writings by the
+		  Bailey family. One section focuses on those speeches, lectures, and reports
+		  written by Isaac and Susie Bailey. Religious in nature, these writings,
+		  generally affiliated with the Arkansas Baptist Association or the Southeast
+		  Baptist Association, cover a broad range of topics from motherhood to Christian
+		  responsibility. Another small section in the collection contains minutes and
+		  reports, largely handwritten, relating to various Baptist conventions and
+		  organizations.</p>
+            <p id="bailey807_1066">The collection also contains a fair amount of printed material dating
+		  from 1880 to 1995. A significant part of the printed material in the collection
+		  highlights the Baileys' leadership in the development of Baptist organizations
+		  in Southeast Arkansas. Many of these documents were printed by African-American
+		  publishers and presses. The more contemporary documents relate to the dealings
+		  of Sue (nee Bailey) and Howard Thurman. This information includes an article on
+		  the Thurmans' trip to India where they met with Mahatma Gandhi. There is also
+		  information related to their affiliations with Spelman and Morehouse Colleges.
+		  In addition to these early pieces, there are also articles on Susie Bailey,
+		  Howard Thurman, and Sue Bailey Thurman, as well as published copies of smaller
+		  books, including Sue Bailey Thurman's 
+		<title id="bailey807_1065" linktype="simple">Pioneers of Negro Origin in California</title> (1949). </p>
+            <p id="bailey807_1069">The next two sections consist of newspapers and newspaper clippings.
+		  The newspapers range in date from 1893 to 1948, and they cover a broad range of
+		  political and religious topics. There are a number of copies of the 
+		<title id="bailey807_1067" linktype="simple">Baptist Vangard</title>, an African-American religious newspaper,
+		as well as numerous copies of the 
+		<title id="bailey807_1068" linktype="simple">St Louis Weekly Globe Democrat</title>. The newspaper clippings
+		cover a broad range of subjects, including, but certainly not limited to,
+		obituaries of Bailey family members, tributes, and honors and awards for the
+		Bailey-Thurman family members.</p>
+            <p id="bailey807_1071">The largest, single component of the collection is the photographic
+		  section. Although the majority of the photographs are undated, they can be
+		  loosely dated from the 1880s to 1996 and have been divided into several
+		  categories. The first consists of the early photographs of the Bailey family
+		  members. The second contains the photographs of Howard Thurman and Sue Bailey
+		  Thurman. There are photographs of them alone and/or attending various
+		  functions, whether together or individually. There is also an array of
+		  photographs of Howard Thurman, from professional portraits to more casual
+		  images. There are many family photographs, professional photographs divided by
+		  organizational affiliation, and travel photographs, including photographs with
+		  Mahatma Gandhi. Finally, there are the photographs taken without either Sue
+		  Bailey or Howard Thurman. These photos vary in subject matter; they include
+		  images used to illustrate Sue Bailey Thurman's 
+		<title id="bailey807_1070" linktype="simple">Pioneers of Negro Origin in California</title> as well as images
+		of well-known African Americans. Additionally, there are a large number of
+		photographs of others, mostly unidentified, although there are prominent
+		individuals featured, including Nathan I. Huggins (who was raised by the
+		Thurmans) and Wole Soyinka. Finally, there are the negatives/slides and
+		miscellaneous photographs.</p>
+            <p id="bailey807_1072">There is a small amount of financial and legal records in the
+		  collection. This covers the period from the late 1800s to approximately 1947.
+		  The financial records include receipts covering a broad range of services from
+		  product orders to deed payments. There is also a folder of banking materials
+		  including bank statements, deposit slips, and bankbooks for Mrs. Susie Bailey.
+		  The legal section consists of insurance policies, real estate records, as well
+		  as miscellaneous legal items.</p>
+            <p id="bailey807_1073">Finally, there are several items of ephemera. These include devotional
+		  books about mothers, a miniature hymnal, election memorabilia, and cloth maps.
+		  </p>
+        </scopecontent>
+        <arrangement encodinganalog="351" id="bailey807_1077">
+            <head id="bailey807_1075">Arrangement Note</head>
+            <p id="bailey807_1076">Organized into nine series: (1) Correspondence, (2) Writing by the
+		  Bailey family, (3) Minutes and reports, (4) Printed material, (5) Photographs,
+		  (6) Legal and financial records, (7) Ephemera, (8) Collected material, and (9)
+		  Audiovisual material.</p>
+        </arrangement>
+        <controlaccess id="bailey807_10115">
+            <head id="bailey807_1078">Selected Search Terms</head>
+            <controlaccess id="bailey807_1085">
+                <head id="bailey807_1079">Personal Names</head>
+                <persname encodinganalog="700" id="bailey807_1080" source="lcnaf"> Bailey, I. G. (Issac
+			 George), 1847-1914.</persname>
+                <persname encodinganalog="700" id="bailey807_1081" source="lcnaf"> Bailey, Susie E., d.
+			 1948.</persname>
+                <persname encodinganalog="600" id="bailey807_1082" source="lcnaf">Morris, Elias
+			 A.</persname>
+                <persname encodinganalog="700" id="bailey807_1083" source="lcnaf"> Thurman, Howard,
+			 1900-1981.</persname>
+                <persname encodinganalog="700" id="bailey807_1084" source="lcnaf"> Thurman, Sue
+			 Bailey.</persname>
+            </controlaccess>
+            <controlaccess id="bailey807_1095">
+                <head id="bailey807_1086">Corporate Names</head>
+                <corpname encodinganalog="610" id="bailey807_1087" source="lcnaf"> Arkansas Baptist
+			 Association.</corpname>
+                <corpname encodinganalog="610" id="bailey807_1088" source="lcnaf"> Arkansas Baptist
+			 College.</corpname>
+                <corpname encodinganalog="610" id="bailey807_1089" source="lcnaf"> Arkansas Baptist State
+			 Convention.</corpname>
+                <corpname encodinganalog="610" id="bailey807_1090" source="lcnaf"> Baptist Women's
+			 Southeastern District Association.</corpname>
+                <corpname encodinganalog="610" id="bailey807_1091" source="lcnaf"> Morehouse College
+			 (Atlanta, Ga.)</corpname>
+                <corpname encodinganalog="610" id="bailey807_1092" source="lcnaf"> Southeast District
+			 Missionary Baptist Association.</corpname>
+                <corpname encodinganalog="610" id="bailey807_1093" source="lcnaf"> Spelman
+			 College.</corpname>
+                <corpname encodinganalog="610" id="bailey807_1094" source="lcnaf"> Woman's American Baptist
+			 Home Mission Society.</corpname>
+            </controlaccess>
+            <controlaccess id="bailey807_10105">
+                <head id="bailey807_1096">Topical Terms</head>
+                <subject encodinganalog="650" id="bailey807_1097" source="lcsh"> African American
+			 clergy--Arkansas.</subject>
+                <subject encodinganalog="650" id="bailey807_1098" source="lcsh"> African American
+			 women--Arkansas.</subject>
+                <subject encodinganalog="650" id="bailey807_1099" source="lcsh"> African American
+			 Baptists--Arkansas.</subject>
+                <subject encodinganalog="650" id="bailey807_10100" source="lcsh">African
+			 Americans--Arkansas--Religion</subject>
+                <subject encodinganalog="650" id="bailey807_10101" source="lcsh"> African American
+			 Baptists--Arkansas--Clergy.</subject>
+                <subject encodinganalog="650" id="bailey807_10102" source="lcsh">
+			 Baptists--Missions--Arkansas.</subject>
+                <subject encodinganalog="650" id="bailey807_10103" source="lcsh"> Spouses of
+			 clergy--Arkansas.</subject>
+                <subject encodinganalog="650" id="bailey807_10104" source="lcsh"> Women in church
+			 work--Arkansas--Baptists.</subject>
+            </controlaccess>
+            <controlaccess id="bailey807_10108">
+                <head id="bailey807_10106">Geographic Names</head>
+                <geogname encodinganalog="651" id="bailey807_10107">Pine Bluff (Ark.)--Social life and
+			 customs.</geogname>
+            </controlaccess>
+            <controlaccess id="bailey807_10111">
+                <head id="bailey807_10109">Form/Genre Terms</head>
+                <genreform encodinganalog="655" id="bailey807_10110" source="aat">Photographs.</genreform>
+            </controlaccess>
+            <controlaccess id="bailey807_10114">
+                <head id="bailey807_10112">Occupation</head>
+                <occupation encodinganalog="656" id="bailey807_10113" source="aat"> Clergy.</occupation>
+            </controlaccess>
+        </controlaccess>
+        <relatedmaterial encodinganalog="544 1" id="bailey807_10118">
+            <head id="bailey807_10116">Related Materials in Other Repositories</head>
+            <p id="bailey807_10117">Howard Thurman study library, Morehouse College; Howard Thurman papers
+		  and Sue Bailey Thurman papers, Mugar Memorial Library, Boston University. </p>
+        </relatedmaterial>
+        <separatedmaterial encodinganalog="544 0" id="bailey807_10121">
+            <head id="bailey807_10119">Related Materials in This Repository</head>
+            <p id="bailey807_10120">Issac and Sue Bailey library and Howard and Sue Bailey Thurman
+		  personal library.</p>
+        </separatedmaterial>
+        <dsc id="bailey807_101742" type="combined">
+            <head id="bailey807_10122">Description of Series</head>
+            <c01 id="bailey807_series1" level="series">
+                <did id="bailey807_10127">
+                    <unitid id="bailey807_10123">Series 1</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_10125">Correspondence, 
+				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="bailey807_10124" normal="1855/1995">1855-1995</unitdate>
+                    </unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_10126">Boxes 1 - 3</physdesc>
+                </did>
+                <c02 id="bailey807_10132" level="file">
+                    <did id="bailey807_10131">
+                        <container id="bailey807_10128" type="box">1</container>
+                        <container id="bailey807_10129" type="folder">1</container>
+                        <unittitle id="bailey807_10130">I. G. Bailey, 1882-1901</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10137" level="file">
+                    <did id="bailey807_10136">
+                        <container id="bailey807_10133" type="box">1</container>
+                        <container id="bailey807_10134" type="folder">2</container>
+                        <unittitle id="bailey807_10135">I. G. Bailey, 1903-1909</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10142" level="file">
+                    <did id="bailey807_10141">
+                        <container id="bailey807_10138" type="box">1</container>
+                        <container id="bailey807_10139" type="folder">3</container>
+                        <unittitle id="bailey807_10140">I. G. Bailey, 1910-1913</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10147" level="file">
+                    <did id="bailey807_10146">
+                        <container id="bailey807_10143" type="box">1</container>
+                        <container id="bailey807_10144" type="folder">4</container>
+                        <unittitle id="bailey807_10145">I. G. Bailey, undated</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10152" level="file">
+                    <did id="bailey807_10151">
+                        <container id="bailey807_10148" type="box">1</container>
+                        <container id="bailey807_10149" type="folder">5</container>
+                        <unittitle id="bailey807_10150">Susie E. Bailey, 1883-1899</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10157" level="file">
+                    <did id="bailey807_10156">
+                        <container id="bailey807_10153" type="box">1</container>
+                        <container id="bailey807_10154" type="folder">6</container>
+                        <unittitle id="bailey807_10155">Susie E. Bailey, 1900-1904</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10162" level="file">
+                    <did id="bailey807_10161">
+                        <container id="bailey807_10158" type="box">1</container>
+                        <container id="bailey807_10159" type="folder">7</container>
+                        <unittitle id="bailey807_10160">Susie E. Bailey, 1905-1909</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10167" level="file">
+                    <did id="bailey807_10166">
+                        <container id="bailey807_10163" type="box">1</container>
+                        <container id="bailey807_10164" type="folder">8</container>
+                        <unittitle id="bailey807_10165">Susie E. Bailey, 1910-1914</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10172" level="file">
+                    <did id="bailey807_10171">
+                        <container id="bailey807_10168" type="box">2</container>
+                        <container id="bailey807_10169" type="folder">1</container>
+                        <unittitle id="bailey807_10170">Susie E. Bailey, 1915-1919</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10177" level="file">
+                    <did id="bailey807_10176">
+                        <container id="bailey807_10173" type="box">2</container>
+                        <container id="bailey807_10174" type="folder">2</container>
+                        <unittitle id="bailey807_10175">Susie E. Bailey, 1920-1925</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10182" level="file">
+                    <did id="bailey807_10181">
+                        <container id="bailey807_10178" type="box">2</container>
+                        <container id="bailey807_10179" type="folder">3</container>
+                        <unittitle id="bailey807_10180">Susie E. Bailey, 1926-1929</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10187" level="file">
+                    <did id="bailey807_10186">
+                        <container id="bailey807_10183" type="box">2</container>
+                        <container id="bailey807_10184" type="folder">4</container>
+                        <unittitle id="bailey807_10185">Susie E. Bailey, 1930-1935</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10192" level="file">
+                    <did id="bailey807_10191">
+                        <container id="bailey807_10188" type="box">2</container>
+                        <container id="bailey807_10189" type="folder">5</container>
+                        <unittitle id="bailey807_10190">Susie E. Bailey, 1936-1939</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10197" level="file">
+                    <did id="bailey807_10196">
+                        <container id="bailey807_10193" type="box">2</container>
+                        <container id="bailey807_10194" type="folder">6</container>
+                        <unittitle id="bailey807_10195">Susie E. Bailey, 1940-1945</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10202" level="file">
+                    <did id="bailey807_10201">
+                        <container id="bailey807_10198" type="box">2</container>
+                        <container id="bailey807_10199" type="folder">7</container>
+                        <unittitle id="bailey807_10200">Susie E. Bailey, 1945-1948</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10207" level="file">
+                    <did id="bailey807_10206">
+                        <container id="bailey807_10203" type="box">2</container>
+                        <container id="bailey807_10204" type="folder">8</container>
+                        <unittitle id="bailey807_10205">Susie E. Bailey, undated</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10212" level="file">
+                    <did id="bailey807_10211">
+                        <container id="bailey807_10208" type="box">3</container>
+                        <container id="bailey807_10209" type="folder">1</container>
+                        <unittitle id="bailey807_10210">Sue Bailey Thurman, 1912-1938</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10217" level="file">
+                    <did id="bailey807_10216">
+                        <container id="bailey807_10213" type="box">3</container>
+                        <container id="bailey807_10214" type="folder">2</container>
+                        <unittitle id="bailey807_10215">Sue Bailey Thurman, 1941-February 1948</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10222" level="file">
+                    <did id="bailey807_10221">
+                        <container id="bailey807_10218" type="box">3</container>
+                        <container id="bailey807_10219" type="folder">3</container>
+                        <unittitle id="bailey807_10220">Sue Bailey Thurman, 1948-1995</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10227" level="file">
+                    <did id="bailey807_10226">
+                        <container id="bailey807_10223" type="box">3</container>
+                        <container id="bailey807_10224" type="folder">4</container>
+                        <unittitle id="bailey807_10225">Sue Bailey Thurman, undated</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10232" level="file">
+                    <did id="bailey807_10231">
+                        <container id="bailey807_10228" type="box">3</container>
+                        <container id="bailey807_10229" type="folder">5</container>
+                        <unittitle id="bailey807_10230">I. G. Bailey, Jr., 1906-1911</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10237" level="file">
+                    <did id="bailey807_10236">
+                        <container id="bailey807_10233" type="box">3</container>
+                        <container id="bailey807_10234" type="folder">6</container>
+                        <unittitle id="bailey807_10235">I. G. Bailey, Jr., 1912-1913</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10242" level="file">
+                    <did id="bailey807_10241">
+                        <container id="bailey807_10238" type="box">3</container>
+                        <container id="bailey807_10239" type="folder">7</container>
+                        <unittitle id="bailey807_10240">I. G. Bailey, Jr., 1914-1918</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10247" level="file">
+                    <did id="bailey807_10246">
+                        <container id="bailey807_10243" type="box">3</container>
+                        <container id="bailey807_10244" type="folder">8</container>
+                        <unittitle id="bailey807_10245">I. G. Bailey, Jr., undated</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10252" level="file">
+                    <did id="bailey807_10251">
+                        <container id="bailey807_10248" type="box">3</container>
+                        <container id="bailey807_10249" type="folder">9</container>
+                        <unittitle id="bailey807_10250">Dorcas Bailey, 1911-1917</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10257" level="file">
+                    <did id="bailey807_10256">
+                        <container id="bailey807_10253" type="box">3</container>
+                        <container id="bailey807_10254" type="folder">10</container>
+                        <unittitle id="bailey807_10255">Maude Bailey, 1900-1909</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10262" level="file">
+                    <did id="bailey807_10261">
+                        <container id="bailey807_10258" type="box">3</container>
+                        <container id="bailey807_10259" type="folder">11</container>
+                        <unittitle id="bailey807_10260">E. A. Morris, 1906-1913</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10267" level="file">
+                    <did id="bailey807_10266">
+                        <container id="bailey807_10263" type="box">3</container>
+                        <container id="bailey807_10264" type="folder">12</container>
+                        <unittitle id="bailey807_10265">Miscellaneous correspondence, 1855-1995</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10272" level="file">
+                    <did id="bailey807_10271">
+                        <container id="bailey807_10268" type="box">3</container>
+                        <container id="bailey807_10269" type="folder">13</container>
+                        <unittitle id="bailey807_10270">Miscellaneous correspondence, undated</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series2" level="series">
+                <did id="bailey807_10276">
+                    <unitid id="bailey807_10273">Series 2</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_10274">Writings by Bailey family,
+				</unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_10275">Box 4 (folders 1 - 16)</physdesc>
+                </did>
+                <c02 id="bailey807_10281" level="file">
+                    <did id="bailey807_10280">
+                        <container id="bailey807_10277" type="box">4</container>
+                        <container id="bailey807_10278" type="folder">1</container>
+                        <unittitle id="bailey807_10279">Manuscript: "These Angels..," author unknown, holograph,
+				  n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10286" level="file">
+                    <did id="bailey807_10285">
+                        <container id="bailey807_10282" type="box">4</container>
+                        <container id="bailey807_10283" type="folder">2</container>
+                        <unittitle id="bailey807_10284">Manuscript: re Black History (incomplete), author
+				  unknown, holograph n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10291" level="file">
+                    <did id="bailey807_10290">
+                        <container id="bailey807_10287" type="box">4</container>
+                        <container id="bailey807_10288" type="folder">3</container>
+                        <unittitle id="bailey807_10289">Manuscript: "The doctrine of the gospel is as salt..."
+				  author unknown, holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10296" level="file">
+                    <did id="bailey807_10295">
+                        <container id="bailey807_10292" type="box">4</container>
+                        <container id="bailey807_10293" type="folder">4</container>
+                        <unittitle id="bailey807_10294">Manuscript: "We must study foreign missions..."
+				  (incomplete), author unknown, holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10301" level="file">
+                    <did id="bailey807_10300">
+                        <container id="bailey807_10297" type="box">4</container>
+                        <container id="bailey807_10298" type="folder">5</container>
+                        <unittitle id="bailey807_10299">Manuscript: "The Munificence of Arkansas" author
+				  unknown, typescript, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10306" level="file">
+                    <did id="bailey807_10305">
+                        <container id="bailey807_10302" type="box">4</container>
+                        <container id="bailey807_10303" type="folder">6</container>
+                        <unittitle id="bailey807_10304">Manuscript: "The Past Week," (incomplete), author
+				  unknown, holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10311" level="file">
+                    <did id="bailey807_10310">
+                        <container id="bailey807_10307" type="box">4</container>
+                        <container id="bailey807_10308" type="folder">7</container>
+                        <unittitle id="bailey807_10309">Manuscript of a sermon, author unknown, holograph,
+				  n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10316" level="file">
+                    <did id="bailey807_10315">
+                        <container id="bailey807_10312" type="box">4</container>
+                        <container id="bailey807_10313" type="folder">8</container>
+                        <unittitle id="bailey807_10314">Manuscript: Re: Southeast Baptist Academy, (incomplete)
+				  author unknown, holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10321" level="file">
+                    <did id="bailey807_10320">
+                        <container id="bailey807_10317" type="box">4</container>
+                        <container id="bailey807_10318" type="folder">9</container>
+                        <unittitle id="bailey807_10319">Manuscript: "Training of Children," Susie Bailey,
+				  holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10326" level="file">
+                    <did id="bailey807_10325">
+                        <container id="bailey807_10322" type="box">4</container>
+                        <container id="bailey807_10323" type="folder">10</container>
+                        <unittitle id="bailey807_10324">Speech: Address by Rev. I.G. Bailey at the 10th
+				  Anniversary of the Southeast District Association, holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10331" level="file">
+                    <did id="bailey807_10330">
+                        <container id="bailey807_10327" type="box">4</container>
+                        <container id="bailey807_10328" type="folder">11</container>
+                        <unittitle id="bailey807_10329">Speech: Susie Bailey regarding raising money for her
+				  school, holograph. n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10336" level="file">
+                    <did id="bailey807_10335">
+                        <container id="bailey807_10332" type="box">4</container>
+                        <container id="bailey807_10333" type="folder">12</container>
+                        <unittitle id="bailey807_10334">Speech: Address at Meeting in District of Columbia
+				  (incomplete), author unknown, typescript, n.d. </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10341" level="file">
+                    <did id="bailey807_10340">
+                        <container id="bailey807_10337" type="box">4</container>
+                        <container id="bailey807_10338" type="folder">13</container>
+                        <unittitle id="bailey807_10339">Speech: Welcome Address to Sisters of the Central
+				  District, author unknown, holograph</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10346" level="file">
+                    <did id="bailey807_10345">
+                        <container id="bailey807_10342" type="box">4</container>
+                        <container id="bailey807_10343" type="folder">14</container>
+                        <unittitle id="bailey807_10344">Speech: Address to the Sisters of the Bible Band
+				  regarding temperance, author unknown, holograph, n.d</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10351" level="file">
+                    <did id="bailey807_10350">
+                        <container id="bailey807_10347" type="box">4</container>
+                        <container id="bailey807_10348" type="folder">15</container>
+                        <unittitle id="bailey807_10349">Speech: "Her Life as Mother" / Tribute/eulogy to Sister
+				  Davis," author unknown, holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10356" level="file">
+                    <did id="bailey807_10355">
+                        <container id="bailey807_10352" type="box">4</container>
+                        <container id="bailey807_10353" type="folder">16</container>
+                        <unittitle id="bailey807_10354">Speech: Welcome Address to a woman’s organization,
+				  author unknown, typescript, n.d.</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series3" level="series">
+                <did id="bailey807_10361">
+                    <unitid id="bailey807_10357">Series 3</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_10359">Minutes and reports, 
+				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="bailey807_10358" normal="1893/1946" type="inclusive">1893-1946</unitdate>
+                    </unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_10360">Box 4 (folders 17-29)</physdesc>
+                </did>
+                <c02 id="bailey807_10366" level="file">
+                    <did id="bailey807_10365">
+                        <container id="bailey807_10362" type="box">4</container>
+                        <container id="bailey807_10363" type="folder">17</container>
+                        <unittitle id="bailey807_10364">Baptist Women’s Southeast Arkansas Association,
+				  president’s report, E.A. Smith (author), typescript, 1911</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10371" level="file">
+                    <did id="bailey807_10370">
+                        <container id="bailey807_10367" type="box">4</container>
+                        <container id="bailey807_10368" type="folder">18</container>
+                        <unittitle id="bailey807_10369">Executive Board (organization unknown), minutes,
+				  holograph, July 16, 1893</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10376" level="file">
+                    <did id="bailey807_10375">
+                        <container id="bailey807_10372" type="box">4</container>
+                        <container id="bailey807_10373" type="folder">19</container>
+                        <unittitle id="bailey807_10374">Executive Board of Mother’s Conference, report,
+				  holograph, December 29 1894</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10381" level="file">
+                    <did id="bailey807_10380">
+                        <container id="bailey807_10377" type="box">4</container>
+                        <container id="bailey807_10378" type="folder">20</container>
+                        <unittitle id="bailey807_10379">Executive Board of the Southeast District Industrial
+				  Academy, minutes, holograph, March 20, 1905</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10386" level="file">
+                    <did id="bailey807_10385">
+                        <container id="bailey807_10382" type="box">4</container>
+                        <container id="bailey807_10383" type="folder">21</container>
+                        <unittitle id="bailey807_10384">Executive Board of the Mothers Fireside Schools of Pine
+				  Bluff, report, Susie Bailey (author), n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10391" level="file">
+                    <did id="bailey807_10390">
+                        <container id="bailey807_10387" type="box">4</container>
+                        <container id="bailey807_10388" type="folder">22</container>
+                        <unittitle id="bailey807_10389">Home Missionary Society, report, Susie Bailey (author),
+				  holograph, November 1930</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10396" level="file">
+                    <did id="bailey807_10395">
+                        <container id="bailey807_10392" type="box">BV1</container>
+                        <container id="bailey807_10393" type="folder"/>
+                        <unittitle id="bailey807_10394">Howard University freshman and sophomore class minute
+				  book, I.G. Bailey, 1911-1913</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10401" level="file">
+                    <did id="bailey807_10400">
+                        <container id="bailey807_10397" type="box">4</container>
+                        <container id="bailey807_10398" type="folder">23</container>
+                        <unittitle id="bailey807_10399">Moderator’s report, (organization unknown), I.G. Bailey
+				  (author), Typescript, November 3, 1909</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10406" level="file">
+                    <did id="bailey807_10405">
+                        <container id="bailey807_10402" type="box">4</container>
+                        <container id="bailey807_10403" type="folder">24</container>
+                        <unittitle id="bailey807_10404">Southeast District Association, report, Mrs. R.N. Davis
+				  (author), Holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10411" level="file">
+                    <did id="bailey807_10410">
+                        <container id="bailey807_10407" type="box">4</container>
+                        <container id="bailey807_10408" type="folder">25</container>
+                        <unittitle id="bailey807_10409">Southeast District Women’s Association, report, Susie
+				  Bailey (author), Holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10416" level="file">
+                    <did id="bailey807_10415">
+                        <container id="bailey807_10412" type="box">4</container>
+                        <container id="bailey807_10413" type="folder">26</container>
+                        <unittitle id="bailey807_10414">Southeast District Women’s Association, report, Susie
+				  Bailey (author), Holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10421" level="file">
+                    <did id="bailey807_10420">
+                        <container id="bailey807_10417" type="box">4</container>
+                        <container id="bailey807_10418" type="folder">27</container>
+                        <unittitle id="bailey807_10419">Superintendent of Sunday Schools of Bethany Church in
+				  Dermott, report, Susie Bailey (author), January 1946</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10426" level="file">
+                    <did id="bailey807_10425">
+                        <container id="bailey807_10422" type="box">4</container>
+                        <container id="bailey807_10423" type="folder">28</container>
+                        <unittitle id="bailey807_10424">Listing of Stockholders Officers (organization unknown),
+				  holograph, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10431" level="file">
+                    <did id="bailey807_10430">
+                        <container id="bailey807_10427" type="box">4</container>
+                        <container id="bailey807_10428" type="folder">29</container>
+                        <unittitle id="bailey807_10429">Miscellaneous notes, n.d.</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series4" level="series">
+                <did id="bailey807_10436">
+                    <unitid id="bailey807_10432">Series 4</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_10434">Printed material, 
+				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="bailey807_10433" normal="1885/1986" type="inclusive">1885-1986</unitdate>
+                    </unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_10435">Box 4 (folders 30-59) - Box 5 and
+				OP1-2</physdesc>
+                </did>
+                <c02 id="bailey807_10439" level="file">
+                    <did id="bailey807_10438">
+                        <unittitle id="bailey807_10437">Pamphlets, brochures, broadsides</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10444" level="file">
+                    <did id="bailey807_10443">
+                        <container id="bailey807_10440" type="box">4</container>
+                        <container id="bailey807_10441" type="folder">30</container>
+                        <unittitle id="bailey807_10442">Arkansas Baptist College, Dedication of Library, May 23,
+				  1948</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10449" level="file">
+                    <did id="bailey807_10448">
+                        <container id="bailey807_10445" type="box">4</container>
+                        <container id="bailey807_10446" type="folder">31</container>
+                        <unittitle id="bailey807_10447">Arkansas Baptist College, "Front Elevation of New
+				  Building" (broadside)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10454" level="file">
+                    <did id="bailey807_10453">
+                        <container id="bailey807_10450" type="box">4</container>
+                        <container id="bailey807_10451" type="folder">32</container>
+                        <unittitle id="bailey807_10452">Arkansas Baptist State Convention, Conventional Letter,
+				  Little Rock August 23-28, 1887</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10459" level="file">
+                    <did id="bailey807_10458">
+                        <container id="bailey807_10455" type="box">4</container>
+                        <container id="bailey807_10456" type="folder">33</container>
+                        <unittitle id="bailey807_10457">Arkansas Baptist State Convention, Conventional Letter,
+				  Little Rock, November 21-25, 1900</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10464" level="file">
+                    <did id="bailey807_10463">
+                        <container id="bailey807_10460" type="box">4</container>
+                        <container id="bailey807_10461" type="folder">34</container>
+                        <unittitle id="bailey807_10462">Arkansas Baptist State Convention, Fiftieth Anniversary
+				  Golden Jubilee, November 19-25, 1917, Little Rock: Vanguard Print</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10469" level="file">
+                    <did id="bailey807_10468">
+                        <container id="bailey807_10465" type="box">4</container>
+                        <container id="bailey807_10466" type="folder">35</container>
+                        <unittitle id="bailey807_10467">Arkansas Baptist State Convention, Minutes of the
+				  Nineteenth Annual Session, August 23-28, 1918, Little Rock: Press Printing
+				  Company</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10474" level="file">
+                    <did id="bailey807_10473">
+                        <container id="bailey807_10470" type="box">4</container>
+                        <container id="bailey807_10471" type="folder">36</container>
+                        <unittitle id="bailey807_10472">Arkansas Baptist Women’s Association, Minutes of the
+				  Forty-Fourth Annual Session, June 1918, Little Rock: The Baptist
+				  Vanguard</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10479" level="file">
+                    <did id="bailey807_10478">
+                        <container id="bailey807_10475" type="box">4</container>
+                        <container id="bailey807_10476" type="folder">37</container>
+                        <unittitle id="bailey807_10477">Bailey, I. G., Circular Letter of the Southeast District
+				  for ca. June 1894 (4 copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10485" level="file">
+                    <did id="bailey807_10484">
+                        <container id="bailey807_10480" type="box">4</container>
+                        <container id="bailey807_10481" type="folder">38</container>
+                        <unittitle id="bailey807_10483">Bailey, I. G., 
+				  <title id="bailey807_10482" linktype="simple">Rules and Regulations of the Literal Society</title>,
+				  Arkansas City: Arkansas: Journal Print, 1885</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10490" level="file">
+                    <did id="bailey807_10489">
+                        <container id="bailey807_10486" type="box">4</container>
+                        <container id="bailey807_10487" type="folder">39</container>
+                        <unittitle id="bailey807_10488">Bailey, Susie, Bible Class Report. Women’s American
+				  Mission Baptist Home Mission Society, n.d. (2 copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10495" level="file">
+                    <did id="bailey807_10494">
+                        <container id="bailey807_10491" type="box">4</container>
+                        <container id="bailey807_10492" type="folder">40</container>
+                        <unittitle id="bailey807_10493">Bailey, Susie, Broadside, n.d. (2 copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10500" level="file">
+                    <did id="bailey807_10499">
+                        <container id="bailey807_10496" type="box">4</container>
+                        <container id="bailey807_10497" type="folder">41</container>
+                        <unittitle id="bailey807_10498">Baptist Women’s Southeastern District Association (held
+				  with The Friendship Baptist Church, Baxter, Arkansas), Programme, July
+				  30-August 1, 1904</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10505" level="file">
+                    <did id="bailey807_10504">
+                        <container id="bailey807_10501" type="box">4</container>
+                        <container id="bailey807_10502" type="folder">42</container>
+                        <unittitle id="bailey807_10503">Baptist Women’s Southeastern District Association (held
+				  with The Saint Morion Baptist Church), August 26-28, 1905,
+				  Programme</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10510" level="file">
+                    <did id="bailey807_10509">
+                        <container id="bailey807_10506" type="box">4</container>
+                        <container id="bailey807_10507" type="folder">43</container>
+                        <unittitle id="bailey807_10508">Baptist Women’s Southeastern Association, Proceedings of
+				  the Thirteenth Annual Session, August 26-28, 1910</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10515" level="file">
+                    <did id="bailey807_10514">
+                        <container id="bailey807_10511" type="box">4</container>
+                        <container id="bailey807_10512" type="folder">44</container>
+                        <unittitle id="bailey807_10513">Baptist Women’s Southeast Arkansas Association, Minutes
+				  of the 17th Annual Session, August 23-26, 1913</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10520" level="file">
+                    <did id="bailey807_10519">
+                        <container id="bailey807_10516" type="box">4</container>
+                        <container id="bailey807_10517" type="folder">45</container>
+                        <unittitle id="bailey807_10518">Blackall, C. R., "Beautiful Praise": An Order of Service
+				  for Children’s Day 1890, American Baptist Publication Society</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10525" level="file">
+                    <did id="bailey807_10524">
+                        <container id="bailey807_10521" type="box">4</container>
+                        <container id="bailey807_10522" type="folder">46</container>
+                        <unittitle id="bailey807_10523">Blue, L. W., History of the Southeast District Baptist
+				  Association, n.d. (incomplete)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10531" level="file">
+                    <did id="bailey807_10530">
+                        <container id="bailey807_10526" type="box">4</container>
+                        <container id="bailey807_10527" type="folder">47</container>
+                        <unittitle id="bailey807_10529">Booker, Joseph A., 
+				  <title id="bailey807_10528" linktype="simple">How Shall We Raise It?</title>, Little Rock: Vanguard
+				  Print, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10537" level="file">
+                    <did id="bailey807_10536">
+                        <container id="bailey807_10532" type="box">4</container>
+                        <container id="bailey807_10533" type="folder">48</container>
+                        <unittitle id="bailey807_10535">Booker, Joseph A., 
+				  <title id="bailey807_10534" linktype="simple">The Self-Education of the Negro</title>, Little Rock:
+				  Arkansas Baptist College (reprint of Baptist Home Mission Monthly August
+				  1903)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10542" level="file">
+                    <did id="bailey807_10541">
+                        <container id="bailey807_10538" type="box">4</container>
+                        <container id="bailey807_10539" type="folder">49</container>
+                        <unittitle id="bailey807_10540">Catholic Interracial Council of Washington, Contemporary
+				  Religious Paintings, Barnett Aden Gallery, Washington, D. C., October
+				  17-November, 1948</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10547" level="file">
+                    <did id="bailey807_10546">
+                        <container id="bailey807_10543" type="box">4</container>
+                        <container id="bailey807_10544" type="folder">50</container>
+                        <unittitle id="bailey807_10545">Chanticleer Farm Chamber Music Festival, Program,
+				  September 10, 1978</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10552" level="file">
+                    <did id="bailey807_10551">
+                        <container id="bailey807_10548" type="box">4</container>
+                        <container id="bailey807_10549" type="folder">51</container>
+                        <unittitle id="bailey807_10550">"China’s Millions"</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10557" level="file">
+                    <did id="bailey807_10556">
+                        <container id="bailey807_10553" type="box">4</container>
+                        <container id="bailey807_10554" type="folder">52</container>
+                        <unittitle id="bailey807_10555">The Church for the Fellowship of All Peoples, 32nd
+				  Anniversary Celebration, Newsletter, October 3, 10, 17, 24 and 31,
+				  1976</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10562" level="file">
+                    <did id="bailey807_10561">
+                        <container id="bailey807_10558" type="box">4</container>
+                        <container id="bailey807_10559" type="folder">53</container>
+                        <unittitle id="bailey807_10560">The Church for the Fellowship of All Peoples, Order of
+				  Worship, August 31, 1986</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10567" level="file">
+                    <did id="bailey807_10566">
+                        <container id="bailey807_10563" type="box">4</container>
+                        <container id="bailey807_10564" type="folder">54</container>
+                        <unittitle id="bailey807_10565">Delany, E.B. "Our Little Light Bearer," Foreign Mission
+				  Board National Baptist Convention, Louisville, Kentucky, undated</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10572" level="file">
+                    <did id="bailey807_10571">
+                        <container id="bailey807_10568" type="box">4</container>
+                        <container id="bailey807_10569" type="folder">55</container>
+                        <unittitle id="bailey807_10570">Dixie to Broadway: An exhibition of Black Americans on
+				  Stage, 1977 (4 copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10577" level="file">
+                    <did id="bailey807_10576">
+                        <container id="bailey807_10573" type="box">4</container>
+                        <container id="bailey807_10574" type="folder">56</container>
+                        <unittitle id="bailey807_10575">Dolls for Democracy, "Toys Aid Thurman Campaign for
+				  Understanding," n.d. (2 copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10582" level="file">
+                    <did id="bailey807_10581">
+                        <container id="bailey807_10578" type="box">4</container>
+                        <container id="bailey807_10579" type="folder">57</container>
+                        <unittitle id="bailey807_10580">Douglass Quilt Exhibit, Howard Thurman Trust Programs (3
+				  copies) and Posters (2 copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10587" level="file">
+                    <did id="bailey807_10586">
+                        <container id="bailey807_10583" type="box">4</container>
+                        <container id="bailey807_10584" type="folder">58</container>
+                        <unittitle id="bailey807_10585">Dunbar High School, Washington, D.C., Annual
+				  Commencement, June 20, 1934</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10592" level="file">
+                    <did id="bailey807_10591">
+                        <container id="bailey807_10588" type="box">4</container>
+                        <container id="bailey807_10589" type="folder">59</container>
+                        <unittitle id="bailey807_10590">First Baptist Church, Goddard, Kansas, January 1,
+				  1933</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10597" level="file">
+                    <did id="bailey807_10596">
+                        <container id="bailey807_10593" type="box">4</container>
+                        <container id="bailey807_10594" type="folder">60</container>
+                        <unittitle id="bailey807_10595">Foard, Elder F.C.V. "I Am on the Right Side," Memphis,
+				  Tennessee, undated</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10602" level="file">
+                    <did id="bailey807_10601">
+                        <container id="bailey807_10598" type="box">4</container>
+                        <container id="bailey807_10599" type="folder">61</container>
+                        <unittitle id="bailey807_10600">Four County Track Meet, Dermott, Arkansas, Program,
+				  April 13, 1923</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10608" level="file">
+                    <did id="bailey807_10607">
+                        <container id="bailey807_10603" type="box">5</container>
+                        <container id="bailey807_10604" type="folder">1</container>
+                        <unittitle id="bailey807_10606">
+                            <title id="bailey807_10605" linktype="simple">Gospel of St. Luke</title> (Susie Bailey’s
+				  copy)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10614" level="file">
+                    <did id="bailey807_10613">
+                        <container id="bailey807_10609" type="box">5</container>
+                        <container id="bailey807_10610" type="folder">2</container>
+                        <unittitle id="bailey807_10612">Harris, H. H. (ed), 
+				  <title id="bailey807_10611" linktype="simple">The Advanced Quarterly: International Lessons</title>,
+				  Philadelphia: American Baptist Publication Society, October 1892</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10619" level="file">
+                    <did id="bailey807_10618">
+                        <container id="bailey807_10615" type="box">5</container>
+                        <container id="bailey807_10616" type="folder">3</container>
+                        <unittitle id="bailey807_10617">Hawkins, Thomas [Dean] and Wallace Capel [M.D.], A
+				  Meritorious Tribute, June 14, 1980</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10624" level="file">
+                    <did id="bailey807_10623">
+                        <container id="bailey807_10620" type="box">5</container>
+                        <container id="bailey807_10621" type="folder">4</container>
+                        <unittitle id="bailey807_10622">Howard College Dramatic Club (broadside), April 15,
+				  1912</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10629" level="file">
+                    <did id="bailey807_10628">
+                        <container id="bailey807_10625" type="box">5</container>
+                        <container id="bailey807_10626" type="folder">5</container>
+                        <unittitle id="bailey807_10627">Howard University Calendar, "Twelve Reproductions from
+				  the Living Madonna in Art Series," n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10634" level="file">
+                    <did id="bailey807_10633">
+                        <container id="bailey807_10630" type="box">5</container>
+                        <container id="bailey807_10631" type="folder">6</container>
+                        <unittitle id="bailey807_10632">Howard University, Commencement Program and Invitation,
+				  June 1917</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10639" level="file">
+                    <did id="bailey807_10638">
+                        <container id="bailey807_10635" type="box">5</container>
+                        <container id="bailey807_10636" type="folder">7</container>
+                        <unittitle id="bailey807_10637">Howard University Journal, Editorial Election,
+				  n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10644" level="file">
+                    <did id="bailey807_10643">
+                        <container id="bailey807_10640" type="box">5</container>
+                        <container id="bailey807_10641" type="folder">8</container>
+                        <unittitle id="bailey807_10642">Jackson, Sister M, Funeral Program, November 3,
+				  1930</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10650" level="file">
+                    <did id="bailey807_10649">
+                        <container id="bailey807_10645" type="box">5</container>
+                        <container id="bailey807_10646" type="folder">9</container>
+                        <unittitle id="bailey807_10648">Jackson, Wallace Van, "The Countee Cullen Memorial
+				  Collection at Atlanta University," 
+				  <title id="bailey807_10647" linktype="simple">The Crisis</title>, May 1947</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10655" level="file">
+                    <did id="bailey807_10654">
+                        <container id="bailey807_10651" type="box">5</container>
+                        <container id="bailey807_10652" type="folder">10</container>
+                        <unittitle id="bailey807_10653">Johnson, Georgia Douglas, Poem, "I Gaze Into the Sun,
+				  n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10660" level="file">
+                    <did id="bailey807_10659">
+                        <container id="bailey807_10656" type="box">5</container>
+                        <container id="bailey807_10657" type="folder">11</container>
+                        <unittitle id="bailey807_10658">Koshland, Daniel Sr., In Memory, 1979</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10665" level="file">
+                    <did id="bailey807_10664">
+                        <container id="bailey807_10661" type="box">5</container>
+                        <container id="bailey807_10662" type="folder">12</container>
+                        <unittitle id="bailey807_10663">Moore, Joanna, "I Will Hear What God the Lord Will
+				  Speak," September 4, 1891 (Photograph in OP3)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10670" level="file">
+                    <did id="bailey807_10669">
+                        <container id="bailey807_10666" type="box">5</container>
+                        <container id="bailey807_10667" type="folder">13</container>
+                        <unittitle id="bailey807_10668">Moran, Ulysses Simpson, Funeral Program, September 3,
+				  1966</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10675" level="file">
+                    <did id="bailey807_10674">
+                        <container id="bailey807_10671" type="box">5</container>
+                        <container id="bailey807_10672" type="folder">14</container>
+                        <unittitle id="bailey807_10673">Morehouse College, Interment Services for Sue Bailey Thurman, May 15, 1997</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10680" level="file">
+                    <did id="bailey807_10679">
+                        <container id="bailey807_10676" type="box">5</container>
+                        <container id="bailey807_10677" type="folder">15</container>
+                        <unittitle id="bailey807_10678">Morris, E. C., Thirty-Sixth Annual Address, Baptist
+				  State Convention of Arkansas, November 20, 1918</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10685" level="file">
+                    <did id="bailey807_10684">
+                        <container id="bailey807_10681" type="box">5</container>
+                        <container id="bailey807_10682" type="folder">16</container>
+                        <unittitle id="bailey807_10683">National Baptist Convention, Music and Official
+				  Programme, Twenty-Ninth Annual Session, September 15-21, 1909</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10690" level="file">
+                    <did id="bailey807_10689">
+                        <container id="bailey807_10686" type="box">5</container>
+                        <container id="bailey807_10687" type="folder">17</container>
+                        <unittitle id="bailey807_10688">National Baptist Convention, U.S.A, Program, Praise
+				  Services and Mortgage-Burning Ceremonies of the Morris Memorial Building,
+				  Nashville, Tennessee, December 10, 1942</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10695" level="file">
+                    <did id="bailey807_10694">
+                        <container id="bailey807_10691" type="box">5</container>
+                        <container id="bailey807_10692" type="folder">18</container>
+                        <unittitle id="bailey807_10693">National Baptist Young People’s Union Board, BYPU
+				  Supplies, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10700" level="file">
+                    <did id="bailey807_10699">
+                        <container id="bailey807_10696" type="box">5</container>
+                        <container id="bailey807_10697" type="folder">19</container>
+                        <unittitle id="bailey807_10698">Nurses’ Sunday Lecture Series</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10706" level="file">
+                    <did id="bailey807_10705">
+                        <container id="bailey807_10701" type="box">5</container>
+                        <container id="bailey807_10702" type="folder">20</container>
+                        <unittitle id="bailey807_10704">Peabody, Lucy W., 
+				  <title id="bailey807_10703" linktype="simple">Everyland Children</title>, Central Committee on the
+				  United Study of Foreign Missions, Lynn, Massachusetts: Nichols-Ellis Press,
+				  1931</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10712" level="file">
+                    <did id="bailey807_10711">
+                        <container id="bailey807_10707" type="box">5</container>
+                        <container id="bailey807_10708" type="folder">21</container>
+                        <unittitle id="bailey807_10710">
+                            <title id="bailey807_10709" linktype="simple">The Peruna Almanac for 1900</title>
+                        </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10717" level="file">
+                    <did id="bailey807_10716">
+                        <container id="bailey807_10713" type="box">5</container>
+                        <container id="bailey807_10714" type="folder">22</container>
+                        <unittitle id="bailey807_10715">Pope, Howard W, "Anyone Can Be Saved and Kept By
+				  Jesus"</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10723" level="file">
+                    <did id="bailey807_10722">
+                        <container id="bailey807_10718" type="box">5</container>
+                        <container id="bailey807_10719" type="folder">23</container>
+                        <unittitle id="bailey807_10721">
+                            <title id="bailey807_10720" linktype="simple">The Preacher’s Helper</title>, Vol. XXVI, No. 3, March
+				  1909</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10729" level="file">
+                    <did id="bailey807_10728">
+                        <container id="bailey807_10724" type="box">5</container>
+                        <container id="bailey807_10725" type="folder">24</container>
+                        <unittitle id="bailey807_10727">
+                            <title id="bailey807_10726" linktype="simple">Raising up a Prophet...</title> (pp. 86-91), Text by
+				  Sudarshan Kapur (See Box 8 FF6 for photographs)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10734" level="file">
+                    <did id="bailey807_10733">
+                        <container id="bailey807_10730" type="box">5</container>
+                        <container id="bailey807_10731" type="folder">25</container>
+                        <unittitle id="bailey807_10732">Smith, Ethel. "Have You Seen Woman: The Eternal
+				  Question," advertisement, undated</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10740" level="file">
+                    <did id="bailey807_10739">
+                        <container id="bailey807_10735" type="box">5</container>
+                        <container id="bailey807_10736" type="folder">26</container>
+                        <unittitle id="bailey807_10738">Smith, Trudi, 
+				  <title id="bailey807_10737" linktype="simple">Sue Bailey Thurman: Building Bridges to Common
+					 Ground</title>, Boston: Trustees of Boston University, 1995</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10745" level="file">
+                    <did id="bailey807_10744">
+                        <container id="bailey807_10741" type="box">5</container>
+                        <container id="bailey807_10742" type="folder">27</container>
+                        <unittitle id="bailey807_10743">Southeast District Baptist Academy, Closing Exercises,
+				  April 21-22, 1904</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10750" level="file">
+                    <did id="bailey807_10749">
+                        <container id="bailey807_10746" type="box">5</container>
+                        <container id="bailey807_10747" type="folder">28</container>
+                        <unittitle id="bailey807_10748">Southeast Baptist Academy, Program, April 12,
+				  1908</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10755" level="file">
+                    <did id="bailey807_10754">
+                        <container id="bailey807_10751" type="box">5</container>
+                        <container id="bailey807_10752" type="folder">29</container>
+                        <unittitle id="bailey807_10753">Southeast Baptist Association, Proceedings of the
+				  Twenty-Third Annual Session, November 1906</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10760" level="file">
+                    <did id="bailey807_10759">
+                        <container id="bailey807_10756" type="box">5</container>
+                        <container id="bailey807_10757" type="folder">30</container>
+                        <unittitle id="bailey807_10758">Southeast Baptist Women’s Association (1st Session),
+				  held with Mt. Calvary Baptist Church, Baxter, Arkansas, July 1897 (2
+				  copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10765" level="file">
+                    <did id="bailey807_10764">
+                        <container id="bailey807_10761" type="box">5</container>
+                        <container id="bailey807_10762" type="folder">31</container>
+                        <unittitle id="bailey807_10763">Southeast District Baptist Association, Proceedings of
+				  the Twenty Ninth Annual Session, held with St. Paul Baptist Church, Dermott,
+				  Arkansas, October 29-November 1, 1913</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10770" level="file">
+                    <did id="bailey807_10769">
+                        <container id="bailey807_10766" type="box">5</container>
+                        <container id="bailey807_10767" type="folder">32</container>
+                        <unittitle id="bailey807_10768">Southeast District Baptist Women’s Association, Program
+				  of the 32nd Annual Session. August 1929</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10775" level="file">
+                    <did id="bailey807_10774">
+                        <container id="bailey807_10771" type="box">5</container>
+                        <container id="bailey807_10772" type="folder">33</container>
+                        <unittitle id="bailey807_10773">Southeast District Baptist Women’s Association, Program
+				  of the 33rd Annual Session, August, 1930</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10780" level="file">
+                    <did id="bailey807_10779">
+                        <container id="bailey807_10776" type="box">5</container>
+                        <container id="bailey807_10777" type="folder">34</container>
+                        <unittitle id="bailey807_10778">Southeast District Baptist Women’s Association, Program
+				  of the 34th Annual Session, 1931</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10785" level="file">
+                    <did id="bailey807_10784">
+                        <container id="bailey807_10781" type="box">5</container>
+                        <container id="bailey807_10782" type="folder">35</container>
+                        <unittitle id="bailey807_10783">Southeast District Missionary Baptist Association,
+				  Proceedings of the Seventh Annual Session, held with Friendship Baptist Church,
+				  Baxter, Arkansas, July 30-August 3, 1890, Little Rock: Vanguard Print, Baptist
+				  College</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10790" level="file">
+                    <did id="bailey807_10789">
+                        <container id="bailey807_10786" type="box">5</container>
+                        <container id="bailey807_10787" type="folder">36</container>
+                        <unittitle id="bailey807_10788">Southeast District Sunday School Convention, Minutes of
+				  the Third Annual Session, May 11-13, 1893, Little Rock: Vanguard
+				  Print</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10795" level="file">
+                    <did id="bailey807_10794">
+                        <container id="bailey807_10791" type="box">5</container>
+                        <container id="bailey807_10792" type="folder">37</container>
+                        <unittitle id="bailey807_10793">Southeastern District Association, Program of the
+				  Minister’s and Deacon’s Union, June 1912</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10800" level="file">
+                    <did id="bailey807_10799">
+                        <container id="bailey807_10796" type="box">5</container>
+                        <container id="bailey807_10797" type="folder">38</container>
+                        <unittitle id="bailey807_10798">Southeastern District Baptist Association of Arkansas,
+				  Programme of the Twenty Fourth Annual Session, held with Silver Mount Baptist
+				  Church, Hudspeth, Arkansas, October 30-November 3, 1907</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10805" level="file">
+                    <did id="bailey807_10804">
+                        <container id="bailey807_10801" type="box">5</container>
+                        <container id="bailey807_10802" type="folder">39</container>
+                        <unittitle id="bailey807_10803">Spelman Seminary, Piano Recital by Advanced Pupils, May
+				  3, 1918</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10810" level="file">
+                    <did id="bailey807_10809">
+                        <container id="bailey807_10806" type="box">5</container>
+                        <container id="bailey807_10807" type="folder">40</container>
+                        <unittitle id="bailey807_10808">Spelman Seminary, Piano Recital, April 22,
+				  1921</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10815" level="file">
+                    <did id="bailey807_10814">
+                        <container id="bailey807_10811" type="box">5</container>
+                        <container id="bailey807_10812" type="folder">41</container>
+                        <unittitle id="bailey807_10813">State Agricultural and Mechanical Institute, Normal,
+				  Alabama, Religious Service, January 28, 1945</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10820" level="file">
+                    <did id="bailey807_10819">
+                        <container id="bailey807_10816" type="box">5</container>
+                        <container id="bailey807_10817" type="folder">42</container>
+                        <unittitle id="bailey807_10818">State Federation of Colored Women’s Clubs, Proceedings
+				  of the Annual Sessions, 1913-1914, Fort Smith, Arkansas: J. W. Rice Printing,
+				  Co.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10826" level="file">
+                    <did id="bailey807_10825">
+                        <container id="bailey807_10821" type="box">5</container>
+                        <container id="bailey807_10822" type="folder">43</container>
+                        <unittitle id="bailey807_10824">Steadwell, B. S. (ed.), 
+				  <title id="bailey807_10823" linktype="simple">The Children’s Code of Morals</title>, La Crosse,
+				  Wisconsin: The Light, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10831" level="file">
+                    <did id="bailey807_10830">
+                        <container id="bailey807_10827" type="box">5</container>
+                        <container id="bailey807_10828" type="folder">44</container>
+                        <unittitle id="bailey807_10829">Southwestern Creek and Seminole District, Sunday School
+				  Convention, Proceedings of the Ninth Annual Session, July 24-27,
+				  1913</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10837" level="file">
+                    <did id="bailey807_10836">
+                        <container id="bailey807_10832" type="box">5</container>
+                        <container id="bailey807_10833" type="folder">45</container>
+                        <unittitle id="bailey807_10835">Thurman, Sue Bailey, 
+				  <title id="bailey807_10834" linktype="simple">Pioneers of Negro Origin in California</title>
+				  (1949)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10842" level="file">
+                    <did id="bailey807_10841">
+                        <container id="bailey807_10838" type="box">5</container>
+                        <container id="bailey807_10839" type="folder">46</container>
+                        <unittitle id="bailey807_10840">Turner, Nephronia (Mrs.), Memorial Service, March 17,
+				  1929</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10848" level="file">
+                    <did id="bailey807_10847">
+                        <container id="bailey807_10843" type="box">5</container>
+                        <container id="bailey807_10844" type="folder">47</container>
+                        <unittitle id="bailey807_10846">Vining, Elizabeth Gray, 
+				  <title id="bailey807_10845" linktype="simple">Anthology with Comments</title>, Wallingford,
+				  Pennsylvania: Pendle Hill, 1951</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10853" level="file">
+                    <did id="bailey807_10852">
+                        <container id="bailey807_10849" type="box">OP23</container>
+                        <container id="bailey807_10850" type="folder"/>
+                        <unittitle id="bailey807_10851">Washington, Little J.L: The Walking Bible and Prodigy,
+				  broadside, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10858" level="file">
+                    <did id="bailey807_10857">
+                        <container id="bailey807_10854" type="box">5</container>
+                        <container id="bailey807_10855" type="folder">48</container>
+                        <unittitle id="bailey807_10856">Webb, Walter Jr., M.D., Memorial Service, February 5,
+				  1976</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10863" level="file">
+                    <did id="bailey807_10862">
+                        <container id="bailey807_10859" type="box">5</container>
+                        <container id="bailey807_10860" type="folder">49</container>
+                        <unittitle id="bailey807_10861">"Where Are My Children?," Advertisement, Hiawatha
+				  Theatre, n.d.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10869" level="file">
+                    <did id="bailey807_10868">
+                        <container id="bailey807_10864" type="box">5</container>
+                        <container id="bailey807_10865" type="folder">50</container>
+                        <unittitle id="bailey807_10867">Williams, Ralph C, 
+				  <title id="bailey807_10866" linktype="simple">The Story of Amos’ Fortune</title>
+                        </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10874" level="file">
+                    <did id="bailey807_10873">
+                        <container id="bailey807_10870" type="box">5</container>
+                        <container id="bailey807_10871" type="folder">51</container>
+                        <unittitle id="bailey807_10872">Woman’s American Baptist Home Mission Society, Tidings,
+				  February 1911</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10879" level="file">
+                    <did id="bailey807_10878">
+                        <container id="bailey807_10875" type="box">5</container>
+                        <container id="bailey807_10876" type="folder">52</container>
+                        <unittitle id="bailey807_10877">Woman's Convention, Auxiliary to the National Baptist
+				  Convention, receipt, Louisville, Kentucky, 1907</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10884" level="file">
+                    <did id="bailey807_10883">
+                        <container id="bailey807_10880" type="box">5</container>
+                        <container id="bailey807_10881" type="folder">53</container>
+                        <unittitle id="bailey807_10882">Women Chicot County Association, Program of the Second
+				  Annual Session, August 11-13, 1898</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10889" level="file">
+                    <did id="bailey807_10888">
+                        <container id="bailey807_10885" type="box">5</container>
+                        <container id="bailey807_10886" type="folder">54</container>
+                        <unittitle id="bailey807_10887">Women’s Southeast District Association, First Annual
+				  Session, July 23-25, 1897, Little Rock: Vanguard Print, 1897</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10892" level="file">
+                    <did id="bailey807_10891">
+                        <unittitle id="bailey807_10890">Newspaper clippings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10897" level="file">
+                    <did id="bailey807_10896">
+                        <container id="bailey807_10893" type="box">5</container>
+                        <container id="bailey807_10894" type="folder">55</container>
+                        <unittitle id="bailey807_10895">Obituaries, Bailey family</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10902" level="file">
+                    <did id="bailey807_10901">
+                        <container id="bailey807_10898" type="box">5</container>
+                        <container id="bailey807_10899" type="folder">56</container>
+                        <unittitle id="bailey807_10900">"Among Colored People" (About Susie Bailey) (3
+				  copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10908" level="file">
+                    <did id="bailey807_10907">
+                        <container id="bailey807_10903" type="box">5</container>
+                        <container id="bailey807_10904" type="folder">57</container>
+                        <unittitle id="bailey807_10906">
+                            <title id="bailey807_10905" linktype="simple">Hope</title>, October 1893</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10913" level="file">
+                    <did id="bailey807_10912">
+                        <container id="bailey807_10909" type="box">5</container>
+                        <container id="bailey807_10910" type="folder">58</container>
+                        <unittitle id="bailey807_10911">Article: Nannie Burroughs, "The Training School
+				  Situation."</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10918" level="file">
+                    <did id="bailey807_10917">
+                        <container id="bailey807_10914" type="box">5</container>
+                        <container id="bailey807_10915" type="folder">59</container>
+                        <unittitle id="bailey807_10916">Howard Thurman to begin teaching at University of
+				  Iowa</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10923" level="file">
+                    <did id="bailey807_10922">
+                        <container id="bailey807_10919" type="box">5</container>
+                        <container id="bailey807_10920" type="folder">60</container>
+                        <unittitle id="bailey807_10921">Sue Bailey Thurman 1937 Lecture Series (2
+				  copies)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10928" level="file">
+                    <did id="bailey807_10927">
+                        <container id="bailey807_10924" type="box">5</container>
+                        <container id="bailey807_10925" type="folder">61</container>
+                        <unittitle id="bailey807_10926">Sue Bailey Thurman to attend Townsend Affair</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10933" level="file">
+                    <did id="bailey807_10932">
+                        <container id="bailey807_10929" type="box">5</container>
+                        <container id="bailey807_10930" type="folder">62</container>
+                        <unittitle id="bailey807_10931">Family related clippings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10938" level="file">
+                    <did id="bailey807_10937">
+                        <container id="bailey807_10934" type="box">5</container>
+                        <container id="bailey807_10935" type="folder">63</container>
+                        <unittitle id="bailey807_10936">"Meta Fuller Dies at 90" (1968)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10943" level="file">
+                    <did id="bailey807_10942">
+                        <container id="bailey807_10939" type="box">5</container>
+                        <container id="bailey807_10940" type="folder">64</container>
+                        <unittitle id="bailey807_10941">Miscellaneous clippings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10946" level="file">
+                    <did id="bailey807_10945">
+                        <unittitle id="bailey807_10944">Newspapers</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10952" level="file">
+                    <did id="bailey807_10951">
+                        <container id="bailey807_10947" type="box">OP1</container>
+                        <container id="bailey807_10948" type="folder">1</container>
+                        <unittitle id="bailey807_10950">
+                            <title id="bailey807_10949" linktype="simple">Arkansas Survey</title>, n.d</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10958" level="file">
+                    <did id="bailey807_10957">
+                        <container id="bailey807_10953" type="box">OP1</container>
+                        <container id="bailey807_10954" type="folder">2</container>
+                        <unittitle id="bailey807_10956">
+                            <title id="bailey807_10955" linktype="simple">Baptist Vanguard</title>, April 28, 1893</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10964" level="file">
+                    <did id="bailey807_10963">
+                        <container id="bailey807_10959" type="box">OP1</container>
+                        <container id="bailey807_10960" type="folder">2</container>
+                        <unittitle id="bailey807_10962">
+                            <title id="bailey807_10961" linktype="simple">Baptist Vanguard</title>, August 11, 1893</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10970" level="file">
+                    <did id="bailey807_10969">
+                        <container id="bailey807_10965" type="box">OP1</container>
+                        <container id="bailey807_10966" type="folder">2</container>
+                        <unittitle id="bailey807_10968">
+                            <title id="bailey807_10967" linktype="simple">Baptist Vanguard</title>, March 31, 1898</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10976" level="file">
+                    <did id="bailey807_10975">
+                        <container id="bailey807_10971" type="box">OP1</container>
+                        <container id="bailey807_10972" type="folder">2</container>
+                        <unittitle id="bailey807_10974">
+                            <title id="bailey807_10973" linktype="simple">Baptist Vanguard</title>, May 2, 1898</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10982" level="file">
+                    <did id="bailey807_10981">
+                        <container id="bailey807_10977" type="box">OP1</container>
+                        <container id="bailey807_10978" type="folder">3</container>
+                        <unittitle id="bailey807_10980">
+                            <title id="bailey807_10979" linktype="simple">The Guardian</title>, June 30, 1906</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10988" level="file">
+                    <did id="bailey807_10987">
+                        <container id="bailey807_10983" type="box">OP1</container>
+                        <container id="bailey807_10984" type="folder">4</container>
+                        <unittitle id="bailey807_10986">
+                            <title id="bailey807_10985" linktype="simple">Hope</title>, July 1892</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_10994" level="file">
+                    <did id="bailey807_10993">
+                        <container id="bailey807_10989" type="box">OP1</container>
+                        <container id="bailey807_10990" type="folder">4</container>
+                        <unittitle id="bailey807_10992">
+                            <title id="bailey807_10991" linktype="simple">Hope</title>, December 1895</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101000" level="file">
+                    <did id="bailey807_10999">
+                        <container id="bailey807_10995" type="box">OP1</container>
+                        <container id="bailey807_10996" type="folder">5</container>
+                        <unittitle id="bailey807_10998">
+                            <title id="bailey807_10997" linktype="simple">Mission Herald</title>, May 1916</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101006" level="file">
+                    <did id="bailey807_101005">
+                        <container id="bailey807_101001" type="box">OP1</container>
+                        <container id="bailey807_101002" type="folder">6</container>
+                        <unittitle id="bailey807_101004">
+                            <title id="bailey807_101003" linktype="simple">Pine Bluff Weekly Herald</title>, May 18, 1901</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101012" level="file">
+                    <did id="bailey807_101011">
+                        <container id="bailey807_101007" type="box">OP1</container>
+                        <container id="bailey807_101008" type="folder">7</container>
+                        <unittitle id="bailey807_101010">
+                            <title id="bailey807_101009" linktype="simple">Southeast Advocate</title>, August 29, 1907</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101018" level="file">
+                    <did id="bailey807_101017">
+                        <container id="bailey807_101013" type="box">OP2</container>
+                        <container id="bailey807_101014" type="folder">1</container>
+                        <unittitle id="bailey807_101016">
+                            <title id="bailey807_101015" linktype="simple">St. Louis Weekly Globe Democrat</title>, September 12,
+				  1889</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101024" level="file">
+                    <did id="bailey807_101023">
+                        <container id="bailey807_101019" type="box">OP2</container>
+                        <container id="bailey807_101020" type="folder">1</container>
+                        <unittitle id="bailey807_101022">
+                            <title id="bailey807_101021" linktype="simple">St. Louis Weekly Globe Democrat</title>, December 8,
+				  1896</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101030" level="file">
+                    <did id="bailey807_101029">
+                        <container id="bailey807_101025" type="box">OP2</container>
+                        <container id="bailey807_101026" type="folder">1</container>
+                        <unittitle id="bailey807_101028">
+                            <title id="bailey807_101027" linktype="simple">St. Louis Weekly Globe Democrat</title>, December 11,
+				  1896</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101036" level="file">
+                    <did id="bailey807_101035">
+                        <container id="bailey807_101031" type="box">OP2</container>
+                        <container id="bailey807_101032" type="folder">1</container>
+                        <unittitle id="bailey807_101034">
+                            <title id="bailey807_101033" linktype="simple">St. Louis Weekly Globe Democrat</title>, December 13,
+				  1896</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101042" level="file">
+                    <did id="bailey807_101041">
+                        <container id="bailey807_101037" type="box">OP2</container>
+                        <container id="bailey807_101038" type="folder">1</container>
+                        <unittitle id="bailey807_101040">
+                            <title id="bailey807_101039" linktype="simple">St. Louis Weekly Globe Democrat</title>, December 15,
+				  1896</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101048" level="file">
+                    <did id="bailey807_101047">
+                        <container id="bailey807_101043" type="box">OP2</container>
+                        <container id="bailey807_101044" type="folder">1</container>
+                        <unittitle id="bailey807_101046">
+                            <title id="bailey807_101045" linktype="simple">St. Louis Weekly Globe Democrat</title>, December 18,
+				  1896</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101054" level="file">
+                    <did id="bailey807_101053">
+                        <container id="bailey807_101049" type="box">OP2</container>
+                        <container id="bailey807_101050" type="folder">1</container>
+                        <unittitle id="bailey807_101052">
+                            <title id="bailey807_101051" linktype="simple">St. Louis Weekly Globe Democrat</title>, December 22,
+				  1896</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101060" level="file">
+                    <did id="bailey807_101059">
+                        <container id="bailey807_101055" type="box">OP2</container>
+                        <container id="bailey807_101056" type="folder">1</container>
+                        <unittitle id="bailey807_101058">
+                            <title id="bailey807_101057" linktype="simple">St. Louis Weekly Globe Democrat</title>, January 5,
+				  1897</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101066" level="file">
+                    <did id="bailey807_101065">
+                        <container id="bailey807_101061" type="box">OP2</container>
+                        <container id="bailey807_101062" type="folder">1</container>
+                        <unittitle id="bailey807_101064">
+                            <title id="bailey807_101063" linktype="simple">St. Louis Weekly Globe Democrat</title>, January 8,
+				  1897</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101072" level="file">
+                    <did id="bailey807_101071">
+                        <container id="bailey807_101067" type="box">OP2</container>
+                        <container id="bailey807_101068" type="folder">1</container>
+                        <unittitle id="bailey807_101070">
+                            <title id="bailey807_101069" linktype="simple">St. Louis Weekly Globe Democrat</title>, September 10,
+				  1901</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101078" level="file">
+                    <did id="bailey807_101077">
+                        <container id="bailey807_101073" type="box">OP2</container>
+                        <container id="bailey807_101074" type="folder">1</container>
+                        <unittitle id="bailey807_101076">
+                            <title id="bailey807_101075" linktype="simple">St. Louis Weekly Globe Democrat</title>, September 13,
+				  1901</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101084" level="file">
+                    <did id="bailey807_101083">
+                        <container id="bailey807_101079" type="box">OP2</container>
+                        <container id="bailey807_101080" type="folder">1</container>
+                        <unittitle id="bailey807_101082">
+                            <title id="bailey807_101081" linktype="simple">St. Louis Weekly Globe Democrat</title>, September 17,
+				  1901</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101090" level="file">
+                    <did id="bailey807_101089">
+                        <container id="bailey807_101085" type="box">OP2</container>
+                        <container id="bailey807_101086" type="folder">1</container>
+                        <unittitle id="bailey807_101088">
+                            <title id="bailey807_101087" linktype="simple">St. Louis Weekly Globe Democrat</title>, September 20,
+				  1901</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101096" level="file">
+                    <did id="bailey807_101095">
+                        <container id="bailey807_101091" type="box">OP2</container>
+                        <container id="bailey807_101092" type="folder">2</container>
+                        <unittitle id="bailey807_101094">
+                            <title id="bailey807_101093" linktype="simple">The Union</title>, September 2, 1948</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series5" level="series">
+                <did id="bailey807_101100">
+                    <unitid id="bailey807_101097">Series 5</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_101098">Photographs</unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_101099">Boxes 6 - 11; OP 3-14 and
+				18</physdesc>
+                </did>
+                <c02 id="bailey807_101103" level="file">
+                    <did id="bailey807_101102">
+                        <unittitle id="bailey807_101101">Family</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101108" level="file">
+                    <did id="bailey807_101107">
+                        <container id="bailey807_101104" type="box">6</container>
+                        <container id="bailey807_101105" type="folder">1</container>
+                        <unittitle id="bailey807_101106">I. G. Bailey</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101113" level="file">
+                    <did id="bailey807_101112">
+                        <container id="bailey807_101109" type="box">OP18</container>
+                        <container id="bailey807_101110"/>
+                        <unittitle id="bailey807_101111">I. G. Bailey, large framed portrait</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101118" level="file">
+                    <did id="bailey807_101117">
+                        <container id="bailey807_101114" type="box">6</container>
+                        <container id="bailey807_101115" type="folder">2</container>
+                        <unittitle id="bailey807_101116">Susie Bailey</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101123" level="file">
+                    <did id="bailey807_101122">
+                        <container id="bailey807_101119" type="box">6</container>
+                        <container id="bailey807_101120" type="folder">3</container>
+                        <unittitle id="bailey807_101121">Susie Bailey and Scott Ford (brother) with charges/students</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101128" level="file">
+                    <did id="bailey807_101127">
+                        <container id="bailey807_101124" type="box">6</container>
+                        <container id="bailey807_101125" type="folder">4</container>
+                        <unittitle id="bailey807_101126">I. G. Bailey, Jr.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101133" level="file">
+                    <did id="bailey807_101132">
+                        <container id="bailey807_101129" type="box">OP3</container>
+                        <container id="bailey807_101130"/>
+                        <unittitle id="bailey807_101131">I. G. Bailey, Jr., portrait</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101138" level="file">
+                    <did id="bailey807_101137">
+                        <container id="bailey807_101134" type="box">OP4</container>
+                        <container id="bailey807_101135"/>
+                        <unittitle id="bailey807_101136">I. G. Bailey, Jr., Omega Psi Phi Fraternity,
+				  1915-1916</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101143" level="file">
+                    <did id="bailey807_101142">
+                        <container id="bailey807_101139" type="box">6</container>
+                        <container id="bailey807_101140" type="folder">5</container>
+                        <unittitle id="bailey807_101141">Extended family</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101148" level="file">
+                    <did id="bailey807_101147">
+                        <container id="bailey807_101144" type="box">6</container>
+                        <container id="bailey807_101145" type="folder">6</container>
+                        <unittitle id="bailey807_101146">Sue Bailey Thurman, alone [Image 0807-003]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101153" level="file">
+                    <did id="bailey807_101152">
+                        <container id="bailey807_101149" type="box">6</container>
+                        <container id="bailey807_101150" type="folder">7</container>
+                        <unittitle id="bailey807_101151">Sue Bailey Thurman with Gandhi in India [See also
+				  Travel: Various photos from India] [Image 0807-001]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101158" level="file">
+                    <did id="bailey807_101157">
+                        <container id="bailey807_101154" type="box">6</container>
+                        <container id="bailey807_101155" type="folder">8</container>
+                        <unittitle id="bailey807_101156">Sue Bailey Thurman, attending various
+				  functions</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101163" level="file">
+                    <did id="bailey807_101162">
+                        <container id="bailey807_101159" type="box">6</container>
+                        <container id="bailey807_101160" type="folder">9</container>
+                        <unittitle id="bailey807_101161">Sue Bailey Thurman, attending various
+				  functions</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101168" level="file">
+                    <did id="bailey807_101167">
+                        <container id="bailey807_101164" type="box">6</container>
+                        <container id="bailey807_101165" type="folder">10</container>
+                        <unittitle id="bailey807_101166">Thurman family home (Childhood home)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101173" level="file">
+                    <did id="bailey807_101172">
+                        <container id="bailey807_101169" type="box">6</container>
+                        <container id="bailey807_101170" type="folder">11</container>
+                        <unittitle id="bailey807_101171">Howard Thurman, alone </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101178" level="file">
+                    <did id="bailey807_101177">
+                        <container id="bailey807_101174" type="box">6</container>
+                        <container id="bailey807_101175" type="folder">12</container>
+                        <unittitle id="bailey807_101176">Howard Thurman, alone</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101183" level="file">
+                    <did id="bailey807_101182">
+                        <container id="bailey807_101179" type="box">6</container>
+                        <container id="bailey807_101180" type="folder">13</container>
+                        <unittitle id="bailey807_101181">Howard Thurman, alone</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101188" level="file">
+                    <did id="bailey807_101187">
+                        <container id="bailey807_101184" type="box">6</container>
+                        <container id="bailey807_101185" type="folder">14</container>
+                        <unittitle id="bailey807_101186">Howard Thurman, alone</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101193" level="file">
+                    <did id="bailey807_101192">
+                        <container id="bailey807_101189" type="box">OP5</container>
+                        <container id="bailey807_101190"/>
+                        <unittitle id="bailey807_101191">Howard Thurman, alone</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101198" level="file">
+                    <did id="bailey807_101197">
+                        <container id="bailey807_101194" type="box">6</container>
+                        <container id="bailey807_101195" type="folder">15</container>
+                        <unittitle id="bailey807_101196">Howard Thurman, alone (candid)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101203" level="file">
+                    <did id="bailey807_101202">
+                        <container id="bailey807_101199" type="box">6</container>
+                        <container id="bailey807_101200" type="folder">16</container>
+                        <unittitle id="bailey807_101201">Howard Thurman, alone (candid)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101208" level="file">
+                    <did id="bailey807_101207">
+                        <container id="bailey807_101204" type="box">6</container>
+                        <container id="bailey807_101205" type="folder">17</container>
+                        <unittitle id="bailey807_101206">Howard Thurman, alone (Religious dress)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101213" level="file">
+                    <did id="bailey807_101212">
+                        <container id="bailey807_101209" type="box">7</container>
+                        <container id="bailey807_101210" type="folder">1</container>
+                        <unittitle id="bailey807_101211">Howard Thurman, group photographs, early
+				  career</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101218" level="file">
+                    <did id="bailey807_101217">
+                        <container id="bailey807_101214" type="box">7</container>
+                        <container id="bailey807_101215" type="folder">2</container>
+                        <unittitle id="bailey807_101216">Howard Thurman, group photographs, middle
+				  career</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101223" level="file">
+                    <did id="bailey807_101222">
+                        <container id="bailey807_101219" type="box">7</container>
+                        <container id="bailey807_101220" type="folder">3</container>
+                        <unittitle id="bailey807_101221">Howard Thurman, group photographs, middle
+				  career</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101228" level="file">
+                    <did id="bailey807_101227">
+                        <container id="bailey807_101224" type="box">7</container>
+                        <container id="bailey807_101225" type="folder">4</container>
+                        <unittitle id="bailey807_101226">Howard Thurman, group photographs, middle
+				  career</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101233" level="file">
+                    <did id="bailey807_101232">
+                        <container id="bailey807_101229" type="box">7</container>
+                        <container id="bailey807_101230" type="folder">5</container>
+                        <unittitle id="bailey807_101231">Howard Thurman, group photographs, middle
+				  career</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101238" level="file">
+                    <did id="bailey807_101237">
+                        <container id="bailey807_101234" type="box">7</container>
+                        <container id="bailey807_101235" type="folder">6</container>
+                        <unittitle id="bailey807_101236">Howard Thurman, group photographs, later
+				  career</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101243" level="file">
+                    <did id="bailey807_101242">
+                        <container id="bailey807_101239" type="box">OP6</container>
+                        <container id="bailey807_101240"/>
+                        <unittitle id="bailey807_101241">Howard Thurman, group photograph, taken at Testimonial
+				  dinner in honor of Dr. William Hinton, Boston, Mass., February 10, 1954 [Dr..
+				  Thurman guest at the head table]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101248" level="file">
+                    <did id="bailey807_101247">
+                        <container id="bailey807_101244" type="box">7</container>
+                        <container id="bailey807_101245" type="folder">7</container>
+                        <unittitle id="bailey807_101246">Howard Thurman, group photographs, religious
+				  proceedings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101253" level="file">
+                    <did id="bailey807_101252">
+                        <container id="bailey807_101249" type="box">7</container>
+                        <container id="bailey807_101250" type="folder">8</container>
+                        <unittitle id="bailey807_101251">Howard and Sue Bailey Thurman alone</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101258" level="file">
+                    <did id="bailey807_101257">
+                        <container id="bailey807_101254" type="box">7</container>
+                        <container id="bailey807_101255" type="folder">9</container>
+                        <unittitle id="bailey807_101256">Howard and Sue Bailey Thurman attending various
+				  functions</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101263" level="file">
+                    <did id="bailey807_101262">
+                        <container id="bailey807_101259" type="box">OP7</container>
+                        <container id="bailey807_101260"/>
+                        <unittitle id="bailey807_101261">Anne Thurman</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101268" level="file">
+                    <did id="bailey807_101267">
+                        <container id="bailey807_101264" type="box">7</container>
+                        <container id="bailey807_101265" type="folder">10</container>
+                        <unittitle id="bailey807_101266">Bailey and Thurman family photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101273" level="file">
+                    <did id="bailey807_101272">
+                        <container id="bailey807_101269" type="box">7</container>
+                        <container id="bailey807_101270" type="folder">11</container>
+                        <unittitle id="bailey807_101271">Bailey and Thurman family photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101278" level="file">
+                    <did id="bailey807_101277">
+                        <container id="bailey807_101274" type="box">7</container>
+                        <container id="bailey807_101275" type="folder">12</container>
+                        <unittitle id="bailey807_101276">Bailey and Thurman family photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101283" level="file">
+                    <did id="bailey807_101282">
+                        <container id="bailey807_101279" type="box">7</container>
+                        <container id="bailey807_101280" type="folder">13</container>
+                        <unittitle id="bailey807_101281">Bailey and Thurman family photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101288" level="file">
+                    <did id="bailey807_101287">
+                        <container id="bailey807_101284" type="box">7</container>
+                        <container id="bailey807_101285" type="folder">14</container>
+                        <unittitle id="bailey807_101286">Bailey and Thurman family photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101293" level="file">
+                    <did id="bailey807_101292">
+                        <container id="bailey807_101289" type="box">8</container>
+                        <container id="bailey807_101290" type="folder">1</container>
+                        <unittitle id="bailey807_101291">Bailey and Thurman family photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101296" level="file">
+                    <did id="bailey807_101295">
+                        <unittitle id="bailey807_101294">Universities/Churches</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101301" level="file">
+                    <did id="bailey807_101300">
+                        <container id="bailey807_101297" type="box">8</container>
+                        <container id="bailey807_101298" type="folder">2</container>
+                        <unittitle id="bailey807_101299">Howard University </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101306" level="file">
+                    <did id="bailey807_101305">
+                        <container id="bailey807_101302" type="box">8</container>
+                        <container id="bailey807_101303" type="folder">3</container>
+                        <unittitle id="bailey807_101304">Howard University </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101311" level="file">
+                    <did id="bailey807_101310">
+                        <container id="bailey807_101307" type="box">OP8</container>
+                        <container id="bailey807_101308"/>
+                        <unittitle id="bailey807_101309">Howard University, African American college students
+				  meeting [Howard University representatives include Thurman]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101316" level="file">
+                    <did id="bailey807_101315">
+                        <container id="bailey807_101312" type="box">OP9</container>
+                        <container id="bailey807_101313"/>
+                        <unittitle id="bailey807_101314">Howard University Choir, Rankin Chapel [Thurman on
+				  right]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101321" level="file">
+                    <did id="bailey807_101320">
+                        <container id="bailey807_101317" type="box">OP10</container>
+                        <container id="bailey807_101318"/>
+                        <unittitle id="bailey807_101319">Howard University Committee [Thurman not
+				  pictured]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101326" level="file">
+                    <did id="bailey807_101325">
+                        <container id="bailey807_101322" type="box">8</container>
+                        <container id="bailey807_101323" type="folder">4</container>
+                        <unittitle id="bailey807_101324">Morehouse College, San Francisco Bay Area Alumni Chapter
+				  Awards Dinner (1969) [Dr. Thurman guest of honor]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101331" level="file">
+                    <did id="bailey807_101330">
+                        <container id="bailey807_101327" type="box">8</container>
+                        <container id="bailey807_101328" type="folder">5</container>
+                        <unittitle id="bailey807_101329">Morehouse College, Howard Thurman birthday celebration
+				  (1983) </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101336" level="file">
+                    <did id="bailey807_101335">
+                        <container id="bailey807_101332" type="box">8</container>
+                        <container id="bailey807_101333" type="folder">6</container>
+                        <unittitle id="bailey807_101334">Morehouse College, Dedication of Howard Thurman Tower of
+				  Bells (1995)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101341" level="file">
+                    <did id="bailey807_101340">
+                        <container id="bailey807_101337" type="box">8</container>
+                        <container id="bailey807_101338" type="folder">7</container>
+                        <unittitle id="bailey807_101339">Morehouse College, 1995 Dedication Ceremony, Sue Bailey
+				  Thurman and Coretta Scott King in attendance</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101346" level="file">
+                    <did id="bailey807_101345">
+                        <container id="bailey807_101342" type="box">8</container>
+                        <container id="bailey807_101343" type="folder">8</container>
+                        <unittitle id="bailey807_101344">Spelman University</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101351" level="file">
+                    <did id="bailey807_101350">
+                        <container id="bailey807_101347" type="box">OP11</container>
+                        <container id="bailey807_101348"/>
+                        <unittitle id="bailey807_101349">Spelman University students</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101356" level="file">
+                    <did id="bailey807_101355">
+                        <container id="bailey807_101352" type="box">8</container>
+                        <container id="bailey807_101353" type="folder">9</container>
+                        <unittitle id="bailey807_101354">Bennett College</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101361" level="file">
+                    <did id="bailey807_101360">
+                        <container id="bailey807_101357" type="box">8</container>
+                        <container id="bailey807_101358" type="folder">10</container>
+                        <unittitle id="bailey807_101359">Boston University, group photographs with Howard
+				  Thurman</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101366" level="file">
+                    <did id="bailey807_101365">
+                        <container id="bailey807_101362" type="box">8</container>
+                        <container id="bailey807_101363" type="folder">11</container>
+                        <unittitle id="bailey807_101364">Boston University, group photographs with Howard
+				  Thurman</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101371" level="file">
+                    <did id="bailey807_101370">
+                        <container id="bailey807_101367" type="box">8</container>
+                        <container id="bailey807_101368" type="folder">12</container>
+                        <unittitle id="bailey807_101369">Boston University, group photographs with Sue Bailey
+				  Thurman</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101376" level="file">
+                    <did id="bailey807_101375">
+                        <container id="bailey807_101372" type="box">8</container>
+                        <container id="bailey807_101373" type="folder">13</container>
+                        <unittitle id="bailey807_101374">Boston University, group photographs without the
+				  Thurmans</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101381" level="file">
+                    <did id="bailey807_101380">
+                        <container id="bailey807_101377" type="box">8</container>
+                        <container id="bailey807_101378" type="folder">14</container>
+                        <unittitle id="bailey807_101379">Boston University, group photographs without the
+				  Thurmans</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101386" level="file">
+                    <did id="bailey807_101385">
+                        <container id="bailey807_101382" type="box">8</container>
+                        <container id="bailey807_101383" type="folder">15</container>
+                        <unittitle id="bailey807_101384">Boston University, group photographs without the
+				  Thurmans</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101391" level="file">
+                    <did id="bailey807_101390">
+                        <container id="bailey807_101387" type="box">OP12</container>
+                        <container id="bailey807_101388"/>
+                        <unittitle id="bailey807_101389">Boston University, lecture [speaker unknown]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101396" level="file">
+                    <did id="bailey807_101395">
+                        <container id="bailey807_101392" type="box">8</container>
+                        <container id="bailey807_101393" type="folder">16</container>
+                        <unittitle id="bailey807_101394">Boston University, contemporary photographs of students
+				  and campus</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101401" level="file">
+                    <did id="bailey807_101400">
+                        <container id="bailey807_101397" type="box">9</container>
+                        <container id="bailey807_101398" type="folder">1</container>
+                        <unittitle id="bailey807_101399">Fellowship Church gatherings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101406" level="file">
+                    <did id="bailey807_101405">
+                        <container id="bailey807_101402" type="box">9</container>
+                        <container id="bailey807_101403" type="folder">2</container>
+                        <unittitle id="bailey807_101404">Fellowship Church gatherings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101411" level="file">
+                    <did id="bailey807_101410">
+                        <container id="bailey807_101407" type="box">9</container>
+                        <container id="bailey807_101408" type="folder">3</container>
+                        <unittitle id="bailey807_101409">Fellowship Church gatherings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101416" level="file">
+                    <did id="bailey807_101415">
+                        <container id="bailey807_101412" type="box">9</container>
+                        <container id="bailey807_101413" type="folder">4</container>
+                        <unittitle id="bailey807_101414">Fellowship Church gatherings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101421" level="file">
+                    <did id="bailey807_101420">
+                        <container id="bailey807_101417" type="box">9</container>
+                        <container id="bailey807_101418" type="folder">5</container>
+                        <unittitle id="bailey807_101419">Fellowship Church programs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101424" level="file">
+                    <did id="bailey807_101423">
+                        <unittitle id="bailey807_101422">Travel</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101429" level="file">
+                    <did id="bailey807_101428">
+                        <container id="bailey807_101425" type="box">9</container>
+                        <container id="bailey807_101426" type="folder">6</container>
+                        <unittitle id="bailey807_101427">Various photos from India</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101434" level="file">
+                    <did id="bailey807_101433">
+                        <container id="bailey807_101430" type="box">9</container>
+                        <container id="bailey807_101431" type="folder">7</container>
+                        <unittitle id="bailey807_101432">Various travels including trip to Egypt [Image
+				  0807-002]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101439" level="file">
+                    <did id="bailey807_101438">
+                        <container id="bailey807_101435" type="box">9</container>
+                        <container id="bailey807_101436" type="folder">8</container>
+                        <unittitle id="bailey807_101437">Various landscapes</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101444" level="file">
+                    <did id="bailey807_101443">
+                        <container id="bailey807_101440" type="box">9</container>
+                        <container id="bailey807_101441" type="folder">9</container>
+                        <unittitle id="bailey807_101442">Travel slides</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101449" level="file">
+                    <did id="bailey807_101448">
+                        <container id="bailey807_101445" type="box">9</container>
+                        <container id="bailey807_101446" type="folder">10</container>
+                        <unittitle id="bailey807_101447">Travel slides</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101455" level="file">
+                    <did id="bailey807_101454">
+                        <container id="bailey807_101450" type="box">9</container>
+                        <container id="bailey807_101451" type="folder">11</container>
+                        <unittitle id="bailey807_101453">Photographs from Sue Bailey Thurman’s 
+				  <title id="bailey807_101452" linktype="simple">Pioneers of Negro Origin in California</title>
+                        </unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101458" level="file">
+                    <did id="bailey807_101457">
+                        <unittitle id="bailey807_101456">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101463" level="file">
+                    <did id="bailey807_101462">
+                        <container id="bailey807_101459" type="box">OP13</container>
+                        <container id="bailey807_101460"/>
+                        <unittitle id="bailey807_101461">Sister Joanna Moore, portrait</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101468" level="file">
+                    <did id="bailey807_101467">
+                        <container id="bailey807_101464" type="box">10</container>
+                        <container id="bailey807_101465" type="folder">1</container>
+                        <unittitle id="bailey807_101466">Photographs of well-known African Americans</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101473" level="file">
+                    <did id="bailey807_101472">
+                        <container id="bailey807_101469" type="box">OP14</container>
+                        <container id="bailey807_101470"/>
+                        <unittitle id="bailey807_101471">Photographs of well-known African Americans</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101478" level="file">
+                    <did id="bailey807_101477">
+                        <container id="bailey807_101474" type="box">10</container>
+                        <container id="bailey807_101475" type="folder">2</container>
+                        <unittitle id="bailey807_101476">Wedding photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101483" level="file">
+                    <did id="bailey807_101482">
+                        <container id="bailey807_101479" type="box">10</container>
+                        <container id="bailey807_101480" type="folder">3</container>
+                        <unittitle id="bailey807_101481">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101488" level="file">
+                    <did id="bailey807_101487">
+                        <container id="bailey807_101484" type="box">10</container>
+                        <container id="bailey807_101485" type="folder">4</container>
+                        <unittitle id="bailey807_101486">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101493" level="file">
+                    <did id="bailey807_101492">
+                        <container id="bailey807_101489" type="box">10</container>
+                        <container id="bailey807_101490" type="folder">5</container>
+                        <unittitle id="bailey807_101491">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101498" level="file">
+                    <did id="bailey807_101497">
+                        <container id="bailey807_101494" type="box">10</container>
+                        <container id="bailey807_101495" type="folder">6</container>
+                        <unittitle id="bailey807_101496">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101503" level="file">
+                    <did id="bailey807_101502">
+                        <container id="bailey807_101499" type="box">10</container>
+                        <container id="bailey807_101500" type="folder">7</container>
+                        <unittitle id="bailey807_101501">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101508" level="file">
+                    <did id="bailey807_101507">
+                        <container id="bailey807_101504" type="box">10</container>
+                        <container id="bailey807_101505" type="folder">8</container>
+                        <unittitle id="bailey807_101506">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101513" level="file">
+                    <did id="bailey807_101512">
+                        <container id="bailey807_101509" type="box">10</container>
+                        <container id="bailey807_101510" type="folder">9</container>
+                        <unittitle id="bailey807_101511">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101518" level="file">
+                    <did id="bailey807_101517">
+                        <container id="bailey807_101514" type="box">10</container>
+                        <container id="bailey807_101515" type="folder">10</container>
+                        <unittitle id="bailey807_101516">Photographs of others</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101521" level="file">
+                    <did id="bailey807_101520">
+                        <unittitle id="bailey807_101519">Miscellaneous</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101526" level="file">
+                    <did id="bailey807_101525">
+                        <container id="bailey807_101522" type="box">11</container>
+                        <container id="bailey807_101523" type="folder">1</container>
+                        <unittitle id="bailey807_101524">Various negatives and slides</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101531" level="file">
+                    <did id="bailey807_101530">
+                        <container id="bailey807_101527" type="box">11</container>
+                        <container id="bailey807_101528" type="folder">2</container>
+                        <unittitle id="bailey807_101529">Various proofs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101536" level="file">
+                    <did id="bailey807_101535">
+                        <container id="bailey807_101532" type="box">11 3</container>
+                        <container id="bailey807_101533" type="folder">Photocopied pictures with identification
+				  </container>
+                        <unittitle id="bailey807_101534"/>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101541" level="file">
+                    <did id="bailey807_101540">
+                        <container id="bailey807_101537" type="box">11</container>
+                        <container id="bailey807_101538" type="folder">4</container>
+                        <unittitle id="bailey807_101539">Artistic Displays by or about Howard Thurman</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101546" level="file">
+                    <did id="bailey807_101545">
+                        <container id="bailey807_101542" type="box">11</container>
+                        <container id="bailey807_101543" type="folder">5</container>
+                        <unittitle id="bailey807_101544">Miscellaneous photographs, Works of Art</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101551" level="file">
+                    <did id="bailey807_101550">
+                        <container id="bailey807_101547" type="box">11</container>
+                        <container id="bailey807_101548" type="folder">6</container>
+                        <unittitle id="bailey807_101549">Miscellaneous photographs, Paintings, Sculptures,
+				  Sketches</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101556" level="file">
+                    <did id="bailey807_101555">
+                        <container id="bailey807_101552" type="box">11</container>
+                        <container id="bailey807_101553" type="folder">7</container>
+                        <unittitle id="bailey807_101554">Black history</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101561" level="file">
+                    <did id="bailey807_101560">
+                        <container id="bailey807_101557" type="box">11</container>
+                        <container id="bailey807_101558" type="folder">8</container>
+                        <unittitle id="bailey807_101559">DuSable Museum</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101566" level="file">
+                    <did id="bailey807_101565">
+                        <container id="bailey807_101562" type="box">11</container>
+                        <container id="bailey807_101563" type="folder">9</container>
+                        <unittitle id="bailey807_101564">M. Gandhi Memorial</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101571" level="file">
+                    <did id="bailey807_101570">
+                        <container id="bailey807_101567" type="box">11</container>
+                        <container id="bailey807_101568" type="folder">10</container>
+                        <unittitle id="bailey807_101569">Miscellaneous photographs</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101576" level="file">
+                    <did id="bailey807_101575">
+                        <container id="bailey807_101572" type="box">11</container>
+                        <container id="bailey807_101573" type="folder">11</container>
+                        <unittitle id="bailey807_101574">Miscellaneous photographs, (floral arrangements,
+				  furniture, etc.)</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series6" level="series">
+                <did id="bailey807_101580">
+                    <unitid id="bailey807_101577">Series 6</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_101578">Legal and financial
+				records</unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_101579">Box 12 (folder 1-7)</physdesc>
+                </did>
+                <c02 id="bailey807_101585" level="file">
+                    <did id="bailey807_101584">
+                        <container id="bailey807_101581" type="box">12</container>
+                        <container id="bailey807_101582" type="folder">1</container>
+                        <unittitle id="bailey807_101583">Receipts</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101590" level="file">
+                    <did id="bailey807_101589">
+                        <container id="bailey807_101586" type="box">12</container>
+                        <container id="bailey807_101587" type="folder">2</container>
+                        <unittitle id="bailey807_101588">Insurance policies</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101595" level="file">
+                    <did id="bailey807_101594">
+                        <container id="bailey807_101591" type="box">12</container>
+                        <container id="bailey807_101592" type="folder">3</container>
+                        <unittitle id="bailey807_101593">Contracts</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101600" level="file">
+                    <did id="bailey807_101599">
+                        <container id="bailey807_101596" type="box">12</container>
+                        <container id="bailey807_101597" type="folder">4</container>
+                        <unittitle id="bailey807_101598">Real estate records</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101605" level="file">
+                    <did id="bailey807_101604">
+                        <container id="bailey807_101601" type="box">12</container>
+                        <container id="bailey807_101602" type="folder">5</container>
+                        <unittitle id="bailey807_101603">Real estate records</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101610" level="file">
+                    <did id="bailey807_101609">
+                        <container id="bailey807_101606" type="box">12</container>
+                        <container id="bailey807_101607" type="folder">6</container>
+                        <unittitle id="bailey807_101608">Bank statements</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101615" level="file">
+                    <did id="bailey807_101614">
+                        <container id="bailey807_101611" type="box">12</container>
+                        <container id="bailey807_101612" type="folder">7</container>
+                        <unittitle id="bailey807_101613">Certificates/Membership information to various
+				  organizations</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series7" level="series">
+                <did id="bailey807_101619">
+                    <unitid id="bailey807_101616">Series 7</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_101617">Ephemera</unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_101618">Box 12 (folders 8-18) and OP 15-17,
+				19-22</physdesc>
+                </did>
+                <c02 id="bailey807_101624" level="file">
+                    <did id="bailey807_101623">
+                        <container id="bailey807_101620" type="box">12</container>
+                        <container id="bailey807_101621" type="folder">8</container>
+                        <unittitle id="bailey807_101622">Book(s) of Devotional Words about Mothers</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101629" level="file">
+                    <did id="bailey807_101628">
+                        <container id="bailey807_101625" type="box">12</container>
+                        <container id="bailey807_101626" type="folder">9</container>
+                        <unittitle id="bailey807_101627">Memorabilia from 14th Annual Session of the National
+				  Baptist Women’s Convention</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101634" level="file">
+                    <did id="bailey807_101633">
+                        <container id="bailey807_101630" type="box">12</container>
+                        <container id="bailey807_101631" type="folder">10</container>
+                        <unittitle id="bailey807_101632">Campaign pin with Abe Lincoln’s picture
+				  attached</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101639" level="file">
+                    <did id="bailey807_101638">
+                        <container id="bailey807_101635" type="box">12</container>
+                        <container id="bailey807_101636" type="folder">11</container>
+                        <unittitle id="bailey807_101637">Scholarship record- I. G. Bailey Jr.</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101644" level="file">
+                    <did id="bailey807_101643">
+                        <container id="bailey807_101640" type="box">12</container>
+                        <container id="bailey807_101641" type="folder">12</container>
+                        <unittitle id="bailey807_101642">Miscellaneous items</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101649" level="file">
+                    <did id="bailey807_101648">
+                        <container id="bailey807_101645" type="box">12</container>
+                        <container id="bailey807_101646" type="folder">13</container>
+                        <unittitle id="bailey807_101647">Miscellaneous items</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101654" level="file">
+                    <did id="bailey807_101653">
+                        <container id="bailey807_101650" type="box">12</container>
+                        <container id="bailey807_101651" type="folder">14</container>
+                        <unittitle id="bailey807_101652">Book list (By Departments) school not
+				  identified</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101659" level="file">
+                    <did id="bailey807_101658">
+                        <container id="bailey807_101655" type="box">12</container>
+                        <container id="bailey807_101656" type="folder">15</container>
+                        <unittitle id="bailey807_101657">Miscellaneous notes</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101664" level="file">
+                    <did id="bailey807_101663">
+                        <container id="bailey807_101660" type="box">12</container>
+                        <container id="bailey807_101661" type="folder">16</container>
+                        <unittitle id="bailey807_101662">Miscellaneous writings</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101669" level="file">
+                    <did id="bailey807_101668">
+                        <container id="bailey807_101665" type="box">12</container>
+                        <container id="bailey807_101666" type="folder">17</container>
+                        <unittitle id="bailey807_101667">Miscellaneous "Letter to Jesus"</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101674" level="file">
+                    <did id="bailey807_101673">
+                        <container id="bailey807_101670" type="box">12</container>
+                        <container id="bailey807_101671" type="folder">18</container>
+                        <unittitle id="bailey807_101672">Assorted addressed/empty envelopes</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101679" level="file">
+                    <did id="bailey807_101678">
+                        <container id="bailey807_101675" type="box">OP15</container>
+                        <container id="bailey807_101676"/>
+                        <unittitle id="bailey807_101677">Cloth map of Palestine</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101684" level="file">
+                    <did id="bailey807_101683">
+                        <container id="bailey807_101680" type="box">OP16</container>
+                        <container id="bailey807_101681"/>
+                        <unittitle id="bailey807_101682">Cloth map of Western Asia</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101689" level="file">
+                    <did id="bailey807_101688">
+                        <container id="bailey807_101685" type="box">OP17</container>
+                        <container id="bailey807_101686"/>
+                        <unittitle id="bailey807_101687">Framed diploma for Josephine Ella Jamison from
+				  Industrial University, Branch Normal College (Isaac Bailey, Sr.’s Alma Mater),
+				  1893</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101694" level="file">
+                    <did id="bailey807_101693">
+                        <container id="bailey807_101690" type="box">OP19</container>
+                        <container id="bailey807_101691"/>
+                        <unittitle id="bailey807_101692">Scrapbook given to Howard Thurman</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101699" level="file">
+                    <did id="bailey807_101698">
+                        <container id="bailey807_101695" type="box">OP20</container>
+                        <container id="bailey807_101696"/>
+                        <unittitle id="bailey807_101697">Scrapbook kept by Howard and Sue Bailey Thurman (re:
+				  Trip to India)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101704" level="file">
+                    <did id="bailey807_101703">
+                        <container id="bailey807_101700" type="box">OP21</container>
+                        <container id="bailey807_101701"/>
+                        <unittitle id="bailey807_101702">Cassette recording (Nathan I. Huggins Memorial
+				  Service)</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101709" level="file">
+                    <did id="bailey807_101708">
+                        <container id="bailey807_101705" type="box">OP22</container>
+                        <container id="bailey807_101706"/>
+                        <unittitle id="bailey807_101707">Miniature Book of Hymns</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series8" level="series">
+                <did id="bailey807_101713">
+                    <unitid id="bailey807_101710">Series 8</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_101711">Collected material</unittitle>
+                    <physdesc encodinganalog="300" id="bailey807_101712">Box 13</physdesc>
+                </did>
+                <c02 id="bailey807_101718" level="file">
+                    <did id="bailey807_101717">
+                        <container id="bailey807_101714" type="box">13</container>
+                        <container id="bailey807_101715" type="folder">1</container>
+                        <unittitle id="bailey807_101716">Slides and negatives of Sue Bailey Thurmond and family
+				  [Acc. 2004-06-02]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101723" level="file">
+                    <did id="bailey807_101722">
+                        <container id="bailey807_101719" type="box">13</container>
+                        <container id="bailey807_101720" type="folder">2</container>
+                        <unittitle id="bailey807_101721">Slides and negatives of Sue Bailey Thurmond and family
+				  [Acc. 2004-06-02]</unittitle>
+                    </did>
+                </c02>
+            </c01>
+            <c01 id="bailey807_series9" level="series">
+                <did id="bailey807_101726">
+                    <unitid id="bailey807_101724">Series 9</unitid>
+                    <unittitle encodinganalog="245$a" id="bailey807_101725">Audiovisual material</unittitle>
+                </did>
+                <c02 id="bailey807_101731" level="file">
+                    <did id="bailey807_101730">
+                        <container id="bailey807_101727" type="box">CD1</container>
+                        <container id="bailey807_101728" type="folder"/>
+                        <unittitle id="bailey807_101729">Coretta Scott King, Sue Thurman, and Howard Thurman
+				  conversation, July 11, 1979 [1 of 3]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101736" level="file">
+                    <did id="bailey807_101735">
+                        <container id="bailey807_101732" type="box">CD2</container>
+                        <container id="bailey807_101733" type="folder"/>
+                        <unittitle id="bailey807_101734">Coretta Scott King, Sue Thurman, and Howard Thurman
+				  conversation, July 11, 1979 [2 of 3]</unittitle>
+                    </did>
+                </c02>
+                <c02 id="bailey807_101741" level="file">
+                    <did id="bailey807_101740">
+                        <container id="bailey807_101737" type="box">CD3</container>
+                        <container id="bailey807_101738" type="folder"/>
+                        <unittitle id="bailey807_101739">Coretta Scott King, Sue Thurman, and Howard Thurman
+				  conversation, July 11, 1979 [3 of 3]</unittitle>
+                    </did>
+                </c02>
+            </c01>
+        </dsc>
+    </archdesc>
+</ead>

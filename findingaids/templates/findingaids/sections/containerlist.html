@@ -1,0 +1,34 @@
+{# expects FindingAid component as series #}
+{% load ead %}
+
+{% if series.c|length %}
+  <table class="box-folder" repeat="1">
+    {% for component in series.c %}
+        {# display box/folder heading once before first item in the series #}
+        {% if forloop.first  %}
+          <tr>
+            <th class="bf">Box</th>
+             <th class="bf">Folder</th>
+             <th class="content">Content</th>          
+           </tr>
+         {% endif %}
+
+        <tr {% if not component.did.container %} class="section" {% endif %} >
+          {% spaceless %}
+            {% for container in component.did.container %}
+            <td class="bf">{{ container }}</td>
+            {% endfor %}
+            {# component with no container currently indicates a section heading #}
+            <td {% if not component.did.container %} colspan="3"
+                {% else %} class="content"
+                {% endif %} >
+                {{ component.did.unittitle|format_ead }}
+                {{ component.did.physdesc|default:'' }}
+                {{ component.did.abstract|format_ead|default:'' }}
+                {{ component.did.note|format_ead|default:'' }}
+            </td>
+          {% endspaceless %}
+        </tr>        
+    {% endfor %}
+  </table>
+{% endif %}

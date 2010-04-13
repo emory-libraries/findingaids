@@ -1,0 +1,29 @@
+README
+======
+
+Dependencies
+------------
+ * eulcore (currently included as a subversion external)
+ * eXist-db 1.4 
+ * xhtml2pdf/Pisa for PDF generation (http://www.xhtml2pdf.com)
+
+
+Installation
+------------
+Install and configure like other django applications.
+
+Copy ``localsettings-sample.py`` to ``localsettings.py`` and configure. The
+eXist-db user should be in the DBA group if you plan to use the app to
+manage the eXist index configuration. For more information on existdb index
+commands::
+
+     $ ./manage.py help existdb_index
+     $ ./manage.py help existdb_reindex
+
+Install `xhtml2pdf/Pisa`_ and its dependencies. On Ubuntu, the following
+should be sufficient::
+
+  $ sudo apt-get install python-reportlab python-html5lib
+  $ sudo easy_install pisa
+
+.. _xhtml2pdf/Pisa: http://www.xhtml2pdf.com/doc/pisa-en.html

@@ -1,0 +1,16 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Search {% endblock %}
+
+{% block content-title %}Search {% endblock %}
+
+{% block content-body %}
+
+<form action="{% url findingaids.fa.views.keyword_search %}" method="get">
+    {{ form.as_p }}
+    <input class="form-submit" type="submit" value="Search" />
+</form>
+
+
+
+{% endblock %}
