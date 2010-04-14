@@ -14,16 +14,19 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 
       Additional fields and methods are used for search, browse, and display.
     """
-    
-    list_title_xpath = "./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
-    
+
+    list_title_xpaths = ["archdesc/did/origination/node()", "archdesc/did[not(origination/node())]/unittitle"]
+    list_title_xpath = "|".join("./%s" % xp for xp in list_title_xpaths)
+    #./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
+
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
     list_title = xmlmap.StringField(list_title_xpath)
     "list title used for alphabetical browse - any origination name, or unittitle if there is none"
-    
-    # first letter of title field - using generic descriptor because no string() conversion is needed
+
+    # first letter of title field
+    # NOTE: probably not needed here any longer; using ListTitle for browse query
     first_letter = xmlmap.ItemField("substring(%s,1,1)" % list_title_xpath)
-    "First letter of list title, used to generate list of first-letters for browse."
+    "First letter of list title"
 
     objects = Manager('/ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
@@ -90,6 +93,21 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
             fields.append(self.archdesc.other)
 
         return fields
+
+class ListTitle(XmlModel):
+    # EAD list title - used to retrieve at the title level for better query response
+
+    xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)
+    # xpath to use for alpha-browse - using list title xpaths from FindingAid
+    
+    # first letter of list title field (using generic item field to avoid string() conversion)
+    first_letter = xmlmap.ItemField("substring(.,1,1)")
+    "First letter of a finding aid list title: use to generate list of first-letters for browse."
+    objects = Manager(xpath)
+
+def title_letters():
+    "List of distinct, sorted first letters present in all Finding Aid titles."
+    return ListTitle.objects.only('first_letter').order_by('first_letter').distinct()
 
 
 class Series(XmlModel, Component):

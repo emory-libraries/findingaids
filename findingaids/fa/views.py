@@ -3,13 +3,13 @@ from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
+from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf
 
 def site_index(request):
     "Site home page"
-    first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
+    first_letters = title_letters()
     return render_to_response('findingaids/index.html', { 'letters' : first_letters,
                                                           'querytime': [first_letters.queryTime()]},
                                                           context_instance=RequestContext(request)
@@ -17,14 +17,14 @@ def site_index(request):
 
 def browse_titles(request):
     "List all first letters in finding aid list title, link to browse by letter."
-    first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
+    first_letters = title_letters()
     return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
                                                            'querytime': [first_letters.queryTime()]},
                                                           context_instance=RequestContext(request))
 
 def titles_by_letter(request, letter):
     "Paginated list of finding aids by first letter in list title"
-    first_letters = FindingAid.objects.only('first_letter').order_by('list_title').distinct()
+    first_letters = title_letters()
 
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*_fa_listfields())   
     fa_subset = _paginate_queryset(request, fa)
