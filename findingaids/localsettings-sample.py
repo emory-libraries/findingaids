@@ -1,4 +1,4 @@
-# Django local settings for edc project.
+# Django local settings for finding aids project.
 
 # all settings in debug section should be false in production environment
 DEBUG = True

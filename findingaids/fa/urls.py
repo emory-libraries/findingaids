@@ -7,7 +7,7 @@ title_urlpatterns = patterns('findingaids.fa.views',
 )
 
 # patterns for ead document id and series id (used in multiple urls)
-ead_id = "(?P<id>[A-Za-z0-9-.]+)"
+ead_id = "(?P<id>[-_A-Za-z0-9.]+)"
 series_id = "[a-zA-Z0-9-._]+"
 
 document_urlpatterns = patterns('findingaids.fa.views',
