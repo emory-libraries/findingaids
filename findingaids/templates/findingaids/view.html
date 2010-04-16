@@ -8,7 +8,7 @@
 {% block content-body %}
 
 <div id="print-links">
-    <p><a class="pdf" href="{% url printable-fa id=findingaid.eadid %}">PDF Version</a></p>
+    <p><a class="pdf" href="{% url fa:printable-fa id=findingaid.eadid %}">PDF Version</a></p>
 </div>
 
 {# main display page for a single finding aid; links to series & subseries, if any #}
@@ -22,7 +22,7 @@
 <h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
 <ul>
   {% for component in findingaid.dsc.c %}
-    <li><a href="{% url findingaids.fa.views.view_series id=findingaid.eadid,series_id=component.id %}"> 
+    <li><a href="{% url fa:view-series id=findingaid.eadid,series_id=component.id %}">
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
         {{ component.did.unittitle|format_ead }}</a>
      </li>

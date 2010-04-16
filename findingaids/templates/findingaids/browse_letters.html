@@ -3,7 +3,7 @@
      {% for l in letters %}
        <li>
         <a {% ifequal l current_letter %} class='current'{% endifequal %}
-            href="{% url findingaids.fa.views.titles_by_letter l %}">{{ l }}</a>
+            href="{% url fa:titles-by-letter l %}">{{ l }}</a>
        </li>
       {% empty %}
        <li>No letters found</li>

@@ -6,7 +6,7 @@
 
 {% block content-body %}
 
-<form action="{% url findingaids.fa.views.keyword_search %}" method="get">
+<form action="{% url fa:keyword-search %}" method="get">
     {{ form.as_p }}
     <input class="form-submit" type="submit" value="Search" />
 </form>

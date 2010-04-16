@@ -5,7 +5,7 @@ from django.conf import settings
 urlpatterns = patterns('',
                        # for now, everything is in main app
                        url(r'^$', 'findingaids.fa.views.site_index', name="site-index"),
-                       (r'^', include('findingaids.fa.urls')),
+                       url(r'^', include('findingaids.fa.urls', namespace='fa')),
 )
 
 # DISABLE THIS IN PRODUCTION

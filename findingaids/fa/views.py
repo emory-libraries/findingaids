@@ -172,15 +172,15 @@ def _series_url(eadid, series_id, *ids):
     args = {'id' : eadid, 'series_id' : series_id}
 
     if len(ids) == 0:       # no additional args
-        view = 'findingaids.fa.views.view_series'
+        urlname = 'fa:view-series'
     if len(ids) >= 1:       # add subseries id arg if one specified (used for sub and sub-subseries)
         args['subseries_id'] = ids[0]
-        view = 'findingaids.fa.views.view_subseries'
+        urlname = 'fa:view-subseries'
     if len(ids) == 2:       # add sub-subseries id arg if specified
         args['subsubseries_id'] = ids[1]
-        view = 'findingaids.fa.views.view_subsubseries'
+        urlname = 'fa:view-subsubseries'
 
-    return reverse(view, kwargs=args)
+    return reverse(urlname, kwargs=args)
 
 def _series_anchor(*ids):
     """Generate a same-page id-based anchor link for a series"""
