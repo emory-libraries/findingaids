@@ -1,5 +1,5 @@
 from eulcore import xmlmap
-from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, SubordinateComponents
+from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, SubordinateComponents, Index as EadIndex
 from eulcore.django.existdb.manager import Manager
 from eulcore.django.existdb.models import XmlModel
 
@@ -210,3 +210,23 @@ class Subsubseries(Series):
 
         Configured to use *//c03* as base search path.
     """
+
+class Index(XmlModel, EadIndex):
+    """
+      EAD Index, with index entries.
+
+      Customized version of :class:`eulcore.xmlmap.eadmap.Index`
+    """
+    ead = xmlmap.NodeField("ancestor::ead", FindingAid)
+    ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
+
+    parent = xmlmap.NodeField("parent::node", "self")
+
+    objects = Manager('//index')
+    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
+        for django db objects, used for finding and retrieving index objects
+        in eXist.
+
+        Configured to use *//index* as base search path.
+    """
+
