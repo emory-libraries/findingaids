@@ -3,8 +3,9 @@
 
 <div class="record_list">
     <p><a href="{% url fa:view-fa fa.eadid %}">{{ fa.list_title|format_ead }}</a> </p>
-    {% ifnotequal fa.title|cut:" " fa.list_title|cut:" " %} {# using 'cut' filter to ignore whitespace differences #}
-        <p>{{ fa.title|format_ead_children }}</p>
+    {# only show unittitle if different from list title; usings slugs to ignore whitespace differences #}
+    {% ifnotequal fa.unittitle|slugify fa.list_title|slugify %}
+        <p>{{ fa.unittitle|format_ead }}</p>
     {% endifnotequal %}
     <p>{{ fa.physical_desc }}</p>
     <p class="abstract">{{ fa.abstract|format_ead }}</p>

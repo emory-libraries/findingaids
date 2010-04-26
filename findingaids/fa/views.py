@@ -164,7 +164,7 @@ def full_fa(request, id, mode):
 
 def _fa_listfields():
     "List of fields that should be returned for brief list display of a finding aid."
-    return ['eadid', 'list_title','title', 'abstract', 'physical_desc']
+    return ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
 
 def _series_url(eadid, series_id, *ids):
     """
