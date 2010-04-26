@@ -3,8 +3,7 @@
 {% load ead %}
 <h2><a name="descriptive_summary">Descriptive Summary</a></h2>
 <table id="descriptive_summary">    {#  display the following fields, in this specific order  #}
-{# FIXME: which fields may not always be present? #}
-   {% if findingaid.archdesc.origination %}
+  {% if findingaid.archdesc.origination %}
       <tr><th>Creator:</th><td>{{ findingaid.archdesc.origination }}</td></tr>
    {% endif %}
    {% if findingaid.unittitle|format_ead %}

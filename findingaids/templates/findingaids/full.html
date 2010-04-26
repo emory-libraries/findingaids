@@ -65,7 +65,7 @@
     </head>
     <body>
 <div class="fa">
-<h1>{{ findingaid.title }}</h1>
+<h1>{{ findingaid.title|format_ead }}</h1>
 
 <div id="publication_statement">
     {% with findingaid.file_desc.publication as publication %}
@@ -146,7 +146,8 @@
 <div id="header">
     <table>
         <tr>
-            <td style="text-align:left">{{ findingaid.title }}</td>
+            <td style="text-align:left">{{ findingaid.title|format_ead
+	      }}</td>
             <td style="text-align:right">{{ findingaid.archdesc.unitid }}</td>
         </tr>
     </table>

@@ -20,7 +20,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     #./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
 
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
-    list_title = xmlmap.StringField(list_title_xpath)
+    list_title = xmlmap.NodeField(list_title_xpath, xmlmap.XmlObject)
     "list title used for alphabetical browse - any origination name, or unittitle if there is none"
 
     # first letter of title field
