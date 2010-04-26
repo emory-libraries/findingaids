@@ -198,6 +198,10 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''', response.content) # admin_info
         self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''', response.content) # collection description
 
+        # only descriptive information that is present
+        response = self.client.get('/documents/bailey807')
+        self.assertNotContains(response, 'Creator:')
+
     def test_view__fa_with_series(self):
         response = self.client.get('/documents/abbey244')
         self.assertEquals(response.status_code, 200)
