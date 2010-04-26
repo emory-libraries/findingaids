@@ -4,15 +4,27 @@
 <h2><a name="descriptive_summary">Descriptive Summary</a></h2>
 <table id="descriptive_summary">    {#  display the following fields, in this specific order  #}
 {# FIXME: which fields may not always be present? #}
+   {% if findingaid.archdesc.origination %}
       <tr><th>Creator:</th><td>{{ findingaid.archdesc.origination }}</td></tr>
+   {% endif %}
+   {% if findingaid.unittitle|format_ead %}
       <tr><th>Title:</th><td> {{ findingaid.unittitle|format_ead }} </td></tr>
+   {% endif %}
+   {% if findingaid.archdesc.unitid %}
       <tr><th>Call Number:</th><td>{{ findingaid.archdesc.unitid }}</td></tr>
+   {% endif %}
+   {% if findingaid.archdesc.extent %}   
       <tr><th>Extent:</th><td>{{ findingaid.archdesc.extent|join:", " }}</td></tr>
+   {% endif %}
    {% if findingaid.archdesc.location %}
       <tr><th>Location:</th><td>{{ findingaid.archdesc.location }}</td></tr>
    {% endif %}
+   {% if findingaid.abstract %}
       <tr><th>Abstract:</th><td>{{ findingaid.abstract|format_ead }}</td></tr>
+   {% endif %}
+   {% if findingaid.archdesc.langmaterial %}
       <tr><th>Language:</th><td>{{ findingaid.archdesc.langmaterial }} </td></tr>
+   {% endif %}
   </table>
   
 <hr/>
