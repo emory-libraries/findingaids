@@ -131,7 +131,10 @@
   {% include "findingaids/sections/containerlist.html" %}
 {% endif %}
 
-{% include "findingaids/sections/indexentry.html" %}
+{% for index in findingaid.archdesc.index %}
+    {% include "findingaids/sections/indexentry.html" %}
+{% endfor %}
+
 </div> {# end div.fa #}
 
 {# header and footer contents #}

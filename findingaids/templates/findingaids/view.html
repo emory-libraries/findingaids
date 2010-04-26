@@ -54,9 +54,11 @@
   {% endwith %}
 {% endif %}
 
-{% if findingaid.archdesc.index %}
+{% if findingaid.archdesc.index|length %}
     <hr/>
-    {% include "findingaids/sections/indexentry.html" %}
+    {% for index in findingaid.archdesc.index %}
+        {% include "findingaids/sections/indexentry.html" %}
+    {% endfor %}
 {% endif %}
 
 </div>

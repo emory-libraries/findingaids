@@ -3,7 +3,7 @@ from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters
+from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf
 
@@ -85,7 +85,8 @@ def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
 def _view_series(request, eadid, *series_ids):
     # additional fields to be returned
     return_fields = ['ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head',
-        'ead__dsc__head', 'ead__archdesc__index__head']
+        'ead__dsc__head']
+        # NOTE: partial result can't handle list fields properly; retreiving index list separately
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
     try:
@@ -104,11 +105,14 @@ def _view_series(request, eadid, *series_ids):
             
     # summary info for all top-level series in this finding aid
     all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=eadid).all()
+    # summary info for any indexes
+    all_indexes = Index.objects.only('id', 'head').filter(ead__eadid=eadid).all()
     return render_to_response('findingaids/view_series.html', { 'series' : series,
                                                                 'all_series' : all_series,
+                                                                'all_indexes' : all_indexes,
                                                                 "subseries" : _subseries_links(series),
                                                                 # anyway to get query time for series object?
-                                                                "querytime" : [series.queryTime(), all_series.queryTime()]},
+                                                                "querytime" : [series.queryTime(), all_series.queryTime(), all_indexes.queryTime()]},
                                                                 context_instance=RequestContext(request))
 
 
