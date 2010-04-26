@@ -35,18 +35,19 @@ class FindingAidTestCase(DjangoTestCase):
 
     def test_custom_fields(self):
         # list title variants
+        # NOTE: list_title is now a NodeField; calling __unicode__ explicitly to do a string compare
         #  - origination, person name
-        self.assertEqual("Leverette, Fannie Lee.", self.findingaid['leverette135'].list_title)
+        self.assertEqual("Leverette, Fannie Lee.", self.findingaid['leverette135'].list_title.__unicode__())
         self.assertEqual("L", self.findingaid['leverette135'].first_letter)
         #  - origination, corporate name
-        self.assertEqual("Abbey Theatre.", self.findingaid['abbey244'].list_title)
+        self.assertEqual("Abbey Theatre.", self.findingaid['abbey244'].list_title.__unicode__())
         self.assertEqual("A", self.findingaid['abbey244'].first_letter)
         #  - origination, family name
-        self.assertEqual("Raoul family.", self.findingaid['raoul548'].list_title)
+        self.assertEqual("Raoul family.", self.findingaid['raoul548'].list_title.__unicode__())
         self.assertEqual("R", self.findingaid['raoul548'].first_letter)
         #  - no origination - list title falls back to unit title
         self.assertEqual("Bailey and Thurman families papers, circa 1882-1995",
-                         self.findingaid['bailey807'].list_title)
+                         self.findingaid['bailey807'].list_title.__unicode__())
         self.assertEqual("B", self.findingaid['bailey807'].first_letter)
 
     # FIXME/TODO: test admin info, collection description ?  (tested in view_series to some extent)
