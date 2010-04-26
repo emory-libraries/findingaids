@@ -7519,5 +7519,8 @@
                 </ptrgrp>
             </indexentry>
         </index>
+        <index id="index2">
+            <head>Second Index</head>
+        </index>
     </archdesc>
 </ead>

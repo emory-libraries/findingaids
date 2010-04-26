@@ -259,6 +259,9 @@ class FaViewsTest(TestCase):
         self.assertContains(response, 'Woolford, T. Guy')
         self.assertContains(response, 'Series 1 - 32:4 (10); 32:5 (3)')
 
+        # second index
+        self.assertContains(response, 'Second Index')
+
     def test_view_nodsc(self):
         response = self.client.get('/documents/adams465')
         self.assertEquals(response.status_code, 200)
@@ -347,6 +350,7 @@ class FaViewsTest(TestCase):
 
         # top-level ToC on series page should include index link
         self.assertContains(response, 'Index of Selected Correspondents')
+        self.assertContains(response, 'Second Index')
 
 
     def test_view_subsubseries__raoul_series4_1a(self):
