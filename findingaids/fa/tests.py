@@ -255,7 +255,17 @@ class FaViewsTest(TestCase):
             response.content, "series 4 link")
 
     def test_view_indexentry(self):
+        # main page should link to indexes in ead contents
         response = self.client.get('/documents/raoul548')
+        self.assertContains(response, 'Index of Selected Correspondents')
+        # second index
+        self.assertContains(response, 'Second Index')
+
+        # first index - on a separate page
+        response = self.client.get('/documents/raoul548/index1')
+        # ead title, table of contents
+        self.assertContains(response, 'Raoul family papers')
+        self.assertContains(response, 'Series 1')
         self.assertContains(response, 'Index of Selected Correspondents')
         # first index name and ref
         self.assertContains(response, 'Alexander, Edwin Porter, 1835-1910')
@@ -265,7 +275,12 @@ class FaViewsTest(TestCase):
         self.assertContains(response, 'Series 1 - 32:4 (10); 32:5 (3)')
 
         # second index
+        response = self.client.get('/documents/raoul548/index2')
         self.assertContains(response, 'Second Index')
+
+        # TODO: test that current index is not linked in TOC
+        # test links are not anchors
+
 
     def test_view_nodsc(self):
         response = self.client.get('/documents/adams465')

@@ -3,6 +3,7 @@ from django.http import Http404
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
+from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf
@@ -60,8 +61,9 @@ def view_fa(request, id):
     "View a single finding aid"
     try:
         fa = FindingAid.objects.get(eadid=id)
-    except Exception:       # FIXME: need queryset to raise a specific exception here?
+    except DoesNotExist:   
         raise Http404
+    # FIXME: handle other exceptions 
 
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid])
     
@@ -69,8 +71,8 @@ def view_fa(request, id):
                                                          'series' : series},
                                                          context_instance=RequestContext(request))
 
-def view_series(request, id, series_id):
-    "View a single series (c01) from a finding aid"
+def series_or_index(request, id, series_id):
+    "View a single series (c01) or index from a finding aid"
     return _view_series(request, id, series_id)
 
 def view_subseries(request, id, series_id, subseries_id):
@@ -81,41 +83,52 @@ def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
     "View a single subseries (c03) from a finding aid"
     return _view_series(request, id, series_id, subseries_id, subsubseries_id)
 
-
 def _view_series(request, eadid, *series_ids):
+    # get the item to be displayed (series, subseries, index)
+    result = _get_series_or_index(eadid, *series_ids)
+    # info needed to construct navigation links within this ead
+    # - summary info for all top-level series in this finding aid
+    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=eadid).all()
+    # - summary info for any indexes
+    all_indexes = Index.objects.only('id', 'head').filter(ead__eadid=eadid).all()
+
+    render_opts = { 'ead': result.ead,
+                    'all_series' : all_series,
+                    'all_indexes' : all_indexes,
+                    "querytime" : [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()]}
+
+    if (isinstance(result, Index)):
+        render_opts['index'] = result
+    else:
+        render_opts['series'] = result
+        render_opts['subseries'] = _subseries_links(result)
+
+    return render_to_response('findingaids/series_or_index.html',
+        render_opts, context_instance=RequestContext(request))
+
+def _get_series_or_index(eadid, *series_ids):
     # additional fields to be returned
     return_fields = ['ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head',
         'ead__dsc__head']
-        # NOTE: partial result can't handle list fields properly; retreiving index list separately
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
     try:
         if len(series_ids) == 1:
-            series = Series.objects.also(*return_fields).get(**search_fields)
+            try:
+                record = Series.objects.also(*return_fields).get(**search_fields)
+            except DoesNotExist:
+                record = Index.objects.also(*return_fields).get(**search_fields)                
         elif len(series_ids) == 2:
             return_fields.append('series__id')
             search_fields["series__id"] = series_ids[0]
-            series = Subseries.objects.also(*return_fields).get(**search_fields)
+            record = Subseries.objects.also(*return_fields).get(**search_fields)
         elif len(series_ids) == 3:
             return_fields.extend(['series__id', 'subseries__id'])
             search_fields.update({"series__id": series_ids[0], "subseries__id" : series_ids[1]})
-            series = Subsubseries.objects.also(*return_fields).get(**search_fields)
-    except Exception:       # FIXME: limit to a more specific exception here...
+            record = Subsubseries.objects.also(*return_fields).get(**search_fields)
+    except DoesNotExist:
         raise Http404
-            
-    # summary info for all top-level series in this finding aid
-    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=eadid).all()
-    # summary info for any indexes
-    all_indexes = Index.objects.only('id', 'head').filter(ead__eadid=eadid).all()
-    return render_to_response('findingaids/view_series.html', { 'series' : series,
-                                                                'all_series' : all_series,
-                                                                'all_indexes' : all_indexes,
-                                                                "subseries" : _subseries_links(series),
-                                                                # anyway to get query time for series object?
-                                                                "querytime" : [series.queryTime(), all_series.queryTime(), all_indexes.queryTime()]},
-                                                                context_instance=RequestContext(request))
-
-
+    return record
 
 def keyword_search(request):
     "Simple keyword search - runs exist full-text terms query on all terms included."
@@ -149,8 +162,9 @@ def full_fa(request, id, mode):
     "View the full contents of a single finding aid as PDF or plain html"
     try:
         fa = FindingAid.objects.get(eadid=id)
-    except Exception:       # FIXME: need queryset to raise a specific exception here?
+    except DoesNotExist:
         raise Http404
+    # FIXME: other exceptions?
 
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
 
@@ -176,7 +190,7 @@ def _series_url(eadid, series_id, *ids):
     args = {'id' : eadid, 'series_id' : series_id}
 
     if len(ids) == 0:       # no additional args
-        urlname = 'fa:view-series'
+        urlname = 'fa:series-or-index'
     if len(ids) >= 1:       # add subseries id arg if one specified (used for sub and sub-subseries)
         args['subseries_id'] = ids[0]
         urlname = 'fa:view-subseries'

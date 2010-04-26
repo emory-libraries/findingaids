@@ -1,6 +1,5 @@
 from django.conf.urls.defaults import *
 
-
 title_urlpatterns = patterns('findingaids.fa.views',
     url('^$', 'browse_titles', name='browse-titles'),
     url(r'^(?P<letter>[A-Z])$', 'titles_by_letter', name='titles-by-letter')
@@ -14,7 +13,7 @@ document_urlpatterns = patterns('findingaids.fa.views',
     url(r'^%s$' % ead_id, 'view_fa', name='view-fa'),
     url(r'^%s/full$' % ead_id, 'full_fa', {'mode' : 'html'}, name='full-fa'),     # html version of pdf, for testing
     url(r'^%s/printable$' % ead_id, 'full_fa', {'mode' : 'pdf'}, name='printable-fa'),
-    url(r'^%s/(?P<series_id>%s)$' % (ead_id, series_id), 'view_series', name='view-series'),
+    url(r'^%s/(?P<series_id>%s)$' % (ead_id, series_id), 'series_or_index', name='series-or-index'),
     url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)$' % (ead_id, series_id, series_id),
         'view_subseries', name='view-subseries'),
     url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)/(?P<subsubseries_id>%s)$' % (ead_id, series_id, series_id, series_id),

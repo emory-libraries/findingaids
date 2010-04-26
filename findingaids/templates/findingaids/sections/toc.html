@@ -9,14 +9,18 @@
          {% if ead.archdesc.controlaccess.head %}
            <li><a href="{{ ead_url }}#control_access">{{ ead.archdesc.controlaccess.head }}</a></li>
          {% endif %}
+         {# FIXME: combine two index lists somehow; need anchor links for full/pdf mode #}
          {% if ead.archdesc.index|length %}
              {% for index in ead.archdesc.index %}
-               <li><a href="{{ ead_url }}#{{index.id}}">{{ index.head }}</a></li>
+             <li><a href="{% url fa:series-or-index id=ead.eadid,series_id=index.id %}">{{ index.head }}</a></li>
              {% endfor %}
          {% endif %}
           {% if all_indexes %}
-             {% for index in all_indexes %}
-               <li><a href="{{ ead_url }}#{{index.id}}">{{ index.head }}</a></li>
+             {% for toc_index in all_indexes %}
+                {% ifequal index.id toc_index.id %}<li>{{ toc_index.head }}</li>
+                {% else %} {# don't link currently displayed index #}
+                    <li><a href="{% url fa:series-or-index id=ead.eadid,series_id=toc_index.id %}">{{ toc_index.head }}</a></li>
+                {% endifequal %}
              {% endfor %}
          {% endif %}
 

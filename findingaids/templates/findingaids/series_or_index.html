@@ -1,0 +1,42 @@
+{# display a single series or subseries or index of a finding aid #}
+{# expects ead and either series or index #}
+{% extends "site_base.html" %}
+{% load ead %}
+
+{% block page-subtitle %}: {{ ead.title }} : {% firstof series.display_label index.head %}{% endblock %}
+
+{% block content-title %}
+  <a href="{% url fa:view-fa ead.eadid %}">{{ ead.title }}</a>
+{% endblock %}
+
+{% block content-body %}
+<div id="print-links">
+    <p><a class="pdf" href="{% url fa:printable-fa id=ead.eadid %}">PDF Version</a></p>
+</div>
+
+<div id="toc_series">
+    {% include "findingaids/sections/toc.html" %}
+<div id="series">
+  <h2><a href="{% url fa:view-fa ead.eadid %}#dsc">{{ ead.dsc.head}}</a></h2>
+<ul>
+  {% for component in all_series %}
+    <li>
+        {% ifequal series.id component.id %}
+           {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+            {{ component.did.unittitle|format_ead }}
+        {% else %}
+           <a href="{% url fa:series-or-index id=ead.eadid,series_id=component.id %}">
+            {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+                {{ component.did.unittitle|format_ead }}</a>
+        {% endifequal %}
+     </li>
+  {% endfor %}
+</ul>
+</div>
+<br class="clear"/>
+</div>
+
+{% if series %} {% include "findingaids/sections/series.html" %} {% endif %}
+{% if index %} {% include "findingaids/sections/indexentry.html" %} {% endif %}
+
+{% endblock %}
