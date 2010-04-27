@@ -64,11 +64,10 @@ def view_fa(request, id):
     except DoesNotExist:   
         raise Http404
     # FIXME: handle other exceptions 
-
-    series = _subseries_links(fa.dsc, url_ids=[fa.eadid])
-    
+    series = _subseries_links(fa.dsc, url_ids=[fa.eadid])    
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
-                                                         'series' : series},
+                                                         'series' : series,
+                                                         'all_indexes' : fa.archdesc.index },
                                                          context_instance=RequestContext(request))
 
 def series_or_index(request, id, series_id):
@@ -104,7 +103,7 @@ def _view_series(request, eadid, *series_ids):
         render_opts['subseries'] = _subseries_links(result)
 
     return render_to_response('findingaids/series_or_index.html',
-        render_opts, context_instance=RequestContext(request))
+                            render_opts, context_instance=RequestContext(request))
 
 def _get_series_or_index(eadid, *series_ids):
     # additional fields to be returned

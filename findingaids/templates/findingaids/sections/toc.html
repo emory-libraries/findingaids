@@ -1,4 +1,5 @@
-{# table of contents for a finding aid - expects finding aid object as ead #}
+{# top-level table of contents for a finding aid (used by main finding aid and series/index views) #}
+{# expects finding aid object as ead, list of any indexes as all_indexes #}
 {% url fa:view-fa ead.eadid as ead_url %} {# store url for main finding aid page #}
 <div id="toc">
     <h2>Table of contents:</h2>
@@ -8,17 +9,11 @@
          <li><a href="{{ ead_url }}#collection_description">Collection Description</a></li>
          {% if ead.archdesc.controlaccess.head %}
            <li><a href="{{ ead_url }}#control_access">{{ ead.archdesc.controlaccess.head }}</a></li>
-         {% endif %}
-         {# FIXME: combine two index lists somehow; need anchor links for full/pdf mode #}
-         {% if ead.archdesc.index|length %}
-             {% for index in ead.archdesc.index %}
-             <li><a href="{% url fa:series-or-index id=ead.eadid,series_id=index.id %}">{{ index.head }}</a></li>
-             {% endfor %}
-         {% endif %}
+         {% endif %}         
           {% if all_indexes %}
              {% for toc_index in all_indexes %}
                 {% ifequal index.id toc_index.id %}<li>{{ toc_index.head }}</li>
-                {% else %} {# don't link currently displayed index #}
+                {% else %} {# if on index page, don't link currently displayed index #}
                     <li><a href="{% url fa:series-or-index id=ead.eadid,series_id=toc_index.id %}">{{ toc_index.head }}</a></li>
                 {% endifequal %}
              {% endfor %}

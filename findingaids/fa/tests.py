@@ -258,8 +258,11 @@ class FaViewsTest(TestCase):
         # main page should link to indexes in ead contents
         response = self.client.get('/documents/raoul548')
         self.assertContains(response, 'Index of Selected Correspondents')
+        # index links should be full urls, not same-page anchors
+        self.assertContains(response, 'href="/documents/raoul548/index1"')
         # second index
         self.assertContains(response, 'Second Index')
+        self.assertContains(response, 'href="/documents/raoul548/index2"')
 
         # first index - on a separate page
         response = self.client.get('/documents/raoul548/index1')
@@ -267,6 +270,8 @@ class FaViewsTest(TestCase):
         self.assertContains(response, 'Raoul family papers')
         self.assertContains(response, 'Series 1')
         self.assertContains(response, 'Index of Selected Correspondents')
+        # current index on TOC should not be a link
+        self.assertContains(response, 'href="/documents/raoul548/index1"', 0)
         # first index name and ref
         self.assertContains(response, 'Alexander, Edwin Porter, 1835-1910')
         self.assertContains(response, 'Series 1 - 2:1 (2); 2:5 (1)')
@@ -370,7 +375,9 @@ class FaViewsTest(TestCase):
 
         # top-level ToC on series page should include index link
         self.assertContains(response, 'Index of Selected Correspondents')
+        self.assertContains(response, 'href="/documents/raoul548/index1"')
         self.assertContains(response, 'Second Index')
+        self.assertContains(response, 'href="/documents/raoul548/index2"')
 
 
     def test_view_subsubseries__raoul_series4_1a(self):
@@ -528,13 +535,12 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2 class="subseries">.*Subseries 1.2 .*Mary Wadley Raoul papers,.* 1865-1936.*</h2>', response.content)
         # index
         self.assertContains(response, "Index of Selected Correspondents")
+        # second index
+        self.assertContains(response, "Second Index")
 
         # simple finding aid with no subseries - should have container list
         response = self.client.get('/documents/leverette135/full')
         self.assertContains(response, "Container List")
-
-
-
 
 
 class FullTextFaViewsTest(TestCase):
