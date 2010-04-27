@@ -7114,6 +7114,48 @@
                 </c04>
                 </c03>
                 </c02>
+                    <!-- problem series from rushdie: missing scopecontent head breaks series_info ? -->
+                <c02 id="rushdie1000_subseries2.1" level="subseries">
+                    <did id="rushdie1000_10600">
+                        <unitid id="rushdie1000_10596">Subseries 2.1</unitid>
+                        <unittitle id="rushdie1000_10598" type="245$a">Fiction,
+				  <unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="rushdie1000_10597" normal="1973/2006" type="inclusive">1973-2006</unitdate>
+                        </unittitle>
+                        <physdesc encodinganalog="300" id="rushdie1000_10599">Boxes 15-45; OP1-5</physdesc>
+                    </did>
+
+                    <scopecontent id="rushdie1000_10620">
+                        <p id="rushdie1000_10615">This subseries contains all materials related to the writing and preparation for publication of each of Rushdie's novels or short stories, from 1973-2006.  All of his published works, including <title id="rushdie1000_10601" linktype="simple">Grimus</title>, <title id="rushdie1000_10602" linktype="simple">Midnight's Children</title>,<title id="rushdie1000_10603" linktype="simple"> Shame</title>, <title id="rushdie1000_10604" linktype="simple">The Satanic Verses</title>, <title id="rushdie1000_10605" linktype="simple">Haroun and the Sea of Stories</title>, <title id="rushdie1000_10606" linktype="simple">East West</title>, <title id="rushdie1000_10607" linktype="simple">The Moor's Last Sigh</title>, <title id="rushdie1000_10608" linktype="simple">The Ground Beneath Her Feet</title>, <title id="rushdie1000_10609" linktype="simple">Fury</title>, and <title id="rushdie1000_10610" linktype="simple">Shalimar the Clown</title> are represented.  Frequently, the subseries frequently contains multiple typescript versions of a novel, many of which are heavily annotated and corrected in Rushdie's hand. At times, typescript versions differ significantly from the published text, with characters and scenes that are excised from the final version; often, Rushdie's drafts contain many versions of a single page, giving the researcher significant insight into his creative process that is supplemented by the large body of manuscript and typescript notes related to the composition of each work.  Additionally, the series contains unpublished fiction, including <title id="rushdie1000_10611" linktype="simple">The Antagonist</title>, <title id="rushdie1000_10612" linktype="simple">The Avatar</title>, <title id="rushdie1000_10613" linktype="simple">Madame Rama</title>, and <title id="rushdie1000_10614" linktype="simple">The Book of the Peer</title>, as well as fragments of additional novels or stories or the title pages for planned novels.  The arrangement of the material within each work roughly follows the creative process from early manuscript or typescript drafts through to galley and page proofs.  </p>
+
+                        <p id="rushdie1000_10619">Additional drafts and notes for<title id="rushdie1000_10616" linktype="simple"> East, West</title>, <title id="rushdie1000_10617" linktype="simple">The Moor's Last Sigh</title>, <title id="rushdie1000_10618" linktype="simple">The Ground Beneath Her Feet</title>, and various short stories can be found in the digital files.  A detailed list of the files is available by accessing the searchable database and emulated environment on the researcher workstation in the Manuscript, Archives, and Rare Book Library (MARBL) reading room.</p>
+                    </scopecontent>
+                    <arrangement encodinganalog="351" id="rushdie1000_10623">
+                        <head id="rushdie1000_10621">Arrangement Note</head>
+
+                        <p id="rushdie1000_10622">Novels are arranged in chronological order by date of publication, followed by short stories and unpublished works arranged alphabetically.</p>
+                    </arrangement>
+                    <accessrestrict encodinganalog="506" id="rushdie1000_10626">
+                        <head id="rushdie1000_10624">Restrictions on Access</head>
+                        <p id="rushdie1000_10625">Selected notes and unpublished writings are restricted.  Access to digital files is only available in the Manuscript, Archives, and Rare Book Library (MARBL).  </p>
+                    </accessrestrict>
+                    <userestrict encodinganalog="540">
+
+                        <head id="rushdie1000_10627">Terms Governing Use and Reproduction</head>
+                        <p id="rushdie1000_10628">The use of personal cameras is not allowed.  Researchers are not permitted to copy or download any digital files or applications from the emulated environment or the searchable database on the computer workstation.   </p>
+                    </userestrict>
+                    <c03 id="rushdie1000_10631" level="file">
+                        <did id="rushdie1000_10630">
+                            <unittitle id="rushdie1000_10629">Published Works</unittitle>
+                        </did>
+
+                    </c03>
+                    <c03 id="rushdie1000_10635" level="file">
+                        <did id="rushdie1000_10634">
+                            <unittitle id="rushdie1000_10633">
+                                <title id="rushdie1000_10632" linktype="simple">Grimus</title> (1975)</unittitle>
+                        </did>
+                    </c03>
+                </c02>
             </c01>
         </dsc>
         <index id="index1">

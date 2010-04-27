@@ -142,7 +142,7 @@ class Series(XmlModel, Component):
         bibliography
 
         :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
-        """
+        """        
         fields = []
         if self.biography_history:
             fields.append(self.biography_history)
@@ -153,7 +153,7 @@ class Series(XmlModel, Component):
         if self.other:
             fields.append(self.other)
         if self.use_restriction:
-            fields.append(self.use_restrict)
+            fields.append(self.use_restriction)
         if self.access_restriction:
             fields.append(self.access_restriction)
         if self.alternate_form:

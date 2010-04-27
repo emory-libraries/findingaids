@@ -42,7 +42,7 @@
 
 {# container list or series/subseries listing #}
 <h2><a name="dsc">{{ findingaid.dsc.head }}</a></h2>
-{% if findingaid.dsc.hasSeries %}       {# list series/subseries here,   display on separate page #}
+{% if findingaid.dsc.hasSeries %}       {# list series/subseries here, display on separate page #}
     <ul>
        {% autoescape off %}
            {{ series|unordered_list }}

@@ -10,9 +10,9 @@
 
 {% for section in series.series_info %}
    <div>
-   	<h3>{{ section.head }}</h3>
+   	<h3>{{ section.head|default:'' }}</h3>
 	{% for para in section.content %}
-	    <p>{{para}}</p>
+	    <p>{{para|format_ead}}</p>
 	{% endfor %}
    </div>
 {% endfor %}

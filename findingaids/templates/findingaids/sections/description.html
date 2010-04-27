@@ -31,7 +31,7 @@
 <h2><a name="administrative_information">Administrative Information</a></h2>
  {% for section in findingaid.admin_info %}
    <div>
-   	<h3>{{ section.head }}</h3>
+   	<h3>{{ section.head|default:"" }}</h3>
 	{% for para in section.content %}
 	    <p>{{ para|format_ead }}</p>
 	{% endfor %}
@@ -43,7 +43,7 @@
 <h2><a name="collection_description">Collection Description</a></h2>
  {% for section in findingaid.collection_description %}
    <div>
-   	<h3>{{ section.head }}</h3>
+   	<h3>{{ section.head|default:'' }}</h3>
 	{% for para in section.content %}
 	    <p>{{ para|format_ead }}</p>
 	{% endfor %}

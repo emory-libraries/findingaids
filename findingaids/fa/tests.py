@@ -60,6 +60,13 @@ class FindingAidTestCase(DjangoTestCase):
 
         # FIXME/TODO: test other possible fields not present in this series?
 
+        # series info problem when scopecontent is missing a <head>; contains use restriction
+        info = self.findingaid['raoul548'].dsc.c[-1].c[-1].series_info()
+        self.assert_(isinstance(info, ListType))
+        self.assert_("contains all materials related to " in info[0].content[0].__unicode__()) # scopecontent with no head
+        self.assertEqual("Arrangement Note", info[1].head)
+        self.assertEqual("Terms Governing Use and Reproduction", info[2].head)
+        self.assertEqual("Restrictions on Access", info[3].head)
 
     def test_series_displaylabel(self):
         self.assertEqual("Series 1: Letters and personal papers, 1865-1982",
@@ -405,6 +412,15 @@ class FaViewsTest(TestCase):
             "first content of sub-subseries 4.1a")
         self.assertPattern('46.*2.*Gaston Cesar Raoul', response.content,
             "last content of sub-subseries 4.1a")
+
+
+        # series with <head>less scopecontent
+        response = self.client.get('/documents/raoul548/raoul548_s4/rushdie1000_subseries2.1')
+        self.assertContains(response, "Subseries 2.1")
+        self.assertContains(response, "Additional drafts and notes")
+        # missing section head should not be displayed as "none"
+        self.assertContains(response, "None", 0)
+
 
 # **** tests for helper functions for creating series url, list of series/subseries for display in templates
 
