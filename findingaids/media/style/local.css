@@ -125,3 +125,27 @@ div#print-links a {
 .sw-version {
   float: right;
 }
+
+.relevance {
+         float: right;
+         margin-top: 5px;
+	 border: 1px solid #0a2944;
+	 width: 2cm;
+	 height: 8px;
+	 background-color: #eeeeee;
+}
+
+.score {
+         max-width: 2cm;
+	 background-color: #2f6390;
+	 height: 8px;
+}
+    
+    
+
+
+
+
+
+
+
