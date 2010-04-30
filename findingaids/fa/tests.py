@@ -571,7 +571,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertPattern("<p[^>]*>Search results for : .*raoul.*</p>", response.content)
         self.assertContains(response, "1 finding aid found")
         self.assertContains(response, "/documents/raoul548")
-        self.assertContains(response, "relevance: ")
+        self.assertContains(response, "<div class=\"relevance\">")
 
         response = self.client.get('/search/', { 'keywords' : 'family papers'})
         self.assertEquals(response.status_code, 200)

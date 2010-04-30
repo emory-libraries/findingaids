@@ -4,8 +4,7 @@
 <div class="record_list">
     {% if fa.fulltext_score %}
       <div class="relevance">
-	<div class="score" style="width:{% widthratio fa.fulltext_score  1 100 %}px">&nbsp;
-        </div>
+	<div class="score" style="width:{% widthratio fa.fulltext_score  1 100 %}px">&nbsp;</div>
       </div>	
     {% endif %}
     <p><a href="{% url fa:view-fa fa.eadid %}">{{ fa.list_title|format_ead }}</a> </p>

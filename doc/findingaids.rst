@@ -49,3 +49,9 @@ Custom Template Filters
 -----------------------
 .. automodule:: findingaids.fa.templatetags.ead
    :members:
+
+Custom admin commands
+---------------------
+.. autoclass:: findingaids.fa.management.commands.Command
+   :members:
+   :inherited-members:
