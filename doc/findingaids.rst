@@ -52,6 +52,6 @@ Custom Template Filters
 
 Custom admin commands
 ---------------------
-.. autoclass:: findingaids.fa.management.commands.Command
+.. autoclass:: findingaids.fa.management.commands.check_eadids
    :members:
    :inherited-members:
