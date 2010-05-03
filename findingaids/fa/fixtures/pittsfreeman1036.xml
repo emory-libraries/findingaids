@@ -33,7 +33,7 @@
     <archdesc id="pittsfreeman1036_1084" level="collection" relatedencoding="MARC21">
         <did id="pittsfreeman1036_1033">
             <unittitle encodinganalog="245$a" id="pittsfreeman1036_1022">
-                <title id="pittsfreeman1036_1020" linktype="simple">Pitts v. Freeman</title>school desegregation case files,<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="pittsfreeman1036_1021" normal="1969/1993" type="inclusive">1969-1993</unitdate>
+                <title id="pittsfreeman1036_1020" linktype="simple">Pitts v. Freeman</title> school desegregation case files,<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="pittsfreeman1036_1021" normal="1969/1993" type="inclusive">1969-1993</unitdate>
             </unittitle>
             <unitid countrycode="us" id="pittsfreeman1036_1023" repositorycode="geu-s">Manuscript Collection No.
 		  1036</unitid>

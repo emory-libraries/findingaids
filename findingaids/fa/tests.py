@@ -128,7 +128,13 @@ class FaViewsTest(TestCase):
 
         # finding aid with no origination - unit title used as browse title & link   
         # - unit title should only be displayed once
-        self.assertContains(response, 'Bailey and Thurman', 1)
+        self.assertContains(response, 'Bailey and Thurman families papers', 1)
+        
+        # Additional case for doubled title problem -title with formatting
+        response = self.client.get('/titles/P')
+        self.assertContains(response, 'Pitts v. Freeman', 2) # Title and abstract
+        self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content) #title within unittitle
+    
 
 # view finding aid main page
 
@@ -201,6 +207,11 @@ class FaViewsTest(TestCase):
         # format_ead
         response = self.client.get('/documents/pomerantz890.xml')
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
+
+        # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
+        self.assertPattern(r'''<h1[^>]*>.*Where Peachtree Meets Sweet Auburn''', response.content) # EAD title
+        self.assertPattern(r'''<table id="descriptive_summary">.*Where Peachtree Meets Sweet Auburn''', response.content) # Descriptive Summary title
+
         self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''', response.content) # abstract
         self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''', response.content) # admin_info
         self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''', response.content) # collection description
@@ -582,6 +593,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, "Bailey and Thurman families papers")
         self.assertContains(response, "Abbey Theatre collection")
         self.assertContains(response, "Pomerantz, Gary M.")
+        self.assertContains(response, "<div class=\"relevance\">", 5)
 
         response = self.client.get('/search/', { 'keywords' : 'nonexistentshouldmatchnothing'})
         self.assertEquals(response.status_code, 200)
