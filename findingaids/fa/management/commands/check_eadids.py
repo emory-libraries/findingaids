@@ -4,16 +4,11 @@ from findingaids.fa.models import FindingAid
 import re
  
 class Command(BaseCommand):
-    """
-      Custom django-admin command that checks the ids of eads against the regex for ead ids, used in 'views.py'. 
-    """
+        
     help = """Check ead id's against regular expression used in 'views.py' for ead ids."""
  
     def handle(self, *args, **options):
-        """
-          Generate a list of ead ids and check each id with the regex EADID_URL_REGEX from findingaids.fa.urls, then output
-          the number of records and the number of mismatches.
-        """
+       
         if args and args[0] == 'help':
             print self.help
         else:

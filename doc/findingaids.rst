@@ -52,6 +52,9 @@ Custom Template Filters
 
 Custom admin commands
 ---------------------
-.. automodule:: findingaids.fa.management.commands.check_eadids
-   :members:
-   :inherited-members:
+The following management commands are available.
+    For more details on these commands, use manage.py <command> help
+
+ * **check_eadids** - compares ead ids against a predefined regular expression
+   
+   
