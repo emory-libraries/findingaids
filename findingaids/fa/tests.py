@@ -209,8 +209,8 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
 
         # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
-        self.assertPattern(r'''<h1[^>]*>.*Where Peachtree Meets Sweet Auburn''', response.content) # EAD title
-        self.assertPattern(r'''<table id="descriptive_summary">.*Where Peachtree Meets Sweet Auburn''', response.content) # Descriptive Summary title
+        self.assertPattern(r'''<h1[^>]*>.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # EAD title
+        self.assertPattern(r'''<table id="descriptive_summary">.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # Descriptive Summary title
 
         self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''', response.content) # abstract
         self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''', response.content) # admin_info
