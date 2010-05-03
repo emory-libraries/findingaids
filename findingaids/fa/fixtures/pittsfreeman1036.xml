@@ -1,0 +1,120 @@
+<ead id="pittsfreeman1036_1085" relatedencoding="MARC21">
+    <eadheader countryencoding="iso3166-1" dateencoding="iso8601" id="pittsfreeman1036_1019" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
+        <eadid countrycode="us" identifier="pittsfreeman1036.xml" mainagencycode="geu-s">pittsfreeman1036.xml</eadid>
+        <filedesc id="pittsfreeman1036_1013">
+            <titlestmt id="pittsfreeman1036_104">
+                <titleproper encodinganalog="Title" id="pittsfreeman1036_102">
+                    <emph id="pittsfreeman1036_101" render="italic">Pitts v. Freeman</emph> school desegregation case files,
+			 1969-1993</titleproper>
+                <author encodinganalog="Creator" id="pittsfreeman1036_103">Manuscript, Archives, and Rare Book
+			 Library, Emory University</author>
+            </titlestmt>
+            <publicationstmt id="pittsfreeman1036_1012">
+                <publisher encodinganalog="Publisher" id="pittsfreeman1036_105">Emory University</publisher>
+                <address id="pittsfreeman1036_1010">
+                    <addressline id="pittsfreeman1036_106">Manuscript, Archives, and Rare Book
+				Library</addressline>
+                    <addressline id="pittsfreeman1036_107">Atlanta, GA 30322</addressline>
+                    <addressline id="pittsfreeman1036_108">404-727-6887</addressline>
+                    <addressline id="pittsfreeman1036_109">Fax: 404-727-0360</addressline>
+                </address>
+                <date calendar="gregorian" encodinganalog="Date" era="ce" id="pittsfreeman1036_1011" normal="2008-07-18">July 18, 2008</date>
+            </publicationstmt>
+        </filedesc>
+        <profiledesc id="pittsfreeman1036_1018">
+            <creation id="pittsfreeman1036_1015">Finding aid encoded, 
+		  <date calendar="gregorian" encodinganalog="Date" era="ce" id="pittsfreeman1036_1014" normal="2008-07-18">July 18, 2008</date>
+            </creation>
+            <langusage id="pittsfreeman1036_1017">
+                <language encodinganalog="Language" id="pittsfreeman1036_1016" langcode="eng" scriptcode="latn">English</language>
+            </langusage>
+        </profiledesc>
+    </eadheader>
+    <archdesc id="pittsfreeman1036_1084" level="collection" relatedencoding="MARC21">
+        <did id="pittsfreeman1036_1033">
+            <unittitle encodinganalog="245$a" id="pittsfreeman1036_1022">
+                <title id="pittsfreeman1036_1020" linktype="simple">Pitts v. Freeman</title>school desegregation case files,<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="pittsfreeman1036_1021" normal="1969/1993" type="inclusive">1969-1993</unitdate>
+            </unittitle>
+            <unitid countrycode="us" id="pittsfreeman1036_1023" repositorycode="geu-s">Manuscript Collection No.
+		  1036</unitid>
+            <physdesc encodinganalog="300" id="pittsfreeman1036_1026">
+                <extent id="pittsfreeman1036_1024">12 linear ft.</extent>
+                <extent id="pittsfreeman1036_1025">(12
+		  boxes)</extent>
+            </physdesc>
+            <abstract id="pittsfreeman1036_1028">
+                <title id="pittsfreeman1036_1027" linktype="simple">Pitts v. Freeman</title> school desegregation case files, consisting of material from the plaintiffs’ legal team, including legal memos, newspaper clippings, transcripts, expert reports, and other materials related to the case.  The case concerned school desegration in the DeKalb County (Georgia) School System.  </abstract>
+            <langmaterial encodinganalog="546" id="pittsfreeman1036_1030">Materials entirely in
+		  <language id="pittsfreeman1036_1029" langcode="eng">English</language>.</langmaterial>
+            <repository encodinganalog="852" id="pittsfreeman1036_1032">Emory University<subarea id="pittsfreeman1036_1031">Manuscript,
+		  Archives, and Rare Book Library</subarea>
+            </repository>
+        </did>
+        <acqinfo encodinganalog="541" id="pittsfreeman1036_1036">
+            <head id="pittsfreeman1036_1034">Source</head>
+            <p id="pittsfreeman1036_1035">Gift, 2005.</p>
+        </acqinfo>
+        <accessrestrict encodinganalog="506" id="pittsfreeman1036_1039">
+            <head id="pittsfreeman1036_1037">Restrictions on Access</head>
+            <p id="pittsfreeman1036_1038">Unrestricted access. </p>
+        </accessrestrict>
+        <userestrict encodinganalog="540">
+            <head id="pittsfreeman1036_1040">Terms Governing Use and Reproduction</head>
+            <p id="pittsfreeman1036_1041">All requests subject to limitations noted in departmental policies on
+		  reproduction.</p>
+        </userestrict>
+        <prefercite encodinganalog="524" id="pittsfreeman1036_1045">
+            <head id="pittsfreeman1036_1042">Citation</head>
+            <p id="pittsfreeman1036_1044">[after identification of item(s)], <title id="pittsfreeman1036_1043" linktype="simple">Pitts v. Freeman</title> school desegregation case files, Manuscript,
+		  Archives, and Rare Book Library, Emory University.</p>
+        </prefercite>
+        <processinfo id="pittsfreeman1036_1050">
+            <head id="pittsfreeman1036_1046">Processing</head>
+            <p id="pittsfreeman1036_1047">Unprocessed collection.</p>
+            <note id="pittsfreeman1036_1049">
+                <p id="pittsfreeman1036_1048">File name:   pittsfreeman1036.doc</p>
+            </note>
+        </processinfo>
+        <bioghist encodinganalog="545" id="pittsfreeman1036_1054">
+            <head id="pittsfreeman1036_1051">Historical  Note</head>
+            <p id="pittsfreeman1036_1053">This lawsuit was part of a series of litigation that sought to dismantle segregation in DeKalb County's public school system. <title id="pittsfreeman1036_1052" linktype="simple">Willie Gene Pitts, et al., v. Robert Freeman, et al.</title>, was filed in 1983.  The litigation centered on the school system's efforts to expand Redan High School to relieve overcrowding at the school.  The plaintiffs filed a motion to block the expansion because the proposed construction violated a 1969 injunction that required DeKalb County to construct and expand school facilities "with the objective of eradicating segregation and perpetuating desegregation."  The plaintiffs contended the county's efforts to expand Redan's capacity were a thinly-veiled effort to avoid reassigning white students to nearby "under capacity" high schools that were predominately African American.</p>
+        </bioghist>
+        <scopecontent encodinganalog="520" id="pittsfreeman1036_1057">
+            <head id="pittsfreeman1036_1055">Scope and Content Note</head>
+            <p id="pittsfreeman1036_1056">The case files consist of materials from plaintiffs' legal team, including legal memos, newspaper clippings, transcripts, expert reports, and other materials related to the case.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351" id="pittsfreeman1036_1060">
+            <head id="pittsfreeman1036_1058">Arrangement Note</head>
+            <p id="pittsfreeman1036_1059">Unprocessed collection.</p>
+        </arrangement>
+        <controlaccess id="pittsfreeman1036_1083">
+            <head id="pittsfreeman1036_1061">Selected Search Terms</head>
+            <controlaccess id="pittsfreeman1036_1065">
+                <head id="pittsfreeman1036_1062">Personal Names</head>
+                <persname encodinganalog="600" id="pittsfreeman1036_1063" source="lcnaf"> Freeman, Robert R.--Trials, litigation, etc.</persname>
+                <persname encodinganalog="600" id="pittsfreeman1036_1064" source="lcnaf">Pitts, Willie Eugene--Trials, litigation, etc.</persname>
+            </controlaccess>
+            <controlaccess id="pittsfreeman1036_1068">
+                <head id="pittsfreeman1036_1066">Corporate Names</head>
+                <corpname encodinganalog="610" id="pittsfreeman1036_1067" source="lcnaf">DeKalb County School System</corpname>
+            </controlaccess>
+            <controlaccess id="pittsfreeman1036_1074">
+                <head id="pittsfreeman1036_1069">Topical Terms</head>
+                <subject encodinganalog="650" id="pittsfreeman1036_1070" source="lcsh"> African Americans--Segregation--Georgia.</subject>
+                <subject encodinganalog="650" id="pittsfreeman1036_1071" source="lcsh">School integration--Georgia.</subject>
+                <subject encodinganalog="650" id="pittsfreeman1036_1072" source="lcsh">Segregation in education--Georgia.</subject>
+                <subject encodinganalog="650" id="pittsfreeman1036_1073" source="lcsh">Segregation--Law and legislation--Georgia.</subject>
+            </controlaccess>
+            <controlaccess id="pittsfreeman1036_1078">
+                <head id="pittsfreeman1036_1075">Geographic Names</head>
+                <geogname encodinganalog="651" id="pittsfreeman1036_1076">DeKalb County (Ga.)--Race relations.</geogname>
+                <geogname encodinganalog="651" id="pittsfreeman1036_1077">DeKalb County (Ga.)--Social conditions.</geogname>
+            </controlaccess>
+            <controlaccess id="pittsfreeman1036_1082">
+                <head id="pittsfreeman1036_1079">Form/Genre Terms</head>
+                <genreform encodinganalog="655" id="pittsfreeman1036_1080" source="aat">Case files.</genreform>
+                <genreform encodinganalog="655" id="pittsfreeman1036_1081" source="aat">Legal files.</genreform>
+            </controlaccess>
+        </controlaccess>
+    </archdesc>
+</ead>
