@@ -25,6 +25,9 @@ EXISTDB_SERVER_URL      = 'http://user:password@existdb.example.com/exist/xmlrpc
 EXISTDB_ROOT_COLLECTION = ""
 EXISTDB_TEST_COLLECTION = ""
 
+# local, full-path location for finding aids to be loaded to eXist via admin interface
+FINDINGAID_EAD_SOURCE= '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'
+
 ADDITIONAL_DATA_INDEX   = ""
 DOI_PURL_HOST = "http://dx.doi.org/"
 

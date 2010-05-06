@@ -12,10 +12,11 @@ Installation
 ------------
 Install and configure like other django applications.
 
-Copy ``localsettings-sample.py`` to ``localsettings.py`` and configure. The
-eXist-db user should be in the DBA group if you plan to use the app to
-manage the eXist index configuration. For more information on existdb index
-commands::
+Copy ``localsettings-sample.py`` to ``localsettings.py`` and configure. 
+
+The configured eXist-db user should be in the DBA group if you plan to
+use the app to manage the eXist index configuration. For more
+information on existdb index commands::
 
      $ ./manage.py help existdb_index
      $ ./manage.py help existdb_reindex
@@ -24,6 +25,10 @@ For a first-time install, you will should run these two steps:
 (Note that if all finding aids are loaded, the reindex step can take quite a while)
      $ ./manage.py existdb_index load
      $ ./manage.py existdb_reindex  
+
+The FINDINGAID_EAD_SOURCE should be set to the directory path for the
+EAD files that will be accessible for loading to eXist via the admin
+interface.
 
 
 Install `xhtml2pdf/Pisa`_ and its dependencies. On Ubuntu, the following
