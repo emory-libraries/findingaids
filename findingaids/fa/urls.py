@@ -1,4 +1,7 @@
 from django.conf.urls.defaults import *
+from django.contrib import admin
+
+admin.autodiscover()
 
 title_urlpatterns = patterns('findingaids.fa.views',
     url('^$', 'browse_titles', name='browse-titles'),
@@ -23,5 +26,6 @@ document_urlpatterns = patterns('findingaids.fa.views',
 urlpatterns = patterns('findingaids.fa.views',
     (r'^titles/', include(title_urlpatterns)),
     (r'^documents/', include(document_urlpatterns)),
-    url(r'^search/?', 'keyword_search', name='keyword-search')
+    url(r'^search/?', 'keyword_search', name='keyword-search'),
+    (r'^admin/', include(admin.site.urls))
 )
