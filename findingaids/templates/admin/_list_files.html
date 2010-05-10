@@ -1,0 +1,20 @@
+{# list recently modified source EAD files #}
+
+<h2>Recently modified files</h2>
+
+{% if error %}<p class="error">Error: {{ error }}</p>{% endif %}
+
+<table>
+    <tr>
+        <th>Filename</th>
+        <th>Last Modified</th>
+    </tr>
+{% for file, mtime in files %}
+    <tr>
+        <td>{{ file }}</td>
+        <td>{{ mtime|date}} ({{ mtime|timesince }} ago)</td>
+    </tr>
+{% empty %}
+  <tr><td colspan="2">No files found</td></tr>
+{% endfor %}
+</table>

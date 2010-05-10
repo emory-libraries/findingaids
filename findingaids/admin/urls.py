@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('findingaids.admin.views',
-   url(r'^$', 'admin_login', name="admin-login")
+   url(r'^$', 'main', name="index"),
+   url(r'^login$', 'admin_login', name="admin-login"),
 )
