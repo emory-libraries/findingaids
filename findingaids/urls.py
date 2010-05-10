@@ -1,14 +1,10 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
-from django.contrib import admin
 
-admin.autodiscover()
-
-urlpatterns = patterns('',
-                       # for now, everything is in main app
+urlpatterns = patterns('',                                                                                  
                        url(r'^admin/', include('findingaids.admin.urls', namespace='admin')),
-                       (r'^db-admin/', include(admin.site.urls)),
                        url(r'^$', 'findingaids.fa.views.site_index', name="site-index"),
+                       # everything else should fall through to the main app
                        url(r'^', include('findingaids.fa.urls', namespace='fa')),
 )
 
