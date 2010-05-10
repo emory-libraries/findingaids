@@ -102,7 +102,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -113,6 +112,7 @@ INSTALLED_APPS = (
     'eulcore.django.ldap',
     'eulcore.django.util',
     'findingaids.fa',
+    'findingaids.admin',
 )
 
 EXTENSION_DIRS = (
