@@ -1,7 +1,4 @@
 from django.conf.urls.defaults import *
-from django.contrib import admin
-
-admin.autodiscover()
 
 title_urlpatterns = patterns('findingaids.fa.views',
     url('^$', 'browse_titles', name='browse-titles'),
