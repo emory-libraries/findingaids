@@ -26,6 +26,5 @@ document_urlpatterns = patterns('findingaids.fa.views',
 urlpatterns = patterns('findingaids.fa.views',
     (r'^titles/', include(title_urlpatterns)),
     (r'^documents/', include(document_urlpatterns)),
-    url(r'^search/?', 'keyword_search', name='keyword-search'),
-    (r'^admin/', include(admin.site.urls))
+    url(r'^search/?', 'keyword_search', name='keyword-search')
 )
