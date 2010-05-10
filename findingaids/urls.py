@@ -6,7 +6,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
                        # for now, everything is in main app
-                       (r'^admin/', include('findingaids.admin.urls')),
+                       url(r'^admin/', include('findingaids.admin.urls', namespace='admin')),
                        (r'^db-admin/', include(admin.site.urls)),
                        url(r'^$', 'findingaids.fa.views.site_index', name="site-index"),
                        url(r'^', include('findingaids.fa.urls', namespace='fa')),
