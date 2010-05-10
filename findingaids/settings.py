@@ -102,13 +102,15 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 )
 
 INSTALLED_APPS = (
-#    'django.contrib.auth',
-#    'django.contrib.contenttypes',
-#    'django.contrib.sessions',
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
 #    'django.contrib.sites',
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
     'eulcore.django.existdb',
+    'eulcore.django.ldap',
     'eulcore.django.util',
     'findingaids.fa',
 )
