@@ -1,10 +1,15 @@
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 import os
 import glob
 from datetime import datetime
 from django.conf import settings
 from eulcore.django.existdb.db import ExistDB
+from eulcore.xmlmap.core import load_xmlobject_from_file
+from findingaids.fa.models import FindingAid
 
 def main(request):
     """
@@ -36,10 +41,10 @@ def publish(request):
     """
     Admin publication form.
 
-    On POST, publish an EAD file specified in request from the configured
+    On POST, publish the EAD file specified in request from the configured
     source directory to make it immediately visible on the site.
 
-    On GET, display list of files available for publication.
+    On GET, display a list of files available for publication.
     """
     if request.method == 'POST':
         filename = request.POST['filename']
@@ -48,15 +53,28 @@ def publish(request):
         # full path in exist db collection
         dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
         db = ExistDB()
-        # get information about db file being replaced, if any
+        # get information to determine if a db file is being replaced
         replaced = db.describeDocument(dbpath)
         # load the document to the configured collection in eXist with the same fileneame
-        # FIXME: allow overwrite on first try ? notify user if it is a new file or an update ?
-        success = db.load(open(fullpath, 'r'), dbpath, True)  
-        return render_to_response('admin/publish.html',
-                                    {'success' : success, 'filename' : filename,
-                                    'replaced' : replaced },
-                                    context_instance=RequestContext(request))
+        # NOTE: specifying to always overwrite copy in eXist 
+        success = db.load(open(fullpath, 'r'), dbpath, True)
+        if success:          
+            # load the file as a FindingAid object so we can generate a url to the document
+            ead = load_xmlobject_from_file(fullpath, FindingAid)
+            ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
+            if replaced:
+                change = "updated"
+            else:
+                change = "added"
+            messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
+                    % (change, filename, ead_url, ead.unittitle))
+        else:
+            messages.error("Error publishing <b>%s</b>." % filename)
+
+        # redirect to main admin page with code 303 See Other
+        response = HttpResponse(status=303)
+        response['Location'] = reverse('admin:index')
+        return response
     else:
         # if not POST, display list of files available for publication
         # for now, just using main admin page
