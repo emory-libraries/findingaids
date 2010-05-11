@@ -4,11 +4,10 @@
 
 {% if error %}<p class="error">Error: {{ error }}</p>{% endif %}
 
-
 <form action="{% url admin:publish-ead %}" method="post">
 <table>
     <tr>
-        <th colspan="2">Filename</th>
+        <th colspan="2">Filename</th> {# also spans column for publish button #}
         <th>Last Modified</th>
     </tr>
 {% for file, mtime in files %}
