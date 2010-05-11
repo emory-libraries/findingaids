@@ -8,6 +8,7 @@ import os
 import glob
 from datetime import datetime
 from django.conf import settings
+from eulcore.django.existdb.db import ExistDB
 
 def main(request):
     """
@@ -34,6 +35,22 @@ def main(request):
 def admin_login(request):
     "Admin page"
     return render_to_response('admin/index.html', context_instance=RequestContext(request))
+
+def publish(request):
+    "Publish an EAD file from configured source directory so it is visible on the site."
+    if request.method == 'POST':
+        filename = request.POST['filename']
+        print filename
+        fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+        db = ExistDB()
+        # load the document to the configured collection in eXist with the same fileneame
+        # FIXME: allow overwrite on first try ? notify user if it is a new file or an update ?
+        success = db.load(open(fullpath), settings.EXISTDB_ROOT_COLLECTION + "/" + filename, True)
+        return render_to_response('admin/publish.html',
+                                    {'success' : success, 'filename' : filename },
+                                    context_instance=RequestContext(request))
+    else:
+       return main(request)
 
 
 def _get_recent_xml_files(dir, num=30):
