@@ -58,4 +58,18 @@ class AdminViewsTest(TestCase):
         response = self.client.get('/admin/')
         self.assert_("check config file" in response.context['error'])
         self.assertEqual(0, len(response.context['files']))
+
+    def test_publish(self):
+        # GET should just list files available to be published
+        response = self.client.get('/admin/publish')
+        self.assertEquals(response.status_code, 200)
+        self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
+
+        # use EAD fixture dircetory to test publication
+        ### TODO  - can't test this until we have fixture users
+        #settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
+        #response = self.client.post('/admin/publish', {'filename' : 'abbey244.xml'})
+        #print response
+        #print response.status
+        #print self.client.session
         
