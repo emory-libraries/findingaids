@@ -1,9 +1,5 @@
 from django.shortcuts import render_to_response
-from django.http import Http404
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from findingaids.admin.models import Login
 import os
 import glob
 from datetime import datetime
@@ -37,20 +33,34 @@ def admin_login(request):
     return render_to_response('admin/index.html', context_instance=RequestContext(request))
 
 def publish(request):
-    "Publish an EAD file from configured source directory so it is visible on the site."
+    """
+    Admin publication form.
+
+    On POST, publish an EAD file specified in request from the configured
+    source directory to make it immediately visible on the site.
+
+    On GET, display list of files available for publication.
+    """
     if request.method == 'POST':
         filename = request.POST['filename']
-        print filename
+        # full path to the local file
         fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+        # full path in exist db collection
+        dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
         db = ExistDB()
+        # get information about db file being replaced, if any
+        replaced = db.describeDocument(dbpath)
         # load the document to the configured collection in eXist with the same fileneame
         # FIXME: allow overwrite on first try ? notify user if it is a new file or an update ?
-        success = db.load(open(fullpath), settings.EXISTDB_ROOT_COLLECTION + "/" + filename, True)
+        success = db.load(open(fullpath, 'r'), dbpath, True)  
         return render_to_response('admin/publish.html',
-                                    {'success' : success, 'filename' : filename },
+                                    {'success' : success, 'filename' : filename,
+                                    'replaced' : replaced },
                                     context_instance=RequestContext(request))
     else:
-       return main(request)
+        # if not POST, display list of files available for publication
+        # for now, just using main admin page
+        return main(request)
 
 
 def _get_recent_xml_files(dir, num=30):
