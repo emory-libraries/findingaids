@@ -127,8 +127,8 @@ div#print-links a {
 }
 
 .relevance {
-         float: right;
-         margin-top: 5px;
+     float: right;
+     margin-top: 5px;
 	 border: 1px solid #0a2944;
 	 width: 2cm;
 	 height: 8px;
@@ -136,14 +136,22 @@ div#print-links a {
 }
 
 .score {
-         max-width: 2cm;
+     max-width: 2cm;
 	 background-color: #2f6390;
 	 height: 8px;
 }
-    
-    
 
-
+ul.messages {
+    list-style-type: none;
+    border: 1px solid black;
+    background-color: #efefef;
+    margin-bottom: 10px;
+}
+ul.messages li {
+    background: none !important;
+    padding-left: 10px !important;
+}
+/* todo: message styles by tag (success, error, etc) */
 
 
 
