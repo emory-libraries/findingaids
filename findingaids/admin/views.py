@@ -5,7 +5,11 @@ import glob
 from datetime import datetime
 from django.conf import settings
 from eulcore.django.existdb.db import ExistDB
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
+
+@login_required
 def main(request):
     """
     Main admin page.
@@ -23,10 +27,12 @@ def main(request):
             error = None
         else:
             error = "EAD source directory '%s' does not exist or is not readable; please check config file." % dir
-
+        
+    logout(request)
     return render_to_response('admin/index.html', {'files' : recent_files,
                             'error' : error },
                             context_instance=RequestContext(request))
+
 
 def admin_login(request):
     "Admin page"
