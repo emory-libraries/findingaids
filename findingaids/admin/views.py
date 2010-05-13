@@ -1,16 +1,23 @@
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.contrib import messages
-from django.core.urlresolvers import reverse
-from django.http import HttpResponse
 import os
 import glob
 from datetime import datetime
+
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
+from django.contrib import messages
+
 from eulcore.django.existdb.db import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file
+
 from findingaids.fa.models import FindingAid
 
+
+@login_required
 def main(request):
     """
     Main admin page.
@@ -28,10 +35,12 @@ def main(request):
             error = None
         else:
             error = "EAD source directory '%s' does not exist or is not readable; please check config file." % dir
-
+        
+    logout(request)
     return render_to_response('admin/index.html', {'files' : recent_files,
-                            'error' : error },
+                            'error' : error},
                             context_instance=RequestContext(request))
+
 
 def admin_login(request):
     "Admin page"
