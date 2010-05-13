@@ -4,7 +4,7 @@
 
 {% if error %}<p class="error">Error: {{ error }}</p>{% endif %}
 
-<form action="{% url admin:publish-ead %}" method="post">
+<form action="{% url admin:publish-ead %}" method="post">{% csrf_token %}
 <table>
     <tr>
         <th colspan="2">Filename</th> {# also spans column for publish button #}
