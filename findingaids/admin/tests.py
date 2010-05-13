@@ -3,12 +3,14 @@ import tempfile
 from time import sleep
 from django.test import Client
 from django.conf import settings
-from eulcore.django.test import TestCase
+from django.test import TestCase
+from django.core.urlresolvers import reverse
 from eulcore.django.existdb.db import ExistDB
 from findingaids.admin.views import _get_recent_xml_files
 from findingaids.admin.utils import check_ead
 
 class AdminViewsTest(TestCase):
+    fixtures =  ['user']
     # create temporary directory with files for testing
     # (unchanged by tests, so only doing once here instead of in setup)
     tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
@@ -47,21 +49,39 @@ class AdminViewsTest(TestCase):
         recent_xml = _get_recent_xml_files(self.tmpdir, 2)
         self.assertEqual(2, len(recent_xml))
 
-    # TODO: add user fixture and login once authentication is set up and required for admin views
     def test_recent_files(self):
-        # note: recent files list currently displayed on main admin page
-        response = self.client.get('/admin/')
-        self.assertEquals(response.status_code, 200)
+        admin_index = reverse('admin:index')
+        # note: recent files list is *currently* displayed on main admin page
+
+        # not logged in
+        response = self.client.get(admin_index)
+        code = response.status_code
+        expected = 302
+        self.failUnlessEqual(code, expected, 'Expected %s but returned %s for %s as AnonymousUser'
+                             % (expected, code, admin_index))
+
+        # follow redirects
+        response = self.client.get(admin_index, follow=True)
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_("?next=%s" % admin_index in redirect_url)
+        
+        # log in as an admin user
+        self.client.login(username='testadmin', password='secret')
+        response = self.client.get(admin_index)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(3, len(response.context['files']))
-        self.assertEqual(None, response.context['error'])
+        self.assert_('error' not in response.context)
+        self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
+        self.assertContains(response, os.path.basename(self.tmpfiles[2].name))
 
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
-        response = self.client.get('/admin/')
+        response = self.client.get(admin_index)
         self.assert_("check config file" in response.context['error'])
         self.assertEqual(0, len(response.context['files']))
 
     def test_publish(self):
+        self.client.login(username='testadmin', password='secret')
         # GET should just list files available to be published
         response = self.client.get('/admin/publish')
         self.assertEquals(response.status_code, 200)

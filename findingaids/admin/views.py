@@ -8,8 +8,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
 from django.contrib import messages
+from django.core.urlresolvers import reverse
 
 from eulcore.django.existdb.db import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file
@@ -36,7 +36,6 @@ def main(request):
         else:
             error = "EAD source directory '%s' does not exist or is not readable; please check config file." % dir
         
-    logout(request)
     return render_to_response('admin/index.html', {'files' : recent_files,
                             'error' : error},
                             context_instance=RequestContext(request))
