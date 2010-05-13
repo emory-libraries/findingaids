@@ -16,6 +16,7 @@ def check_ead(filename, dbpath):
 
     :param filename: full path to the EAD file to be checked
     :param dbpath: full path within eXist where the document will be saved
+    :rtype list: list of all errors found
     """
     errors = []
     try:
@@ -42,7 +43,7 @@ def check_ead(filename, dbpath):
                     % (ead.eadid, fa[0].document_name))            
 
     # check that series ids are set
-    if ead.dsc.hasSeries:
+    if ead.dsc.hasSeries():
         for series in ead.dsc.c:
             errors.extend(_check_series_ids(series))
 

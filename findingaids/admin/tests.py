@@ -11,6 +11,9 @@ from findingaids.admin.utils import check_ead
 
 class AdminViewsTest(TestCase):
     fixtures =  ['user']
+    admin_credentials = {'username': 'testadmin', 'password': 'secret'}
+
+    db = ExistDB()
     # create temporary directory with files for testing
     # (unchanged by tests, so only doing once here instead of in setup)
     tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
@@ -57,7 +60,7 @@ class AdminViewsTest(TestCase):
         response = self.client.get(admin_index)
         code = response.status_code
         expected = 302
-        self.failUnlessEqual(code, expected, 'Expected %s but returned %s for %s as AnonymousUser'
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as AnonymousUser'
                              % (expected, code, admin_index))
 
         # follow redirects
@@ -66,13 +69,22 @@ class AdminViewsTest(TestCase):
         self.assert_("?next=%s" % admin_index in redirect_url)
         
         # log in as an admin user
-        self.client.login(username='testadmin', password='secret')
+        self.client.login(**self.admin_credentials)
         response = self.client.get(admin_index)
         self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe'
+                             % (expected, code, admin_index))
         self.assertEqual(3, len(response.context['files']))
         self.assert_('error' not in response.context)
         self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
         self.assertContains(response, os.path.basename(self.tmpfiles[2].name))
+        # file list contains buttons to publish documents
+        publish_url = reverse('admin:publish-ead')
+        self.assertContains(response, '<form action="%s" method="post"' % publish_url)
+        self.assertContains(response, '<button type="submit" name="filename" value="%s" '
+                % os.path.basename(self.tmpfiles[0].name))
 
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
@@ -81,21 +93,52 @@ class AdminViewsTest(TestCase):
         self.assertEqual(0, len(response.context['files']))
 
     def test_publish(self):
-        self.client.login(username='testadmin', password='secret')
+        publish_url = reverse('admin:publish-ead')
+        self.client.login(**self.admin_credentials)
         # GET should just list files available to be published
-        response = self.client.get('/admin/publish')
-        self.assertEquals(response.status_code, 200)
+        response = self.client.get(publish_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
+                             % (expected, code, publish_url))
         self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
 
-        # use EAD fixture dircetory to test publication
-        ### TODO  - can't test this until we have fixture users
-        #settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
-        #response = self.client.post('/admin/publish', {'filename' : 'abbey244.xml'})
-        #print response
-        #print response.status
-        #print self.client.session
+        # use fixture directory to test publication
+        filename = 'hartsfield558.xml'
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'admin', 'fixtures')
+        response = self.client.post(publish_url, {'filename' : filename}, follow=True)
+        code = response.status_code
+        expected = 200  # final code, after following redirects
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
+                             % (expected, code, publish_url))
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(reverse('admin:index') in redirect_url)       
+        expected = 303      # redirect
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
+                             % (expected, code, publish_url))
+        self.assertContains(response, "Successfully added")
+        docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)
+        # confirm that document was actually saved to exist
+        self.assertEqual(docinfo['name'], settings.EXISTDB_TEST_COLLECTION + '/' + filename)
+        self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)
+
+        # publish invalid document - should display errors
+        response = self.client.post(publish_url, {'filename' : 'hartsfield558_invalid.xml'})
+        code = response.status_code
+        expected = 200 
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
+                             % (expected, code, publish_url))
+        self.assertContains(response, "Could not publish")
+        self.assertContains(response, "not declared")   # DTD validation error
+        self.assertContains(response, "series c01 id attribute is not set")
+        self.assertContains(response, "index id attribute is not set")
+        docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield588_invalid.xml')
+        self.assertEqual({}, docinfo)   # invalid document not loaded to exist
+        
+
 
 class UtilsTest(TestCase):
+    db = ExistDB()
     
     def test_check_ead(self):
         # check valid EAD - no errors  -- good fixture, should pass all tests
@@ -114,23 +157,22 @@ class UtilsTest(TestCase):
         self.assert_("subseries c02 id attribute is not set for Subseries 6.1" in errors[3])
         self.assert_("index id attribute is not set for Index of Selected Correspondents" in errors[4])
 
-        # eadid uniqueness check in db
-        db = ExistDB()
-        db.load(open(valid_eadfile), dbpath, True)
+        # eadid uniqueness check in exist
+        self.db.load(open(valid_eadfile), dbpath, True)
         errors = check_ead(valid_eadfile, dbpath)
         # same eadid, but present in the file that will be updated - no errors
         self.assertEqual(0, len(errors))
 
         # upload same file to a different path - non-unique eadid error
-        db.load(open(valid_eadfile), settings.EXISTDB_TEST_COLLECTION + '/harstfield_other.xml', True)
+        self.db.load(open(valid_eadfile), settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml', True)
         errors = check_ead(valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database already contains 2 instances of eadid" in errors[0])
 
         # remove version with correct path to test single conflicting eadid
-        db.removeDocument(dbpath)
+        self.db.removeDocument(dbpath)
         errors = check_ead(valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database contains eadid 'hartsfield558' in a different document" in errors[0])
-        db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/harstfield_other.xml')
+        self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml')
 

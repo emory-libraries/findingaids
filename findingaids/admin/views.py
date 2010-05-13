@@ -15,7 +15,7 @@ from eulcore.django.existdb.db import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
 from findingaids.fa.models import FindingAid
-
+from findingaids.admin.utils import check_ead
 
 @login_required
 def main(request):
@@ -45,6 +45,7 @@ def admin_login(request):
     "Admin page"
     return render_to_response('admin/index.html', context_instance=RequestContext(request))
 
+@login_required
 def publish(request):
     """
     Admin publication form.
@@ -60,6 +61,12 @@ def publish(request):
         fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
         # full path in exist db collection
         dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
+
+        errors = check_ead(fullpath, dbpath)
+        if errors:
+            return render_to_response('admin/publish-errors.html', {'errors': errors, 'filename': filename},
+                            context_instance=RequestContext(request))
+        # only load to exist if there are no errors found
         db = ExistDB()
         # get information to determine if a db file is being replaced
         replaced = db.describeDocument(dbpath)
@@ -79,7 +86,7 @@ def publish(request):
         else:
             messages.error("Error publishing <b>%s</b>." % filename)
 
-        # redirect to main admin page with code 303 See Other
+        # redirect to main admin page with code 303 (See Other)
         response = HttpResponse(status=303)
         response['Location'] = reverse('admin:index')
         return response
