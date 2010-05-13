@@ -1,0 +1,1 @@
+[{"pk": 2, "model": "auth.user", "fields": {"username": "testadmin", "first_name": "", "last_name": "", "is_active": true, "is_superuser": true, "is_staff": true, "last_login": "2010-05-12 16:39:59", "groups": [], "user_permissions": [], "password": "sha1$691c4$f0e2a436dc6b084840e7a11b58dd9f14ec7e1e19", "email": "testadmin@emory.edu", "date_joined": "2010-05-12 16:39:59"}}]
