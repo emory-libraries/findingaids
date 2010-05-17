@@ -2,17 +2,19 @@
 {% block page-subtitle %}: Administration Page {% endblock %}
 {% block content-title %}Administer Finding Aids{% endblock %}
 
- {% block content-body %}
-
-
-<p>Begining of the admin page... stay tuned lol</p>
-{% if user.is_authenticated %}
-    <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
-{% else %}
+{% block content-body %}
+  {% if user.is_authenticated %}
+    <div>
+      <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+    </div>  
+    <div id="print-links">
+      <a href="{{ settings.LOGIN_REDIRECT_URL }}logout">logout</a>
+   </div>   
+  {% else %}
     <p>Welcome, new user. Please log in.</p>
-{% endif %}
-<hr/>
-{% include "admin/_list_files.html" %}
+  {% endif %}
+  <hr/>
+  {% include "admin/_list_files.html" %}
 
 
 {% endblock %}

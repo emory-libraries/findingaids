@@ -8,14 +8,16 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import logout_then_login
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+
 
 from eulcore.django.existdb.db import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
 from findingaids.fa.models import FindingAid
 from findingaids.admin.utils import check_ead
+
 
 @login_required
 def main(request):
@@ -42,8 +44,25 @@ def main(request):
 
 
 def admin_login(request):
-    "Admin page"
+    """
+    Admin login page.
+
+    
+    """
     return render_to_response('admin/index.html', context_instance=RequestContext(request))
+
+
+def admin_logout(request):
+    """
+    Admin Login page.
+
+    
+    """
+    login_url = settings.LOGIN_URL
+    
+    return logout_then_login(request)
+
+
 
 @login_required
 def publish(request):

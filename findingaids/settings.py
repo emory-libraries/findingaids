@@ -109,6 +109,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 
                            'eulcore.django.ldap.emory.EmoryLDAPBackend')
 
+LOGIN_URL="/accounts/login/"
+LOGIN_REDIRECT_URL="/admin/"
 
 INSTALLED_APPS = (
     'django.contrib.auth',
