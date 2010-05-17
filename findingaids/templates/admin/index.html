@@ -5,7 +5,7 @@
 {% block content-body %}
   {% if user.is_authenticated %}
     <div>
-      <p>Welcome, {{ user.username }}. Thanks for logging in.</p>
+      <p>Welcome, {{ user.username }}.</p>
     </div>  
     <div id="print-links">
       <a href="{{ settings.LOGIN_REDIRECT_URL }}logout">logout</a>

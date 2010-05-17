@@ -134,7 +134,26 @@ class AdminViewsTest(TestCase):
         self.assertContains(response, "index id attribute is not set")
         docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield588_invalid.xml')
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
+
+
+    def test_login(self):
+        admin_index = reverse('admin:index')
+
+        # Test admin account can login
+        self.client.login(**self.admin_credentials)
+        response = self.client.get(admin_index)
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
         
+        # Test a none existent account cannot login
+        self.client.login(username='testclient', password='password')
+        response = self.client.get(admin_index)
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
 
 
 class UtilsTest(TestCase):

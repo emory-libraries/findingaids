@@ -43,15 +43,6 @@ def main(request):
                             context_instance=RequestContext(request))
 
 
-def admin_login(request):
-    """
-    Admin login page.
-
-    
-    """
-    return render_to_response('admin/index.html', context_instance=RequestContext(request))
-
-
 def admin_logout(request):
     """
     Admin Login page.
@@ -59,7 +50,7 @@ def admin_logout(request):
     
     """
     login_url = settings.LOGIN_URL
-    
+    messages.success(request, 'You have logged out of finding aids.')
     return logout_then_login(request)
 
 
