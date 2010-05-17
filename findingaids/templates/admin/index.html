@@ -5,13 +5,11 @@
 {% block content-body %}
   {% if user.is_authenticated %}
     <div>
-      <p>Welcome, {{ user.username }}.</p>
+      <p>Welcome, <strong>{{ user.first_name }} {{ user.last_name }}</strong>. You are now logged into the Finding Aids site.</p>
     </div>  
     <div id="print-links">
       <a href="{{ settings.LOGIN_REDIRECT_URL }}logout">logout</a>
    </div>   
-  {% else %}
-    <p>Welcome, new user. Please log in.</p>
   {% endif %}
   <hr/>
   {% include "admin/_list_files.html" %}
