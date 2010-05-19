@@ -139,7 +139,6 @@ class AdminViewsTest(TestCase):
 
     def test_login_admin(self):
         admin_index = reverse('admin:index')
-
         # Test admin account can login
         self.client.login(**self.admin_credentials)
         response = self.client.get(admin_index)
@@ -159,6 +158,24 @@ class AdminViewsTest(TestCase):
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+
+    def test_logout(self):
+        admin_index = reverse('admin:index')
+        self.client.login(**self.admin_credentials)
+        response = self.client.get(admin_index)
+        self.assertContains(response, 'You are now logged into the Finding Aids site.</p>')
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+        self.client.logout()
+        response = self.client.get('/accounts/login/?next=/admin/')
+        self.assertContains(response, '''<form method="post" action="/accounts/login/">''')
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+
 
 
 class UtilsTest(TestCase):
