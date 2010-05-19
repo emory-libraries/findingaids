@@ -12,6 +12,7 @@ from findingaids.admin.utils import check_ead
 class AdminViewsTest(TestCase):
     fixtures =  ['user']
     admin_credentials = {'username': 'testadmin', 'password': 'secret'}
+    non_existent_credentials = {'username': 'nonexistent', 'password': 'whatever'}
 
     db = ExistDB()
     # create temporary directory with files for testing
@@ -136,20 +137,25 @@ class AdminViewsTest(TestCase):
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
 
-    def test_login(self):
+    def test_login_admin(self):
         admin_index = reverse('admin:index')
 
         # Test admin account can login
         self.client.login(**self.admin_credentials)
         response = self.client.get(admin_index)
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '''You are now logged into the Finding Aids site.</p>''')
         code = response.status_code
+        print response
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
-        
+  
+    def test_login_non_existent(self):
+        admin_index = reverse('admin:index')    
         # Test a none existent account cannot login
-        self.client.login(username='testclient', password='password')
-        response = self.client.get(admin_index)
+        self.client.login(**self.non_existent_credentials)
+        response = self.client.get('/accounts/login/')
+        self.assertContains(response, '''<form method="post" action="/accounts/login/">''')
         self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
