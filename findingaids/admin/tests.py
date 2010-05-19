@@ -8,11 +8,11 @@ from django.core.urlresolvers import reverse
 from eulcore.django.existdb.db import ExistDB
 from findingaids.admin.views import _get_recent_xml_files
 from findingaids.admin.utils import check_ead
+from django.contrib.auth.models import User
 
 class AdminViewsTest(TestCase):
     fixtures =  ['user']
     admin_credentials = {'username': 'testadmin', 'password': 'secret'}
-    non_existent_credentials = {'username': 'nonexistent', 'password': 'whatever'}
 
     db = ExistDB()
     # create temporary directory with files for testing
@@ -140,42 +140,55 @@ class AdminViewsTest(TestCase):
     def test_login_admin(self):
         admin_index = reverse('admin:index')
         # Test admin account can login
-        self.client.login(**self.admin_credentials)
-        response = self.client.get(admin_index)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '''You are now logged into the Finding Aids site.</p>''')
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
-  
-    def test_login_non_existent(self):
-        admin_index = reverse('admin:index')    
-        # Test a none existent account cannot login
-        self.client.login(**self.non_existent_credentials)
-        response = self.client.get('/accounts/login/')
-        self.assertContains(response, '''<form method="post" action="/accounts/login/">''')
-        self.assertEqual(response.status_code, 200)
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
-
-    def test_logout(self):
-        admin_index = reverse('admin:index')
-        self.client.login(**self.admin_credentials)
-        response = self.client.get(admin_index)
+        response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
+        response = self.client.get('/admin/')
         self.assertContains(response, 'You are now logged into the Finding Aids site.</p>')
         self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
-        self.client.logout()
-        response = self.client.get('/accounts/login/?next=/admin/')
-        self.assertContains(response, '''<form method="post" action="/accounts/login/">''')
+        
+    def test_login_staff(self):
+        admin_index = reverse('admin:index')
+        staff = User.objects.create_user('staffmember', 'staff.member@emory.edu', 'staffpassword')
+        staff.is_staff = True
+        staff.save()
+        # Test staff account can login
+        response = self.client.post('/accounts/login/', {'username': 'staffmember', 'password': 'staffpassword'})
+        response = self.client.get('/admin/')
+        self.assertContains(response, 'You are now logged into the Finding Aids site.</p>')
         self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
 
+    def test_login_non_existent(self):
+        admin_index = reverse('admin:index')    
+        # Test a none existent account cannot login
+        response = self.client.post('/accounts/login/', {'username': 'non_existent', 'password': 'whatever'})
+        self.assertContains(response, '''<p>Your username and password didn't match. Please try again.</p>''')
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+        
+    def test_logout(self):
+        admin_index = reverse('admin:index')
+        # Test admin account can login
+        response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
+        response = self.client.get('/admin/')
+        self.assertContains(response, 'You are now logged into the Finding Aids site.</p>')
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+        response = self.client.get('/admin/logout')
+        response = self.client.get('/accounts/login/')
+        self.assertContains(response, '<li class="success">You have logged out of finding aids.</li>')
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+        
 
 
 class UtilsTest(TestCase):
