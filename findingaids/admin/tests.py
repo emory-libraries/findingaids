@@ -146,7 +146,6 @@ class AdminViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '''You are now logged into the Finding Aids site.</p>''')
         code = response.status_code
-        print response
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
   
