@@ -1,7 +1,7 @@
 import os
 import glob
 from datetime import datetime
-
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -9,6 +9,8 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
+from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.models import User, Group
 from django.contrib import messages
 
 
@@ -47,6 +49,7 @@ def admin_logout(request):
     """
     Admin Login page.
 
+    Logout user and redirect to admin login page.
     
     """
     login_url = settings.LOGIN_URL
@@ -54,7 +57,31 @@ def admin_logout(request):
     return logout_then_login(request)
 
 
+def admin_list_staff(request):
+    
+    users = User.objects.all()
+    print users
 
+    return render_to_response('admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
+
+
+def admin_accounts(request):
+    if request.user.is_superuser:
+        if request.method == 'POST': # If the form has been submitted...
+            userForm = UserChangeForm(request.POST) # A form bound to the POST data
+            if userForm.is_valid(): # All validation rules pass
+                # Process the data in form.cleaned_data
+                # ...
+                return HttpResponseRedirect('/admin/') # Redirect after PO
+        else:
+            userForm = UserChangeForm()
+          
+        return render_to_response('admin/account-management.html', {'form' : userForm,}, context_instance=RequestContext(request))
+    else:
+        messages.warning(request, 'You do not have permission to view this page.')
+        return HttpResponseRedirect("/admin/")
+        
+        
 @login_required
 def publish(request):
     """
