@@ -1,0 +1,43 @@
+{% extends "site_base.html" %}
+{% block page-subtitle %}: Administration Page {% endblock %}
+{% block content-title %}Current users{% endblock %}
+
+{% block content-body %}
+{% if user.is_authenticated %}
+    <div id="print-links">
+        <a href="/admin/logout">logout</a>
+    </div>
+    <div>
+      <p>Welcome, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong>. You are now logged into the Finding Aids site.</p>
+    </div>  
+    {% endif %}
+    <table>
+        <tr>
+            <td><h2>First Name</h2></td>
+            <td><h2>Lastname</h2></td>
+            <td><h2>User</h2></td>
+            <td><h2>Account</h2></td>
+            <td><h2>Admin</h2></td>
+            <td><h2>Edit</h2></td>
+        </tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.first_name }}</td>
+            <td>{{ user.last_name }}</td>
+            <td>{{ user.username }}</td>
+            {% if user.password == "!" %}
+                <td>ldap</td>
+            {% else %}
+                <td>Local</td>
+            {% endif %}
+            {% if user.is_superuser %}
+            <td><img src="{{ MEDIA_URL }}/admin/true.gif" alt="True" Icon style="border:0px solid" /></td>
+            {% else %}
+            <td><img src="{{ MEDIA_URL }}/admin/false.gif" alt="False" Icon style="border:0px solid" /></td>
+            {% endif %}
+            <td><a href="/admin/accounts/user/2/"><img src="{{ MEDIA_URL }}/admin/edit.gif" alt="Edit" Icon style="border:0px solid" /></a>change</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <hr/>
+{% endblock %}
