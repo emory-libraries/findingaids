@@ -105,6 +105,11 @@ def publish(request):
         # for now, just using main admin page
         return main(request)
 
+@login_required
+def clean(request, filename):
+    pass
+
+
 
 def _get_recent_xml_files(dir, num=30):
     "Return recently modified xml files from the specified directory."

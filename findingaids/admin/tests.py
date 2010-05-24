@@ -86,6 +86,9 @@ class AdminViewsTest(TestCase):
         self.assertContains(response, '<form action="%s" method="post"' % publish_url)
         self.assertContains(response, '<button type="submit" name="filename" value="%s" '
                 % os.path.basename(self.tmpfiles[0].name))
+        # file list contains link to clean documents
+        clean_url = reverse('admin:clean-ead', args=[os.path.basename(self.tmpfiles[0].name)])
+        self.assertContains(response, '<a href="%s">clean</a>' % clean_url)
 
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
