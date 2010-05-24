@@ -7,9 +7,9 @@
     <div id="print-links">
         <a href="/admin/logout">logout</a>
     </div>
-    <div>
-      <p>Welcome, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong>. You are now logged into the Finding Aids site.</p>
-    </div>  
+  <div>
+    <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong>.</p>
+  </div>  
     {% endif %}
     <table>
         <tr>

@@ -110,6 +110,10 @@ div#print-links a {
     text-decoration: none;
 }
 
+a#no-decoration {
+    text-decoration: none;
+}
+
 .ead-bold {
     font-weight: bold;
 }
