@@ -115,6 +115,9 @@ LOGIN_REDIRECT_URL="/admin/"
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
+# NOTE: using memory cache for now for simplicity
+CACHE_BACKEND = 'locmem://'
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',

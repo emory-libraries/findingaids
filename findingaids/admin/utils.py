@@ -11,8 +11,7 @@ def check_ead(filename, dbpath):
      - DTD valid (file must include doctype declaration)
      - eadid matches expected pattern (filename without .xml)
      - check that eadid is unique within the database (only present once, in the file that will be updated)
-     - series and index ids are present
-     
+     - series and index ids are present     
 
     :param filename: full path to the EAD file to be checked
     :param dbpath: full path within eXist where the document will be saved
@@ -42,6 +41,19 @@ def check_ead(filename, dbpath):
                 errors.append("Database contains eadid '%s' in a different document (%s)"
                     % (ead.eadid, fa[0].document_name))            
 
+    errors.extend(check_eadxml(ead))
+
+    return errors
+
+def check_eadxml(ead):
+    """Sanity checks specific to the EAD xml, independent of file or eXist.
+    Currently checks that expected ids are set (series, subseries, index).
+
+    :param ead: :class:`FindingAid` ead instance to be checked
+    :rtype: list of errors
+    """
+    errors = []
+
     # check that series ids are set
     if ead.dsc.hasSeries():
         for series in ead.dsc.c:
@@ -52,10 +64,8 @@ def check_ead(filename, dbpath):
         if not index.id:
             errors.append("%(node)s id attribute is not set for %(label)s"
                 % { 'node' : index.dom_node.nodeName, 'label' : index.head })
-    return errors   
-    
-
-
+    return errors
+   
 def _check_series_ids(series):
     # recursive function to check that series and subseries ids are present
     errors = []
@@ -66,4 +76,27 @@ def _check_series_ids(series):
         for c in series.c:
             errors.extend(_check_series_ids(c))
     return errors
+
+
+def clean_ead(ead, filename):
+    # eadid should be document name without .xml extension
+    ead.eadid = os.path.basename(filename).replace('.xml', '')
+    # set series ids
+    if ead.dsc.hasSeries():
+        for series in ead.dsc.c:
+            _set_series_ids(series, ead.eadid)
+    # set index ids 
+    for i, index in enumerate(ead.archdesc.index):
+        # generate index ids based on eadid and index number (starting at 1, not 0)
+        index.id = "%s_index%s" % (ead.eadid, i+1)
+
+    return ead
+
+def _set_series_ids(series, eadid):
+    # recursive function to set series and subseries ids
+    series.id = "%s_%s" % (eadid, series.did.unitid.replace(' ', '').lower())
+    if series.hasSubseries():
+        for c in series.c:
+            _set_series_ids(c, eadid)
+
     

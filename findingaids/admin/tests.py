@@ -1,6 +1,8 @@
 import os
 import tempfile
 from time import sleep
+from shutil import rmtree
+
 from django.test import Client
 from django.conf import settings
 from django.test import TestCase
@@ -15,19 +17,22 @@ class AdminViewsTest(TestCase):
     admin_credentials = {'username': 'testadmin', 'password': 'secret'}
 
     db = ExistDB()
-    # create temporary directory with files for testing
-    # (unchanged by tests, so only doing once here instead of in setup)
-    tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
-    tmpfiles = []
-    for num in ['first', 'second', 'third']:
-        tmpfiles.append(tempfile.NamedTemporaryFile(suffix='.xml', prefix=num+'_', dir=tmpdir))
-        sleep(1)        # ensure modification times are different
-    # add a non-xml file
-    nonxml_tmpfile = tempfile.NamedTemporaryFile(suffix='.txt', prefix='nonxml', dir=tmpdir)
 
     def setUp(self):
         self.client = Client()
-        # tmp dir for testing source ead files
+
+        # create temporary directory with files for testing
+        # - unchanged by tests, so only doing once here instead of in setup
+        # - turning off auto-delete so directory and files can be easily cleaned up
+        self.tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
+        self.tmpfiles = []
+        for num in ['first', 'second', 'third']:
+            self.tmpfiles.append(tempfile.NamedTemporaryFile(suffix='.xml',
+                    prefix=num+'_', dir=self.tmpdir, delete=False))
+            sleep(1)        # ensure modification times are different
+        # add a non-xml file
+        self.nonxml_tmpfile = tempfile.NamedTemporaryFile(suffix='.txt',
+                    prefix='nonxml', dir=self.tmpdir, delete=False)
         
         # temporarily override setting for testing
         if hasattr(settings, 'FINDINGAID_EAD_SOURCE'):
@@ -37,6 +42,9 @@ class AdminViewsTest(TestCase):
     def tearDown(self):
         if hasattr(self, '_stored_ead_src'):
             settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
+            
+        # clean up temp files & dir
+        rmtree(self.tmpdir)
 
     def test_get_recent_xml_files(self):        
         recent_xml = _get_recent_xml_files(self.tmpdir)
@@ -87,8 +95,8 @@ class AdminViewsTest(TestCase):
         self.assertContains(response, '<button type="submit" name="filename" value="%s" '
                 % os.path.basename(self.tmpfiles[0].name))
         # file list contains link to clean documents
-        clean_url = reverse('admin:clean-ead', args=[os.path.basename(self.tmpfiles[0].name)])
-        self.assertContains(response, '<a href="%s">clean</a>' % clean_url)
+        clean_url = reverse('admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
+        self.assertContains(response, '<a href="%s">CLEAN</a>' % clean_url)
 
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"

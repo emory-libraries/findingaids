@@ -14,7 +14,7 @@
     <tr>
         <td>{{ file }}</td>
         <td><button type="submit" name="filename" value="{{ file }}" >PUBLISH</button></td>
-        <td><a href="{% url admin:clean-ead file %}">clean</a></td>
+        <td><a href="{% url admin:cleaned-ead-about file %}">CLEAN</a></td>
         <td>{{ mtime|date}} ({{ mtime|timesince }} ago)</td>
     </tr>
 {% empty %}
