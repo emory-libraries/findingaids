@@ -18,11 +18,8 @@
 <p><a href="{% url admin:cleaned-ead-diff filename %}" target="_blank">View file differences line by line.</a></p>
 
 <div class="diff">
-{% for c in changes %}    
-    {% spaceless %}
-        <p {% if c|first == "-" %}class="removed"{% endif %}
-          {% if c|first == "+" %}class="added"{% endif %}'>{{ c }}</p>
-    {% endspaceless %}
+{% for c in changes %}        
+  <p {% if c|first == "-" %}class="removed"{% endif %}{% if c|first == "+" %}class="added"{% endif %}>{{ c }}</p>  
 {% endfor %}
 </div>
 

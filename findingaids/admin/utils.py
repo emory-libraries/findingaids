@@ -55,7 +55,7 @@ def check_eadxml(ead):
     errors = []
 
     # check that series ids are set
-    if ead.dsc.hasSeries():
+    if ead.dsc and ead.dsc.hasSeries():
         for series in ead.dsc.c:
             errors.extend(_check_series_ids(series))
 
@@ -79,12 +79,21 @@ def _check_series_ids(series):
 
 
 def clean_ead(ead, filename):
+    """Clean up EAD xml so it is publish-able. Sets the eadid and
+    ids on any series, subseries, and index elements based on filename and series
+    unitid or index number.
+
+    :param ead: :class:`FindingAid` ead instance to be cleaned
+    :param string: filename of the EAD file (used as base eadid)
+    :rtype: :class:`FindingAid`
+    """
+
     # eadid should be document name without .xml extension
     ead.eadid = os.path.basename(filename).replace('.xml', '')
     # set series ids
-    if ead.dsc.hasSeries():
-        for series in ead.dsc.c:
-            _set_series_ids(series, ead.eadid)
+    if ead.dsc and ead.dsc.hasSeries():
+        for i, series in enumerate(ead.dsc.c):
+            _set_series_ids(series, ead.eadid, i)
     # set index ids 
     for i, index in enumerate(ead.archdesc.index):
         # generate index ids based on eadid and index number (starting at 1, not 0)
@@ -92,11 +101,15 @@ def clean_ead(ead, filename):
 
     return ead
 
-def _set_series_ids(series, eadid):
+def _set_series_ids(series, eadid, position):
     # recursive function to set series and subseries ids
-    series.id = "%s_%s" % (eadid, series.did.unitid.replace(' ', '').lower())
+    if series.did.unitid:
+        series.id = "%s_%s" % (eadid, series.did.unitid.replace(' ', '').lower())
+    else:
+        # fall-back id: generate from c-level (series, subseries) and position in the series
+        series.id = "%s_%s%s" % (eadid, series.level.lower(), position + 1)
     if series.hasSubseries():
-        for c in series.c:
-            _set_series_ids(c, eadid)
+        for j, c in enumerate(series.c):
+            _set_series_ids(c, eadid, j)
 
     

@@ -136,7 +136,8 @@ def publish(request):
         return main(request)
 
 @login_required
-@cache_page(60 * 2)        # cache this view and use it as source for cleaned diff/summary views
+@cache_page(60)        # cache this view and use it as source for cleaned diff/summary views
+# FIXME: what is a reasonable duration?
 def cleaned_eadxml(request, filename):
     fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
     ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?
@@ -169,7 +170,7 @@ def cleaned_ead(request, filename, mode):
         errors = check_eadxml(ead)
         changes = list(difflib.unified_diff(original_xml.split('\n'), cleaned_xml.split('\n')))
         if not changes:
-            messages.info(request, 'No changes needed to clean <b>%s</b>.' % filename)
+            messages.info(request, 'No changes made to <b>%s</b>; EAD is already clean.' % filename)
             # redirect to main admin page with code 303 (See Other)
             response = HttpResponse(status=303)
             response['Location'] = reverse('admin:index')
