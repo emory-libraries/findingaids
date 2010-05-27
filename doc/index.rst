@@ -11,8 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 2
 
-   findingaids
    readme
+   findingaids
 
 
 Indices and tables

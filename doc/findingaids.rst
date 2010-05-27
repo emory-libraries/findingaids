@@ -42,19 +42,35 @@ Views
 .. automodule:: findingaids.fa.views
    :members:
 
-.. todo:: use more specific exceptions when object is not found in exist
-
 
 Custom Template Filters
 -----------------------
 .. automodule:: findingaids.fa.templatetags.ead
    :members:
 
-Custom admin commands
+
+Admin Site
+----------
+
+The admin section of the finding aids site is designed to allow archivists to
+manage the finding aids content.
+
+
+Admin Views
+^^^^^^^^^^^
+.. automodule:: findingaids.admin.views
+   :members:
+
+Admin Functions
+^^^^^^^^^^^^^^^
+.. automodule:: findingaids.admin.utils
+   :members:
+
+
+Custom manage commands
 ---------------------
 The following management commands are available.
     For more details on these commands, use manage.py <command> help
 
  * **check_eadids** - compares ead ids against a predefined regular expression
-   
-   
+

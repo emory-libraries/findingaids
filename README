@@ -23,6 +23,7 @@ information on existdb index commands::
 
 For a first-time install, you will should run these two steps: 
 (Note that if all finding aids are loaded, the reindex step can take quite a while)
+
      $ ./manage.py existdb_index load
      $ ./manage.py existdb_reindex  
 

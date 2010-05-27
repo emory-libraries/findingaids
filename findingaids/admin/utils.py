@@ -15,7 +15,8 @@ def check_ead(filename, dbpath):
 
     :param filename: full path to the EAD file to be checked
     :param dbpath: full path within eXist where the document will be saved
-    :rtype list: list of all errors found
+    :returns: list of all errors found
+    :rtype: list
     """
     errors = []
     try:
@@ -49,8 +50,9 @@ def check_eadxml(ead):
     """Sanity checks specific to the EAD xml, independent of file or eXist.
     Currently checks that expected ids are set (series, subseries, index).
 
-    :param ead: :class:`FindingAid` ead instance to be checked
-    :rtype: list of errors
+    :param ead: :class:`~findingaids.fa.models.FindingAid` ead instance to be checked
+    :returns: list of all errors found
+    :rtype: list
     """
     errors = []
 
@@ -79,13 +81,13 @@ def _check_series_ids(series):
 
 
 def clean_ead(ead, filename):
-    """Clean up EAD xml so it is publish-able. Sets the eadid and
+    """Clean up EAD xml so it can be published. Sets the eadid and
     ids on any series, subseries, and index elements based on filename and series
     unitid or index number.
 
-    :param ead: :class:`FindingAid` ead instance to be cleaned
+    :param ead: :class:`~findingaids.fa.models.FindingAid` ead instance to be cleaned
     :param string: filename of the EAD file (used as base eadid)
-    :rtype: :class:`FindingAid`
+    :rtype: :class:`~findingaids.fa.models.FindingAid`
     """
 
     # eadid should be document name without .xml extension
