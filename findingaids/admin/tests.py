@@ -7,12 +7,13 @@ from django.test import Client
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator
 
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
-from findingaids.admin.views import _get_recent_xml_files
+from findingaids.admin.views import _get_recent_xml_files, _pages_to_show
 from findingaids.admin.utils import check_ead, clean_ead
 from findingaids.fa.models import FindingAid
 
@@ -50,21 +51,6 @@ class AdminViewsTest(TestCase):
         # clean up temp files & dir
         rmtree(self.tmpdir)
 
-    def test_get_recent_xml_files(self):        
-        recent_xml = _get_recent_xml_files(self.tmpdir)
-        filenames = [file for file, mtime in recent_xml]
-        self.assertEqual(3, len(recent_xml))
-        # should be in reverse order - last created first
-        self.assertEqual(filenames[0], os.path.basename(self.tmpfiles[2].name))
-        self.assertEqual(filenames[1], os.path.basename(self.tmpfiles[1].name))
-        self.assertEqual(filenames[2], os.path.basename(self.tmpfiles[0].name))
-        # non-xml file not included
-        self.assert_(os.path.basename(self.nonxml_tmpfile.name) not in filenames)
-
-        # restrict just to two - confirm only 2 are returned
-        recent_xml = _get_recent_xml_files(self.tmpdir, 2)
-        self.assertEqual(2, len(recent_xml))
-
     def test_recent_files(self):
         admin_index = reverse('admin:index')
         # note: recent files list is *currently* displayed on main admin page
@@ -87,10 +73,12 @@ class AdminViewsTest(TestCase):
         self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe'
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin'
                              % (expected, code, admin_index))
-        self.assertEqual(3, len(response.context['files']))
-        self.assert_('error' not in response.context)
+        self.assertEqual(3, len(response.context['files'].object_list))
+        self.assert_(response.context['show_pages'], "file list view includes list of pages to show")
+        self.assertEqual(None, response.context['error'],
+                "correctly configured file list view has no error messages")
         self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
         self.assertContains(response, os.path.basename(self.tmpfiles[2].name))
         # file list contains buttons to publish documents
@@ -101,12 +89,15 @@ class AdminViewsTest(TestCase):
         # file list contains link to clean documents
         clean_url = reverse('admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
         self.assertContains(response, '<a href="%s">CLEAN</a>' % clean_url)
+        # contains pagination
+        self.assertContains(response, 'Pages: 1')
+        print response
 
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
         response = self.client.get(admin_index)
         self.assert_("check config file" in response.context['error'])
-        self.assertEqual(0, len(response.context['files']))
+        self.assertEqual(0, len(response.context['files'].object_list))
 
     def test_publish(self):
         publish_url = reverse('admin:publish-ead')
@@ -269,6 +260,45 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (clean EAD)'
                              % (expected, code, cleaned_summary))
         self.assertContains(response, "No changes made to <b>%s</b>" % filename)
+
+    # tests for view helper functions
+
+    def test_get_recent_xml_files(self):
+        recent_xml = _get_recent_xml_files(self.tmpdir)
+        filenames = [file for file, mtime in recent_xml]
+        self.assertEqual(3, len(recent_xml))
+        # should be in reverse order - last created first
+        self.assertEqual(filenames[0], os.path.basename(self.tmpfiles[2].name))
+        self.assertEqual(filenames[1], os.path.basename(self.tmpfiles[1].name))
+        self.assertEqual(filenames[2], os.path.basename(self.tmpfiles[0].name))
+        # non-xml file not included
+        self.assert_(os.path.basename(self.nonxml_tmpfile.name) not in filenames)
+
+
+    def test_pages_to_show(self):
+        paginator = Paginator(range(300), 10)
+        # range of pages at the beginning
+        pages = _pages_to_show(paginator, 1)
+        self.assertEqual(7, len(pages), "show pages returns 7 items for first page")
+        self.assert_(1 in pages, "show pages includes 1 for first page")
+        self.assert_(6 in pages, "show pages includes 6 for first page")
+
+        # range of pages in the middle
+        pages = _pages_to_show(paginator, 15)
+        self.assertEqual(7, len(pages), "show pages returns 7 items for middle of page result")
+        self.assert_(15 in pages, "show pages includes current page for middle of page result")
+        self.assert_(11 in pages,
+            "show pages includes third page before current page for middle of page result")
+        self.assert_(18 in pages,
+            "show pages includes third page after current page for middle of page result")
+
+        # range of pages at the end
+        pages = _pages_to_show(paginator, 30)
+        self.assertEqual(7, len(pages), "show pages returns 7 items for last page")
+        self.assert_(30 in pages, "show pages includes last page for last page of results")
+        self.assert_(23 in pages,
+            "show pages includes 7 pages before last page for last page of results")
+
 
 class UtilsTest(TestCase):
     db = ExistDB()

@@ -6,6 +6,7 @@ import difflib
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.conf import settings
@@ -33,17 +34,34 @@ def main(request):
     or published.
     """
     recent_files = []
+    show_pages = []
     if not hasattr(settings, 'FINDINGAID_EAD_SOURCE'):
         error = "Please configure EAD source directory in local settings."
     else:
         dir = settings.FINDINGAID_EAD_SOURCE
         if os.access(dir, os.F_OK | os.R_OK):
-            recent_files = _get_recent_xml_files(dir)
+            recent_files = _get_recent_xml_files(dir)            
             error = None
+            paginator = Paginator(recent_files, 30, orphans=5)
+            try:
+                page = int(request.GET.get('page', '1'))
+            except ValueError:
+                page = 1
+
+            show_pages = _pages_to_show(paginator, page)
+            
+             # If page request (9999) is out of range, deliver last page of results.
+            try:
+                recent_files = paginator.page(page)
+            except (EmptyPage, InvalidPage):
+                recent_files = paginator.page(paginator.num_pages)
+
+
         else:
             error = "EAD source directory '%s' does not exist or is not readable; please check config file." % dir
         
     return render_to_response('admin/index.html', {'files' : recent_files,
+                            'show_pages' : show_pages,
                             'error' : error},
                             context_instance=RequestContext(request))
 
@@ -179,7 +197,7 @@ def cleaned_ead(request, filename, mode):
                                 'changes' : changes, 'errors' : errors},
                                 context_instance=RequestContext(request))
 
-def _get_recent_xml_files(dir, num=30):
+def _get_recent_xml_files(dir):
     "Return recently modified xml files from the specified directory."
     # get all xml files in the specified directory
     filenames = glob.glob(os.path.join(dir, '*.xml'))
@@ -187,6 +205,25 @@ def _get_recent_xml_files(dir, num=30):
     files = [ (os.path.getmtime(file), os.path.basename(file)) for file in filenames ]
     # reverse sort - most recently modified first
     files.sort(reverse=True)
-    # convert modified time into a datetime object (only process and return the requested number)
-    recent_files = [ (filename, datetime.utcfromtimestamp(mtime)) for mtime, filename in files[0:num] ]
+    # convert modified time into a datetime object
+    recent_files = [ (filename, datetime.utcfromtimestamp(mtime)) for mtime, filename in files ]
     return recent_files
+
+def _pages_to_show(paginator, page):
+    # generate a list of pages to show around the current page
+    # show 3 numbers on either side of current number, or more if close to end/beginning
+    show_pages = []
+    if page != 1:        
+        before = 4
+        if page >= (paginator.num_pages - 3):   # current page is within 3 of end
+            # increase number to show before current page based on distance to end
+            before += (3 - (paginator.num_pages - page))
+        for i in range(before, 1, -1):
+            if (page - i) >= 1:
+                show_pages.append(page - i)
+    # show up to 3 to 7 numbers after the current number, depending on how many we already have
+    for i in range(7 - len(show_pages)):
+        if (page + i) <= paginator.num_pages:
+            show_pages.append(page + i)
+
+    return show_pages
