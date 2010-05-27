@@ -1,11 +1,15 @@
 from os import path
 from types import ListType
+from lxml import etree
 from django.test import Client, TestCase as DjangoTestCase
-from eulcore.xmlmap  import load_xmlobject_from_file
+
+from eulcore.xmlmap  import load_xmlobject_from_file, XmlObject
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
+
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
+from findingaids.fa.templatetags.ead import format_ead
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
@@ -598,3 +602,52 @@ class FullTextFaViewsTest(TestCase):
         response = self.client.get('/search/', { 'keywords' : 'nonexistentshouldmatchnothing'})
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, "No finding aids matched")
+
+
+class FormatEadTestCase(DjangoTestCase):
+# test ead_format template tag explicitly
+    ITALICS = """<titleproper><emph render="italic">Pitts v. Freeman</emph> school desegregation case files,
+1969-1993</titleproper>"""
+    BOLD = """<titleproper><emph render="bold">Pitts v. Freeman</emph> school desegregation case files,
+1969-1993</titleproper>"""
+    TITLE = """<abstract>A submission for the magazine <title>The Smart Set</title> from
+    Irish writer Oliver St. John Gogarty to author Ernest Augustus Boyd.</abstract>"""
+    TITLE_EMPH = """<bibref><emph>Biographical source:</emph> "Shaw, George Bernard."
+    <title>Contemporary Authors Online</title>, Gale, 2003</bibref>"""
+    NESTED = """<abstract>magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>"""
+
+    def setUp(self):
+        self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
+        
+    def test_italics(self):
+        self.content.dom_node = etree.fromstring(self.ITALICS)
+        format = format_ead(self.content)
+        self.assert_('<span class="ead-italic">Pitts v. Freeman</span> school desegregation' in format,
+            "render italic converted correctly to span class ead-italic")
+
+    def test_bold(self):
+        self.content.dom_node = etree.fromstring(self.BOLD)
+        format = format_ead(self.content)
+        self.assert_('<span class="ead-bold">Pitts v. Freeman</span> school desegregation' in format,
+            "render bold converted correctly to span class ead-bold")
+
+    def test_title(self):
+        self.content.dom_node  = etree.fromstring(self.TITLE)
+        format = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The Smart Set</span> from' in format,
+            "title tag converted correctly to span class ead-title")
+
+    def test_title_emph(self):
+        self.content.dom_node = etree.fromstring(self.TITLE_EMPH)
+        format = format_ead(self.content)
+        self.assert_('<em>Biographical source:</em> "Shaw, George' in format,
+            "emph tag rendered correctly in section with title")
+        self.assert_('<span class="ead-title">Contemporary Authors Online</span>, Gale' in format,
+            "title rendered correctly in sectino with emph tag")
+
+    def test_nested(self):
+        self.content.dom_node = etree.fromstring(self.NESTED)
+        format = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The "Smart" Set</span>...' in format,
+            "nested format rendered correctly")
+        

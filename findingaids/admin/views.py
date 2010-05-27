@@ -41,25 +41,22 @@ def main(request):
         dir = settings.FINDINGAID_EAD_SOURCE
         if os.access(dir, os.F_OK | os.R_OK):
             recent_files = _get_recent_xml_files(dir)            
-            error = None
-            paginator = Paginator(recent_files, 30, orphans=5)
-            try:
-                page = int(request.GET.get('page', '1'))
-            except ValueError:
-                page = 1
-
-            show_pages = _pages_to_show(paginator, page)
-            
-             # If page request (9999) is out of range, deliver last page of results.
-            try:
-                recent_files = paginator.page(page)
-            except (EmptyPage, InvalidPage):
-                recent_files = paginator.page(paginator.num_pages)
-
-
+            error = None        
         else:
             error = "EAD source directory '%s' does not exist or is not readable; please check config file." % dir
-        
+
+    paginator = Paginator(recent_files, 30, orphans=5)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    show_pages = _pages_to_show(paginator, page)
+    # If page request (9999) is out of range, deliver last page of results.
+    try:
+        recent_files = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        recent_files = paginator.page(paginator.num_pages)
+
     return render_to_response('admin/index.html', {'files' : recent_files,
                             'show_pages' : show_pages,
                             'error' : error},

@@ -90,8 +90,8 @@ class AdminViewsTest(TestCase):
         clean_url = reverse('admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
         self.assertContains(response, '<a href="%s">CLEAN</a>' % clean_url)
         # contains pagination
-        self.assertContains(response, 'Pages: 1')
-        print response
+        self.assertPattern('Pages: \s*1', response.content)
+
 
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
@@ -136,7 +136,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
                              % (expected, code, publish_url))
         self.assertContains(response, "Could not publish")
-        self.assertContains(response, "not declared")   # DTD validation error
+        self.assertContains(response, "No declaration for attribute invalid")   # DTD validation error
         self.assertContains(response, "series c01 id attribute is not set")
         self.assertContains(response, "index id attribute is not set")
         docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield588_invalid.xml')
@@ -239,9 +239,11 @@ class AdminViewsTest(TestCase):
         self.assertEqual(response['Content-Type'], expected, "Expected '%s' but returned '%s' for %s mimetype" % \
                         (expected, response['Content-Type'], cleaned_xml))
         self.assertEqual(response['Content-Disposition'], "attachment; filename=%s" % filename)
+        self.assertContains(response, "<!DOCTYPE ead PUBLIC",
+                    msg_prefix="response does not lose doctype declaration from original xml")
         self.assertContains(response, 'hartsfield558</eadid>')
-        self.assertContains(response, '<c01 id="hartsfield558_series1"')
-        self.assertContains(response, '<c02 id="hartsfield558_subseries6.1"')
+        self.assertContains(response, '<c01 level="series" id="hartsfield558_series1"')
+        self.assertContains(response, '<c02 level="subseries" id="hartsfield558_subseries6.1"')
         self.assertContains(response, '<index id="hartsfield558_index1">')
 
         # clean an ead that doesn't need any changes
@@ -314,7 +316,7 @@ class UtilsTest(TestCase):
         errors = check_ead(os.path.join(settings.BASE_DIR, 'admin', 'fixtures', 'hartsfield558_invalid.xml'),
                 dbpath)
         self.assertNotEqual(0, len(errors))
-        self.assert_("Attribute 'invalid' not declared" in errors[0])   # validation error
+        self.assert_("No declaration for attribute invalid" in str(errors[0]))   # validation error
         self.assert_("eadid 'hartsfield558.xml' does not match expected value" in errors[1])
         self.assert_("series c01 id attribute is not set for Series 1" in errors[2])
         self.assert_("subseries c02 id attribute is not set for Subseries 6.1" in errors[3])

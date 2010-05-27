@@ -216,28 +216,28 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url):
     if url_ids is None:
         if not (series.ead and series.ead.eadid):
             raise Exception("Cannot construct subseries links without eadid for %s element %s"
-                        % (series.dom_node.nodeName, series.id))
+                        % (series.dom_node.tag, series.id))
 
         url_ids = [series.ead.eadid]
         # if c02/c03, check to ensure we have enough information to generate the correct link
-        if series.dom_node.nodeName in ['c02', 'c03']:
+        if series.dom_node.tag in ['c02', 'c03']:
             # if initial series passed in is c02 or c03, add c01 series id to url ids before current series id
             if hasattr(series, 'series') and series.series:
                 url_ids.append(series.series.id)
             else:
                 raise Exception("Cannot construct subseries links without c01 series id for %s element %s"
-                        % (series.dom_node.nodeName, series.id))
+                        % (series.dom_node.tag, series.id))
 
-            if series.dom_node.nodeName == 'c03':
+            if series.dom_node.tag == 'c03':
                 # if initial series passed in is c03, add c02 series id to url ids before current series id
                 if hasattr(series, 'subseries') and series.subseries:
                     url_ids.append(series.subseries.id)
                 else:
                     raise Exception("Cannot construct subseries links without c02 subseries id for %s element %s"
-                        % (series.dom_node.nodeName, series.id))
+                        % (series.dom_node.tag, series.id))
 
         #  current series id
-        if series.dom_node.nodeName in ['c01', 'c02', 'c03']:
+        if series.dom_node.tag in ['c01', 'c02', 'c03']:
             url_ids.append(series.id)
         
     links = []

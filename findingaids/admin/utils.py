@@ -1,5 +1,5 @@
 import os
-from Ft.Xml import ReaderException
+from lxml.etree import XMLSyntaxError
 from eulcore.xmlmap.core import load_xmlobject_from_file
 from findingaids.fa.models import FindingAid
 
@@ -21,7 +21,7 @@ def check_ead(filename, dbpath):
     errors = []
     try:
         ead = load_xmlobject_from_file(filename, FindingAid, validate=True)
-    except ReaderException, e:
+    except XMLSyntaxError, e:
         errors.append(e)
         # if not dtd-valid, load without validation to do additional checking
         ead = load_xmlobject_from_file(filename, FindingAid, validate=False)
@@ -65,7 +65,7 @@ def check_eadxml(ead):
     for index in ead.archdesc.index:
         if not index.id:
             errors.append("%(node)s id attribute is not set for %(label)s"
-                % { 'node' : index.dom_node.nodeName, 'label' : index.head })
+                % { 'node' : index.dom_node.tag, 'label' : index.head })
     return errors
    
 def _check_series_ids(series):
@@ -73,7 +73,7 @@ def _check_series_ids(series):
     errors = []
     if not series.id:
         errors.append("%(level)s %(node)s id attribute is not set for %(label)s"
-                % { 'node' : series.dom_node.nodeName, 'level' : series.level, 'label' : series.display_label() })
+                % { 'node' : series.dom_node.tag, 'level' : series.level, 'label' : series.display_label() })
     if series.hasSubseries():
         for c in series.c:
             errors.extend(_check_series_ids(c))
