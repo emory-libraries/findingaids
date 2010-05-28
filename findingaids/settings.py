@@ -119,11 +119,11 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 CACHE_BACKEND = 'locmem://'
 
 INSTALLED_APPS = (
-    #'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    #'django.contrib.sites',
+    'django.contrib.sites',
     'django.contrib.messages',
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
