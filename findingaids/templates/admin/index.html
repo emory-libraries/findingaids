@@ -9,13 +9,13 @@
   </div>
   <div>
     <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong>.</p>
-  </div>  
+  </div>
   <hr/>
   {% endif %}
   {% if user.is_superuser %}
   <div id="record_list">
       <h2>Account Management</h2>
-      <p>You can manage accounts <a id="no-decoration" href="{% url admin:edit-user %}">here.</a></p>
+      <p>You can manage accounts <a id="no-decoration" href="{% url admin:list-staff %}">here.</a></p>
   </div>
   {% endif %}
   {% include "admin/_list_files.html" %}

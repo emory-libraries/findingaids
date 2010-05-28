@@ -6,7 +6,7 @@
 
   {% if user.is_authenticated %}
         <div id="print-links">
-      <a href="/admin/logout">logout</a>
+      <a href="{% url admin:logout %}">logout</a>
    </div>
     <div>
       <p>Please edit the user settings...</p>
