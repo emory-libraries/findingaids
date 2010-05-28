@@ -148,7 +148,7 @@ class AdminViewsTest(TestCase):
         # Test admin account can login
         response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
         response = self.client.get('/admin/')
-        self.assertContains(response, 'You are now logged into the Finding Aids site.</p>')
+        self.assertContains(response, '<p>You are logged in as,')
         self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
@@ -162,7 +162,7 @@ class AdminViewsTest(TestCase):
         # Test staff account can login
         response = self.client.post('/accounts/login/', {'username': 'staffmember', 'password': 'staffpassword'})
         response = self.client.get('/admin/')
-        self.assertContains(response, 'You are now logged into the Finding Aids site.</p>')
+        self.assertContains(response, '<p>You are logged in as,')
         self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
@@ -183,7 +183,7 @@ class AdminViewsTest(TestCase):
         # Test admin account can login
         response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
         response = self.client.get('/admin/')
-        self.assertContains(response, 'You are now logged into the Finding Aids site.</p>')
+        self.assertContains(response, '<p>You are logged in as,')
         self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200

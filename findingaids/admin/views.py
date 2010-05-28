@@ -63,7 +63,7 @@ def main(request):
                             context_instance=RequestContext(request))
 
 
-def admin_logout(request):
+def logout(request):
     """
     Admin Login page.
 
@@ -75,7 +75,7 @@ def admin_logout(request):
     return logout_then_login(request)
 
 
-def admin_list_staff(request):
+def list_staff(request):
     
     users = User.objects.all()
     print users
@@ -83,7 +83,7 @@ def admin_list_staff(request):
     return render_to_response('admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
 
 
-def admin_accounts(request):
+def edit_user(request):
     if request.user.is_superuser:
         if request.method == 'POST': # If the form has been submitted...
             userForm = UserChangeForm(request.POST) # A form bound to the POST data
