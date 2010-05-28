@@ -43,7 +43,7 @@ def format_ead(value, autoescape=None):
     if value is None:
         parts = []
     elif hasattr(value, 'dom_node'):
-        parts = node_parts(value.dom_node, escape)
+        parts = node_parts(value.dom_node, escape, include_tail=False)
     else:
         parts = [ escape(unicode(value)) ]
     
@@ -68,7 +68,7 @@ def format_ead_children(value, autoescape=None):
     node = getattr(value, 'dom_node', None)
     children = getattr(node, 'childNodes', ())
     parts = ( part for child in children
-                   for part in node_parts(child, escape) )
+                   for part in node_parts(child, escape, include_tail=False) )
     result = ''.join(parts)
     return mark_safe(result)
 format_ead_children.needs_autoescape = True
@@ -80,53 +80,56 @@ _RENDER_ITALIC = etree.XPath('@render="italic"')
 _IS_EMPH = etree.XPath('self::emph')
 _IS_TITLE = etree.XPath('self::title')
 
-def node_parts(node, escape):
+def node_parts(node, escape, include_tail):
     """Recursively convert a DOM node to HTML. This function is used
-    internally by :func:`format_ead`. You probably that function, not this
-    one.
+    internally by :func:`format_ead`. You probably want that function, not
+    this one.
     
     This function returns an iterable over unicode chunks intended for easy
     joining by :func:`format_ead`.
     """
 
-    if len(node):
-        # if this node contains other nodes, start with a generator expression
-        #to recurse into children, getting the node_parts for each.
-        child_parts = [ part for child in node
-                             for part in node_parts(child, escape)]      
+    # if current node contains text before the first node, pre-pend to list of parts
+    text = node.text and escape(node.text)
         
-        # if current node contains text before the first node, pre-pend to list of parts
-        if node.text:
-            child_parts.insert(0, escape(node.text))
-            
-        # format the current node, and either wrap child parts in appropriate
-        # fenceposts or return them directly.
-        return _format_node(node, child_parts)        
-    else:
-        # element with no child nodes - format and return
-        return _format_node(node, escape(node.text))
+    # if this node contains other nodes, start with a generator expression
+    # to recurse into children, getting the node_parts for each.
+    child_parts = ( part for child in node
+                         for part in node_parts(child, escape, include_tail=True) )
 
-def _format_node(node, contents):
+    tail = include_tail and node.tail and escape(node.tail)
+    
+    # format the current node, and either wrap child parts in appropriate
+    # fenceposts or return them directly.
+    return _format_node(node, text, child_parts, tail)
+
+def _format_node(node, text, contents, tail):
     # format a single node, wrapping any contents, and passing any 'tail' text content
     if _RENDER_DOUBLEQUOTE(node):
-        return _wrap('"', contents, '"', node.tail)
+        return _wrap('"', text, contents, '"', tail)
     elif _RENDER_BOLD(node):
-        return _wrap('<span class="ead-bold">', contents, '</span>', node.tail)
+        return _wrap('<span class="ead-bold">', text, contents, '</span>', tail)
     elif _RENDER_ITALIC(node):
-        return _wrap('<span class="ead-italic">', contents, '</span>', node.tail)
+        return _wrap('<span class="ead-italic">', text, contents, '</span>', tail)
     elif _IS_EMPH(node):
-        return _wrap('<em>', contents, '</em>', node.tail)
+        return _wrap('<em>', text, contents, '</em>', tail)
     elif _IS_TITLE(node):
-        return _wrap('<span class="ead-title">', contents, '</span>', node.tail)
+        return _wrap('<span class="ead-title">', text, contents, '</span>', tail)
     else:
-        return contents
+        return _wrap(None, text, contents, None, tail)
 
-def _wrap(begin, parts, end, tail=None):
+def _wrap(begin, text, parts, end, tail):
     """Wrap some iterable parts in beginning and ending fenceposts. Simply
     yields begin, then each part, then end."""
-    yield begin
+    if begin:
+        yield begin
+    if text:
+        yield text
+
     for part in parts:
         yield part
-    yield end
-    if tail is not None:
+
+    if end:
+        yield end
+    if tail:
         yield tail

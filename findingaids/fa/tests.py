@@ -615,6 +615,7 @@ class FormatEadTestCase(DjangoTestCase):
     TITLE_EMPH = """<bibref><emph>Biographical source:</emph> "Shaw, George Bernard."
     <title>Contemporary Authors Online</title>, Gale, 2003</bibref>"""
     NESTED = """<abstract>magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>"""
+    NOTRANS = """<abstract>magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>"""
 
     def setUp(self):
         self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
@@ -649,5 +650,11 @@ class FormatEadTestCase(DjangoTestCase):
         self.content.dom_node = etree.fromstring(self.NESTED)
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The "Smart" Set</span>...' in format,
+            "nested format rendered correctly")
+        
+    def test_notrans(self):
+        self.content.dom_node = etree.fromstring(self.NOTRANS)
+        format = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The Smart Set</span>...' in format,
             "nested format rendered correctly")
         
