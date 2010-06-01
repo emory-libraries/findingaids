@@ -1,9 +1,16 @@
-from django.shortcuts import render_to_response
+import datetime
+
 from django.http import Http404
+from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
+from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.views.decorators.http import condition
+
+from eulcore.django.existdb.db import ExistDB
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf
@@ -157,6 +164,20 @@ def keyword_search(request):
                     {'form' : form, 'request': request },
                     context_instance=RequestContext(request))
 
+def _ead_lastmodified(request, id, mode):
+    db = ExistDB()
+    if '.xml' in id:	# TEMPORARY (we hope)
+        id = id.replace('.xml', '')
+    info = db.describeDocument("%s/%s.xml" % (settings.EXISTDB_ROOT_COLLECTION, id))
+    # returns an xmlrpc DateTime object - convert into datetime format required by django
+    mod_time = info['modified'].timetuple()
+    modified = datetime.datetime(mod_time.tm_year, mod_time.tm_mon, mod_time.tm_mday,
+                                 mod_time.tm_hour, mod_time.tm_min, mod_time.tm_sec)
+    return modified
+
+#FIXME/TODO: also generate an etag ?
+
+@condition(last_modified_func=_ead_lastmodified)
 def full_fa(request, id, mode):
     "View the full contents of a single finding aid as PDF or plain html"
     try:
