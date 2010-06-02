@@ -145,11 +145,20 @@ class FaViewsTest(TestCase):
     def test_view_simple(self):
         response = self.client.get('/documents/leverette135')
         self.assertEquals(response.status_code, 200)
+
         # title
         self.assertPattern('<h1[^>]*>.*Fannie Lee Leverette scrapbooks', response.content)
         self.assertContains(response, 'circa 1900-1948</h1>')
+	# meta data
+        self.assertContains(response, '<meta content="2007-06-27" name="DC.date" />')
+        self.assertContains(response, '<meta content="Manuscript, Archives, and Rare Book')
+        self.assertContains(response, '<meta content="leverette135')
+        self.assertContains(response, '<meta content="Manuscript, Archives, and Rare Book')
+        self.assertContains(response, '<meta content="Emory University" name="DC.publisher" />')
+        self.assertContains(response, '<meta content="English" name="DC.language" />')
+        self.assertContains(response, '<meta content="Fannie Lee Leverette scrapbooks, circa 1900-1948" name="DC.title" />')
         # descriptive summary content
-        self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
+	self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
             "descriptive summary - creator")
         self.assertPattern('Title:.*Fannie Lee Leverette scrapbooks,circa 1900-1948',
             response.content, "descriptive summary - title")

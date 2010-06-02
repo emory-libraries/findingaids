@@ -1,6 +1,15 @@
 {% extends "site_base.html" %}
 {% load ead %}
 
+
+{% block page-head %}
+  {% comment %} dublin core metadata for a certain EAD {% endcomment %}
+  {{block.super}}
+    {% for meta_name, meta_content in meta_dict.items %}
+        <meta content="{{meta_content}}" name="{{meta_name}}" />
+    {% endfor %}
+{% endblock %}
+
 {% block page-subtitle %}: {{ findingaid.title }}{% endblock %}
 
 {% block content-title %}{{ findingaid.title|format_ead }}{% endblock %}
