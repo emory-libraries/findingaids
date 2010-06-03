@@ -24,7 +24,11 @@ def _ead_lastmodified(request, id, *args, **kwargs):
     :rtype: :class:`datetime.datetime`
     """
     # get document name and path by eadid, then call describeDocument
-    fa = FindingAid.objects.only('document_name', 'collection_name').get(eadid=id)
+    try:
+        fa = FindingAid.objects.only('document_name', 'collection_name').get(eadid=id)
+    except DoesNotExist:   
+        raise Http404
+    
     db = ExistDB()
     info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
     # returns an xmlrpc DateTime object - convert into datetime format required by django

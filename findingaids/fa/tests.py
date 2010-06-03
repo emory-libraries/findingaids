@@ -1,11 +1,15 @@
+from datetime import datetime
 from os import path
+import re
 from types import ListType
+from django.http import Http404
 from django.test import Client, TestCase as DjangoTestCase
 from eulcore.xmlmap  import load_xmlobject_from_file
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
-from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
+from findingaids.fa.views import _series_url, _subseries_links, _series_anchor, \
+	_ead_lastmodified, _ead_etag
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
@@ -568,6 +572,28 @@ class FaViewsTest(TestCase):
         # simple finding aid with no subseries - should have container list
         response = self.client.get('/documents/leverette135/full')
         self.assertContains(response, "Container List")
+
+    def test_ead_lastmodified(self):
+        modified = _ead_lastmodified('rqst', 'abbey244')
+        self.assert_(isinstance(modified, datetime),
+                     "_ead_lastmodified should return a datetime object")
+        today = datetime.now()
+        date_format = '%Y-%m-%d'
+        expected = datetime.now().strftime(date_format)
+        value = modified.strftime(date_format)
+        self.assertEqual(expected, value,
+                     'ead lastmodified should be today, expected %s, got %s' % (expected, value))
+
+        # invalid eadid
+        self.assertRaises(Http404, _ead_lastmodified, 'rqst', 'bogusid')
+        
+
+    def test_ead_etag(self):
+        checksum = _ead_etag('rqst', 'abbey244')
+        self.assert_(re.match('[0-9a-f]{40}$', checksum),
+                     'ead etag should be 40-character hex checksum, got %s' % checksum)
+        # invalid eadid
+        self.assertRaises(Http404, _ead_lastmodified, 'rqst', 'bogusid')
 
 
 class FullTextFaViewsTest(TestCase):
