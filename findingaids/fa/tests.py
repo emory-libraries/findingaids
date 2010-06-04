@@ -1,6 +1,7 @@
 from os import path
 from types import ListType
 from django.test import Client, TestCase as DjangoTestCase
+from twisted.trial.unittest import TestCase as TwistedTestCase
 from eulcore.xmlmap  import load_xmlobject_from_file
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
@@ -10,7 +11,7 @@ from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
 
-class FindingAidTestCase(DjangoTestCase):
+class FindingAidTestCase(TwistedTestCase):
     # test finding aid model (customization of eulcore xmlmap ead object)
     FIXTURES = ['leverette135.xml',  # simple finding aid (no series/subseries), origination is a person name
                 'abbey244.xml',	     # finding aid with series (no subseries), origination is a corporate name
@@ -49,6 +50,16 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertEqual("Bailey and Thurman families papers, circa 1882-1995",
                          self.findingaid['bailey807'].list_title.__unicode__())
         self.assertEqual("B", self.findingaid['bailey807'].first_letter)
+
+        #dc_subjects
+        self.assertIn(u'Irish drama--20th\n\t\t\t century.', self.findingaid['abbey244'].dc_subjects)
+        self.assertIn(u'Theater--Ireland--20th\n\t\t\t century.', self.findingaid['abbey244'].dc_subjects)
+        self.assertIn(u'Dublin (Ireland)', self.findingaid['abbey244'].dc_subjects)
+        #dc_contributors
+        self.assertIn(u' Bailey, I. G. (Issac\n\t\t\t George), 1847-1914.', self.findingaid['bailey807'].dc_contributors)
+        self.assertIn(u' Bailey, Susie E., d.\n\t\t\t 1948.', self.findingaid['bailey807'].dc_contributors)
+        self.assertIn(u' Thurman, Howard,\n\t\t\t 1900-1981.', self.findingaid['bailey807'].dc_contributors)
+        self.assertIn(u' Thurman, Sue\n\t\t\t Bailey.', self.findingaid['bailey807'].dc_contributors)
 
     # FIXME/TODO: test admin info, collection description ?  (tested in view_series to some extent)
 

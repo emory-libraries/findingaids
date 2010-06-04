@@ -28,6 +28,17 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     first_letter = xmlmap.ItemField("substring(%s,1,1)" % list_title_xpath)
     "First letter of list title"
 
+    dc_subjects = xmlmap.StringListField ('archdesc//controlaccess/subject[@encodinganalog = "650"] | \
+            archdesc//controlaccess/persname[@encodinganalog = "600"] | \
+            archdesc//controlaccess/corpname[@encodinganalog = "610"] | \
+            archdesc//controlaccess/corpname[@encodinganalog = "611"] | \
+            archdesc//controlaccess/geogname[@encodinganalog = "651"]')
+    "A list of strings from an EAD that should be mapped to dulbin core subjects"
+
+    dc_contributors = xmlmap.StringListField ('archdesc//controlaccess/persname[@encodinganalog = "700"] | \
+        archdesc//controlaccess/corpname[@encodinganalog = "710"]')
+    "A list of strings from an EAD that should be mapped to dulbin core contributors"
+
     objects = Manager('/ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving FindingAid objects
