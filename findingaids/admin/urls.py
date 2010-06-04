@@ -3,7 +3,7 @@ from django.conf.urls.defaults import *
 urlpatterns = patterns('findingaids.admin.views',
     url(r'^$', 'main', name="index"),
     url(r'^accounts/$', 'list_staff', name="list-staff"),
-    url(r'^accounts/user/[0-9.]+/$', 'edit_user', name="edit-user"),
+    url(r'^accounts/user/(?P<user_id>[0-9.]+)/$', 'edit_user', name="edit-user"),
     url(r'^logout$', 'logout', name="logout"),
     url(r'^publish$', 'publish', name="publish-ead"),
     url(r'^(?P<filename>[^/]+)/cleaned$', 'cleaned_eadxml', name="cleaned-ead"),

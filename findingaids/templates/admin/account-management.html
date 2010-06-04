@@ -10,7 +10,7 @@
    </div>
     <div>
       <p>Please edit the user settings...</p>
-        <form action="/contact/" method="post">
+        <form action="{% url admin:index %}" method="post">{% csrf_token %}
           <table>
             {{ form.as_table }}
           </table>

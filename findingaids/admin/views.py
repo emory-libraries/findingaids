@@ -80,16 +80,17 @@ def list_staff(request):
     return render_to_response('admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
 
 
-def edit_user(request):
+def edit_user(request, user_id):
+    user = User.objects.get(id = user_id)
     if request.user.is_superuser:
         if request.method == 'POST': # If the form has been submitted...
             userForm = UserChangeForm(request.POST) # A form bound to the POST data
             if userForm.is_valid(): # All validation rules pass
                 # Process the data in form.cleaned_data
-                # ...
-                return HttpResponseRedirect('/admin/') # Redirect after PO
+                messages.success(request, 'Form has been submitted.')
+                return HttpResponseRedirect("/admin/") # Redirect after PO
         else:
-            userForm = UserChangeForm()
+            userForm = UserChangeForm(instance=user)
           
         return render_to_response('admin/account-management.html', {'form' : userForm,}, context_instance=RequestContext(request))
     else:
