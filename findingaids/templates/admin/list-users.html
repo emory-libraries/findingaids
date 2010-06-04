@@ -35,7 +35,7 @@
             {% else %}
             <td><img src="{{ MEDIA_URL }}/admin/false.gif" alt="False" Icon style="border:0px solid" /></td>
             {% endif %}
-            <td><a href="/admin/accounts/user/{{ user.id }}/"><img src="{{ MEDIA_URL }}/admin/edit.gif" alt="Edit" Icon style="border:0px solid" /></a>change</td>
+            <td><a href="{% url admin:edit-user user.id %}"><img src="{{ MEDIA_URL }}/admin/edit.gif" alt="Edit" Icon style="border:0px solid" /></a>change</td>
         </tr>
     {% endfor %}
     </table>
