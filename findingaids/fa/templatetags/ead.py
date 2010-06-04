@@ -2,11 +2,12 @@
 Custom filters for processing EAD structured fields to HTML.
 """
 
+from lxml import etree
+
 from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from Ft.Xml.XPath import Compile
 from eulcore.xmlmap import XmlObject
 
 __all__ = [ 'format_ead', 'format_ead_children' ]
@@ -42,7 +43,7 @@ def format_ead(value, autoescape=None):
     if value is None:
         parts = []
     elif hasattr(value, 'dom_node'):
-        parts = node_parts(value.dom_node, escape)
+        parts = node_parts(value.dom_node, escape, include_tail=False)
     else:
         parts = [ escape(unicode(value)) ]
     
@@ -67,65 +68,68 @@ def format_ead_children(value, autoescape=None):
     node = getattr(value, 'dom_node', None)
     children = getattr(node, 'childNodes', ())
     parts = ( part for child in children
-                   for part in node_parts(child, escape) )
+                   for part in node_parts(child, escape, include_tail=False) )
     result = ''.join(parts)
     return mark_safe(result)
 format_ead_children.needs_autoescape = True
 
 # Precompile XPath expressions for use in node_parts below.
-_RENDER_DOUBLEQUOTE = Compile('@render="doublequote"')
-_RENDER_BOLD = Compile('@render="bold"')
-_RENDER_ITALIC = Compile('@render="italic"')
-_IS_EMPH = Compile('self::emph')
-_IS_TITLE = Compile('self::title')
+_RENDER_DOUBLEQUOTE = etree.XPath('@render="doublequote"')
+_RENDER_BOLD = etree.XPath('@render="bold"')
+_RENDER_ITALIC = etree.XPath('@render="italic"')
+_IS_EMPH = etree.XPath('self::emph')
+_IS_TITLE = etree.XPath('self::title')
 
-def node_parts(node, escape):
+def node_parts(node, escape, include_tail):
     """Recursively convert a DOM node to HTML. This function is used
-    internally by :func:`format_ead`. You probably that function, not this
-    one.
+    internally by :func:`format_ead`. You probably want that function, not
+    this one.
     
     This function returns an iterable over unicode chunks intended for easy
     joining by :func:`format_ead`.
     """
 
-    if node.nodeValue is not None:
-        # A text node yields a single unicode chunk containing its
-        # escaped contents.
-        return [ escape(node.nodeValue) ]
+    # if current node contains text before the first node, pre-pend to list of parts
+    text = node.text and escape(node.text)
+        
+    # if this node contains other nodes, start with a generator expression
+    # to recurse into children, getting the node_parts for each.
+    child_parts = ( part for child in node
+                         for part in node_parts(child, escape, include_tail=True) )
 
-    elif hasattr(node, 'childNodes'):
-        # Element nodes yield their children, sometimes wrapped by start and
-        # end tags. Start with a generator expression to recurse into children,
-        # getting the node_parts for each.
-        child_parts = ( part for child in node.childNodes
-                             for part in node_parts(child, escape) )
+    tail = include_tail and node.tail and escape(node.tail)
+    
+    # format the current node, and either wrap child parts in appropriate
+    # fenceposts or return them directly.
+    return _format_node(node, text, child_parts, tail)
 
-        # And then depending on the details of the *current* node, either
-        # wrap those child parts in appropriate fenceposts or return them
-        # directly.
-        if node.xpath(_RENDER_DOUBLEQUOTE):
-            return _wrap('"', child_parts, '"')
-        elif node.xpath(_RENDER_BOLD):
-            return _wrap('<span class="ead-bold">', child_parts, '</span>')
-        elif node.xpath(_RENDER_ITALIC):
-            return _wrap('<span class="ead-italic">', child_parts, '</span>')
-        elif node.xpath(_IS_EMPH):
-            return _wrap('<em>', child_parts, '</em>')
-        elif node.xpath(_IS_TITLE):
-            return _wrap('<span class="ead-title">', child_parts, '</span>')
-        else:
-            return child_parts
-
+def _format_node(node, text, contents, tail):
+    # format a single node, wrapping any contents, and passing any 'tail' text content
+    if _RENDER_DOUBLEQUOTE(node):
+        return _wrap('"', text, contents, '"', tail)
+    elif _RENDER_BOLD(node):
+        return _wrap('<span class="ead-bold">', text, contents, '</span>', tail)
+    elif _RENDER_ITALIC(node):
+        return _wrap('<span class="ead-italic">', text, contents, '</span>', tail)
+    elif _IS_EMPH(node):
+        return _wrap('<em>', text, contents, '</em>', tail)
+    elif _IS_TITLE(node):
+        return _wrap('<span class="ead-title">', text, contents, '</span>', tail)
     else:
-        # Something else? Not sure what might fall into this category. Yield
-        # nothing (effectively dropping the node) for now.
-        return []
+        return _wrap(None, text, contents, None, tail)
 
-
-def _wrap(begin, parts, end):
+def _wrap(begin, text, parts, end, tail):
     """Wrap some iterable parts in beginning and ending fenceposts. Simply
     yields begin, then each part, then end."""
-    yield begin
+    if begin:
+        yield begin
+    if text:
+        yield text
+
     for part in parts:
         yield part
-    yield end
+
+    if end:
+        yield end
+    if tail:
+        yield tail

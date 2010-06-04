@@ -1,0 +1,26 @@
+{% extends "site_base.html" %}
+{% block page-subtitle %}: Administration Page {% endblock %}
+{% block content-title %}Account Management{% endblock %}
+
+{% block content-body %}
+
+  {% if user.is_authenticated %}
+        <div id="print-links">
+      <a href="{% url admin:logout %}">logout</a>
+   </div>
+    <div>
+      <p>Please edit the user settings...</p>
+        <form action="{% url admin:index %}" method="post">{% csrf_token %}
+          <table>
+            {{ form.as_table }}
+          </table>
+        <input type="submit" value="Submit" />
+      </form>
+    </div>  
+  
+  {% endif %}
+  <hr/>
+  
+
+
+{% endblock %}

@@ -16,6 +16,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
 )
 
 DEBUG = True
@@ -78,7 +79,9 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 )
 
 ROOT_URLCONF = 'findingaids.urls'
@@ -95,6 +98,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
+    "django.contrib.messages.context_processors.messages",
     # additional context processors
     "django.core.context_processors.request", # always include request in render context
     "findingaids.fa.context_processors.searchform",  # search form on every page
@@ -106,12 +110,21 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 
                            'eulcore.django.ldap.emory.EmoryLDAPBackend')
 
+LOGIN_URL="/accounts/login/"
+LOGIN_REDIRECT_URL="/admin/"
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+# NOTE: using memory cache for now for simplicity
+CACHE_BACKEND = 'locmem://'
 
 INSTALLED_APPS = (
+    #'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-#    'django.contrib.sites',
+    'django.contrib.sites',
+    'django.contrib.messages',
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
     'eulcore.django.existdb',

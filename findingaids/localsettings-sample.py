@@ -25,6 +25,18 @@ EXISTDB_SERVER_URL      = 'http://user:password@existdb.example.com/exist/xmlrpc
 EXISTDB_ROOT_COLLECTION = ""
 EXISTDB_TEST_COLLECTION = ""
 
+# EULCORE LDAP SETTINGS
+# LDAP login settings. These are configured for emory, but you'll need
+# to get a base user DN and password elsewhere.
+AUTH_LDAP_SERVER = '' # i.e. 'ldaps://vlad.service.emory.edu'
+AUTH_LDAP_BASE_USER = '' # i.e. 'uid=USERNAME,ou=services,o=emory.edu'
+AUTH_LDAP_BASE_PASS = '' # password for USERNAME above
+AUTH_LDAP_SEARCH_SUFFIX = '' # i.e. 'o=emory.edu'
+AUTH_LDAP_SEARCH_FILTER = '' # i.e. '(uid=%s)'
+AUTH_LDAP_CHECK_SERVER_CERT = False # ALWAYS SET True in production.
+AUTH_LDAP_CA_CERT_PATH = '' # absolute path of cert
+
+
 # local, full-path location for finding aids to be loaded to eXist via admin interface
 FINDINGAID_EAD_SOURCE= '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'
 

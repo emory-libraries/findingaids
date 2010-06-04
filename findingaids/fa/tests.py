@@ -1,17 +1,21 @@
 from os import path
 from types import ListType
+from lxml import etree
+
 from django.test import Client, TestCase as DjangoTestCase
-from twisted.trial.unittest import TestCase as TwistedTestCase
-from eulcore.xmlmap  import load_xmlobject_from_file
+
+from eulcore.xmlmap  import load_xmlobject_from_file, XmlObject
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
+
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
+from findingaids.fa.templatetags.ead import format_ead
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
 
-class FindingAidTestCase(TwistedTestCase):
+class FindingAidTestCase(DjangoTestCase):
     # test finding aid model (customization of eulcore xmlmap ead object)
     FIXTURES = ['leverette135.xml',  # simple finding aid (no series/subseries), origination is a person name
                 'abbey244.xml',	     # finding aid with series (no subseries), origination is a corporate name
@@ -52,14 +56,14 @@ class FindingAidTestCase(TwistedTestCase):
         self.assertEqual("B", self.findingaid['bailey807'].first_letter)
 
         #dc_subjects
-        self.assertIn(u'Irish drama--20th\n\t\t\t century.', self.findingaid['abbey244'].dc_subjects)
-        self.assertIn(u'Theater--Ireland--20th\n\t\t\t century.', self.findingaid['abbey244'].dc_subjects)
-        self.assertIn(u'Dublin (Ireland)', self.findingaid['abbey244'].dc_subjects)
+        self.assert_(u'Irish drama--20th\n\t\t\t century.' in self.findingaid['abbey244'].dc_subjects)
+        self.assert_(u'Theater--Ireland--20th\n\t\t\t century.' in self.findingaid['abbey244'].dc_subjects)
+        self.assert_(u'Dublin (Ireland)' in self.findingaid['abbey244'].dc_subjects)
         #dc_contributors
-        self.assertIn(u' Bailey, I. G. (Issac\n\t\t\t George), 1847-1914.', self.findingaid['bailey807'].dc_contributors)
-        self.assertIn(u' Bailey, Susie E., d.\n\t\t\t 1948.', self.findingaid['bailey807'].dc_contributors)
-        self.assertIn(u' Thurman, Howard,\n\t\t\t 1900-1981.', self.findingaid['bailey807'].dc_contributors)
-        self.assertIn(u' Thurman, Sue\n\t\t\t Bailey.', self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u' Bailey, I. G. (Issac\n\t\t\t George), 1847-1914.' in self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u' Bailey, Susie E., d.\n\t\t\t 1948.' in self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u' Thurman, Howard,\n\t\t\t 1900-1981.' in self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u' Thurman, Sue\n\t\t\t Bailey.' in self.findingaid['bailey807'].dc_contributors)
 
     # FIXME/TODO: test admin info, collection description ?  (tested in view_series to some extent)
 
@@ -618,3 +622,59 @@ class FullTextFaViewsTest(TestCase):
         response = self.client.get('/search/', { 'keywords' : 'nonexistentshouldmatchnothing'})
         self.assertEquals(response.status_code, 200)
         self.assertContains(response, "No finding aids matched")
+
+
+class FormatEadTestCase(DjangoTestCase):
+# test ead_format template tag explicitly
+    ITALICS = """<titleproper><emph render="italic">Pitts v. Freeman</emph> school desegregation case files,
+1969-1993</titleproper>"""
+    BOLD = """<titleproper><emph render="bold">Pitts v. Freeman</emph> school desegregation case files,
+1969-1993</titleproper>"""
+    TITLE = """<abstract>A submission for the magazine <title>The Smart Set</title> from
+    Irish writer Oliver St. John Gogarty to author Ernest Augustus Boyd.</abstract>"""
+    TITLE_EMPH = """<bibref><emph>Biographical source:</emph> "Shaw, George Bernard."
+    <title>Contemporary Authors Online</title>, Gale, 2003</bibref>"""
+    NESTED = """<abstract>magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>"""
+    NOTRANS = """<abstract>magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>"""
+
+    def setUp(self):
+        self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
+        
+    def test_italics(self):
+        self.content.dom_node = etree.fromstring(self.ITALICS)
+        format = format_ead(self.content)
+        self.assert_('<span class="ead-italic">Pitts v. Freeman</span> school desegregation' in format,
+            "render italic converted correctly to span class ead-italic")
+
+    def test_bold(self):
+        self.content.dom_node = etree.fromstring(self.BOLD)
+        format = format_ead(self.content)
+        self.assert_('<span class="ead-bold">Pitts v. Freeman</span> school desegregation' in format,
+            "render bold converted correctly to span class ead-bold")
+
+    def test_title(self):
+        self.content.dom_node  = etree.fromstring(self.TITLE)
+        format = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The Smart Set</span> from' in format,
+            "title tag converted correctly to span class ead-title")
+
+    def test_title_emph(self):
+        self.content.dom_node = etree.fromstring(self.TITLE_EMPH)
+        format = format_ead(self.content)
+        self.assert_('<em>Biographical source:</em> "Shaw, George' in format,
+            "emph tag rendered correctly in section with title")
+        self.assert_('<span class="ead-title">Contemporary Authors Online</span>, Gale' in format,
+            "title rendered correctly in sectino with emph tag")
+
+    def test_nested(self):
+        self.content.dom_node = etree.fromstring(self.NESTED)
+        format = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The "Smart" Set</span>...' in format,
+            "nested format rendered correctly")
+        
+    def test_notrans(self):
+        self.content.dom_node = etree.fromstring(self.NOTRANS)
+        format = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The Smart Set</span>...' in format,
+            "nested format rendered correctly")
+        
