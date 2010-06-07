@@ -27,9 +27,13 @@ For a first-time install, you will should run these two steps:
      $ ./manage.py existdb_index load
      $ ./manage.py existdb_reindex  
 
+The EXISTDB_PREVIEW_COLLECTION should be set to an eXist collection outside of the
+main Finding Aids collection in eXist; it is used for admin functionality only.
+
 The FINDINGAID_EAD_SOURCE should be set to the directory path for the
 EAD files that will be accessible for loading to eXist via the admin
 interface.
+
 
 
 Install `xhtml2pdf/Pisa`_ and its dependencies. On Ubuntu, the following

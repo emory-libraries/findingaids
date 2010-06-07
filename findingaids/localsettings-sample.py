@@ -23,6 +23,8 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 EXISTDB_SERVER_URL      = 'http://user:password@existdb.example.com/exist/xmlrpc'
 # collection should begin with / -  e.g., /edc
 EXISTDB_ROOT_COLLECTION = ""
+# preview collection - should be outside main findingaids collection
+EXISTDB_PREVIEW_COLLECTION = ""
 EXISTDB_TEST_COLLECTION = ""
 
 # EULCORE LDAP SETTINGS
