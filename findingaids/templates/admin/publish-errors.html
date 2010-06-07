@@ -1,10 +1,10 @@
 {% extends "site_base.html" %}
-{% block page-subtitle %}: Admin : Publish Errors {% endblock %}
-{% block content-title %}Publish{% endblock %}
+{% block page-subtitle %}: Admin : {{ mode|title }} Errors {% endblock %}
+{% block content-title %}{{ mode|title }}{% endblock %}
 
 {% block content-body %}
 
-<p>Could not publish <b>{{ filename }}</b> due to the following:</p>
+<p>Could not {{ mode }} <b>{{ filename }}</b> due to the following:</p>
 
 <ul>
 {% for err in errors %}

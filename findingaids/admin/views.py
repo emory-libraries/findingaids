@@ -122,7 +122,42 @@ def edit_user(request, user_id):
         messages.warning(request, 'You do not have permission to view this page.')
         return HttpResponseRedirect("/admin/")
         
-        
+def _prepublication_check(request, filename, mode='publish'):
+    """
+    Pre-publication check logic common to :meth:`publish` and :meth:`preview`.
+
+    Generates a full path to the file in the configured EAD source directory,
+    and the expected published location in eXist, and then runs :meth:`check_ead`
+    to check the xml for errors.
+
+    If there are errors, will generate an error response that can be displayed.
+
+    :param request: request object passed into the view (for generating error response)
+    :param filename: base filename of the ead file to be checked
+    :param mode: optional mode, for display on error page (defaults to publish)
+    :rtype: list
+    :returns: list of the following:
+      - boolean ok (if True, all checks passed)
+      - HttpResponse response error response to display, if there were errors
+      - dbpath - full path to publication location in configured eXist db
+      - fullpath - full path to the file in the configured source directory
+    """
+
+    # full path to the local file
+    fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+    # full path in exist db collection
+    dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
+    errors = check_ead(fullpath, dbpath)
+    if errors:
+        ok = False
+        response = render_to_response('admin/publish-errors.html',
+                {'errors': errors, 'filename': filename, 'mode': mode},
+                context_instance=RequestContext(request))
+    else:
+        ok = True
+        response = None
+    return [ok, response, dbpath, fullpath]
+
 @login_required
 def publish(request):
     """
@@ -141,22 +176,16 @@ def publish(request):
     """
     if request.method == 'POST':
         filename = request.POST['filename']
-        # full path to the local file
-        fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
-        # full path in exist db collection
-        dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
-
-        errors = check_ead(fullpath, dbpath)
-        if errors:
-            return render_to_response('admin/publish-errors.html', {'errors': errors, 'filename': filename},
-                            context_instance=RequestContext(request))
+        
+        ok, response, dbpath, fullpath = _prepublication_check(request, filename)
+        if ok is not True:
+            return response
         # only load to exist if there are no errors found
         db = ExistDB()
         # get information to determine if a db file is being replaced
         replaced = db.describeDocument(dbpath)
         # load the document to the configured collection in eXist with the same fileneame
-        # NOTE: specifying to always overwrite copy in eXist 
-        success = db.load(open(fullpath, 'r'), dbpath, True)
+        success = db.load(open(fullpath, 'r'), dbpath, overwrite=True)
         if success:          
             # load the file as a FindingAid object so we can generate a url to the document
             ead = load_xmlobject_from_file(fullpath, FindingAid)
@@ -181,6 +210,37 @@ def publish(request):
 
 
 @login_required
+def preview(request):
+    if request.method == 'POST':
+        filename = request.POST['filename']
+        # only load to exist if document passes publication check
+        ok, response, dbpath, fullpath = _prepublication_check(request, filename, mode='preview')
+        if ok is not True:
+            return response
+        
+        db = ExistDB()
+        # load the document to the *preview* collection in eXist with the same fileneame
+        preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename        
+        success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
+        if success:
+            # load the file as a FindingAid object so we can generate the preview url
+            ead = load_xmlobject_from_file(fullpath, FindingAid)
+            messages.success(request, 'Successfully loaded <b>%s</b> for preview.' % filename)                
+            # redirect to document preview page with code 303 (See Other)
+            response = HttpResponse(status=303)
+            response['Location'] = reverse('admin:preview:view-fa', kwargs={'id': ead.eadid })
+            return response
+        else:
+            messages.error("Error loading <b>%s</b> for preview." % filename)
+            # redirect to main admin page with code 303 (See Other)
+            response = HttpResponse(status=303)
+            response['Location'] = reverse('admin:index')
+            return response
+    else:
+        return HttpResponse('preview placeholder- list of files to be added here')
+
+
+@login_required
 @cache_page(60)        # cache this view and use it as source for cleaned diff/summary views
 # FIXME: what is a reasonable duration?
 def cleaned_eadxml(request, filename):
@@ -195,9 +255,7 @@ def cleaned_eadxml(request, filename):
         document will be pulled from the configured source directory.    
     """
     fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
-    ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?
-    #original_xml = ead.serialize()  # store as serialized by xml object, so xml output will be the same
-    # FIXME: losing doctype declaration on serialize?!?
+    ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?    
     ead = clean_ead(ead, filename)
     cleaned_xml = ead.serialize()
 

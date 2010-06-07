@@ -96,6 +96,11 @@ class AdminViewsTest(TestCase):
         self.assertContains(response, '<form action="%s" method="post"' % publish_url)
         self.assertContains(response, '<button type="submit" name="filename" value="%s" '
                 % os.path.basename(self.tmpfiles[0].name))
+        # file list contains buttons to prnvenw documents
+        preview_url = reverse('admin:preview-ead')
+        self.assertContains(response, '<form action="%s" method="post"' % preview_url)
+        self.assertContains(response, '<button type="submit" name="filename" value="%s" '
+                % os.path.basename(self.tmpfiles[0].name), 2)
         # file list contains link to clean documents
         clean_url = reverse('admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
         self.assertContains(response, '<a href="%s">CLEAN</a>' % clean_url)
@@ -151,6 +156,44 @@ class AdminViewsTest(TestCase):
         docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield588_invalid.xml')
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
+    def test_preview(self):
+        preview_url = reverse('admin:preview-ead')
+        self.client.login(**self.admin_credentials)
+        # TODO: GET should just list files available for preview
+        response = self.client.get(preview_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
+                             % (expected, code, preview_url))        
+
+        # use fixture directory to test preview
+        filename = 'hartsfield558.xml'
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'admin', 'fixtures')
+        response = self.client.post(preview_url, {'filename' : filename})
+        # NOTE: django testclient doesn't seem to load preview versions correctly
+        code = response.status_code
+        preview_docurl = reverse('admin:preview:view-fa', kwargs={'id': 'hartsfield558'})
+        self.assert_(preview_docurl in response['Location'])
+        expected = 303      # redirect
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
+                             % (expected, code, preview_url))
+        # because preview response fails, can't check preview page (?)
+        #self.assertContains(response, "Successfully loaded")
+        docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
+        # confirm that document was actually saved to exist
+        self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)        
+        self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
+
+        # preview invalid document - should display errors
+        response = self.client.post(preview_url, {'filename' : 'hartsfield558_invalid.xml'})
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
+                             % (expected, code, preview_url))
+        self.assertContains(response, "Could not preview")
+        self.assertContains(response, "No declaration for attribute invalid")   # DTD validation error
+        docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/hartsfield588_invalid.xml')
+        self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
     def test_login_admin(self):
         admin_index = reverse('admin:index')
