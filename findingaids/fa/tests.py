@@ -6,12 +6,8 @@ from lxml import etree
 
 from django.http import Http404
 from django.test import Client, TestCase as DjangoTestCase
-<<<<<<< .mine
-from eulcore.xmlmap  import load_xmlobject_from_file
-=======
 
 from eulcore.xmlmap  import load_xmlobject_from_file, XmlObject
->>>>>>> .r537
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
