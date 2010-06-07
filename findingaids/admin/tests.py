@@ -204,6 +204,30 @@ class AdminViewsTest(TestCase):
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
 
+    def test_list_staff(self):
+        admin_index = reverse('admin:index')
+        # Test admin account can login
+        self.client.login(**self.admin_credentials)
+        response = self.client.get('/admin/accounts/')
+        self.assertContains(response, "Current users")
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+
+    def test_edit_user(self):
+        admin_index = reverse('admin:index')
+        # Test admin account can login
+        self.client.login(**self.admin_credentials)
+        user = User.objects.create_user('test', 'test@emory.edu', 'testpassword')
+        user.is_staff = True
+        user.save()
+        response = self.client.get('/admin/accounts/user/%d/' % user.id)
+        self.assertContains(response, "<p>Please edit the user settings...</p>")
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
 
     def test_cleaned_ead(self):
          # use fixture directory to test publication

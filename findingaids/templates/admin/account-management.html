@@ -8,9 +8,16 @@
         <div id="print-links">
       <a href="{% url admin:logout %}">logout</a>
    </div>
+   {% if form.errors %}
+    <div id="form-error">
+	<p>The operation could not be performed because one or more error(s) occurred.<br />
+            Please resubmit the form after making the following changes:</p>
+    </div>
+    {% endif %}
     <div>
       <p>Please edit the user settings...</p>
-        <form action="{% url admin:index %}" method="post">{% csrf_token %}
+      {% url admin.edit_user user_id as edit_user_url %}
+        <form action="{{ edit_user_url }}" method="post">{% csrf_token %}
           <table>
             {{ form.as_table }}
           </table>

@@ -74,23 +74,50 @@ def logout(request):
 
 
 def list_staff(request):
+    """
+    List user page.
+
+    Displays a list of users which may be selected for editing.
+
+    """
     users = User.objects.all()
     return render_to_response('admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
 
 
 def edit_user(request, user_id):
+    """
+    Edit user page.
+
+    Displays a user object for editing
+
+    """
     user = User.objects.get(id = user_id)
     if request.user.is_superuser:
         if request.method == 'POST': # If the form has been submitted...
-            userForm = UserChangeForm(request.POST) # A form bound to the POST data
-            if userForm.is_valid(): # All validation rules pass
+            userForm = UserChangeForm(request.POST, instance=user) # A form bound to the POST data
+            if userForm.is_valid():
+                # All validation rules pass
                 # Process the data in form.cleaned_data
-                messages.success(request, 'Form has been submitted.')
-                return HttpResponseRedirect("/admin/") # Redirect after PO
+                user.first_name = userForm.cleaned_data['first_name']
+                user.last_name = userForm.cleaned_data['last_name']
+                user.email = userForm.cleaned_data['email']
+                user.is_staff = userForm.cleaned_data['is_staff']
+                user.is_active = userForm.cleaned_data['is_active']
+                user.is_superuser = userForm.cleaned_data['is_superuser']
+                user.groups = userForm.cleaned_data['groups']
+                user.user_permissions = userForm.cleaned_data['user_permissions']
+                user.save()
+                messages.success(request, "The changes you have selected for '%s' have been saved." % user.username)
+                return HttpResponseRedirect("/admin/")
+
+            else: # Handle validation errors
+                messages.success(request, 'There are errors in you submission, please review the form.')
+                return render_to_response('admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
         else:
             userForm = UserChangeForm(instance=user)
-          
-        return render_to_response('admin/account-management.html', {'form' : userForm,}, context_instance=RequestContext(request))
+            
+            
+        return render_to_response('admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
     else:
         messages.warning(request, 'You do not have permission to view this page.')
         return HttpResponseRedirect("/admin/")

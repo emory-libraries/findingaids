@@ -8,7 +8,7 @@
     <a href="{% url admin:logout %}">logout</a>
   </div>
   <div>
-    <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong>.</p>
+    <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong></p>
   </div>
   <hr/>
   {% endif %}
