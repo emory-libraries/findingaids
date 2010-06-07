@@ -103,10 +103,6 @@ def view_fa(request, id):
         fa = FindingAid.objects.get(eadid=id)
     except DoesNotExist:   
         raise Http404
-<<<<<<< .mine
-#    print fa.dc_fields()
-   
-=======
 
     meta_dict = dict({'DC.title' : fa.title,
     'DC.creator' : fa.author,
@@ -123,7 +119,6 @@ def view_fa(request, id):
             del meta_dict[name]
 
 
->>>>>>> .r537
     # FIXME: handle other exceptions 
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid])    
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
