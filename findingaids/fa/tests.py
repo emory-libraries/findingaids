@@ -164,6 +164,7 @@ class FaViewsTest(TestCase):
     def test_view_dc_fields(self):
         response = self.client.get('/documents/abbey244')
         #dc:creator
+        print response
         self.assertContains(response, '<meta content="\n                Abbey Theatre.\n            " name="DC:creator">')
         #dc:publisher
         self.assertContains(response, '<meta content="Emory University" name="DC:publisher">')
