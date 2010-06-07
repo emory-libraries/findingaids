@@ -60,14 +60,14 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertEqual("B", self.findingaid['bailey807'].first_letter)
 
         #dc_subjects
-        self.assert_(u'Irish drama--20th\n\t\t\t century.' in self.findingaid['abbey244'].dc_subjects)
-        self.assert_(u'Theater--Ireland--20th\n\t\t\t century.' in self.findingaid['abbey244'].dc_subjects)
+        self.assert_(u'Irish drama--20th century.' in self.findingaid['abbey244'].dc_subjects)
+        self.assert_(u'Theater--Ireland--20th century.' in self.findingaid['abbey244'].dc_subjects)
         self.assert_(u'Dublin (Ireland)' in self.findingaid['abbey244'].dc_subjects)
         #dc_contributors
-        self.assert_(u' Bailey, I. G. (Issac\n\t\t\t George), 1847-1914.' in self.findingaid['bailey807'].dc_contributors)
-        self.assert_(u' Bailey, Susie E., d.\n\t\t\t 1948.' in self.findingaid['bailey807'].dc_contributors)
-        self.assert_(u' Thurman, Howard,\n\t\t\t 1900-1981.' in self.findingaid['bailey807'].dc_contributors)
-        self.assert_(u' Thurman, Sue\n\t\t\t Bailey.' in self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u'Bailey, I. G. (Issac George), 1847-1914.' in self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u'Bailey, Susie E., d. 1948.' in self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u'Thurman, Howard, 1900-1981.' in self.findingaid['bailey807'].dc_contributors)
+        self.assert_(u'Thurman, Sue Bailey.' in self.findingaid['bailey807'].dc_contributors)
 
     # FIXME/TODO: test admin info, collection description ?  (tested in view_series to some extent)
 
@@ -164,7 +164,6 @@ class FaViewsTest(TestCase):
     def test_view_dc_fields(self):
         response = self.client.get('/documents/abbey244')
         #dc:creator
-        print response
         self.assertContains(response, '<meta content="\n                Abbey Theatre.\n            " name="DC:creator">')
         #dc:publisher
         self.assertContains(response, '<meta content="Emory University" name="DC:publisher">')
