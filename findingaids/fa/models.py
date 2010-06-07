@@ -105,6 +105,26 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 
         return fields
 
+    def dc_fields(self):
+        """
+        Collect dulbin core fields from an EAD. It returns a dictionary.
+        Dictionary key: base name of a dulbin core field
+        Dictionary value: a list of collected strings. Each string pairs with
+                         the key of the dictionary entry once.
+        Note that some keys may have emty lists as their values.
+        """
+        fields = dict()
+        fields["title"] = [self.title, self.unittitle]
+        fields["creator"] = [name for name in [self.archdesc.origination] if name]
+        fields["publisher"] = [self.file_desc.publication.publisher]
+        fields["date"] = [self.profiledesc.date.normalized]
+        fields["language"] = self.profiledesc.language_codes
+        fields["subject"] = self.dc_subjects
+        fields["contributor"] = self.dc_contributors
+        fields["identifier"] = [self.eadid]
+        
+        return fields
+
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
 

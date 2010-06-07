@@ -5,9 +5,13 @@
 {% block page-head %}
   {% comment %} dublin core metadata for a certain EAD {% endcomment %}
   {{block.super}}
-    {% for meta_name, meta_content in meta_dict.items %}
-        <meta content="{{meta_content}}" name="{{meta_name}}" />
+
+  {% for dc_name, dc_contents in findingaid.dc_fields.items %}
+    {% for dc_content in dc_contents %}
+       <meta content="{{dc_content}}" name="DC:{{dc_name}}">
     {% endfor %}
+  {% endfor %}
+
 {% endblock %}
 
 {% block page-subtitle %}: {{ findingaid.title }}{% endblock %}

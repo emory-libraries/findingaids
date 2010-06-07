@@ -6,8 +6,12 @@ from lxml import etree
 
 from django.http import Http404
 from django.test import Client, TestCase as DjangoTestCase
+<<<<<<< .mine
+from eulcore.xmlmap  import load_xmlobject_from_file
+=======
 
 from eulcore.xmlmap  import load_xmlobject_from_file, XmlObject
+>>>>>>> .r537
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
@@ -161,6 +165,31 @@ class FaViewsTest(TestCase):
         response = self.client.get('/documents/nonexistent')
         self.assertEquals(response.status_code, 404)
 
+    def test_view_dc_fields(self):
+        response = self.client.get('/documents/abbey244')
+        #dc:creator
+        self.assertContains(response, '<meta content="\n                Abbey Theatre.\n            " name="DC:creator">')
+        #dc:publisher
+        self.assertContains(response, '<meta content="Emory University" name="DC:publisher">')
+        #date
+        self.assertContains(response, '<meta content="2002-02-04" name="DC:date">')        #language
+        self.assertContains(response, '<meta content="eng" name="DC:language">')
+        #dc_subjects
+        self.assertContains(response, '<meta content="Irish drama--20th\n\t\t\t century." name="DC:subject">')
+        self.assertContains(response, '<meta content="Theater--Ireland--20th\n\t\t\t century." name="DC:subject">')
+        self.assertContains(response, '<meta content="Dublin (Ireland)" name="DC:subject">')
+        #identifier
+        self.assertContains(response, '<meta content="abbey244" name="DC:identifier">')
+
+        response = self.client.get('/documents/bailey807')
+        #title
+        self.assertContains(response, '<meta content="Bailey and Thurman families papers, circa 1882-1995" name="DC:title">')
+        #dc_contributors
+        self.assertContains(response, '<meta content=" Bailey, I. G. (Issac\n\t\t\t George), 1847-1914." name="DC:contributor">')
+        self.assertContains(response, '<meta content=" Bailey, Susie E., d.\n\t\t\t 1948." name="DC:contributor">')
+        self.assertContains(response, '<meta content=" Thurman, Howard,\n\t\t\t 1900-1981." name="DC:contributor">')
+        self.assertContains(response, '<meta content=" Thurman, Sue\n\t\t\t Bailey." name="DC:contributor">')
+       
     def test_view_simple(self):
         response = self.client.get('/documents/leverette135')
         self.assertEquals(response.status_code, 200)
@@ -168,14 +197,7 @@ class FaViewsTest(TestCase):
         # title
         self.assertPattern('<h1[^>]*>.*Fannie Lee Leverette scrapbooks', response.content)
         self.assertContains(response, 'circa 1900-1948</h1>')
-	# meta data
-        self.assertContains(response, '<meta content="2007-06-27" name="DC.date" />')
-        self.assertContains(response, '<meta content="Manuscript, Archives, and Rare Book')
-        self.assertContains(response, '<meta content="leverette135')
-        self.assertContains(response, '<meta content="Manuscript, Archives, and Rare Book')
-        self.assertContains(response, '<meta content="Emory University" name="DC.publisher" />')
-        self.assertContains(response, '<meta content="English" name="DC.language" />')
-        self.assertContains(response, '<meta content="Fannie Lee Leverette scrapbooks, circa 1900-1948" name="DC.title" />')
+
         # descriptive summary content
 	self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
             "descriptive summary - creator")
