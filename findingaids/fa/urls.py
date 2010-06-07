@@ -9,19 +9,27 @@ title_urlpatterns = patterns('findingaids.fa.views',
 EADID_URL_REGEX = "(?P<id>[-_A-Za-z0-9.]+)"
 series_id = "[a-zA-Z0-9-._]+"
 
-document_urlpatterns = patterns('findingaids.fa.views',
-    url(r'^%s$' % EADID_URL_REGEX, 'view_fa', name='view-fa'),
-    url(r'^%s/full$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'html'}, name='full-fa'),     # html version of pdf, for testing
-    url(r'^%s/printable$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'pdf'}, name='printable-fa'),
-    url(r'^%s/(?P<series_id>%s)$' % (EADID_URL_REGEX, series_id), 'series_or_index', name='series-or-index'),
-    url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)$' % (EADID_URL_REGEX, series_id, series_id),
-        'view_subseries', name='view-subseries'),
-    url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)/(?P<subsubseries_id>%s)$' % (EADID_URL_REGEX, series_id, series_id, series_id),
-        'view_subsubseries', name='view-subsubseries')
-)
+# make document url patterns available in a way that they can be re-used for
+# the admin preview urls
+def document_urls(**kwargs):
+    return patterns('findingaids.fa.views',
+        url(r'^%s$' % EADID_URL_REGEX, 'view_fa', dict(**kwargs), name='view-fa'),
+        url(r'^%s/full$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'html'},
+            name='full-fa'),     # html version of pdf, for testing
+        url(r'^%s/printable$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'pdf'},
+            name='printable-fa'),
+        url(r'^%s/(?P<series_id>%s)$' % (EADID_URL_REGEX, series_id),
+            'series_or_index', name='series-or-index'),
+        url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)$' % \
+            (EADID_URL_REGEX, series_id, series_id),
+            'view_subseries', name='view-subseries'),
+        url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)/(?P<subsubseries_id>%s)$' % \
+            (EADID_URL_REGEX, series_id, series_id, series_id),
+            'view_subsubseries', name='view-subsubseries')
+    )
 
 urlpatterns = patterns('findingaids.fa.views',
     (r'^titles/', include(title_urlpatterns)),
-    (r'^documents/', include(document_urlpatterns)),
+    (r'^documents/', include(document_urls())),
     url(r'^search/?', 'keyword_search', name='keyword-search')
 )
