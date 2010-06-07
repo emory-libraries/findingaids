@@ -1,12 +1,52 @@
-from django.shortcuts import render_to_response
+import datetime
+
 from django.http import Http404
+from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
+from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.views.decorators.http import condition
+
+from eulcore.django.existdb.db import ExistDB
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf
+
+
+def _ead_lastmodified(request, id, *args, **kwargs):
+    """Get the last modification time for a finding aid in eXist by eadid.
+    Used to generate last-modified header for views based on a single EAD document.
+    
+    :param id: eadid
+    :rtype: :class:`datetime.datetime`
+    """
+    # get document name and path by eadid, then call describeDocument
+    try:
+        fa = FindingAid.objects.only('document_name', 'collection_name').get(eadid=id)
+    except DoesNotExist:   
+        raise Http404
+    
+    db = ExistDB()
+    info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
+    # returns an xmlrpc DateTime object - convert into datetime format required by django
+    mod_time = info['modified'].timetuple()
+    modified = datetime.datetime(mod_time.tm_year, mod_time.tm_mon, mod_time.tm_mday,
+                                 mod_time.tm_hour, mod_time.tm_min, mod_time.tm_sec)
+    return modified
+
+
+def _ead_etag(request, id, *args, **kwargs):
+    """Generate an Etag for an ead by eadid by requesting a SHA-1 checksum
+    of the entire EAD xml document from eXist."""
+    try:
+        fa = FindingAid.objects.only('hash').get(eadid=id)
+    except DoesNotExist:   
+        raise Http404
+    return fa.hash
+
 
 def site_index(request):
     "Site home page"
@@ -56,7 +96,7 @@ def _paginate_queryset(request, qs, per_page=10):
 
     return paginated_qs
 
-
+@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def view_fa(request, id):
     "View a single finding aid"
     try:
@@ -87,14 +127,17 @@ def view_fa(request, id):
                                                          "meta_dict" : meta_dict},
                                                          context_instance=RequestContext(request))
 
+@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def series_or_index(request, id, series_id):
     "View a single series (c01) or index from a finding aid"
     return _view_series(request, id, series_id)
 
+@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def view_subseries(request, id, series_id, subseries_id):
     "View a single subseries (c02) from a finding aid"   
     return _view_series(request, id, series_id, subseries_id)
 
+@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
     "View a single subseries (c03) from a finding aid"
     return _view_series(request, id, series_id, subseries_id, subsubseries_id)
@@ -174,6 +217,7 @@ def keyword_search(request):
                     {'form' : form, 'request': request },
                     context_instance=RequestContext(request))
 
+@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def full_fa(request, id, mode):
     "View the full contents of a single finding aid as PDF or plain html"
     try:
