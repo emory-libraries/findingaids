@@ -107,11 +107,11 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 
     def dc_fields(self):
         """
-        Collect dulbin core fields from an EAD. It returns a dictionary.
-        Dictionary key: base name of a dulbin core field
-        Dictionary value: a list of collected strings. Each string pairs with
-                         the key of the dictionary entry once.
-        Note that some keys may have emty lists as their values.
+        Generate a dictionary of Dublin Core fields from an EAD.
+        Dictionary key: base name of a Dublin Core field (e.g., creator, title)
+        Dictionary value: a list of values corresponding to the DC field.
+                    Note that some keys may have empty lists as their values.
+        :rtype: dict
         """
         fields = dict()
         fields["title"] = [self.title, self.unittitle]
