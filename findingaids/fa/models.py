@@ -114,14 +114,14 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         :rtype: dict
         """
         fields = dict()
-        fields["title"] = [self.title, self.unittitle]
-        fields["creator"] = [name for name in [self.archdesc.origination] if name]
-        fields["publisher"] = [self.file_desc.publication.publisher]
-        fields["date"] = [date.normalized for date in [self.profiledesc.date] if date]
-        fields["language"] = self.profiledesc.language_codes
-        fields["subject"] = self.dc_subjects
-        fields["contributor"] = self.dc_contributors
-        fields["identifier"] = [self.eadid]
+        fields["title"] = set([self.title, self.unittitle])
+        fields["creator"] = set([name for name in [self.archdesc.origination] if name])
+        fields["publisher"] = set([self.file_desc.publication.publisher])
+        fields["date"] = set([date.normalized for date in [self.profiledesc.date] if date])
+        fields["language"] = set(self.profiledesc.language_codes)
+        fields["subject"] = set(self.dc_subjects)
+        fields["contributor"] = set(self.dc_contributors)
+        fields["identifier"] = set([self.eadid])
         
         return fields
 
