@@ -222,10 +222,10 @@ class FaViewsTest(TestCase):
         #title
         self.assertContains(response, '<meta content="Bailey and Thurman families papers, circa 1882-1995" name="DC:title">')
         #dc_contributors
-        self.assertContains(response, '<meta content=" Bailey, I. G. (Issac George), 1847-1914." name="DC:contributor">')
-        self.assertContains(response, '<meta content=" Bailey, Susie E., d. 1948." name="DC:contributor">')
-        self.assertContains(response, '<meta content=" Thurman, Howard, 1900-1981." name="DC:contributor">')
-        self.assertContains(response, '<meta content=" Thurman, Sue Bailey." name="DC:contributor">')
+        self.assertContains(response, '<meta content="Bailey, I. G. (Issac George), 1847-1914." name="DC:contributor">')
+        self.assertContains(response, '<meta content="Bailey, Susie E., d. 1948." name="DC:contributor">')
+        self.assertContains(response, '<meta content="Thurman, Howard, 1900-1981." name="DC:contributor">')
+        self.assertContains(response, '<meta content="Thurman, Sue Bailey." name="DC:contributor">')
        
     def test_view_simple(self):
         fa_url = reverse('fa:view-fa', kwargs={'id': 'leverette135'})
