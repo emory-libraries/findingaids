@@ -9,11 +9,11 @@
 {% endblock %}
 
 {% block site-name %}Finding Aids{% endblock %}
-{% block site-slogan %}Find Manuscripts & Archives{% endblock %}
+{% block site-slogan %}Find Manuscripts &amp; Archives{% endblock %}
 
 {% load eulcore_tags %}
 {% block navbar-items %}
-        <li><a href="{% url fa:keyword-search %}"class="{% activebase request '^/search' %}">search</a></li>
+        <li><a href="{% url fa:keyword-search %}" class="{% activebase request '^/search' %}">search</a></li>
         <li><a>collections</a></li>
         <li><a href="">About</a></li>
 {% endblock %}

@@ -1,8 +1,7 @@
-{# finding aids base template - handles preview logic if preview is set to True #}
 {% extends "site_base.html" %}
+{# finding aids base template - handles preview logic if preview is set to True #}
 
-{% block page-title %}Finding Aids {% if preview %} : PREVIEW {% endif %}
-    {% block page-subtitle %}: Home{% endblock %}
+{% block page-title %}Finding Aids {% if preview %} : PREVIEW {% endif %}{% block page-subtitle %}: Home{% endblock %}
 {% endblock %}
 
 {% block body-class %}{% if preview %}preview{% endif %}{% endblock %}
