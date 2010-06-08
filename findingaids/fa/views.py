@@ -104,22 +104,7 @@ def view_fa(request, id):
     except DoesNotExist:   
         raise Http404
 
-    meta_dict = dict({'DC.title' : fa.title,
-    'DC.creator' : fa.author,
-    'DC.contributor' : fa.author,
-    'DC.publisher' : fa.file_desc.publication.publisher,
-    'DC.date' : fa.file_desc.publication.date.normalized,
-    'DC.language' : fa.profiledesc.languages[0],	# FIXME: temporary
-    'DC.identifier' : fa.eadid})
-
-    for name in meta_dict.keys():
-        if meta_dict[name]:
-            continue
-        else:
-            del meta_dict[name]
-
-
-    # FIXME: handle other exceptions 
+    # FIXME: handle other exceptions
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid])    
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
                                                          'series' : series,
