@@ -205,15 +205,15 @@ class FaViewsTest(TestCase):
     def test_view_dc_fields(self):
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'abbey244'}))
         #dc:creator
-        self.assertContains(response, '<meta content="\n                Abbey Theatre.\n            " name="DC:creator">')
+        self.assertContains(response, '<meta content="Abbey Theatre." name="DC:creator">')
         #dc:publisher
         self.assertContains(response, '<meta content="Emory University" name="DC:publisher">')
         #date
         self.assertContains(response, '<meta content="2002-02-24" name="DC:date">')        #language
         self.assertContains(response, '<meta content="eng" name="DC:language">')
         #dc_subjects
-        self.assertContains(response, '<meta content="Irish drama--20th\n\t\t\t century." name="DC:subject">')
-        self.assertContains(response, '<meta content="Theater--Ireland--20th\n\t\t\t century." name="DC:subject">')
+        self.assertContains(response, '<meta content="Irish drama--20th century." name="DC:subject">')
+        self.assertContains(response, '<meta content="Theater--Ireland--20th century." name="DC:subject">')
         self.assertContains(response, '<meta content="Dublin (Ireland)" name="DC:subject">')
         #identifier
         self.assertContains(response, '<meta content="abbey244" name="DC:identifier">')
@@ -222,10 +222,10 @@ class FaViewsTest(TestCase):
         #title
         self.assertContains(response, '<meta content="Bailey and Thurman families papers, circa 1882-1995" name="DC:title">')
         #dc_contributors
-        self.assertContains(response, '<meta content=" Bailey, I. G. (Issac\n\t\t\t George), 1847-1914." name="DC:contributor">')
-        self.assertContains(response, '<meta content=" Bailey, Susie E., d.\n\t\t\t 1948." name="DC:contributor">')
-        self.assertContains(response, '<meta content=" Thurman, Howard,\n\t\t\t 1900-1981." name="DC:contributor">')
-        self.assertContains(response, '<meta content=" Thurman, Sue\n\t\t\t Bailey." name="DC:contributor">')
+        self.assertContains(response, '<meta content=" Bailey, I. G. (Issac George), 1847-1914." name="DC:contributor">')
+        self.assertContains(response, '<meta content=" Bailey, Susie E., d. 1948." name="DC:contributor">')
+        self.assertContains(response, '<meta content=" Thurman, Howard, 1900-1981." name="DC:contributor">')
+        self.assertContains(response, '<meta content=" Thurman, Sue Bailey." name="DC:contributor">')
        
     def test_view_simple(self):
         fa_url = reverse('fa:view-fa', kwargs={'id': 'leverette135'})
