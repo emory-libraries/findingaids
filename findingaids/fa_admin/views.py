@@ -21,7 +21,7 @@ from eulcore.django.existdb.db import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 
 from findingaids.fa.models import FindingAid
-from findingaids.admin.utils import check_ead, check_eadxml, clean_ead
+from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 
 
 @login_required
@@ -56,7 +56,7 @@ def main(request):
     except (EmptyPage, InvalidPage):
         recent_files = paginator.page(paginator.num_pages)
 
-    return render_to_response('admin/index.html', {'files' : recent_files,
+    return render_to_response('fa_admin/index.html', {'files' : recent_files,
                             'show_pages' : show_pages,
                             'error' : error},
                             context_instance=RequestContext(request))
@@ -81,7 +81,7 @@ def list_staff(request):
 
     """
     users = User.objects.all()
-    return render_to_response('admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
+    return render_to_response('fa_admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
 
 
 def edit_user(request, user_id):
@@ -108,16 +108,16 @@ def edit_user(request, user_id):
                 user.user_permissions = userForm.cleaned_data['user_permissions']
                 user.save()
                 messages.success(request, "The changes you have selected for '%s' have been saved." % user.username)
-                return HttpResponseRedirect("/admin/")
+                return HttpResponseRedirect("/fa_admin/")
 
             else: # Handle validation errors
                 messages.success(request, 'There are errors in you submission, please review the form.')
-                return render_to_response('admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
+                return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
         else:
             userForm = UserChangeForm(instance=user)
             
             
-        return render_to_response('admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
+        return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
     else:
         messages.warning(request, 'You do not have permission to view this page.')
         return HttpResponseRedirect("/admin/")
@@ -150,7 +150,7 @@ def _prepublication_check(request, filename, mode='publish'):
     errors = check_ead(fullpath, dbpath)
     if errors:
         ok = False
-        response = render_to_response('admin/publish-errors.html',
+        response = render_to_response('fa_admin/publish-errors.html',
                 {'errors': errors, 'filename': filename, 'mode': mode},
                 context_instance=RequestContext(request))
     else:
@@ -164,7 +164,7 @@ def publish(request):
     Admin publication form.  Allows publishing an EAD file by updating or adding
     it to the configured eXist database so it will be immediately visible on
     the public site.  Files can only be published if they pass an EAD sanity check,
-    implemented in :meth:`~findingaids.admin.utils.check_ead`.
+    implemented in :meth:`~findingaids.fa_admin.utils.check_ead`.
 
     On POST, sanity-check the EAD file specified in request from the configured
     and (if it passes all checks), publish it to make it immediately visible on
@@ -201,7 +201,7 @@ def publish(request):
 
         # redirect to main admin page with code 303 (See Other)
         response = HttpResponse(status=303)
-        response['Location'] = reverse('admin:index')
+        response['Location'] = reverse('fa-admin:index')
         return response
     else:
         # if not POST, display list of files available for publication
@@ -228,13 +228,13 @@ def preview(request):
             messages.success(request, 'Successfully loaded <b>%s</b> for preview.' % filename)                
             # redirect to document preview page with code 303 (See Other)
             response = HttpResponse(status=303)
-            response['Location'] = reverse('admin:preview:view-fa', kwargs={'id': ead.eadid })
+            response['Location'] = reverse('fa-admin:preview:view-fa', kwargs={'id': ead.eadid })
             return response
         else:
             messages.error("Error loading <b>%s</b> for preview." % filename)
             # redirect to main admin page with code 303 (See Other)
             response = HttpResponse(status=303)
-            response['Location'] = reverse('admin:index')
+            response['Location'] = reverse('fa-admin:index')
             return response
     else:
         return HttpResponse('preview placeholder- list of files to be added here')
@@ -249,7 +249,7 @@ def cleaned_eadxml(request, filename):
     the xml, with a filename matching that of the original document.
 
     Steps taken to clean a document are documented in
-    :meth:`~findingaids.admin.utils.clean_ead`.
+    :meth:`~findingaids.fa_admin.utils.clean_ead`.
 
     :param filename: name of the file to clean; should be base filename only,
         document will be pulled from the configured source directory.    
@@ -301,9 +301,9 @@ def cleaned_ead(request, filename, mode):
             messages.info(request, 'No changes made to <b>%s</b>; EAD is already clean.' % filename)
             # redirect to main admin page with code 303 (See Other)
             response = HttpResponse(status=303)
-            response['Location'] = reverse('admin:index')
+            response['Location'] = reverse('fa-admin:index')
             return response
-        return render_to_response('admin/cleaned.html', {'filename' : filename,
+        return render_to_response('fa_admin/cleaned.html', {'filename' : filename,
                                 'changes' : changes, 'errors' : errors},
                                 context_instance=RequestContext(request))
 

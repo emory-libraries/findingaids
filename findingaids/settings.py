@@ -119,7 +119,7 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 CACHE_BACKEND = 'locmem://'
 
 INSTALLED_APPS = (
-    #'django.contrib.admin',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -131,7 +131,7 @@ INSTALLED_APPS = (
     'eulcore.django.ldap.emory',
     'eulcore.django.util',
     'findingaids.fa',
-    'findingaids.admin',
+    'findingaids.fa_admin',
 )
 
 EXTENSION_DIRS = (

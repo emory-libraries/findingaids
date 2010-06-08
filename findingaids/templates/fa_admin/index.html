@@ -5,7 +5,7 @@
 {% block content-body %}
   {% if user.is_authenticated %}
   <div id="print-links">
-    <a href="{% url admin:logout %}">logout</a>
+    <a href="{% url fa-admin:logout %}">logout</a>
   </div>
   <div>
     <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong></p>
@@ -15,9 +15,9 @@
   {% if user.is_superuser %}
   <div id="record_list">
       <h2>Account Management</h2>
-      <p>You can manage accounts <a id="no-decoration" href="{% url admin:list-staff %}">here.</a></p>
+      <p>You can manage accounts <a id="no-decoration" href="{% url fa-admin:list-staff %}">here.</a></p>
   </div>
   {% endif %}
-  {% include "admin/_list_files.html" %}
+  {% include "fa_admin/_list_files.html" %}
 
 {% endblock %}

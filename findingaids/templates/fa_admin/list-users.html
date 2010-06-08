@@ -5,7 +5,7 @@
 {% block content-body %}
 {% if user.is_authenticated %}
     <div id="print-links">
-        <a href="{% url admin:logout %}">logout</a>
+        <a href="{% url fa-admin:logout %}">logout</a>
     </div>
   <div>
     <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong></p>
@@ -35,7 +35,7 @@
             {% else %}
             <td><img src="{{ MEDIA_URL }}/admin/false.gif" alt="False" Icon style="border:0px solid" /></td>
             {% endif %}
-            <td><a href="{% url admin:edit-user user.id %}"><img src="{{ MEDIA_URL }}/admin/edit.gif" alt="Edit" Icon style="border:0px solid" /></a>change</td>
+            <td><a href="{% url fa-admin:edit-user user.id %}"><img src="{{ MEDIA_URL }}/admin/edit.gif" alt="Edit" Icon style="border:0px solid" /></a>change</td>
         </tr>
     {% endfor %}
     </table>

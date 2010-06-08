@@ -13,8 +13,8 @@ from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
-from findingaids.admin.views import _get_recent_xml_files, _pages_to_show
-from findingaids.admin.utils import check_ead, clean_ead
+from findingaids.fa_admin.views import _get_recent_xml_files, _pages_to_show
+from findingaids.fa_admin.utils import check_ead, clean_ead
 from findingaids.fa.models import FindingAid
 
 
@@ -22,7 +22,7 @@ class AdminViewsTest(TestCase):
     fixtures =  ['user']
     admin_credentials = {'username': 'testadmin', 'password': 'secret'}
 
-    # create temporary directory with files for testing
+    # create temporary dirctory with files for testing
     # (unchanged by tests, so only doing once here instead of in setup)
     tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
     tmpfiles = []
@@ -62,7 +62,7 @@ class AdminViewsTest(TestCase):
         rmtree(self.tmpdir)
 
     def test_recent_files(self):
-        admin_index = reverse('admin:index')
+        admin_index = reverse('fa-admin:index')
         # note: recent files list is *currently* displayed on main admin page
 
         # not logged in
@@ -92,17 +92,17 @@ class AdminViewsTest(TestCase):
         self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
         self.assertContains(response, os.path.basename(self.tmpfiles[2].name))
         # file list contains buttons to publish documents
-        publish_url = reverse('admin:publish-ead')
+        publish_url = reverse('fa-admin:publish-ead')
         self.assertContains(response, '<form action="%s" method="post"' % publish_url)
         self.assertContains(response, '<button type="submit" name="filename" value="%s" '
                 % os.path.basename(self.tmpfiles[0].name))
         # file list contains buttons to prnvenw documents
-        preview_url = reverse('admin:preview-ead')
+        preview_url = reverse('fa-admin:preview-ead')
         self.assertContains(response, '<form action="%s" method="post"' % preview_url)
         self.assertContains(response, '<button type="submit" name="filename" value="%s" '
                 % os.path.basename(self.tmpfiles[0].name), 2)
         # file list contains link to clean documents
-        clean_url = reverse('admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
+        clean_url = reverse('fa-admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
         self.assertContains(response, '<a href="%s">CLEAN</a>' % clean_url)
         # contains pagination
         self.assertPattern('Pages: \s*1', response.content)
@@ -114,7 +114,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual(0, len(response.context['files'].object_list))
 
     def test_publish(self):
-        publish_url = reverse('admin:publish-ead')
+        publish_url = reverse('fa-admin:publish-ead')
         self.client.login(**self.admin_credentials)
         # GET should just list files available to be published
         response = self.client.get(publish_url)
@@ -126,14 +126,14 @@ class AdminViewsTest(TestCase):
 
         # use fixture directory to test publication
         filename = 'hartsfield558.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'admin', 'fixtures')
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
         response = self.client.post(publish_url, {'filename' : filename}, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
                              % (expected, code, publish_url))
         (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(reverse('admin:index') in redirect_url)       
+        self.assert_(reverse('fa-admin:index') in redirect_url)       
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
                              % (expected, code, publish_url))
@@ -157,7 +157,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
     def test_preview(self):
-        preview_url = reverse('admin:preview-ead')
+        preview_url = reverse('fa-admin:preview-ead')
         self.client.login(**self.admin_credentials)
         # TODO: GET should just list files available for preview
         response = self.client.get(preview_url)
@@ -168,11 +168,11 @@ class AdminViewsTest(TestCase):
 
         # use fixture directory to test preview
         filename = 'hartsfield558.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'admin', 'fixtures')
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
         response = self.client.post(preview_url, {'filename' : filename})
         # NOTE: django testclient doesn't seem to load preview versions correctly
         code = response.status_code
-        preview_docurl = reverse('admin:preview:view-fa', kwargs={'id': 'hartsfield558'})
+        preview_docurl = reverse('fa-admin:preview:view-fa', kwargs={'id': 'hartsfield558'})
         self.assert_(preview_docurl in response['Location'])
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
@@ -196,7 +196,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
     def test_login_admin(self):
-        admin_index = reverse('admin:index')
+        admin_index = reverse('fa-admin:index')
         # Test admin account can login
         response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
         response = self.client.get('/admin/')
@@ -207,7 +207,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
         
     def test_login_staff(self):
-        admin_index = reverse('admin:index')
+        admin_index = reverse('fa-admin:index')
         staff = User.objects.create_user('staffmember', 'staff.member@emory.edu', 'staffpassword')
         staff.is_staff = True
         staff.save()
@@ -221,7 +221,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
 
     def test_login_non_existent(self):
-        admin_index = reverse('admin:index')    
+        admin_index = reverse('fa-admin:index')    
         # Test a none existent account cannot login
         response = self.client.post('/accounts/login/', {'username': 'non_existent', 'password': 'whatever'})
         self.assertContains(response, """<p>Your username and password didn't match. Please try again.</p>""")
@@ -231,7 +231,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
         
     def test_logout(self):
-        admin_index = reverse('admin:index')
+        admin_index = reverse('fa-admin:index')
         # Test admin account can login
         response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
         response = self.client.get('/admin/')
@@ -248,7 +248,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
 
     def test_list_staff(self):
-        admin_index = reverse('admin:index')
+        admin_index = reverse('fa-admin:index')
         # Test admin account can login
         self.client.login(**self.admin_credentials)
         response = self.client.get('/admin/accounts/')
@@ -259,7 +259,7 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
 
     def test_edit_user(self):
-        admin_index = reverse('admin:index')
+        admin_index = reverse('fa-admin:index')
         # Test admin account can login
         self.client.login(**self.admin_credentials)
         user = User.objects.create_user('test', 'test@emory.edu', 'testpassword')
@@ -275,11 +275,11 @@ class AdminViewsTest(TestCase):
     def test_cleaned_ead(self):
          # use fixture directory to test publication
         filename = 'hartsfield558.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'admin', 'fixtures')        
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')        
         
-        cleaned_xml = reverse('admin:cleaned-ead', args=[filename])
-        cleaned_summary = reverse('admin:cleaned-ead-about', args=[filename])
-        cleaned_diff = reverse('admin:cleaned-ead-diff', args=[filename])
+        cleaned_xml = reverse('fa-admin:cleaned-ead', args=[filename])
+        cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
+        cleaned_diff = reverse('fa-admin:cleaned-ead-diff', args=[filename])
         
         self.client.login(**self.admin_credentials)
         response = self.client.get(cleaned_summary)
@@ -326,14 +326,14 @@ class AdminViewsTest(TestCase):
         filename = 'abbey244.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
 
-        cleaned_summary = reverse('admin:cleaned-ead-about', args=[filename])
+        cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
         response = self.client.get(cleaned_summary, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (following redirects, clean EAD)'
                              % (expected, code, cleaned_summary))
         (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(reverse('admin:index') in redirect_url)
+        self.assert_(reverse('fa-admin:index') in redirect_url)
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (clean EAD)'
                              % (expected, code, cleaned_summary))
@@ -384,12 +384,12 @@ class UtilsTest(TestCase):
     def test_check_ead(self):
         # check valid EAD - no errors  -- good fixture, should pass all tests
         dbpath = settings.EXISTDB_TEST_COLLECTION + '/hartsfield588.xml'
-        valid_eadfile = os.path.join(settings.BASE_DIR, 'admin', 'fixtures', 'hartsfield558.xml')
+        valid_eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml')
         errors = check_ead(valid_eadfile, dbpath)
         self.assertEqual(0, len(errors))
 
         # should cause several errors - not DTD valid, eadid, series/subseries ids missing, index id missing
-        errors = check_ead(os.path.join(settings.BASE_DIR, 'admin', 'fixtures', 'hartsfield558_invalid.xml'),
+        errors = check_ead(os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558_invalid.xml'),
                 dbpath)
         self.assertNotEqual(0, len(errors))
         self.assert_("No declaration for attribute invalid" in str(errors[0]))   # validation error
@@ -419,7 +419,7 @@ class UtilsTest(TestCase):
 
     def test_clean_ead(self):
         # ead with series/subseries, and index
-        eadfile = os.path.join(settings.BASE_DIR, 'admin', 'fixtures', 'hartsfield558.xml')
+        eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = clean_ead(ead, eadfile)
         self.assert_(isinstance(ead, FindingAid), "clean_ead should return an instance of FindingAid")

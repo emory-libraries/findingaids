@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 from django.conf import settings
 
 urlpatterns = patterns('',                                                                                  
-                       url(r'^admin/', include('findingaids.admin.urls', namespace='admin')),
+                       url(r'^admin/', include('findingaids.fa_admin.urls', namespace='fa-admin')),
                        (r'^accounts/login/$', 'django.contrib.auth.views.login'),
                        url(r'^$', 'findingaids.fa.views.site_index', name="site-index"),
                        # everything else should fall through to the main app

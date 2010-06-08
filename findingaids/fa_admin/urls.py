@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 from findingaids.fa.urls import document_urls
 
-urlpatterns = patterns('findingaids.admin.views',
+urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^$', 'main', name="index"),
     url(r'^accounts/$', 'list_staff', name="list-staff"),
     url(r'^accounts/user/(?P<user_id>[0-9.]+)/$', 'edit_user', name="edit-user"),

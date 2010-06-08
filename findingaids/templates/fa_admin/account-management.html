@@ -6,7 +6,7 @@
 
   {% if user.is_authenticated %}
         <div id="print-links">
-      <a href="{% url admin:logout %}">logout</a>
+      <a href="{% url fa-admin:logout %}">logout</a>
    </div>
    {% if form.errors %}
     <div id="form-error">
@@ -16,7 +16,7 @@
     {% endif %}
     <div>
       <p>Please edit the user settings...</p>
-      {% url admin.edit_user user_id as edit_user_url %}
+      {% url fa_admin:edit-user user_id as edit_user_url %}
         <form action="{{ edit_user_url }}" method="post">{% csrf_token %}
           <table>
             {{ form.as_table }}

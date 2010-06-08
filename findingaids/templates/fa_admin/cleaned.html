@@ -15,7 +15,7 @@
 </ul>
 {% endif %}
 
-<p><a href="{% url admin:cleaned-ead-diff filename %}" target="_blank">View file differences line by line.</a></p>
+<p><a href="{% url fa-admin:cleaned-ead-diff filename %}" target="_blank">View file differences line by line.</a></p>
 
 <div class="diff">
 {% for c in changes %}        
@@ -24,6 +24,6 @@
 </div>
 
 <hr/> {# provide a link to cleaned xml after differences have been reviewed #}
-<p>Download the <a href="{% url admin:cleaned-ead filename %}">cleaned version of {{ filename }}</a>.</p>
+<p>Download the <a href="{% url fa-admin:cleaned-ead filename %}">cleaned version of {{ filename }}</a>.</p>
 
 {% endblock %}

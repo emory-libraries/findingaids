@@ -26,16 +26,16 @@
     <tr>
         <td>{{ file }}</td>
         <td>
-            <form action="{% url admin:publish-ead %}" method="post">{% csrf_token %}
+            <form action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
                 <button type="submit" name="filename" value="{{ file }}" >PUBLISH</button>
             </form>
         </td>
         <td>
-            <form action="{% url admin:preview-ead %}" method="post">{% csrf_token %}
+            <form action="{% url fa-admin:preview-ead %}" method="post">{% csrf_token %}
                 <button type="submit" name="filename" value="{{ file }}" >PREVIEW</button>
             </form>
         </td>
-        <td><a href="{% url admin:cleaned-ead-about file %}">CLEAN</a></td>
+        <td><a href="{% url fa-admin:cleaned-ead-about file %}">CLEAN</a></td>
         <td>{{ mtime|date}} ({{ mtime|timesince }} ago)</td>
     </tr>
 {% empty %}
