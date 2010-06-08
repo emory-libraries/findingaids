@@ -4,5 +4,7 @@ expects a dictionary named dc_fields with dc field names for keys and list of va
 {% endcomment %}
 <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" />
 {% for name, contents in dc_fields.items %}
-   {% for value in contents %}<meta name="DC.{{name}}" content="{{value}}" />{% endfor %}
+    {% for value in contents %}
+        <meta name="DC.{{name}}" content="{{value}}" />
+    {% endfor %}
 {% endfor %}
