@@ -1,0 +1,6 @@
+{# Dulbin Core meta data for a finding aid (used by view.html) #}
+{% for dc_name, dc_contents in findingaid.dc_fields.items %}
+   {% for dc_content in dc_contents %}
+      <meta content="{{dc_content}}" name="DC:{{dc_name}}">
+   {% endfor %}
+{% endfor %}
