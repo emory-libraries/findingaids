@@ -1,11 +1,12 @@
 {% extends "findingaids/base.html" %}
 {% load ead %}
 
-
 {% block page-head %}
   {{block.super}}
-  {% comment %} dublin core metadata for a certain EAD {% endcomment %}
-  {% include "findingaids/sections/_dc_meta.html" %}
+  {# embed Dublin Core metadata for this finding aid in the html header #}
+  {% with findingaid.dc_fields as dc_fields %}
+    {% include "findingaids/sections/_dc_meta.html" %}
+  {% endwith %}
 {% endblock %}
 
 {% block page-subtitle %}: {{ findingaid.title }}{% endblock %}
