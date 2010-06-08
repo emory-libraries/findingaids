@@ -204,28 +204,28 @@ class FaViewsTest(TestCase):
 
     def test_view_dc_fields(self):
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'abbey244'}))
-        #dc:creator
-        self.assertContains(response, '<meta content="Abbey Theatre." name="DC:creator">')
-        #dc:publisher
-        self.assertContains(response, '<meta content="Emory University" name="DC:publisher">')
+        #DC.creator
+        self.assertContains(response, '<meta name="DC.creator" content="Abbey Theatre." />')
+        #DC.publisher
+        self.assertContains(response, '<meta name="DC.publisher" content="Emory University" />')
         #date
-        self.assertContains(response, '<meta content="2002-02-24" name="DC:date">')        #language
-        self.assertContains(response, '<meta content="eng" name="DC:language">')
+        self.assertContains(response, '<meta name="DC.date" content="2002-02-24" />')        #language
+        self.assertContains(response, '<meta name="DC.language" content="eng" />')
         #dc_subjects
-        self.assertContains(response, '<meta content="Irish drama--20th century." name="DC:subject">')
-        self.assertContains(response, '<meta content="Theater--Ireland--20th century." name="DC:subject">')
-        self.assertContains(response, '<meta content="Dublin (Ireland)" name="DC:subject">')
+        self.assertContains(response, '<meta name="DC.subject" content="Irish drama--20th century." />')
+        self.assertContains(response, '<meta name="DC.subject" content="Theater--Ireland--20th century." />')
+        self.assertContains(response, '<meta name="DC.subject" content="Dublin (Ireland)" />')
         #identifier
-        self.assertContains(response, '<meta content="abbey244" name="DC:identifier">')
+        self.assertContains(response, '<meta name="DC.identifier" content="abbey244" />')
 
-        response = self.client.get('/documents/bailey807')
+        response = self.client.get(reverse('fa:view-fa', kwargs = {'id': 'bailey807'}))
         #title
-        self.assertContains(response, '<meta content="Bailey and Thurman families papers, circa 1882-1995" name="DC:title">')
+        self.assertContains(response, '<meta name="DC.title" content="Bailey and Thurman families papers, circa 1882-1995" />')
         #dc_contributors
-        self.assertContains(response, '<meta content="Bailey, I. G. (Issac George), 1847-1914." name="DC:contributor">')
-        self.assertContains(response, '<meta content="Bailey, Susie E., d. 1948." name="DC:contributor">')
-        self.assertContains(response, '<meta content="Thurman, Howard, 1900-1981." name="DC:contributor">')
-        self.assertContains(response, '<meta content="Thurman, Sue Bailey." name="DC:contributor">')
+        self.assertContains(response, '<meta name="DC.contributor" content="Bailey, I. G. (Issac George), 1847-1914." />')
+        self.assertContains(response, '<meta name="DC.contributor" content="Bailey, Susie E., d. 1948." />')
+        self.assertContains(response, '<meta name="DC.contributor" content="Thurman, Howard, 1900-1981." />')
+        self.assertContains(response, '<meta name="DC.contributor" content="Thurman, Sue Bailey." />')
        
     def test_view_simple(self):
         fa_url = reverse('fa:view-fa', kwargs={'id': 'leverette135'})
