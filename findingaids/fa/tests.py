@@ -100,7 +100,7 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_("Abbey Theatre collection, 1921-1995" in [title.__unicode__() for title in fields["title"]])
         self.assert_("Abbey Theatre." in fields["creator"])
         self.assert_("Emory University" in fields["publisher"])
-        self.assert_("2002-02-04" in fields["date"])
+        self.assert_("2002-02-24" in fields["date"])
         self.assert_("eng" in fields["language"])
         self.assert_("Irish drama--20th century." in fields["subject"])
         self.assert_("Theater--Ireland--20th century." in fields["subject"])
@@ -180,30 +180,13 @@ class FaViewsTest(TestCase):
         self.assertEquals(response.status_code, 404)
 
     def test_view_dc_fields(self):
-        fields = self.findingaid['abbey244'].dc_fields()
-        self.assert_("Bailey and Thurman families papers, circa 1882-1995" in fields["title"])
-        self.assert_("\n                Abbey Theatre.\n            " in fields["creator"])
-        self.assert_("Emory University" in fields["publisher"])
-        self.assert_("2002-02-04" in fields["date"])
-        self.assert_("eng" in fields["language"])
-        self.assert_("Irish drama--20th\n\t\t\t century." in fields["subject"])
-        self.assert_("Theater--Ireland--20th\n\t\t\t century." in fields["subject"])
-        self.assert_("Dublin (Ireland)" in fields["subject"])
-        self.assert_("abbey244" in fields["identifier"])
-        
-        fields = self.findingaid['bailey807'].dc_fields()
-        self.assert_(" Bailey, I. G. (Issac\n\t\t\t George), 1847-1914." in fields["contributor"])
-        self.assert_(" Bailey, Susie E., d.\n\t\t\t 1948." in fields["contributor"])
-        self.assert_(" Thurman, Howard,\n\t\t\t 1900-1981." in fields["contributor"])
-        self.assert_(" Thurman, Sue\n\t\t\t Bailey." in fields["contributor"])
-
         response = self.client.get('/documents/abbey244')
         #dc:creator
         self.assertContains(response, '<meta content="\n                Abbey Theatre.\n            " name="DC:creator">')
         #dc:publisher
         self.assertContains(response, '<meta content="Emory University" name="DC:publisher">')
         #date
-        self.assertContains(response, '<meta content="2002-02-04" name="DC:date">')        #language
+        self.assertContains(response, '<meta content="2002-02-24" name="DC:date">')        #language
         self.assertContains(response, '<meta content="eng" name="DC:language">')
         #dc_subjects
         self.assertContains(response, '<meta content="Irish drama--20th\n\t\t\t century." name="DC:subject">')
