@@ -1,0 +1,18 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Preview{% endblock %}
+
+{% block content-title %}Finding Aids available preview{% endblock %}
+
+{% block content-body %}
+
+<ul>
+{% for fa in findingaids %}
+<li><a href="{% url fa-admin:preview:view-fa fa.eadid %}">{{ fa.list_title }}</a>
+    <br/>last modified: {{ fa.last_modified|timesince }} ago ({{ fa.last_modified|date}})</li>
+{% empty %}
+  <li>No documents currently loaded for preview.</li>
+{% endfor %}
+</ul>
+
+{% endblock %}

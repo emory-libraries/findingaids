@@ -159,13 +159,7 @@ class AdminViewsTest(TestCase):
     def test_preview(self):
         preview_url = reverse('fa-admin:preview-ead')
         self.client.login(**self.admin_credentials)
-        # TODO: GET should just list files available for preview
-        response = self.client.get(preview_url)
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
-                             % (expected, code, preview_url))        
-
+        
         # use fixture directory to test preview
         filename = 'hartsfield558.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
@@ -181,7 +175,22 @@ class AdminViewsTest(TestCase):
         #self.assertContains(response, "Successfully loaded")
         docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
         # confirm that document was actually saved to exist
-        self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)        
+        self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
+
+        # GET should just list files available for preview
+        response = self.client.get(preview_url)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
+                             % (expected, code, preview_url))
+        self.assertContains(response, "Hartsfield, William Berry",
+            msg_prefix="preview summary should list title of document loaded for preview")
+        self.assertContains(response, reverse('fa-admin:preview:view-fa', kwargs={'id': 'hartsfield558'}),
+            msg_prefix="preview summary should link to preview page for document loaded to preview")
+        self.assertContains(response, 'last modified: 0 minutes ago',
+            msg_prefix="preview summary listing includes modification time")
+            
+        # clean up
         self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # preview invalid document - should display errors

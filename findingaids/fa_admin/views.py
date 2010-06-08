@@ -21,6 +21,7 @@ from eulcore.django.existdb.db import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 
 from findingaids.fa.models import FindingAid
+from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 
 
@@ -237,6 +238,12 @@ def preview(request):
             response['Location'] = reverse('fa-admin:index')
             return response
     else:
+        _use_preview_collection()    
+        fa = FindingAid.objects.order_by('last_modified').only('eadid', 'list_title', 'last_modified')
+        _restore_publish_collection()
+        return render_to_response('fa_admin/preview_list.html',
+                {'findingaids' : fa, 'querytime': [fa.queryTime()]},
+                context_instance=RequestContext(request))
         return HttpResponse('preview placeholder- list of files to be added here')
 
 

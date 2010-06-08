@@ -13,7 +13,7 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
-from findingaids.fa.utils import render_to_pdf
+from findingaids.fa.utils import render_to_pdf, _use_preview_collection, _restore_publish_collection
 
 
 def _ead_lastmodified(request, id, *args, **kwargs):
@@ -311,24 +311,3 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url):
             if component.hasSubseries():
                 links.append(_subseries_links(component, url_ids=current_url_ids, url_callback=url_callback))
     return links
-
-
-_stored_publish_collection = None
-
-def _use_preview_collection():
-    # for preview mode: store real exist collection, and switch to preview collection
-    global _stored_publish_collection
-    _stored_publish_collection = getattr(settings, "EXISTDB_ROOT_COLLECTION", None)
-
-    # temporarily override settings
-    settings.EXISTDB_ROOT_COLLECTION = settings.EXISTDB_PREVIEW_COLLECTION
-    db = ExistDB()
-    # create test collection, but don't complain if collection already exists
-    db.createCollection(settings.EXISTDB_ROOT_COLLECTION, True)
-
-def _restore_publish_collection():
-    # for preview mode: switch back to real exist collection
-    global _stored_publish_collection
-
-    if _stored_publish_collection is not None:
-        settings.EXISTDB_ROOT_COLLECTION = _stored_publish_collection
