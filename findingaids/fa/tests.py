@@ -4,6 +4,7 @@ import re
 from types import ListType
 from lxml import etree
 
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import Client, TestCase as DjangoTestCase
 
@@ -126,61 +127,83 @@ class FaViewsTest(TestCase):
         pass
      
     def test_title_letter_list(self):
-        response = self.client.get('/titles')
-        self.assertEquals(response.status_code, 301)    # redirect to titles/
-
-        response = self.client.get('/titles/')
-        self.assertEquals(response.status_code, 200)
+        titles_url = reverse('fa:browse-titles')
+        response = self.client.get(titles_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
+                             % (expected, response.status_code, titles_url))
 
         # first letters from 4 test documents
-        self.assertContains(response, 'href="/titles/A"')
-        self.assertContains(response, 'href="/titles/B"')
-        self.assertContains(response, 'href="/titles/L"')
-        self.assertContains(response, 'href="/titles/R"')
+        for letter in ['A', 'B', 'L', 'R']:        
+            self.assertContains(response, 'href="%s"' % \
+                reverse('fa:titles-by-letter', kwargs={'letter':letter}),
+                msg_prefix="browse titles should link to titles starting with %s    " % letter)
+
         # should not include first letters not present in the data
-        self.assertContains(response, 'href="/titles/Z"', 0)
+        self.assertContains(response, 'href="%s"' % \
+                reverse('fa:titles-by-letter', kwargs={'letter':'Z'}), 0,
+                msg_prefix='browse titles should not link to titles starting with Z')
 
     def test_titles_by_letter(self):
-        response = self.client.get('/titles/A')
-        self.assertEquals(response.status_code, 200)
-        self.assertContains(response, 'href="/documents/abbey244')
-        self.assertContains(response, '<p class="abstract">Collection of play scripts')
-        self.assertContains(response, '2 finding aids found')
+        a_titles = reverse('fa:titles-by-letter', kwargs={'letter':'A'})
+        response = self.client.get(a_titles)
+        expected = 200
+        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
+                             % (expected, response.status_code, a_titles))
+        self.assertContains(response, 'href="%s' % \
+            reverse('fa:view-fa', kwargs={'id': 'abbey244'}),
+            msg_prefix='browse by titles for A should link to Abbey finding aid')
+        self.assertContains(response, '<p class="abstract">Collection of play scripts',
+            msg_prefix='browse by titles for A should include Abbey finding aid abstract')
+        self.assertContains(response, '2 finding aids found',
+            msg_prefix='browse by titles for A should return 2 finding aids')
         # test pagination ?
 
         # test current letter
-        self.assertPattern("<a *class='current'[^>]*>A<", response.content)
+        self.assertPattern("<a *class='current'[^>]*>A<", response.content,
+            msg_prefix='browse by letter A should mark A as current letter')
 
         # format_ead
-        response = self.client.get('/titles/P')
-        self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+> research files''', response.content) # title
-        self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''', response.content) # abstract
+        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'P'}))
+        # title
+        self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+> research files''',
+            response.content, msg_prefix='title with formatting should be formatted in list view')
+        # abstract
+        self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''',
+            response.content, msg_prefix='abstract with formatting should be formatted in list view') 
 
         # no finding aids
-        response = self.client.get('/titles/Z')
-        self.assertPattern('<div>No finding aids found for .*Z.*</div>', response.content)
+        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'Z'}))
+        self.assertPattern('<div>No finding aids found for .*Z.*</div>', response.content,
+            msg_prefix="titles by letter 'Z' should return no finding aids")
 
-    def test_listview(self):
-        response = self.client.get('/titles/B')
+        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'B'}))
 
         # finding aid with no origination - unit title used as browse title & link   
         # - unit title should only be displayed once
-        self.assertContains(response, 'Bailey and Thurman families papers', 1)
+        self.assertContains(response, 'Bailey and Thurman families papers', 1,
+            msg_prefix="finding aid with no origination should use unit title once as title & link")
         
         # Additional case for doubled title problem -title with formatting
-        response = self.client.get('/titles/P')
+        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'P'}))
         self.assertContains(response, 'Pitts v. Freeman', 2) # Title and abstract
-        self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content) #title within unittitle
+        #title within unittitle
+        self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content,
+            msg_prefix='title within unittitle should be formatted on list view')
     
 
 # view finding aid main page
 
     def test_view_notfound(self):
-        response = self.client.get('/documents/nonexistent')
-        self.assertEquals(response.status_code, 404)
+        nonexistent_ead = reverse('fa:view-fa', kwargs={'id': 'nonexistent'})
+        response = self.client.get(nonexistent_ead)
+        expected = 404
+        self.assertEqual(response.status_code, expected, 
+                        'Expected %s but returned %s for nonexistent EAD at %s'
+                            % (expected, response.status_code, nonexistent_ead))
 
     def test_view_dc_fields(self):
-        response = self.client.get('/documents/abbey244')
+        response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'abbey244'}))
         #dc:creator
         self.assertContains(response, '<meta content="\n                Abbey Theatre.\n            " name="DC:creator">')
         #dc:publisher
@@ -205,15 +228,19 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<meta content=" Thurman, Sue\n\t\t\t Bailey." name="DC:contributor">')
        
     def test_view_simple(self):
-        response = self.client.get('/documents/leverette135')
-        self.assertEquals(response.status_code, 200)
+        fa_url = reverse('fa:view-fa', kwargs={'id': 'leverette135'})
+        response = self.client.get(fa_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, fa_url))
 
         # title
         self.assertPattern('<h1[^>]*>.*Fannie Lee Leverette scrapbooks', response.content)
         self.assertContains(response, 'circa 1900-1948</h1>')
 
         # descriptive summary content
-	self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
+        self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
             "descriptive summary - creator")
         self.assertPattern('Title:.*Fannie Lee Leverette scrapbooks,circa 1900-1948',
             response.content, "descriptive summary - title")
@@ -285,8 +312,12 @@ class FaViewsTest(TestCase):
         self.assertNotContains(response, 'Creator:')
 
     def test_view__fa_with_series(self):
-        response = self.client.get('/documents/abbey244')
-        self.assertEquals(response.status_code, 200)
+        fa_url = reverse('fa:view-fa', kwargs={'id': 'abbey244'})
+        response = self.client.get(fa_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, fa_url))
 
         # admin info fields not present in leverette
         self.assertPattern('Related Materials in This Repository.*William Butler Yeats collection',
@@ -307,8 +338,12 @@ class FaViewsTest(TestCase):
             response.content, "series 3 link")
 
     def test_view__fa_with_subseries(self):
-        response = self.client.get('/documents/raoul548')
-        self.assertEquals(response.status_code, 200)
+        fa_url = reverse('fa:view-fa', kwargs={'id': 'raoul548'})
+        response = self.client.get(fa_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, fa_url))
 
         # admin info fields not present in previous fixtures
         self.assertPattern('Related Materials in Other Repositories.*original Wadley diaries',
@@ -338,75 +373,103 @@ class FaViewsTest(TestCase):
 
     def test_view_indexentry(self):
         # main page should link to indexes in ead contents
-        response = self.client.get('/documents/raoul548')
-        self.assertContains(response, 'Index of Selected Correspondents')
+        response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'raoul548'}))
+        self.assertContains(response, 'Index of Selected Correspondents',
+            msg_prefix='main finding aid page should list Index title')
         # index links should be full urls, not same-page anchors
-        self.assertContains(response, 'href="/documents/raoul548/index1"')
+        index_url = reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'index1'})
+        self.assertContains(response, 'href="%s"' % index_url,
+            msg_prefix='main finding aid page should link to index page')
         # second index
-        self.assertContains(response, 'Second Index')
-        self.assertContains(response, 'href="/documents/raoul548/index2"')
+        self.assertContains(response, 'Second Index',
+            msg_prefix='main finding aid page should list second Index title')
+        index2_url = reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'index2'})
+        self.assertContains(response, 'href="%s"' % index2_url,
+            msg_prefix='main finding aid page should link to second index page')
 
         # first index - on a separate page
-        response = self.client.get('/documents/raoul548/index1')
+        
+        response = self.client.get(index_url)
         # ead title, table of contents
-        self.assertContains(response, 'Raoul family papers')
-        self.assertContains(response, 'Series 1')
-        self.assertContains(response, 'Index of Selected Correspondents')
+        self.assertContains(response, 'Raoul family papers',
+            msg_prefix="finding aid index page includes main finding aid title")
+        self.assertContains(response, 'Series 1',
+            msg_prefix='finding aid index page includes series listing')
+        self.assertContains(response, 'Index of Selected Correspondents',
+            msg_prefix='finding aid index page includes current index title')
         # current index on TOC should not be a link
-        self.assertContains(response, 'href="/documents/raoul548/index1"', 0)
+        self.assertContains(response, 'href="%s"' % index_url, 0,
+            msg_prefix='current index is not a link in finding aid ToC')
+        # should link to other index
+        self.assertContains(response, 'href="%s"' % index2_url,
+            msg_prefix='index page includes link to second index in finding aid ToC')
         # first index name and ref
-        self.assertContains(response, 'Alexander, Edwin Porter, 1835-1910')
-        self.assertContains(response, 'Series 1 - 2:1 (2); 2:5 (1)')
+        self.assertContains(response, 'Alexander, Edwin Porter, 1835-1910',
+            msg_prefix='first index name is listed on index page')
+        self.assertContains(response, 'Series 1 - 2:1 (2); 2:5 (1)',
+            msg_prefix='first index reference is listed on index page')
         # last index name and ref
-        self.assertContains(response, 'Woolford, T. Guy')
-        self.assertContains(response, 'Series 1 - 32:4 (10); 32:5 (3)')
+        self.assertContains(response, 'Woolford, T. Guy',
+            msg_prefix='last index name is listed on index page')
+        self.assertContains(response, 'Series 1 - 32:4 (10); 32:5 (3)',
+            msg_prefix='reference from last index name is listed on index page')
 
-        # second index
-        response = self.client.get('/documents/raoul548/index2')
+        # second index also retrieves
+        response = self.client.get(index2_url)
         self.assertContains(response, 'Second Index')
-
-        # TODO: test that current index is not linked in TOC
-        # test links are not anchors
 
 
     def test_view_nodsc(self):
-        response = self.client.get('/documents/adams465')
-        self.assertEquals(response.status_code, 200)
+        fa_url = reverse('fa:view-fa', kwargs={'id': 'adams465'})
+        response = self.client.get(fa_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, fa_url))
 
         # record with no dsc - no container list or series
-        self.assertNotContains(response, 'Container List')
-        self.assertNotContains(response, 'Description of Series')
+        self.assertNotContains(response, 'Container List',
+            msg_prefix='finding aid with no dsc does not include a container list')
+        self.assertNotContains(response, 'Description of Series',
+            msg_prefix='finding aid with no dsc does not include a description of series')
 
         # FIXME: test also not listed in top-level table of contents?
 
-# view single series in a finding aid
-
+    # view single series in a finding aid
     def test_view_series__bailey_series1(self):
-        response = self.client.get('/documents/bailey807/bailey807_series1')
-        self.assertEquals(response.status_code, 200)
+        series_url = reverse('fa:series-or-index', kwargs={'id': 'bailey807',
+            'series_id': 'bailey807_series1'})
+        response = self.client.get(series_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, series_url))
 
+        fa_url = reverse('fa:view-fa', kwargs={'id': 'bailey807'})
         # single series page
         # - series title
         self.assertPattern('<h2>.*Series 1.*Correspondence,.*1855-1995.*</h2>',
             response.content, "series title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="/documents/bailey807">Bailey and Thurman.+families papers',
+        self.assertPattern('<h1[^>]*>.*<a href="%s">Bailey and Thurman.+families papers' % fa_url,
             response.content, "finding aid title displayed, links to main record page")
         # ead toc
-        self.assertPattern('<a href="/documents/bailey807#descriptive_summary">Descriptive Summary</a>',
+        self.assertPattern('<a href="%s#descriptive_summary">Descriptive Summary</a>' % fa_url,
             response.content, "link to main finding aid descriptive summary")
-        self.assertPattern('<a href="/documents/bailey807#administrative_information">Administrative Information</a>',
+        self.assertPattern('<a href="%s#administrative_information">Administrative Information</a>' % fa_url,
             response.content, "link to main finding aid admin info")
-        self.assertPattern('<a href="/documents/bailey807#collection_description">Collection Description</a>',
+        self.assertPattern('<a href="%s#collection_description">Collection Description</a>' % fa_url,
             response.content, "link to main finding aid collection description")
-        self.assertPattern('<a href="/documents/bailey807#control_access">Selected Search Terms</a>',
+        self.assertPattern('<a href="%s#control_access">Selected Search Terms</a>' % fa_url,
             response.content, "link to main finding aid control access")
         # series nav
         self.assertPattern('<li>[^<]*Series 1:.*Correspondence.*</li>',
             response.content, "series nav - current series not a link")
-        self.assertPattern('<li>.*<a href="/documents/bailey807/bailey807_series2">.*Series 2:.*Writings by Bailey family.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 2:.*Writings by Bailey family.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'bailey807', 'series_id': 'bailey807_series2'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="/documents/bailey807/bailey807_series9">.*Series 9:.*Audiovisual material.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 9:.*Audiovisual material.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'bailey807', 'series_id': 'bailey807_series9'}),
             response.content, "series nav - link to series 9")
 
         # series contents
@@ -419,23 +482,32 @@ class FaViewsTest(TestCase):
 
 
     def test_view_subseries__raoul_series1_6(self):
-        response = self.client.get('/documents/raoul548/raoul548_1003223/raoul548_1001928')
-        self.assertEquals(response.status_code, 200)
+        subseries_url = reverse('fa:view-subseries', kwargs={'id': 'raoul548',
+            'series_id': 'raoul548_1003223', 'subseries_id': 'raoul548_1001928'})
+        response = self.client.get(subseries_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, subseries_url))
 
         # single series page
         # - series title
         self.assertPattern('<h2>.*Subseries 1\.6.*Gaston C\. Raoul papers,.*1882-1959.*</h2>',
             response.content, "subseries title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="/documents/raoul548">Raoul family papers,.*1865-1985',
+        self.assertPattern('<h1[^>]*>.*<a href="%s">Raoul family papers,.*1865-1985' % \
+            reverse('fa:view-fa', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
             
         # series nav
-        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003223">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'}),
             response.content, "series nav - series 1 link")
-        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003649">.*Series 2:.*Photographs.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 2:.*Photographs.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003649'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_s4">.*Series 4:.*Miscellaneous.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}),
             response.content, "series nav - link to series 4")
 
         # descriptive info
@@ -456,30 +528,46 @@ class FaViewsTest(TestCase):
             "last content of subseries 1.6")
 
         # top-level ToC on series page should include index link
-        self.assertContains(response, 'Index of Selected Correspondents')
-        self.assertContains(response, 'href="/documents/raoul548/index1"')
-        self.assertContains(response, 'Second Index')
-        self.assertContains(response, 'href="/documents/raoul548/index2"')
+        self.assertContains(response, 'Index of Selected Correspondents',
+            msg_prefix="subseries ToC lists index title")
+        self.assertContains(response, 'href="%s"' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'index1'}),
+            msg_prefix="subseries ToC links to index")
+        self.assertContains(response, 'Second Index',
+            msg_prefix='subseries ToC lists second index title')
+        self.assertContains(response, 'href="%s"' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'index2'}),
+            msg_prefix='subseries ToC links to second index')
 
 
     def test_view_subsubseries__raoul_series4_1a(self):
         # NOTE: raoul series 4 broken into sub-sub-series for testing, is not in original finding aid
-        response = self.client.get('/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1a')
-        self.assertEquals(response.status_code, 200)
+        subsubseries_url = reverse('fa:view-subsubseries', kwargs={'id': 'raoul548',
+            'series_id': 'raoul548_s4', 'subseries_id': 'raoul548_4.1',
+            'subsubseries_id': 'raoul548_4.1a'})
+        response = self.client.get(subsubseries_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, subsubseries_url))
         
         # - sub-subseries title
         self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
             response.content, "sub-subseries title displayed, no physdesc")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="/documents/raoul548">Raoul family papers,.*1865-1985',
+        self.assertPattern('<h1[^>]*>.*<a href="%s">Raoul family papers,.*1865-1985' % \
+            reverse('fa:view-fa', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
 
         # series nav
-        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003223">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'}),
             response.content, "series nav - series 1 link")
-        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_1003649">.*Series 2:.*Photographs.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 2:.*Photographs.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003649'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="/documents/raoul548/raoul548_s4">.*Series 4:.*Miscellaneous.*</a>.*</li>',
+        self.assertPattern('<li>.*<a href="%s">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}),
             response.content, "series nav - link to series 4")
 
         # subseries contents
@@ -490,19 +578,27 @@ class FaViewsTest(TestCase):
 
 
         # series with <head>less scopecontent
-        response = self.client.get('/documents/raoul548/raoul548_s4/rushdie1000_subseries2.1')
+        subseries_url = reverse('fa:view-subseries', kwargs={'id': 'raoul548',
+            'series_id': 'raoul548_s4', 'subseries_id': 'rushdie1000_subseries2.1'})
+        response = self.client.get(subseries_url)
         self.assertContains(response, "Subseries 2.1")
         self.assertContains(response, "Additional drafts and notes")
         # missing section head should not be displayed as "none"
-        self.assertContains(response, "None", 0)
+        self.assertContains(response, "None", 0,
+            msg_prefix="series with a section with no head does not display 'None' for heading")
 
 
 # **** tests for helper functions for creating series url, list of series/subseries for display in templates
 
     def test__series_url(self):
-        self.assertEqual('/documents/docid/s1', _series_url('docid', 's1'))
-        self.assertEqual('/documents/docid/s1/s1.2', _series_url('docid', 's1', 's1.2'))
-        self.assertEqual('/documents/docid/s3/s3.5/s3.5a', _series_url('docid', 's3', 's3.5', 's3.5a'))
+        self.assertEqual(reverse('fa:series-or-index', kwargs={'id': 'docid', 'series_id': 's1'}),
+             _series_url('docid', 's1'))
+        self.assertEqual(reverse('fa:view-subseries',
+            kwargs={'id': 'docid', 'series_id': 's1', 'subseries_id': 's1.2'}),
+            _series_url('docid', 's1', 's1.2'))
+        self.assertEqual(reverse('fa:view-subsubseries',
+            kwargs={'id': 'docid', 'series_id': 's3', 'subseries_id': 's3.5', 'subsubseries_id': 's3.5a'}),
+            _series_url('docid', 's3', 's3.5', 's3.5a'))
 
     def test__subseries_links__dsc(self):
         # subseries links for a top-level series that has subseries
@@ -510,15 +606,20 @@ class FaViewsTest(TestCase):
         links = _subseries_links(fa.dsc, url_ids=[fa.eadid])
         
         self.assert_("Series 1: Letters and personal papers" in links[0])
-        self.assert_("href='/documents/raoul548/raoul548_1003223'" in links[0])
+        self.assert_("href='%s'" %  reverse('fa:series-or-index',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'})
+            in links[0])
         # nested list for subseries
         self.assert_(isinstance(links[1], ListType))
         self.assert_("Subseries 1.1: William Greene" in links[1][0])
-        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100355'" in links[1][0])
+        self.assert_("href='%s'" % reverse('fa:view-subseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+            'subseries_id': 'raoul548_100355'})    in links[1][0])
 
         # second-to-last entry - series 4
         self.assert_("Series 4: Misc" in links[-2])
-        self.assert_("href='/documents/raoul548/raoul548_s4'" in links[-2])
+        self.assert_("href='%s'" % reverse('fa:series-or-index',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}) in links[-2])
         # last entry - series 4 subseries
         self.assert_(isinstance(links[-1], ListType))
         self.assert_("Subseries 4.1:" in links[-1][0])
@@ -534,15 +635,25 @@ class FaViewsTest(TestCase):
         links = _subseries_links(series)
         
         self.assertEqual(13, len(links))  # raoul series has subseries 1-13
-        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100904'" in links[2])
+        self.assert_("href='%s'" % reverse('fa:view-subseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+            'subseries_id': 'raoul548_100904'}) in links[2])
         self.assert_('Subseries 1.1: William Greene' in links[0])
-        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100355'" in links[0])
+        self.assert_("href='%s'" % reverse('fa:view-subseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+            'subseries_id': 'raoul548_100355'}) in links[0])
         self.assert_('Subseries 1.2: Mary Wadley' in links[1])
-        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100529'" in links[1])
+        self.assert_("href='%s'" % reverse('fa:view-subseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+            'subseries_id': 'raoul548_100529'}) in links[1])
         self.assert_('Subseries 1.3: Sarah Lois' in links[2])
-        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_100904'" in links[2])
+        self.assert_("href='%s'" % reverse('fa:view-subseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+            'subseries_id': 'raoul548_100904'}) in links[2])
         self.assert_('Subseries 1.13: Norman Raoul' in links[-1])
-        self.assert_("href='/documents/raoul548/raoul548_1003223/raoul548_1003222'" in links[-1])
+        self.assert_("href='%s'" % reverse('fa:view-subseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+            'subseries_id': 'raoul548_1003222'}) in links[-1])
 
         series = Series.objects.get(id='raoul548_1003223')
         # should get exception when top-level ead id is not available
@@ -555,12 +666,18 @@ class FaViewsTest(TestCase):
         links = _subseries_links(series)
         
         self.assert_("Subseries 4.1: Misc" in links[0])
-        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1'" in links[0])
+        self.assert_("href='%s'" % reverse('fa:view-subseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
+            'subseries_id': 'raoul548_4.1'}) in links[0])
         self.assert_(isinstance(links[1], ListType))
         self.assert_("Subseries 4.1a: Genealogy" in links[1][0])
-        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1a'" in links[1][0])
+        self.assert_("href='%s'" % reverse('fa:view-subsubseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
+            'subseries_id': 'raoul548_4.1', 'subsubseries_id': 'raoul548_4.1a'}) in links[1][0])
         self.assert_("Subseries 4.1b: Genealogy part 2" in links[1][1])
-        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1b'" in links[1][1])
+        self.assert_("href='%s'" % reverse('fa:view-subsubseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
+            'subseries_id': 'raoul548_4.1', 'subsubseries_id': 'raoul548_4.1b'}) in links[1][1])
         
 
     def test__subseries_links_c02(self):
@@ -570,9 +687,13 @@ class FaViewsTest(TestCase):
 
         self.assertEqual(2, len(links))     # test doc has two c03 subseries
         self.assert_("Subseries 4.1a: Genealogy" in links[0])
-        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1a'" in links[0])
+        self.assert_("href='%s'" % reverse('fa:view-subsubseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
+            'subseries_id': 'raoul548_4.1', 'subsubseries_id': 'raoul548_4.1a'}) in links[0])
         self.assert_("Subseries 4.1b: Genealogy part 2" in links[1])
-        self.assert_("href='/documents/raoul548/raoul548_s4/raoul548_4.1/raoul548_4.1b'" in links[1])
+        self.assert_("href='%s'" % reverse('fa:view-subsubseries',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
+            'subseries_id': 'raoul548_4.1', 'subsubseries_id': 'raoul548_4.1b'}) in links[1])
 
         # c02 retrieved without parent c01 id should get an exception
         series = Subseries.objects.also('ead__eadid').get(id='raoul548_4.1')        
@@ -605,9 +726,13 @@ class FaViewsTest(TestCase):
 
     def test_printable_fa(self):
         # using 'full' html version of pdf for easier testing
-        response = self.client.get('/documents/raoul548/full')
-        self.assertEquals(response.status_code, 200)        
-        # publication info         
+        fullfa_url = reverse('fa:full-fa', kwargs={'id': 'raoul548'})
+        response = self.client.get(fullfa_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, fullfa_url))
+        # publication infor
         self.assertPattern('Emory University.*Manuscript, Archives, and Rare Book Library.*Atlanta, GA 30322', response.content,
             "publication statement included")
 
@@ -630,8 +755,9 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "Second Index")
 
         # simple finding aid with no subseries - should have container list
-        response = self.client.get('/documents/leverette135/full')
-        self.assertContains(response, "Container List")
+        response = self.client.get(reverse('fa:full-fa', kwargs={'id': 'leverette135'}))
+        self.assertContains(response, "Container List",
+            msg_prefix="finding aid with no subseries should include container list in printable mode")
 
     def test_ead_lastmodified(self):
         modified = _ead_lastmodified('rqst', 'abbey244')
@@ -662,28 +788,50 @@ class FullTextFaViewsTest(TestCase):
                        'directory' : exist_fixture_path }
 
     def test_keyword_search(self):
-        response = self.client.get('/search/', { 'keywords' : 'raoul'})
-        self.assertEquals(response.status_code, 200)
+        search_url = reverse('fa:keyword-search')
+        response = self.client.get(search_url, { 'keywords' : 'raoul'})
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, search_url))
 
-        self.assertPattern("<p[^>]*>Search results for : .*raoul.*</p>", response.content)
-        self.assertContains(response, "1 finding aid found")
-        self.assertContains(response, "/documents/raoul548")
-        self.assertContains(response, "<div class=\"relevance\">")
+        self.assertPattern("<p[^>]*>Search results for : .*raoul.*</p>", response.content,
+            msg_prefix='search results include search term')
+        self.assertContains(response, "1 finding aid found",
+            msg_prefix='search for "raoul" returns one finding aid')
+        self.assertContains(response, reverse('fa:view-fa', kwargs={'id': 'raoul548'}),
+            msg_prefix='search for raoul includes link to raoul finding aid')
+        self.assertContains(response, "<div class=\"relevance\">",
+            msg_prefix='search results include relevance indicator')
 
-        response = self.client.get('/search/', { 'keywords' : 'family papers'})
-        self.assertEquals(response.status_code, 200)
+        response = self.client.get(search_url, { 'keywords' : 'family papers'})
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, search_url))
         self.assertPattern("<p[^>]*>Search results for : .*family papers.*</p>", response.content)
-        self.assertContains(response, "5 finding aids found")
-        self.assertContains(response, "Fannie Lee Leverette scrapbooks")
-        self.assertContains(response, "Raoul family papers")
-        self.assertContains(response, "Bailey and Thurman families papers")
-        self.assertContains(response, "Abbey Theatre collection")
-        self.assertContains(response, "Pomerantz, Gary M.")
-        self.assertContains(response, "<div class=\"relevance\">", 5)
+        self.assertContains(response, "5 finding aids found",
+            msg_prefix='search for "family papers" should return 5 test finding aids')
+        self.assertContains(response, "Fannie Lee Leverette scrapbooks",
+            msg_prefix='search for "family papers" should include Leverette')
+        self.assertContains(response, "Raoul family papers",
+            msg_prefix='search for "family papers" should include raoul')
+        self.assertContains(response, "Bailey and Thurman families papers",
+            msg_prefix='search for "family papers" should include bailey')
+        self.assertContains(response, "Abbey Theatre collection",
+            msg_prefix='search for "family papers" should include abbey theatre')
+        self.assertContains(response, "Pomerantz, Gary M.",
+            msg_prefix='search for "family papers" should include pomerantz')
+        self.assertContains(response, "<div class=\"relevance\">", 5,
+            msg_prefix='search results return one relevance indicator for each match')
 
-        response = self.client.get('/search/', { 'keywords' : 'nonexistentshouldmatchnothing'})
-        self.assertEquals(response.status_code, 200)
-        self.assertContains(response, "No finding aids matched")
+        response = self.client.get(search_url, { 'keywords' : 'nonexistentshouldmatchnothing'})
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, search_url))
+        self.assertContains(response, "No finding aids matched",
+            msg_prefix='search for nonexistent term should indicate no matches found')
 
 
 class FormatEadTestCase(DjangoTestCase):

@@ -117,7 +117,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         fields["title"] = [self.title, self.unittitle]
         fields["creator"] = [name for name in [self.archdesc.origination] if name]
         fields["publisher"] = [self.file_desc.publication.publisher]
-        fields["date"] = [self.profiledesc.date.normalized]
+        fields["date"] = [date.normalized for date in [self.profiledesc.date] if date]
         fields["language"] = self.profiledesc.language_codes
         fields["subject"] = self.dc_subjects
         fields["contributor"] = self.dc_contributors

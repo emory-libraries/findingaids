@@ -97,36 +97,48 @@ def _paginate_queryset(request, qs, per_page=10):
     return paginated_qs
 
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
-def view_fa(request, id):
+def view_fa(request, id, preview=False):
     "View a single finding aid"
+
+    if preview:
+        _use_preview_collection()                
     try:
         fa = FindingAid.objects.get(eadid=id)
     except DoesNotExist:   
         raise Http404
-
     # FIXME: handle other exceptions
-    series = _subseries_links(fa.dsc, url_ids=[fa.eadid])    
+    if preview:
+        _restore_publish_collection()
+        
+    series = _subseries_links(fa.dsc, url_ids=[fa.eadid])        
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
                                                          'series' : series,
-                                                         'all_indexes' : fa.archdesc.index},
+                                                         'all_indexes' : fa.archdesc.index,
+                                                         'preview': preview},
                                                          context_instance=RequestContext(request))
 
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
-def series_or_index(request, id, series_id):
+def series_or_index(request, id, series_id, preview=False):
     "View a single series (c01) or index from a finding aid"
-    return _view_series(request, id, series_id)
+    return _view_series(request, id, series_id,
+                        preview=preview)
 
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
-def view_subseries(request, id, series_id, subseries_id):
+def view_subseries(request, id, series_id, subseries_id, preview=False):
     "View a single subseries (c02) from a finding aid"   
-    return _view_series(request, id, series_id, subseries_id)
+    return _view_series(request, id, series_id, subseries_id,
+                        preview=preview)
 
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
-def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id):
+def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id, preview=False):
     "View a single subseries (c03) from a finding aid"
-    return _view_series(request, id, series_id, subseries_id, subsubseries_id)
+    return _view_series(request, id, series_id, subseries_id, subsubseries_id,
+                        preview=preview)
 
-def _view_series(request, eadid, *series_ids):
+def _view_series(request, eadid, *series_ids, **kwargs):
+    if 'preview' in kwargs and kwargs['preview']:
+        _use_preview_collection()
+        
     # get the item to be displayed (series, subseries, index)
     result = _get_series_or_index(eadid, *series_ids)
     # info needed to construct navigation links within this ead
@@ -134,11 +146,16 @@ def _view_series(request, eadid, *series_ids):
     all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=eadid).all()
     # - summary info for any indexes
     all_indexes = Index.objects.only('id', 'head').filter(ead__eadid=eadid).all()
+    
+    if 'preview' in kwargs and kwargs['preview']:
+        _restore_publish_collection()
 
     render_opts = { 'ead': result.ead,
                     'all_series' : all_series,
                     'all_indexes' : all_indexes,
                     "querytime" : [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()]}
+    # include any keyword args in template parameters (preview mode)
+    render_opts.update(kwargs)
 
     if (isinstance(result, Index)):
         render_opts['index'] = result
@@ -202,7 +219,7 @@ def keyword_search(request):
                     context_instance=RequestContext(request))
 
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
-def full_fa(request, id, mode):
+def full_fa(request, id, mode, preview=False):
     "View the full contents of a single finding aid as PDF or plain html"
     try:
         fa = FindingAid.objects.get(eadid=id)
@@ -214,7 +231,7 @@ def full_fa(request, id, mode):
 
     template = 'findingaids/full.html'
     template_args = { 'findingaid' : fa, 'series' : series,
-                    'mode' : mode, 'request' : request}
+                    'mode' : mode, 'preview': preview, 'request' : request}
     if mode == 'html':
         return render_to_response(template, template_args)
     elif mode == 'pdf':
@@ -294,3 +311,24 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url):
             if component.hasSubseries():
                 links.append(_subseries_links(component, url_ids=current_url_ids, url_callback=url_callback))
     return links
+
+
+_stored_publish_collection = None
+
+def _use_preview_collection():
+    # for preview mode: store real exist collection, and switch to preview collection
+    global _stored_publish_collection
+    _stored_publish_collection = getattr(settings, "EXISTDB_ROOT_COLLECTION", None)
+
+    # temporarily override settings
+    settings.EXISTDB_ROOT_COLLECTION = settings.EXISTDB_PREVIEW_COLLECTION
+    db = ExistDB()
+    # create test collection, but don't complain if collection already exists
+    db.createCollection(settings.EXISTDB_ROOT_COLLECTION, True)
+
+def _restore_publish_collection():
+    # for preview mode: switch back to real exist collection
+    global _stored_publish_collection
+
+    if _stored_publish_collection is not None:
+        settings.EXISTDB_ROOT_COLLECTION = _stored_publish_collection

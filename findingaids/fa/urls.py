@@ -11,21 +11,21 @@ series_id = "[a-zA-Z0-9-._]+"
 
 # make document url patterns available in a way that they can be re-used for
 # the admin preview urls
-def document_urls(**kwargs):
+def document_urls(**extra_opts):
     return patterns('findingaids.fa.views',
-        url(r'^%s$' % EADID_URL_REGEX, 'view_fa', dict(**kwargs), name='view-fa'),
+        url(r'^%s$' % EADID_URL_REGEX, 'view_fa', extra_opts, name='view-fa'),
         url(r'^%s/full$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'html'},
             name='full-fa'),     # html version of pdf, for testing
         url(r'^%s/printable$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'pdf'},
             name='printable-fa'),
-        url(r'^%s/(?P<series_id>%s)$' % (EADID_URL_REGEX, series_id),
-            'series_or_index', name='series-or-index'),
+        url(r'^%s/(?P<series_id>%s)$' % (EADID_URL_REGEX, series_id), 'series_or_index',
+            extra_opts, name='series-or-index'),
         url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)$' % \
-            (EADID_URL_REGEX, series_id, series_id),
-            'view_subseries', name='view-subseries'),
+            (EADID_URL_REGEX, series_id, series_id), 'view_subseries',
+            extra_opts, name='view-subseries'),
         url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)/(?P<subsubseries_id>%s)$' % \
-            (EADID_URL_REGEX, series_id, series_id, series_id),
-            'view_subsubseries', name='view-subsubseries')
+            (EADID_URL_REGEX, series_id, series_id, series_id), 
+            'view_subsubseries', extra_opts, name='view-subsubseries')
     )
 
 urlpatterns = patterns('findingaids.fa.views',

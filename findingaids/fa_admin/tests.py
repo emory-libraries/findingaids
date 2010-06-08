@@ -199,12 +199,11 @@ class AdminViewsTest(TestCase):
         admin_index = reverse('fa-admin:index')
         # Test admin account can login
         response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
-        response = self.client.get('/admin/')
+        response = self.client.get(admin_index)
         self.assertContains(response, '<p>You are logged in as,')
-        self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' % (expected, code, admin_index))
         
     def test_login_staff(self):
         admin_index = reverse('fa-admin:index')
@@ -213,12 +212,11 @@ class AdminViewsTest(TestCase):
         staff.save()
         # Test staff account can login
         response = self.client.post('/accounts/login/', {'username': 'staffmember', 'password': 'staffpassword'})
-        response = self.client.get('/admin/')
+        response = self.client.get(admin_index)
         self.assertContains(response, '<p>You are logged in as,')
-        self.assertEqual(response.status_code, 200)
         code = response.status_code
         expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, admin_index))
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' % (expected, code, admin_index))
 
     def test_login_non_existent(self):
         admin_index = reverse('fa-admin:index')    

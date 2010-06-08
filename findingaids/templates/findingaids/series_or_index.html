@@ -1,6 +1,6 @@
 {# display a single series or subseries or index of a finding aid #}
 {# expects ead and either series or index #}
-{% extends "site_base.html" %}
+{% extends "findingaids/base.html" %}
 {% load ead %}
 
 {% block page-subtitle %}: {{ ead.title }} : {% firstof series.display_label index.head %}{% endblock %}
