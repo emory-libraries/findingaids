@@ -5,7 +5,8 @@ from types import ListType
 from lxml import etree
 
 from django.core.urlresolvers import reverse
-from django.http import Http404
+from django.http import Http404, HttpRequest
+from django.template import RequestContext, Template
 from django.test import Client, TestCase as DjangoTestCase
 
 from eulcore.xmlmap  import load_xmlobject_from_file, XmlObject
@@ -204,12 +205,15 @@ class FaViewsTest(TestCase):
 
     def test_view_dc_fields(self):
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'abbey244'}))
+        # TODO: would be nice to validate the DC output...  (if possible)
+        
         #DC.creator
         self.assertContains(response, '<meta name="DC.creator" content="Abbey Theatre." />')
         #DC.publisher
         self.assertContains(response, '<meta name="DC.publisher" content="Emory University" />')
         #date
-        self.assertContains(response, '<meta name="DC.date" content="2002-02-24" />')        #language
+        self.assertContains(response, '<meta name="DC.date" content="2002-02-24" />')
+        #language
         self.assertContains(response, '<meta name="DC.language" content="eng" />')
         #dc_subjects
         self.assertContains(response, '<meta name="DC.subject" content="Irish drama--20th century." />')
@@ -888,3 +892,27 @@ class FormatEadTestCase(DjangoTestCase):
         self.assert_('magazine <span class="ead-title">The Smart Set</span>...' in format,
             "nested format rendered correctly")
         
+# test custom template tag ifurl
+class IfUrlTestCase(DjangoTestCase):
+
+    def test_ifurl(self):
+        template = Template("{% load ifurl %}{% ifurl preview fa:full-fa fa:view-fa id=id %}")
+        urlopts = {'id': 'docid'}
+        context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})        
+        url = template.render(context)
+        self.assertEqual(reverse('fa:view-fa', kwargs=urlopts), url,
+            "when condition is false, url is generated from second named url")
+
+        context = RequestContext(HttpRequest(), {'preview': True, 'id': 'docid'})
+        url = template.render(context)
+        self.assertEqual(reverse('fa:full-fa', kwargs=urlopts), url,
+            "when condition is true, url is generated from first named url")
+
+    def test_ifurl_asvar(self):
+        # store ifurl output in a context variable and then render it for testing
+        template = Template("{% load ifurl %}{% ifurl preview fa:full-fa fa:view-fa id=id as myurl %}{{ myurl }}")
+        urlopts = {'id': 'docid'}
+        context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})
+        url = template.render(context)
+        self.assertEqual(reverse('fa:view-fa', kwargs=urlopts), url,
+            "ifurl correctly stores resulting url in context when 'as' is specified")
