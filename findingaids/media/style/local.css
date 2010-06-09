@@ -167,3 +167,5 @@ p.removed { background-color: #ffdddd; }
 p.added { background-color: #ddffdd; }
 
 body.preview div#main { background: url('/static/images/preview.png') repeat scroll 0 0}
+span.preview-label { color: red; }
+form#preview-publish { float: right; }

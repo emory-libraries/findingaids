@@ -622,6 +622,13 @@ class FaViewsTest(TestCase):
                         kwargs={'id': 'raoul548', 'series_id': 'index1'})
         self.assertContains(response, 'href="%s"' % index_url,
             msg_prefix='preview version of main finding aid should link to index in preview mode')
+        # publish form
+        self.assertContains(response,
+                '<form id="preview-publish" action="%s" method="post"' % reverse('fa-admin:publish-ead'),
+                msg_prefix="preview page includes publish form")
+        publish_submit = '<button type="submit" name="preview_id" value="raoul548" >PUBLISH'
+        self.assertContains(response, publish_submit,
+                msg_prefix="publish form submit button has document eadid for value")
 
         # load series page
         series_url = reverse('fa-admin:preview:series-or-index',
@@ -631,12 +638,16 @@ class FaViewsTest(TestCase):
             msg_prefix='preview version of series should link to main finding aid page in preview mode')
         self.assertContains(response, 'href="%s"' % index_url,
             msg_prefix='preview version of series should link to index in preview mode')
-        
+        self.assertContains(response, publish_submit,
+                msg_prefix="publish form submit button on series page has document eadid for value")
 
         # clean up
         self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
 
-
+        # non-preview page should *NOT* include publish form
+        response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'raoul548'}))
+        self.assertNotContains(response, '<form id="preview-publish" ',
+                msg_prefix="non-preview finding aid page should not include publish form")
 
 # **** tests for helper functions for creating series url, list of series/subseries for display in templates
 

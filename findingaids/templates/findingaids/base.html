@@ -1,5 +1,5 @@
 {% extends "site_base.html" %}
-{# finding aids base template - handles preview logic if preview is set to True #}
+{# base template for single-finding aid content pages - handles preview logic if preview is set to True #}
 
 {% block page-title %}Finding Aids {% if preview %} : PREVIEW {% endif %}{% block page-subtitle %}: Home{% endblock %}
 {% endblock %}
@@ -7,5 +7,10 @@
 {% block body-class %}{% if preview %}preview{% endif %}{% endblock %}
 
 {% block content-header  %}
-    <h1 class="title">{% if preview %}PREVIEW: {% endif %}{% block content-title %}{% endblock %}</h1>
+    {% if preview %}
+        <form id="preview-publish" action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
+            <button type="submit" name="preview_id" value="{% firstof findingaid.eadid ead.eadid %}" >PUBLISH</button>
+        </form>
+    {% endif %} 
+    <h1 class="title">{% if preview %}<span class="preview-label">PREVIEW:</span> {% endif %}{% block content-title %}{% endblock %}</h1>
 {% endblock %}
