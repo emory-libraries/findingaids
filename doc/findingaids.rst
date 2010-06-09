@@ -43,11 +43,13 @@ Views
    :members:
 
 
-Custom Template Filters
------------------------
+Custom Template Filters & Tags
+------------------------------
 .. automodule:: findingaids.fa.templatetags.ead
    :members:
 
+.. automodule:: findingaids.fa.templatetags.ifurl
+   :members:
 
 Admin Site
 ----------
@@ -58,12 +60,12 @@ manage the finding aids content.
 
 Admin Views
 ^^^^^^^^^^^
-.. automodule:: findingaids.admin.views
+.. automodule:: findingaids.fa_admin.views
    :members:
 
 Admin Functions
 ^^^^^^^^^^^^^^^
-.. automodule:: findingaids.admin.utils
+.. automodule:: findingaids.fa_admin.utils
    :members:
 
 
