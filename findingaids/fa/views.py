@@ -110,12 +110,12 @@ def view_fa(request, id, preview=False):
     if preview:
         _restore_publish_collection()
         
-    series = _subseries_links(fa.dsc, url_ids=[fa.eadid])        
+    series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview)
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
                                                          'series' : series,
                                                          'all_indexes' : fa.archdesc.index,
                                                          'preview': preview},
-                                                         context_instance=RequestContext(request))
+                                            context_instance=RequestContext(request, current_app='preview'))
 
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def series_or_index(request, id, series_id, preview=False):
@@ -221,12 +221,16 @@ def keyword_search(request):
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def full_fa(request, id, mode, preview=False):
     "View the full contents of a single finding aid as PDF or plain html"
+    
+    if preview:
+        _use_preview_collection()          
     try:
         fa = FindingAid.objects.get(eadid=id)
     except DoesNotExist:
         raise Http404
-    # FIXME: other exceptions?
-
+    if preview:
+        _restore_publish_collection()
+        
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
 
     template = 'findingaids/full.html'
@@ -241,7 +245,7 @@ def _fa_listfields():
     "List of fields that should be returned for brief list display of a finding aid."
     return ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
 
-def _series_url(eadid, series_id, *ids):
+def _series_url(eadid, series_id, *ids, **extra_opts):
     """
     Generate a series or subseries url when given an eadid and list of series ids.
     Requires at least ead document id and top-level series id.  Number of additional
@@ -251,22 +255,27 @@ def _series_url(eadid, series_id, *ids):
     args = {'id' : eadid, 'series_id' : series_id}
 
     if len(ids) == 0:       # no additional args
-        urlname = 'fa:series-or-index'
+        view_name = 'series-or-index'
     if len(ids) >= 1:       # add subseries id arg if one specified (used for sub and sub-subseries)
         args['subseries_id'] = ids[0]
-        urlname = 'fa:view-subseries'
+        view_name = 'view-subseries'
     if len(ids) == 2:       # add sub-subseries id arg if specified
         args['subsubseries_id'] = ids[1]
-        urlname = 'fa:view-subsubseries'
+        view_name = 'view-subsubseries'
 
-    return reverse(urlname, kwargs=args)
+    if 'preview' in extra_opts and extra_opts['preview'] == True:
+        view_namespace = 'fa-admin:preview'
+    else:
+        view_namespace = 'fa'
 
-def _series_anchor(*ids):
+    return reverse('%s:%s' % (view_namespace, view_name), kwargs=args)
+
+def _series_anchor(*ids, **extra_opts):
     """Generate a same-page id-based anchor link for a series"""
     # only actually use the last of all ids passed in
     return "#%s" % ids[-1]
 
-def _subseries_links(series, url_ids=None, url_callback=_series_url):
+def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=False):
     """
     Recursive function to build a nested list of links to series and subseries
     to simplify template display logic for complicated series.
@@ -306,8 +315,10 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url):
     if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
         for component in series.c:            
             current_url_ids = url_ids + [component.id]
-            text = "<a href='%s'>%s</a>" % (apply(url_callback, current_url_ids), component.display_label())
+            text = "<a href='%s'>%s</a>" % (url_callback(*current_url_ids, preview=preview), \
+                            component.display_label())
             links.append(text)
             if component.hasSubseries():
-                links.append(_subseries_links(component, url_ids=current_url_ids, url_callback=url_callback))
+                links.append(_subseries_links(component, url_ids=current_url_ids, \
+                    url_callback=url_callback, preview=preview))
     return links

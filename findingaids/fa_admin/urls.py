@@ -9,9 +9,12 @@ urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^publish$', 'publish', name="publish-ead"),
     url(r'^preview$', 'preview', name="preview-ead"),
     url(r'^(?P<filename>[^/]+)/cleaned$', 'cleaned_eadxml', name="cleaned-ead"),
-    url(r'^(?P<filename>[^/]+)/cleaned/diff', 'cleaned_ead', {'mode': 'diff'}, name="cleaned-ead-diff"),
-    url(r'^(?P<filename>[^/]+)/cleaned/about', 'cleaned_ead', {'mode': 'summary'}, name="cleaned-ead-about"),
+    url(r'^(?P<filename>[^/]+)/cleaned/diff', 'cleaned_ead', {'mode': 'diff'},
+            name="cleaned-ead-diff"),
+    url(r'^(?P<filename>[^/]+)/cleaned/about', 'cleaned_ead', {'mode': 'summary'},
+            name="cleaned-ead-about"),
     # include finding document urls for preview
-    url(r'^preview/documents/', include(document_urls(preview=True), namespace='preview')),
+    url(r'^preview/documents/', include(document_urls(preview=True),
+            namespace='preview')),
 )
 

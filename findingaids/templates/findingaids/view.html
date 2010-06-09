@@ -1,5 +1,5 @@
 {% extends "findingaids/base.html" %}
-{% load ead %}
+{% load ead %}   {% load ifurl %}
 
 {% block page-head %}
   {{block.super}}
@@ -16,7 +16,7 @@
 {% block content-body %}
 
 <div id="print-links">
-    <p><a class="pdf" href="{% url fa:printable-fa id=findingaid.eadid %}">PDF Version</a></p>
+    <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable-fa fa:printable-fa id=findingaid.eadid %}">PDF Version</a></p>
 </div>
 
 {# main display page for a single finding aid; links to series & subseries, if any #}
@@ -30,7 +30,7 @@
 <h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
 <ul>
     {% for component in findingaid.dsc.c %}
-    <li><a href="{% url fa:series-or-index id=findingaid.eadid,series_id=component.id %}">
+    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=findingaid.eadid,series_id=component.id %}">
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
         {{ component.did.unittitle|format_ead }}</a>
      </li>

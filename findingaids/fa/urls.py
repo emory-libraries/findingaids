@@ -14,9 +14,9 @@ series_id = "[a-zA-Z0-9-._]+"
 def document_urls(**extra_opts):
     return patterns('findingaids.fa.views',
         url(r'^%s$' % EADID_URL_REGEX, 'view_fa', extra_opts, name='view-fa'),
-        url(r'^%s/full$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'html'},
+        url(r'^%s/full$' % EADID_URL_REGEX, 'full_fa', dict({'mode': 'html'}, **extra_opts),
             name='full-fa'),     # html version of pdf, for testing
-        url(r'^%s/printable$' % EADID_URL_REGEX, 'full_fa', {'mode' : 'pdf'},
+        url(r'^%s/printable$' % EADID_URL_REGEX, 'full_fa', dict({'mode': 'pdf'}, **extra_opts),
             name='printable-fa'),
         url(r'^%s/(?P<series_id>%s)$' % (EADID_URL_REGEX, series_id), 'series_or_index',
             extra_opts, name='series-or-index'),

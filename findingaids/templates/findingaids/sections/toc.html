@@ -1,6 +1,8 @@
 {# top-level table of contents for a finding aid (used by main finding aid and series/index views) #}
 {# expects finding aid object as ead, list of any indexes as all_indexes #}
-{% url fa:view-fa ead.eadid as ead_url %} {# store url for main finding aid page #}
+{% load ifurl %}
+{# generate and store url for main finding aid page #}
+{% ifurl preview admin:preview:view-fa fa:view-fa ead.eadid as ead_url %}
 <div id="toc">
     <h2>Table of contents:</h2>
     <ul>
@@ -14,7 +16,7 @@
              {% for toc_index in all_indexes %}
                 {% ifequal index.id toc_index.id %}<li>{{ toc_index.head }}</li>
                 {% else %} {# if on index page, don't link currently displayed index #}
-                    <li><a href="{% url fa:series-or-index id=ead.eadid,series_id=toc_index.id %}">{{ toc_index.head }}</a></li>
+                    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=toc_index.id %}">{{ toc_index.head }}</a></li>
                 {% endifequal %}
              {% endfor %}
          {% endif %}

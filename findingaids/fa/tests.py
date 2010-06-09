@@ -4,6 +4,7 @@ import re
 from types import ListType
 from lxml import etree
 
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
@@ -300,7 +301,7 @@ class FaViewsTest(TestCase):
             "family photos in container list")
 
         # format_ead
-        response = self.client.get('/documents/pomerantz890.xml')
+        response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'pomerantz890.xml'}))
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
 
         # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
@@ -312,7 +313,7 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''', response.content) # collection description
 
         # only descriptive information that is present
-        response = self.client.get('/documents/bailey807')
+        response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'bailey807'}))
         self.assertNotContains(response, 'Creator:')
 
     def test_view__fa_with_series(self):
@@ -590,6 +591,51 @@ class FaViewsTest(TestCase):
         # missing section head should not be displayed as "none"
         self.assertContains(response, "None", 0,
             msg_prefix="series with a section with no head does not display 'None' for heading")
+
+
+    def test_preview_mode(self):
+        # test preview mode of all main finding aid views
+        
+        # load fixture to preview collection
+        fullpath = path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
+        self.db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml',
+                overwrite=True)
+        fa_url = reverse('fa-admin:preview:view-fa', kwargs={'id': 'raoul548'})
+        response = self.client.get(fa_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, fa_url))
+
+        series_url = reverse('fa-admin:preview:series-or-index',
+                        kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'})
+        self.assertContains(response, 'href="%s"' % series_url,
+            msg_prefix='preview version of main finding aid should link to series in preview mode')
+
+        subseries_url = reverse('fa-admin:preview:view-subseries',
+                        kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+                                'subseries_id': 'raoul548_100355'})
+        self.assertContains(response, "href='%s'" % subseries_url,
+            msg_prefix='preview version of main finding aid should link to subseries in preview mode')
+
+        index_url = reverse('fa-admin:preview:series-or-index',
+                        kwargs={'id': 'raoul548', 'series_id': 'index1'})
+        self.assertContains(response, 'href="%s"' % index_url,
+            msg_prefix='preview version of main finding aid should link to index in preview mode')
+
+        # load series page
+        series_url = reverse('fa-admin:preview:series-or-index',
+                              kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'})
+        response = self.client.get(series_url)
+        self.assertContains(response, 'href="%s"' % fa_url,
+            msg_prefix='preview version of series should link to main finding aid page in preview mode')
+        self.assertContains(response, 'href="%s"' % index_url,
+            msg_prefix='preview version of series should link to index in preview mode')
+        
+
+        # clean up
+        self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
+
 
 
 # **** tests for helper functions for creating series url, list of series/subseries for display in templates
