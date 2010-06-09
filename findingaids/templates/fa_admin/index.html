@@ -18,6 +18,10 @@
       <p>You can manage accounts <a id="no-decoration" href="{% url fa-admin:list-staff %}">here.</a></p>
   </div>
   {% endif %}
+
+  <p>View <a href="{% url fa-admin:preview-ead
+  %}">documents available for preview</a>.</p>
+
   {% include "fa_admin/_list_files.html" %}
 
 {% endblock %}
