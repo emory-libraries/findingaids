@@ -19,9 +19,12 @@
   </div>
   {% endif %}
 
-  <p>View <a href="{% url fa-admin:preview-ead
-  %}">documents available for preview</a>.</p>
-
+<h2>Manage documents</h2>
+<ul>
+  <li><a href="">published documents</a></li>
+  <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
+</ul>
+<hr/>
   {% include "fa_admin/_list_files.html" %}
 
 {% endblock %}
