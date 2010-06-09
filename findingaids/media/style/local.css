@@ -166,4 +166,4 @@ div.diff p {
 p.removed { background-color: #ffdddd; }
 p.added { background-color: #ddffdd; }
 
-
+body.preview div#main { background: url('/static/images/preview.png') repeat scroll 0 0}
