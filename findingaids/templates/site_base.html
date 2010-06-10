@@ -20,11 +20,11 @@
 {% block admin-url %}{% url fa-admin:index %}{% endblock %}
 
 {% block sidebar-left %}
-  {% if form %}
+  {% if kwsearch_form %}
   <div id="keyword-search">
       Search all Finding Aids
       <form action="{% url fa:keyword-search %}" method="get">
-        {{form.keywords}}
+        {{kwsearch_form.keywords}}
         <input class="form-submit" type="submit" value="Search" />
       </form>
   </div>
