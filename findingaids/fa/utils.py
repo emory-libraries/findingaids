@@ -39,7 +39,7 @@ def _use_preview_collection():
     # temporarily override settings
     settings.EXISTDB_ROOT_COLLECTION = settings.EXISTDB_PREVIEW_COLLECTION
     db = ExistDB()
-    # create test collection, but don't complain if collection already exists
+    # create preview collection, but don't complain if it already exists
     db.createCollection(settings.EXISTDB_ROOT_COLLECTION, True)
 
 def _restore_publish_collection():
