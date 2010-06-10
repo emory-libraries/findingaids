@@ -16,11 +16,10 @@
     {% endif %}
     <div>
       <p>Please edit the user settings...</p>
-      {% url fa-admin:edit-user user_id %}
-        <form action="{% url fa-admin:edit-user user_id  %}" method="post">{% csrf_token %}
-          <table>
-            {{ form.as_table }}
-          </table>
+      <form action="{% url fa-admin:edit-user user_id  %}" method="post">{% csrf_token %}
+        <table>
+          {{ form.as_table }}
+        </table>
         <input type="submit" value="Submit" />
       </form>
     </div>  

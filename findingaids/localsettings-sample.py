@@ -11,9 +11,16 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-#We will not be using a RDB but this will allow tests to run
-DATABASE_ENGINE = 'sqlite3'
-DATABASE_NAME = 'no_db'
+# RDB used for user account management.
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',   # The database backend you plan to use
+        'NAME': 'database you are using',       # Database name
+        'HOST': '',                             # Host you want to connect to. An empty string means localhost.
+        'USER': 'user',                         # The username to use when connecting to the database.
+        'PASSWORD': 'password',                 # The password to use when connecting to the database.
+    }
+}
 
 #Specify Session Engine
 CACHE_BACKEND = 'file:///tmp/django_cache'
