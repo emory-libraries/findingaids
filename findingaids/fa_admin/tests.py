@@ -204,6 +204,51 @@ class AdminViewsTest(TestCase):
         docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/hartsfield588_invalid.xml')
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
+    def test_publish_from_preview(self):
+        # test publishing a document that has been loaded for preview
+        publish_url = reverse('fa-admin:publish-ead')
+        self.client.login(**self.admin_credentials)
+
+        # load a file to preview to test
+        filename = 'hartsfield558.xml'
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        response = self.client.post(reverse('fa-admin:preview-ead'), {'filename' : filename})
+
+        # publish the preview file
+        response =  self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        code = response.status_code
+        expected = 200  # final code, after following redirects
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
+                             % (expected, code, publish_url))
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(reverse('fa-admin:index') in redirect_url)
+        expected = 303      # redirect
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
+                             % (expected, code, publish_url))
+        self.assertContains(response, "Successfully added",     # NOTE: this could be 'updated' if a previous test failed
+            msg_prefix='publication success message displays')
+        self.assertContains(response, 'href="%s"' % reverse('fa:view-fa', kwargs={'id': 'hartsfield558'}),
+            msg_prefix='success message links to published document')
+        self.assertContains(response, 'William Berry Hartsfield papers',
+            msg_prefix='success message includes unit title of published document')
+
+        # confirm that document was moved to main collection
+        docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)
+        self.assertEqual(docinfo['name'], settings.EXISTDB_TEST_COLLECTION + '/' + filename)
+        # confirm that document is no longer in preview collection
+        docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)        
+        self.assertEqual({}, docinfo)
+
+        # attempt to publish a document NOT loaded to preview
+        response =  self.client.post(publish_url, {'preview_id': 'bogus345'}, follow=True)
+        messages = response.context['messages']
+        self.assertContains(response, 'Publish failed. Could not retrieve',
+            msg_prefix='error message displayed when attempting to publish a document not in preview')
+
+        # clean up
+        self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)
+
+
     def test_login_admin(self):
         admin_index = reverse('fa-admin:index')
         # Test admin account can login

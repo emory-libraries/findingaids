@@ -1,9 +1,9 @@
 import os
-from lxml.etree import XMLSyntaxError
-from eulcore.xmlmap.core import load_xmlobject_from_file
+from lxml.etree import XMLSyntaxError, XMLSchema
+from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from findingaids.fa.models import FindingAid
 
-def check_ead(filename, dbpath):
+def check_ead(filename, dbpath, xml=None):
     """
     Sanity check an EAD file before it is loaded to the configured database.
 
@@ -19,12 +19,19 @@ def check_ead(filename, dbpath):
     :rtype: list
     """
     errors = []
+    if xml is not None:
+        load_xml = load_xmlobject_from_string
+        content = xml
+    else:
+        load_xml = load_xmlobject_from_file
+        content = filename
+    
     try:
-        ead = load_xmlobject_from_file(filename, FindingAid, validate=True)
+        ead = load_xml(content, FindingAid, validate=True)
     except XMLSyntaxError, e:
         errors.append(e)
         # if not dtd-valid, load without validation to do additional checking
-        ead = load_xmlobject_from_file(filename, FindingAid, validate=False)
+        ead = load_xml(content, FindingAid, validate=False)
     
     # eadid is expected to match filename without .xml extension
     expected_eadid = os.path.basename(filename).replace('.xml', '')

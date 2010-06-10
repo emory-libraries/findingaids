@@ -17,7 +17,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 
-from eulcore.django.existdb.db import ExistDB
+from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 
 from findingaids.fa.models import FindingAid
@@ -123,7 +123,7 @@ def edit_user(request, user_id):
         messages.warning(request, 'You do not have permission to view this page.')
         return HttpResponseRedirect("/admin/")
         
-def _prepublication_check(request, filename, mode='publish'):
+def _prepublication_check(request, filename, mode='publish', xml=None):
     """
     Pre-publication check logic common to :meth:`publish` and :meth:`preview`.
 
@@ -148,7 +148,7 @@ def _prepublication_check(request, filename, mode='publish'):
     fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
     # full path in exist db collection
     dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
-    errors = check_ead(fullpath, dbpath)
+    errors = check_ead(fullpath, dbpath, xml)
     if errors:
         ok = False
         response = render_to_response('fa_admin/publish-errors.html',
@@ -176,34 +176,81 @@ def publish(request):
     On GET, displays a list of files available for publication.
     """
     if request.method == 'POST':
-        filename = request.POST['filename']
-        
-        ok, response, dbpath, fullpath = _prepublication_check(request, filename)
-        if ok is not True:
-            return response
-        # only load to exist if there are no errors found
-        db = ExistDB()
-        # get information to determine if a db file is being replaced
-        replaced = db.describeDocument(dbpath)
-        # load the document to the configured collection in eXist with the same fileneame
-        success = db.load(open(fullpath, 'r'), dbpath, overwrite=True)
-        if success:          
-            # load the file as a FindingAid object so we can generate a url to the document
-            ead = load_xmlobject_from_file(fullpath, FindingAid)
-            ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
-            if replaced:
-                change = "updated"
-            else:
-                change = "added"
-            messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
-                    % (change, filename, ead_url, ead.unittitle))
-        else:
-            messages.error("Error publishing <b>%s</b>." % filename)
+        try:
+            if 'filename' in request.POST:
+                publish_mode = 'file'
+                filename = request.POST['filename']
+                xml = None
 
-        # redirect to main admin page with code 303 (See Other)
-        response = HttpResponse(status=303)
-        response['Location'] = reverse('fa-admin:index')
-        return response
+            elif 'preview_id' in request.POST:
+                publish_mode = 'preview'
+                id = request.POST['preview_id']
+
+                # retrieve info about the document from preview collection
+                _use_preview_collection()
+                try:
+                    ead = FindingAid.objects.also('document_name').get(eadid=id)
+                except ExistDBException:
+                    ead = None
+                    messages.error(request,
+                        "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
+                _restore_publish_collection()
+
+                if ead is None:
+                    # if ead could not be retrieved from preview mode, skip processing
+                    return
+                
+                filename = ead.document_name
+                xml = ead.serialize()
+
+            ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
+            if ok is not True and publish_mode != 'preview':
+                # FIXME: currently, doctype declaration is getting lost when we load to eXist
+                # so validation fails on pre-publication check
+                # ignoring validation errors for now, since preview files *should*
+                # already have been checked when loaded for preview...
+                return response
+
+            # only load to exist if there are no errors found
+            db = ExistDB()
+            # get information to determine if an existing file is being replaced
+            replaced = db.describeDocument(dbpath)
+
+            if publish_mode == 'file':
+                # load the document to the configured collection in eXist with the same fileneame
+                success = db.load(open(fullpath, 'r'), dbpath, overwrite=True)
+                # load the file as a FindingAid object so we can generate a url to the document
+                ead = load_xmlobject_from_file(fullpath, FindingAid)
+            elif publish_mode == 'preview' and ead is not None:
+                try:
+                    # move the document from preview collection to configured public collection
+                    success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
+                            settings.EXISTDB_ROOT_COLLECTION, filename)
+                    # FindingAid instance ead already set above
+                except ExistDBException:
+                    messages.error(request,
+                        "Error moving document %s from preview collection to main collection." % filename)
+                    success = False
+                
+            if success:
+                ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
+                change = "updated" if replaced else "added"
+                messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
+                        % (change, filename, ead_url, unicode(ead.unittitle)))
+            else:
+                messages.error(request, "Error publishing <b>%s</b>." % filename)
+                
+        finally:
+            # if there is at least one error or success message, redirect to admin
+            msg = messages.get_messages(request)
+            if len(msg):
+                msg.used = False
+                # redirect to main admin page with code 303 (See Other)
+                response = HttpResponse(status=303)
+                response['Location'] = reverse('fa-admin:index')
+                return response
+            
+            # otherwise, should display prepublication-check error page
     else:
         # if not POST, display list of files available for publication
         # for now, just using main admin page
