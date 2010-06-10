@@ -12,19 +12,22 @@
   </div>
   <hr/>
   {% endif %}
-  {% if user.is_superuser %}
   <div id="record_list">
-      <h2>Account Management</h2>
-      <p>You can manage accounts <a id="no-decoration" href="{% url fa-admin:list-staff %}">here.</a></p>
+      <h2>Manage user accounts</h2>
+      {% if user.is_superuser %}
+          <ul>
+            <li> <a href="{% url fa-admin:list-staff %}">Manage user accounts</a></li>
+          </ul>
+     {% else %}
+      <p>Your user account may not have the correct permissions you require to do your work. If this is the case please...</p>
+     {% endif %}
   </div>
-  {% endif %}
-
-<h2>Manage documents</h2>
-<ul>
-  <li><a href="">published documents</a></li>
-  <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
-</ul>
-<hr/>
+  <hr/>
+  <h2>Manage documents</h2>
+    <ul>
+      <li><a href="">published documents</a></li>
+      <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
+  </ul>
+  <hr/>
   {% include "fa_admin/_list_files.html" %}
-
 {% endblock %}

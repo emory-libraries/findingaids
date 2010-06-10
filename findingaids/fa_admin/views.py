@@ -115,7 +115,7 @@ def edit_user(request, user_id):
                 messages.success(request, 'There are errors in you submission, please review the form.')
                 return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
         else:
-            userForm = UserChangeForm(instance=user)
+            userForm = UserChangeForm(initial={'password': '',}, instance=user)
             
             
         return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
