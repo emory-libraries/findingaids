@@ -1,5 +1,6 @@
 import datetime
 
+from django.http import HttpResponse
 from django.http import Http404
 from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -322,3 +323,21 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                 links.append(_subseries_links(component, url_ids=current_url_ids, \
                     url_callback=url_callback, preview=preview))
     return links
+
+@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
+def xml_fa(request, id, preview=False):
+    """
+    Display the XML content of a finding aid
+
+    :param id: the ID of an EAD
+    """
+    if preview:
+        _use_preview_collection()
+    try:
+        fa = FindingAid.objects.get(eadid=id)
+    except DoesNotExist:
+        raise Http404
+    if preview:
+        _restore_publish_collection()
+    xml_ead = fa.serialize(pretty = True)
+    return HttpResponse(xml_ead, mimetype='application/xml')
