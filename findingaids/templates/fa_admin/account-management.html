@@ -16,8 +16,8 @@
     {% endif %}
     <div>
       <p>Please edit the user settings...</p>
-      {% url fa_admin:edit-user user_id as edit_user_url %}
-        <form action="{{ edit_user_url }}" method="post">{% csrf_token %}
+      {% url fa-admin:edit-user user_id %}
+        <form action="{% url fa-admin:edit-user user_id  %}" method="post">{% csrf_token %}
           <table>
             {{ form.as_table }}
           </table>

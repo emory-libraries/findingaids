@@ -109,16 +109,16 @@ def edit_user(request, user_id):
                 user.user_permissions = userForm.cleaned_data['user_permissions']
                 user.save()
                 messages.success(request, "The changes you have selected for '%s' have been saved." % user.username)
-                return HttpResponseRedirect("/fa_admin/")
+                return HttpResponseRedirect("/admin/")
 
             else: # Handle validation errors
                 messages.success(request, 'There are errors in you submission, please review the form.')
-                return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
+                return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
         else:
-            userForm = UserChangeForm(initial={'password': '',}, instance=user)
+            userForm = UserChangeForm(instance=user)
             
             
-        return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user-id': user_id,}, context_instance=RequestContext(request))
+        return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
     else:
         messages.warning(request, 'You do not have permission to view this page.')
         return HttpResponseRedirect("/admin/")
