@@ -1,5 +1,1 @@
-from django.db import models
-
-# Create your models here.
-class Login():
-    pass
+# Models module required so tests are discovered.
