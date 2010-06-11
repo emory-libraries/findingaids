@@ -842,6 +842,21 @@ class FaViewsTest(TestCase):
         # invalid eadid
         self.assertRaises(Http404, _ead_lastmodified, 'rqst', 'bogusid')
 
+    def test_xml_fa(self):
+        nonexistent_ead = reverse('fa:xml-fa', kwargs={'id': 'nonexistent'})
+        response = self.client.get(nonexistent_ead)
+        expected = 404
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for nonexistent EAD at %s'
+                            % (expected, response.status_code, nonexistent_ead))
+        xml_url = reverse('fa:xml-fa', kwargs={'id': 'abbey244'})
+        response = self.client.get(xml_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s' % \
+                        (expected, response.status_code, xml_url))
+        expected = 'application/xml'
+        self.assertEqual(response['Content-Type'], expected, "Expected '%s' but returned '%s' for %s mimetype" % \
+                        (expected, response['Content-Type'], xml_url))
 
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index
