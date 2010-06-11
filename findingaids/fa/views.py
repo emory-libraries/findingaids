@@ -16,8 +16,10 @@ from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, t
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, _use_preview_collection, _restore_publish_collection
 
+# TODO: consolidate common logic for getting a single finding aid with or without preview mode
 
-def _ead_lastmodified(request, id, *args, **kwargs):
+
+def _ead_lastmodified(request, id, preview=False, *args, **kwargs):
     """Get the last modification time for a finding aid in eXist by eadid.
     Used to generate last-modified header for views based on a single EAD document.
     
@@ -25,29 +27,40 @@ def _ead_lastmodified(request, id, *args, **kwargs):
     :rtype: :class:`datetime.datetime`
     """
     # get document name and path by eadid, then call describeDocument
+    if preview:
+        _use_preview_collection()    
     try:
         fa = FindingAid.objects.only('document_name', 'collection_name').get(eadid=id)
-    except DoesNotExist:   
-        raise Http404
-    
-    db = ExistDB()
-    info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
-    # returns an xmlrpc DateTime object - convert into datetime format required by django
-    mod_time = info['modified'].timetuple()
-    modified = datetime.datetime(mod_time.tm_year, mod_time.tm_mon, mod_time.tm_mday,
+
+        db = ExistDB()
+        info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
+        # returns an xmlrpc DateTime object - convert into datetime format required by django
+        mod_time = info['modified'].timetuple()
+        modified = datetime.datetime(mod_time.tm_year, mod_time.tm_mon, mod_time.tm_mday,
                                  mod_time.tm_hour, mod_time.tm_min, mod_time.tm_sec)
+    except DoesNotExist:
+        raise Http404    
+    finally:
+        if preview:
+            _restore_publish_collection()
+        
     return modified
 
 
-def _ead_etag(request, id, *args, **kwargs):
+def _ead_etag(request, id, preview=False, *args, **kwargs):
     """Generate an Etag for an ead by eadid by requesting a SHA-1 checksum
     of the entire EAD xml document from eXist."""
+    if preview:
+        _use_preview_collection()    
     try:
         fa = FindingAid.objects.only('hash').get(eadid=id)
-    except DoesNotExist:   
+    except DoesNotExist:
         raise Http404
+    finally:
+        if preview:
+            _restore_publish_collection()
+        
     return fa.hash
-
 
 def site_index(request):
     "Site home page"
