@@ -235,6 +235,10 @@ def publish(request):
                     success = False
                 
             if success:
+                # request the cache to reload the PDF
+                # NOTE: need to do this asynchronously, otherwise request times out
+                #reload_cached_pdf(ead.eadid)
+
                 ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
                 change = "updated" if replaced else "added"
                 messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
@@ -410,3 +414,14 @@ def _pages_to_show(paginator, page):
             show_pages.append(page + i)
 
     return show_pages
+
+def reload_cached_pdf(eadid):
+    """Hit the configured proxy and request the PDF of a finding aid so the proxy will
+    cache the latest version."""
+    if hasattr(settings, 'PROXY_HOST') and hasattr(settings, 'SITE_BASE_URL'):
+        sleep(3)    # may need to sleep for a few seconds so cache will recognized as modified (?)
+        connection = httplib.HTTPConnection(settings.PROXY_HOST)
+        url = "%s%s" % (settings.SITE_BASE_URL.rstrip('/'), reverse('fa:printable-fa', kwargs={'id': eadid }))
+        connection.request('GET', url, None, {'Pragma': 'no-cache'})
+        r = connection.getresponse()
+    # TODO: what to do if settings are not found?

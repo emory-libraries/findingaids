@@ -49,6 +49,11 @@ AUTH_LDAP_CA_CERT_PATH = '' # absolute path of cert
 # local, full-path location for finding aids to be loaded to eXist via admin interface
 FINDINGAID_EAD_SOURCE= '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'
 
+# settings for proxy host and site base url; used to configure cache to reload
+# a PDF when publishing a new or updated EAD
+PROXY_HOST = 'localhost:3128'
+SITE_BASE_URL = 'http://localhost:800/'     
+
 ADDITIONAL_DATA_INDEX   = ""
 DOI_PURL_HOST = "http://dx.doi.org/"
 
