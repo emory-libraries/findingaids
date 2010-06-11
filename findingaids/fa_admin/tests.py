@@ -156,6 +156,17 @@ class AdminViewsTest(TestCase):
         docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield588_invalid.xml')
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
+        # attempt to publish non-well-formed xml - display errors
+        response = self.client.post(publish_url, {'filename' : 'badlyformed.xml'})
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, not well-formed xml) as admin user'
+                             % (expected, code, publish_url))
+        self.assertContains(response, "Could not publish")
+        self.assertContains(response, "Unescaped &#39;&lt;&#39; not allowed in attributes values",
+            msg_prefix="syntax error detail for badly formed XML displays")
+
+
     def test_preview(self):
         preview_url = reverse('fa-admin:preview-ead')
         self.client.login(**self.admin_credentials)
@@ -390,6 +401,38 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (clean EAD)'
                              % (expected, code, cleaned_summary))
         self.assertContains(response, "No changes made to <b>%s</b>" % filename)
+
+    def test_clean_badlyformedxml(self):
+        # use fixture directory to test publication
+        filename = 'badlyformed.xml'
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+
+        cleaned_xml = reverse('fa-admin:cleaned-ead', args=[filename])
+        cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
+        cleaned_diff = reverse('fa-admin:cleaned-ead-diff', args=[filename])
+
+        self.client.login(**self.admin_credentials)
+        response = self.client.get(cleaned_xml)
+        expected = 500
+        self.assertEqual(response.status_code, expected,
+                        'Expected %s but returned %s for %s (non-well-formed xml)' % \
+                        (expected, response.status_code, cleaned_summary))
+
+        response = self.client.get(cleaned_summary)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
+                        (expected, code, cleaned_summary))
+
+        self.assertContains(response, 'Could not load document',
+                msg_prefix='error loading document displayed')
+        self.assertContains(response, 'not allowed in attributes',
+                msg_prefix='xml syntax error displayed')
+        self.assertNotContains(response, cleaned_diff,
+                msg_prefix="cleaned summary for badly formed xml should NOT link to line-by-line diff")
+        self.assertNotContains(response, cleaned_xml,
+                msg_prefix="cleaned summary for badly formed xml should NOT link to xml for download")
+        
 
     # tests for view helper functions
 

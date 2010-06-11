@@ -15,6 +15,7 @@
 </ul>
 {% endif %}
 
+{% if xml_status == 200 %} {# only display diffs / download if cleaned xml can be generated #}
 <p><a href="{% url fa-admin:cleaned-ead-diff filename %}" target="_blank">View file differences line by line.</a></p>
 
 <div class="diff">
@@ -25,5 +26,13 @@
 
 <hr/> {# provide a link to cleaned xml after differences have been reviewed #}
 <p>Download the <a href="{% url fa-admin:cleaned-ead filename %}">cleaned version of {{ filename }}</a>.</p>
+
+{% else %}
+
+<p>There was an error loading the file you selected for cleaning; most likely,
+this indicates that the document contains invalid XML.  Please check the file in
+an XML editor and try again.</p>
+
+{% endif %}
 
 {% endblock %}

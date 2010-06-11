@@ -1,9 +1,12 @@
 import os
 import glob
+import httplib
 from datetime import datetime
 import difflib
+from lxml.etree import XMLSyntaxError
+from time import sleep
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -308,7 +311,12 @@ def cleaned_eadxml(request, filename):
         document will be pulled from the configured source directory.    
     """
     fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
-    ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?    
+    try:
+        ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?
+    except XMLSyntaxError, e:
+        # xml is not well-formed : return 500 with error message
+        return HttpResponseServerError("Could not load document: %s" % e)
+
     ead = clean_ead(ead, filename)
     cleaned_xml = ead.serialize()
 
@@ -334,30 +342,42 @@ def cleaned_ead(request, filename, mode):
     
     """
     fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
-    cleaned_ead = cleaned_eadxml(request, filename)
-    orig_ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?
-    original_xml = orig_ead.serialize()  # store as serialized by xml object, so xml output will be the same
-    # FIXME: losing doctype declaration on serialize?!?
+    changes = []
     
-    cleaned_xml = cleaned_ead.content
-    ead = load_xmlobject_from_string(cleaned_xml, FindingAid) # validate?        
-    if mode == 'diff':
-        diff = difflib.HtmlDiff(8, 80)  # set columns to wrap at 80 characters
-        # generate a html table with line-by-line comparison (meant to be called in a new window)
-        changes = diff.make_file(original_xml.split('\n'), cleaned_xml.split('\n'))
-        return HttpResponse(changes)
-    elif mode == 'summary':
-        # cleaned up EAD should pass sanity checks required for publication
-        errors = check_eadxml(ead)
-        changes = list(difflib.unified_diff(original_xml.split('\n'), cleaned_xml.split('\n')))
-        if not changes:
-            messages.info(request, 'No changes made to <b>%s</b>; EAD is already clean.' % filename)
-            # redirect to main admin page with code 303 (See Other)
-            response = HttpResponse(status=303)
-            response['Location'] = reverse('fa-admin:index')
-            return response
-        return render_to_response('fa_admin/cleaned.html', {'filename' : filename,
-                                'changes' : changes, 'errors' : errors},
+    cleaned_ead = cleaned_eadxml(request, filename)
+    
+    if cleaned_ead.status_code == 200:        
+        orig_ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?
+        original_xml = orig_ead.serialize()  # store as serialized by xml object, so xml output will be the same
+        
+        cleaned_xml = cleaned_ead.content
+        ead = load_xmlobject_from_string(cleaned_xml, FindingAid) # validate?
+        if mode == 'diff':
+            diff = difflib.HtmlDiff(8, 80)  # set columns to wrap at 80 characters
+            # generate a html table with line-by-line comparison (meant to be called in a new window)
+            changes = diff.make_file(original_xml.split('\n'), cleaned_xml.split('\n'))
+            return HttpResponse(changes)
+        elif mode == 'summary':
+            # cleaned up EAD should pass sanity checks required for publication
+            errors = check_eadxml(ead)
+            changes = list(difflib.unified_diff(original_xml.split('\n'), cleaned_xml.split('\n')))
+            if not changes:
+                messages.info(request, 'No changes made to <b>%s</b>; EAD is already clean.' % filename)
+                # redirect to main admin page with code 303 (See Other)
+                response = HttpResponse(status=303)
+                response['Location'] = reverse('fa-admin:index')
+                return response        
+    elif cleaned_ead.status_code == 500:
+        # something went wrong with generating cleaned xml - most likely, non-well-formed xml
+        errors = [cleaned_ead.content]        
+    else:
+        # this shouldn't happen; not 200 or 500 == something went dreadfully wrong
+        errors = ['Something went wrong trying to load the specified document.',
+                  cleaned_ead.content ]     # pass along the output in case it is useful?
+        
+    return render_to_response('fa_admin/cleaned.html', {'filename' : filename,
+                                'changes' : changes, 'errors' : errors,
+                                'xml_status' : cleaned_ead.status_code },
                                 context_instance=RequestContext(request))
 
 def _get_recent_xml_files(dir):

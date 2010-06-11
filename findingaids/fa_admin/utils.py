@@ -1,5 +1,5 @@
 import os
-from lxml.etree import XMLSyntaxError, XMLSchema
+from lxml.etree import XMLSyntaxError
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from findingaids.fa.models import FindingAid
 
@@ -30,8 +30,14 @@ def check_ead(filename, dbpath, xml=None):
         ead = load_xml(content, FindingAid, validate=True)
     except XMLSyntaxError, e:
         errors.append(e)
-        # if not dtd-valid, load without validation to do additional checking
-        ead = load_xml(content, FindingAid, validate=False)
+        # if not dtd-valid, then appempt to load without validation to do additional checking
+        try:
+            ead = load_xml(content, FindingAid, validate=False)
+        except XMLSyntaxError, e:
+            # if this fails, document is not well-formed xml
+            # don't bother appending the syntax error, it will be the same one found above
+            # can't do any further processing, so return
+            return errors
     
     # eadid is expected to match filename without .xml extension
     expected_eadid = os.path.basename(filename).replace('.xml', '')
