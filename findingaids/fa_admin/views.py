@@ -10,6 +10,7 @@ from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
@@ -23,7 +24,7 @@ from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_st
 from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
-
+from findingaids.fa_admin.models import Permissions
 
 @login_required
 def main(request):
@@ -84,7 +85,7 @@ def list_staff(request):
     users = User.objects.all()
     return render_to_response('fa_admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
 
-
+@permission_required('permisssions.can_edit_user')
 def edit_user(request, user_id):
     """
     Edit user page.
@@ -115,9 +116,7 @@ def edit_user(request, user_id):
                 messages.success(request, 'There are errors in you submission, please review the form.')
                 return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
         else:
-            userForm = UserChangeForm(instance=user)
-            
-            
+            userForm = UserChangeForm(instance=user)            
         return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
     else:
         messages.warning(request, 'You do not have permission to view this page.')
