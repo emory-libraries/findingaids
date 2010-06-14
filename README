@@ -10,9 +10,10 @@ Dependencies
 
 Installation
 ------------
-Install and configure like other django applications.
 
-Copy ``localsettings-sample.py`` to ``localsettings.py`` and configure. 
+Run ./configure
+
+Copy ``localsettings-sample.py`` to ``localsettings.py`` and customize the settings.
 
 The configured eXist-db user should be in the DBA group if you plan to
 use the app to manage the eXist index configuration. For more

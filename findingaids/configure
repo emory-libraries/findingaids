@@ -1,0 +1,17 @@
+sudo apt-get install python-setuptools
+sudo apt-get install mysql-server
+sudo apt-get install python-mysqldb
+sudo easy_install django
+sudo apt-get install python-django
+sudo apt-get install python-reportlab 
+sudo apt-get install python-html5lib
+sudo apt-get install libxml2-dev
+sudo apt-get install libxml2
+sudo apt-get install libxslt-dev
+sudo apt-get install python-dev
+sudo easy_install lxml
+sudo apt-get install python-ldap
+sudo easy_install python-ldap
+sudo easy_install pisa
+sudo apt-get install python-4suite-xml
+sudo python manage.py syncdb
