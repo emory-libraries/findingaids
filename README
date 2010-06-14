@@ -3,10 +3,16 @@ README
 
 Dependencies
 ------------
- * eulcore (currently included as a subversion external)
  * eXist-db 1.4 
  * xhtml2pdf/Pisa for PDF generation (http://www.xhtml2pdf.com)
+ * eulcore (currently included as a subversion external); see
+   :ref:`eulcore dependencies <eulcore-deps>` for per-module
+   dependencies. eulcore modules currently in use:
 
+   * eulcore.xmlmap
+   * eulcore.existdb and eulcore.django.existdb
+   * eulcore.django.ldap
+   * eulcore.django.testsetup
 
 Installation
 ------------
@@ -44,3 +50,15 @@ should be sufficient::
   $ sudo easy_install pisa
 
 .. _xhtml2pdf/Pisa: http://www.xhtml2pdf.com/doc/pisa-en.html
+
+
+.. _eulcore-deps:
+
+eulcore dependencies
+^^^^^^^^^^^^^^^^^^^^
+.. include:: external/django-modules/eulcore/README.dependencies 
+
+
+
+
+
