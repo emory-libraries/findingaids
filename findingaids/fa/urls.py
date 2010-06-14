@@ -2,7 +2,7 @@ from django.conf.urls.defaults import *
 
 title_urlpatterns = patterns('findingaids.fa.views',
     url('^$', 'browse_titles', name='browse-titles'),
-    url(r'^(?P<letter>[A-Z0-9])$', 'titles_by_letter', name='titles-by-letter')
+    url(r'^(?P<letter>[a-zA-Z0-9])$', 'titles_by_letter', name='titles-by-letter')
     # TEMPORARY: allow numeric - shouldn't get this, but a weird query glitch is happening...
 )
 

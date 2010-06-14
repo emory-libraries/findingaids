@@ -40,8 +40,8 @@ def format_ead(value, autoescape=None):
     
     if value is None:
         parts = []
-    elif hasattr(value, 'dom_node'):
-        parts = node_parts(value.dom_node, escape, include_tail=False)
+    elif hasattr(value, 'node'):
+        parts = node_parts(value.node, escape, include_tail=False)
     else:
         parts = [ escape(unicode(value)) ]
     
@@ -63,7 +63,7 @@ def format_ead_children(value, autoescape=None):
     else:
         escape = lambda x: x
     
-    node = getattr(value, 'dom_node', None)
+    node = getattr(value, 'node', None)
     children = getattr(node, 'childNodes', ())
     parts = ( part for child in children
                    for part in node_parts(child, escape, include_tail=False) )
@@ -79,7 +79,7 @@ _IS_EMPH = etree.XPath('self::emph')
 _IS_TITLE = etree.XPath('self::title')
 
 def node_parts(node, escape, include_tail):
-    """Recursively convert a DOM node to HTML. This function is used
+    """Recursively convert an xml node to HTML. This function is used
     internally by :func:`format_ead`. You probably want that function, not
     this one.
     

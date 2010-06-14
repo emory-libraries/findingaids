@@ -927,25 +927,25 @@ class FormatEadTestCase(DjangoTestCase):
         self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
         
     def test_italics(self):
-        self.content.dom_node = etree.fromstring(self.ITALICS)
+        self.content.node = etree.fromstring(self.ITALICS)
         format = format_ead(self.content)
         self.assert_('<span class="ead-italic">Pitts v. Freeman</span> school desegregation' in format,
             "render italic converted correctly to span class ead-italic")
 
     def test_bold(self):
-        self.content.dom_node = etree.fromstring(self.BOLD)
+        self.content.node = etree.fromstring(self.BOLD)
         format = format_ead(self.content)
         self.assert_('<span class="ead-bold">Pitts v. Freeman</span> school desegregation' in format,
             "render bold converted correctly to span class ead-bold")
 
     def test_title(self):
-        self.content.dom_node  = etree.fromstring(self.TITLE)
+        self.content.node  = etree.fromstring(self.TITLE)
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The Smart Set</span> from' in format,
             "title tag converted correctly to span class ead-title")
 
     def test_title_emph(self):
-        self.content.dom_node = etree.fromstring(self.TITLE_EMPH)
+        self.content.node = etree.fromstring(self.TITLE_EMPH)
         format = format_ead(self.content)
         self.assert_('<em>Biographical source:</em> "Shaw, George' in format,
             "emph tag rendered correctly in section with title")
@@ -953,13 +953,13 @@ class FormatEadTestCase(DjangoTestCase):
             "title rendered correctly in sectino with emph tag")
 
     def test_nested(self):
-        self.content.dom_node = etree.fromstring(self.NESTED)
+        self.content.node = etree.fromstring(self.NESTED)
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The "Smart" Set</span>...' in format,
             "nested format rendered correctly")
         
     def test_notrans(self):
-        self.content.dom_node = etree.fromstring(self.NOTRANS)
+        self.content.node = etree.fromstring(self.NOTRANS)
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The Smart Set</span>...' in format,
             "nested format rendered correctly")

@@ -111,6 +111,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         Dictionary key: base name of a Dublin Core field (e.g., creator, title)
         Dictionary value: a list of values corresponding to the DC field.
                     Note that some keys may have empty lists as their values.
+                    
         :rtype: dict
         """
         fields = dict()
@@ -128,7 +129,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
 
-    xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)
+    xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)    
     # xpath to use for alpha-browse - using list title xpaths from FindingAid
     
     # first letter of list title field (using generic item field to avoid string() conversion)
