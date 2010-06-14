@@ -88,7 +88,7 @@ def list_staff(request):
     users = User.objects.all()
     return render_to_response('fa_admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
 
-@permission_required('permisssions.can_edit_user')
+
 def edit_user(request, user_id):
     """
     Edit user page.
