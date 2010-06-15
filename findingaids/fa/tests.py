@@ -857,6 +857,7 @@ class FaViewsTest(TestCase):
         expected = 'application/xml'
         self.assertEqual(response['Content-Type'], expected, "Expected '%s' but returned '%s' for %s mimetype" % \
                         (expected, response['Content-Type'], xml_url))
+        self.assertContains(response, 'identifier="abbey244.xml')
 
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index
