@@ -3,6 +3,7 @@ README
 
 Dependencies
 ------------
+ * django 1.2
  * eXist-db 1.4 
  * xhtml2pdf/Pisa for PDF generation (http://www.xhtml2pdf.com)
  * eulcore (currently included as a subversion external); see
@@ -17,7 +18,7 @@ Dependencies
 Installation
 ------------
 
-Run ./configure
+Install and configure like other django applications. 
 
 Copy ``localsettings-sample.py`` to ``localsettings.py`` and customize the settings.
 
@@ -29,7 +30,7 @@ information on existdb index commands::
      $ ./manage.py help existdb_reindex
 
 For a first-time install, you will should run these two steps: 
-(Note that if all finding aids are loaded, the reindex step can take quite a while)
+(Note that if all finding aids are loaded, the reindex step can take quite a while)::
 
      $ ./manage.py existdb_index load
      $ ./manage.py existdb_reindex  
@@ -40,7 +41,6 @@ main Finding Aids collection in eXist; it is used for admin functionality only.
 The FINDINGAID_EAD_SOURCE should be set to the directory path for the
 EAD files that will be accessible for loading to eXist via the admin
 interface.
-
 
 
 Install `xhtml2pdf/Pisa`_ and its dependencies. On Ubuntu, the following
@@ -60,5 +60,14 @@ eulcore dependencies
 
 
 
+To install all the necessary components for a development environment
+on an Ubuntu 10.04 workstation:
 
+sudo apt-get install python-ldap python-pisa python-lxml python-4suite-xml
 
+This assumes you already have a django 1.2 installation and python bindings
+for the database platform you are using (e.g., python-mysqldb for mysql).
+
+If you are running a version of Ubuntu earlier than 10.04, the
+python-pisa package will not be available and you will have to install
+pisa as documented above.
