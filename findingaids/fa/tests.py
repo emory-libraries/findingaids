@@ -10,7 +10,7 @@ from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
 from django.test import Client, TestCase as DjangoTestCase
 
-from eulcore.xmlmap  import load_xmlobject_from_file, XmlObject
+from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
@@ -855,9 +855,16 @@ class FaViewsTest(TestCase):
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, xml_url))
         expected = 'application/xml'
-        self.assertEqual(response['Content-Type'], expected, "Expected '%s' but returned '%s' for %s mimetype" % \
+        self.assertEqual(response['Content-Type'], expected,
+                        "Expected '%s' but returned '%s' for %s mimetype" % \
                         (expected, response['Content-Type'], xml_url))
         self.assertContains(response, 'identifier="abbey244.xml')
+
+        # load httpresponse body into an XmlObject to compare with findingaid doc
+        ead = load_xmlobject_from_string(response.content)
+        abbey = FindingAid.objects.get(eadid='abbey244')
+        self.assertEqual(ead.serialize(), abbey.serialize(),
+            "response content should be the full, valid XML content of the requested EAD document")
 
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index
