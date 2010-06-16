@@ -1,0 +1,18 @@
+{# a page navigator to a list of items - expects 'items' which is an instance of class Page, and 'show_pages"  #}
+
+{% if items.paginator.count %}
+<div class="pagination">Pages:
+
+{% for page in show_pages %}
+    {% if forloop.first and page != 1%}<a href="?page=1">1</a> ... {% endif %}
+    {% ifequal page items.number %} {{ page }}
+    {% else %}<a href='?{{parameters|default:""}}page={{ page }}'>{{ page }}</a>
+    {% endifequal %}
+    {%if forloop.last and page != items.paginator.num_pages %} ...  {% endif %}
+{% endfor %}
+
+{% if items.paginator.num_pages not in show_pages %}
+  <a href='?page={{ items.paginator.num_pages }}'>{{ items.paginator.num_pages }}</a>
+{% endif %}
+</div>
+{% endif %}
