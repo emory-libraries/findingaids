@@ -1,0 +1,31 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Published {% endblock %}
+
+{% block content-title %} Published Finding Aids {% endblock %}
+
+{% block content-body %}
+
+{% with findingaids as items %}
+    {% include "snippets/page_navigator.html" %}
+{% endwith %}
+
+<table>
+    <tr>
+        <th>Filename</th>
+        <th>Last Modified</th>
+    </tr>
+{% for fa in findingaids.object_list %}
+    <tr>
+        <td><a href="{% url fa:view-fa fa.eadid %}">{{ fa.document_name }}</a></td>
+        <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>
+    </tr>
+{% empty %}
+  <tr><td colspan="2">No files found</td></tr>
+{% endfor %}
+</table>
+
+{% with findingaids as items %}
+    {% include "snippets/page_navigator.html" %}
+{% endwith %}
+{% endblock %}

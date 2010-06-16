@@ -16,5 +16,6 @@ urlpatterns = patterns('findingaids.fa_admin.views',
     # include finding document urls for preview
     url(r'^preview/documents/', include(document_urls(preview=True),
             namespace='preview')),
+    url(r'^documents/$', 'list_published', name="list_published"),
 )
 

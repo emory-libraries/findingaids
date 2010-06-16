@@ -472,6 +472,16 @@ class AdminViewsTest(TestCase):
         self.assert_(23 in pages,
             "show pages includes 7 pages before last page for last page of results")
 
+    def test_list_published(self):
+        # Test admin account can login
+        self.client.login(**self.admin_credentials)
+        list_published_url = reverse('fa-admin:list_published')
+        response = self.client.get(list_published_url)
+        self.assertContains(response, "Published Finding Aids")
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, list_published_url))
 
 class UtilsTest(TestCase):
     db = ExistDB()

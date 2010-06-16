@@ -425,3 +425,26 @@ def reload_cached_pdf(eadid):
         connection.request('GET', url, None, {'Pragma': 'no-cache'})
         r = connection.getresponse()
     # TODO: what to do if settings are not found?
+
+@login_required
+def list_published (request):
+
+     fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')
+#     fa_subset = _paginate_queryset(request, fa, 50)
+     paginator = Paginator(fa, 30, orphans=5)
+     try:
+         page = int(request.GET.get('page', '1'))
+     except ValueError:
+         page = 1
+     show_pages = _pages_to_show(paginator, page)
+     try:
+         fa_subset = paginator.page(page)
+     except (EmptyPage, InvalidPage):
+         fa_subset = paginator.page(paginator.num_pages)
+     return render_to_response('fa_admin/published_list.html', {'findingaids' : fa_subset,
+                                                    'querytime': [fa.queryTime()], 'show_pages' : show_pages},
+        context_instance=RequestContext(request))
+
+
+
+   
