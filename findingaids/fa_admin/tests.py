@@ -104,8 +104,6 @@ class AdminViewsTest(TestCase):
         # file list contains link to clean documents
         clean_url = reverse('fa-admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
         self.assertContains(response, '<a href="%s">CLEAN</a>' % clean_url)
-        # contains pagination
-        self.assertPattern('Pages: \s*1', response.content)
 
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
