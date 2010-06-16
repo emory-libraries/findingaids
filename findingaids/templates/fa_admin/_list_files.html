@@ -4,18 +4,9 @@
 
 {% if error %}<p class="error">Error: {{ error }}</p>{% endif %}
 
-<div class="pagination">Pages: 
-{% for page in show_pages %}
-    {% if forloop.first and page != 1%}<a href="?page=1">1</a> ... {% endif %}
-    {% ifequal page files.number %} {{ page }}
-    {% else %}<a href='?page={{ page }}'>{{ page }}</a>
-    {% endifequal %}    
-    {%if forloop.last and page != files.paginator.num_pages %} ...  {% endif %}
-{% endfor %}
-{% if files.paginator.num_pages not in show_pages %}
-  <a href='?page={{ files.paginator.num_pages }}'>{{ files.paginator.num_pages }}</a>
-{% endif %}
-</div>
+{% with files as items %}
+    {% include "snippets/page_navigator.html" %}
+{% endwith %}
 
 <table>
     <tr>

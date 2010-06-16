@@ -15,6 +15,7 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, _use_preview_collection, _restore_publish_collection
+from findingaids.fa_admin.views import _pages_to_show
 
 # TODO: consolidate common logic for getting a single finding aid with or without preview mode
 
@@ -82,14 +83,26 @@ def titles_by_letter(request, letter):
     first_letters = title_letters()
 
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*_fa_listfields())   
-    fa_subset = _paginate_queryset(request, fa)
+    show_pages = []
+    paginator = Paginator(fa, 10, orphans=5)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    show_pages = _pages_to_show(paginator, page)
+    try:
+        fa_subset = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        fa_subset = paginator.page(paginator.num_pages)
+
     query_times = [first_letters.queryTime(), fa.queryTime()]
 
     return render_to_response('findingaids/titles_list.html',
         {'findingaids' : fa_subset,
          'querytime': query_times,
          'letters': first_letters,
-         'current_letter': letter},
+         'current_letter': letter,
+         'show_pages' : show_pages},
          context_instance=RequestContext(request))
 
 # object pagination - adapted directly from django paginator documentation
