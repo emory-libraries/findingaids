@@ -34,3 +34,6 @@
 {% endfor %}
 </table>
 </form>
+{% with files as items %}
+    {% include "snippets/page_navigator.html" %}
+{% endwith %}
