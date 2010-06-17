@@ -236,7 +236,7 @@ class AdminViewsTest(TestCase):
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
                              % (expected, code, publish_url))
-        self.assertContains(response, "Successfully added",     # NOTE: this could be 'updated' if a previous test failed
+        self.assertContains(response, "Successfully",    # NOTE: could be updated or added if a previous test failed
             msg_prefix='publication success message displays')
         self.assertContains(response, 'href="%s"' % reverse('fa:view-fa', kwargs={'id': 'hartsfield558'}),
             msg_prefix='success message links to published document')
@@ -456,11 +456,16 @@ class AdminViewsTest(TestCase):
         self.assert_(1 in pages, "show pages includes 1 for first page")
         self.assert_(6 in pages, "show pages includes 6 for first page")
 
+        pages = _pages_to_show(paginator, 2)
+        self.assert_(1 in pages, "show pages for page 2 includes 1")
+        self.assert_(2 in pages, "show pages for page 2 includes 2")
+        self.assert_(3 in pages, "show pages for page 2 includes 3")
+
         # range of pages in the middle
         pages = _pages_to_show(paginator, 15)
         self.assertEqual(7, len(pages), "show pages returns 7 items for middle of page result")
         self.assert_(15 in pages, "show pages includes current page for middle of page result")
-        self.assert_(11 in pages,
+        self.assert_(12 in pages,
             "show pages includes third page before current page for middle of page result")
         self.assert_(18 in pages,
             "show pages includes third page after current page for middle of page result")
@@ -469,8 +474,8 @@ class AdminViewsTest(TestCase):
         pages = _pages_to_show(paginator, 30)
         self.assertEqual(7, len(pages), "show pages returns 7 items for last page")
         self.assert_(30 in pages, "show pages includes last page for last page of results")
-        self.assert_(23 in pages,
-            "show pages includes 7 pages before last page for last page of results")
+        self.assert_(24 in pages,
+            "show pages includes 6 pages before last page for last page of results")
 
     def test_list_published(self):
         # Test admin account can login

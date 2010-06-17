@@ -401,11 +401,11 @@ def _pages_to_show(paginator, page):
     # show 3 numbers on either side of current number, or more if close to end/beginning
     show_pages = []
     if page != 1:        
-        before = 4
+        before = 3      # default number of pages to show before the current page
         if page >= (paginator.num_pages - 3):   # current page is within 3 of end
             # increase number to show before current page based on distance to end
             before += (3 - (paginator.num_pages - page))
-        for i in range(before, 1, -1):
+        for i in range(before, 0, -1):    # add pages from before away up to current page
             if (page - i) >= 1:
                 show_pages.append(page - i)
     # show up to 3 to 7 numbers after the current number, depending on how many we already have
