@@ -5,6 +5,7 @@ from types import ListType
 from lxml import etree
 
 from django.conf import settings
+from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
@@ -18,6 +19,7 @@ from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor, \
 	_ead_lastmodified, _ead_etag
 from findingaids.fa.templatetags.ead import format_ead
+from findingaids.fa.utils import pages_to_show
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
@@ -865,6 +867,39 @@ class FaViewsTest(TestCase):
         abbey = FindingAid.objects.get(eadid='abbey244')
         self.assertEqual(ead.serialize(), abbey.serialize(),
             "response content should be the full, valid XML content of the requested EAD document")
+
+class UtilsTest(TestCase):
+
+    def test_pages_to_show(self):
+        paginator = Paginator(range(300), 10)
+        # range of pages at the beginning
+        pages = pages_to_show(paginator, 1)
+        self.assertEqual(7, len(pages), "show pages returns 7 items for first page")
+        self.assert_(1 in pages, "show pages includes 1 for first page")
+        self.assert_(6 in pages, "show pages includes 6 for first page")
+
+        pages = pages_to_show(paginator, 2)
+        self.assert_(1 in pages, "show pages for page 2 includes 1")
+        self.assert_(2 in pages, "show pages for page 2 includes 2")
+        self.assert_(3 in pages, "show pages for page 2 includes 3")
+
+        # range of pages in the middle
+        pages = pages_to_show(paginator, 15)
+        self.assertEqual(7, len(pages), "show pages returns 7 items for middle of page result")
+        self.assert_(15 in pages, "show pages includes current page for middle of page result")
+        self.assert_(12 in pages,
+            "show pages includes third page before current page for middle of page result")
+        self.assert_(18 in pages,
+            "show pages includes third page after current page for middle of page result")
+
+        # range of pages at the end
+        pages = pages_to_show(paginator, 30)
+        self.assertEqual(7, len(pages), "show pages returns 7 items for last page")
+        self.assert_(30 in pages, "show pages includes last page for last page of results")
+        self.assert_(24 in pages,
+            "show pages includes 6 pages before last page for last page of results")
+
+
 
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index

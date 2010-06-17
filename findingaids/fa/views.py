@@ -15,7 +15,7 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, _use_preview_collection, _restore_publish_collection
-from findingaids.fa_admin.views import _pages_to_show
+from findingaids.fa.utils import pages_to_show
 
 # TODO: consolidate common logic for getting a single finding aid with or without preview mode
 
@@ -89,7 +89,7 @@ def titles_by_letter(request, letter):
         page = int(request.GET.get('page', '1'))
     except ValueError:
         page = 1
-    show_pages = _pages_to_show(paginator, page)
+    show_pages = pages_to_show(paginator, page)
     try:
         fa_subset = paginator.page(page)
     except (EmptyPage, InvalidPage):

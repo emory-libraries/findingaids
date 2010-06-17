@@ -7,13 +7,12 @@ from django.test import Client, TestCase
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
-from django.core.paginator import Paginator
 
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
-from findingaids.fa_admin.views import _get_recent_xml_files, _pages_to_show
+from findingaids.fa_admin.views import _get_recent_xml_files
 from findingaids.fa_admin.utils import check_ead, clean_ead
 from findingaids.fa.models import FindingAid
 
@@ -447,35 +446,6 @@ class AdminViewsTest(TestCase):
         # non-xml file not included
         self.assert_(os.path.basename(self.nonxml_tmpfile.name) not in filenames)
 
-
-    def test_pages_to_show(self):
-        paginator = Paginator(range(300), 10)
-        # range of pages at the beginning
-        pages = _pages_to_show(paginator, 1)
-        self.assertEqual(7, len(pages), "show pages returns 7 items for first page")
-        self.assert_(1 in pages, "show pages includes 1 for first page")
-        self.assert_(6 in pages, "show pages includes 6 for first page")
-
-        pages = _pages_to_show(paginator, 2)
-        self.assert_(1 in pages, "show pages for page 2 includes 1")
-        self.assert_(2 in pages, "show pages for page 2 includes 2")
-        self.assert_(3 in pages, "show pages for page 2 includes 3")
-
-        # range of pages in the middle
-        pages = _pages_to_show(paginator, 15)
-        self.assertEqual(7, len(pages), "show pages returns 7 items for middle of page result")
-        self.assert_(15 in pages, "show pages includes current page for middle of page result")
-        self.assert_(12 in pages,
-            "show pages includes third page before current page for middle of page result")
-        self.assert_(18 in pages,
-            "show pages includes third page after current page for middle of page result")
-
-        # range of pages at the end
-        pages = _pages_to_show(paginator, 30)
-        self.assertEqual(7, len(pages), "show pages returns 7 items for last page")
-        self.assert_(30 in pages, "show pages includes last page for last page of results")
-        self.assert_(24 in pages,
-            "show pages includes 6 pages before last page for last page of results")
 
     def test_list_published(self):
         # Test admin account can login

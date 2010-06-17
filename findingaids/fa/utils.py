@@ -27,6 +27,26 @@ def render_to_pdf(template_src, context_dict, filename=None):
     return http.HttpResponse('Error generating PDF')
     return http.HttpResponse('Error generating PDF<pre>%s</pre>' % cgi.escape(html))
 
+def pages_to_show(paginator, page):
+    # generate a list of pages to show around the current page
+    # show 3 numbers on either side of current number, or more if close to end/beginning
+    show_pages = []
+    if page != 1:
+        before = 3      # default number of pages to show before the current page
+        if page >= (paginator.num_pages - 3):   # current page is within 3 of end
+            # increase number to show before current page based on distance to end
+            before += (3 - (paginator.num_pages - page))
+        for i in range(before, 0, -1):    # add pages from before away up to current page
+            if (page - i) >= 1:
+                show_pages.append(page - i)
+    # show up to 3 to 7 numbers after the current number, depending on how many we already have
+    for i in range(7 - len(show_pages)):
+        if (page + i) <= paginator.num_pages:
+            show_pages.append(page + i)
+
+    return show_pages
+
+
 # functionality for switching to preview mode
 
 _stored_publish_collection = None
