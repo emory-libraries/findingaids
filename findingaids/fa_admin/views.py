@@ -28,7 +28,6 @@ from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 from findingaids.fa_admin.models import Permissions
-from findingaids.fa.utils import pages_to_show
 
 @login_required
 def main(request):
@@ -55,7 +54,7 @@ def main(request):
         page = int(request.GET.get('page', '1'))
     except ValueError:
         page = 1
-    show_pages = pages_to_show(paginator, page)
+    show_pages = _pages_to_show(paginator, page)
     # If page request (9999) is out of range, deliver last page of results.
     try:
         recent_files = paginator.page(page)
@@ -397,6 +396,25 @@ def _get_recent_xml_files(dir):
     recent_files = [ (filename, datetime.utcfromtimestamp(mtime)) for mtime, filename in files ]
     return recent_files
 
+def _pages_to_show(paginator, page):
+    # generate a list of pages to show around the current page
+    # show 3 numbers on either side of current number, or more if close to end/beginning
+    show_pages = []
+    if page != 1:        
+        before = 4
+        if page >= (paginator.num_pages - 3):   # current page is within 3 of end
+            # increase number to show before current page based on distance to end
+            before += (3 - (paginator.num_pages - page))
+        for i in range(before, 1, -1):
+            if (page - i) >= 1:
+                show_pages.append(page - i)
+    # show up to 3 to 7 numbers after the current number, depending on how many we already have
+    for i in range(7 - len(show_pages)):
+        if (page + i) <= paginator.num_pages:
+            show_pages.append(page + i)
+
+    return show_pages
+
 def reload_cached_pdf(eadid):
     """Hit the configured proxy and request the PDF of a finding aid so the proxy will
     cache the latest version."""
@@ -410,23 +428,31 @@ def reload_cached_pdf(eadid):
 
 @login_required
 def list_published (request):
+    """List all published EADs"""
 
-     fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')
-#     fa_subset = _paginate_queryset(request, fa, 50)
-     paginator = Paginator(fa, 30, orphans=5)
-     try:
-         page = int(request.GET.get('page', '1'))
-     except ValueError:
-         page = 1
-     show_pages = pages_to_show(paginator, page)
-     try:
-         fa_subset = paginator.page(page)
-     except (EmptyPage, InvalidPage):
-         fa_subset = paginator.page(paginator.num_pages)
-     return render_to_response('fa_admin/published_list.html', {'findingaids' : fa_subset,
-                                                    'querytime': [fa.queryTime()], 'show_pages' : show_pages},
-        context_instance=RequestContext(request))
+    fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')
+    paginator = Paginator(fa, 30, orphans=5)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+    show_pages = _pages_to_show(paginator, page)
+    try:
+        fa_subset = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        fa_subset = paginator.page(paginator.num_pages)
+    return render_to_response('fa_admin/published_list.html', {'findingaids' : fa_subset,
+                                                   'querytime': [fa.queryTime()], 'show_pages' : show_pages},
+       context_instance=RequestContext(request))
+
+@login_required
+def delete_ead(request):
+    """Delete an EAD"""
+    filename = request.POST['filename']
+    if request.method != 'POST':
+      return list_published(request)
+#logic to be added
+    return list_published(request)
 
 
 
-   

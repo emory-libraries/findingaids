@@ -6,18 +6,25 @@
 
 {% block content-body %}
 
+<div>Total Number: {{findingaids.paginator.count}} </div>
+
 {% with findingaids as items %}
     {% include "snippets/page_navigator.html" %}
 {% endwith %}
 
 <table>
     <tr>
-        <th>Filename</th>
+        <th colspan="2">Filename</th> {# spans columns for delete button #}
         <th>Last Modified</th>
     </tr>
 {% for fa in findingaids.object_list %}
     <tr>
         <td><a href="{% url fa:view-fa fa.eadid %}">{{ fa.document_name }}</a></td>
+        <td>
+            <form action="{% url fa-admin:delete-ead %}" method="post">{% csrf_token %}
+                <button type="submit" name="filename" value="{{ fa.document_name }}" >DELETE</button>
+            </form>
+        </td>
         <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>
     </tr>
 {% empty %}
@@ -29,3 +36,4 @@
     {% include "snippets/page_navigator.html" %}
 {% endwith %}
 {% endblock %}
+
