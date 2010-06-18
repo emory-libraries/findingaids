@@ -429,12 +429,23 @@ def list_published (request):
 
 @login_required
 def delete_ead(request):
-    """Delete an EAD"""
-    filename = request.POST['filename']
+    """Delete a published EAD"""
+    
     if request.method != 'POST':
       return list_published(request)
-#logic to be added
+
+    db = ExistDB()
+    filename = request.POST['filename']
+    success = True
+    try:
+      #remove the document from the public collection
+      success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + filename)
+                    # FindingAid instance ead already set above
+    except ExistDBException:
+      success = False
+
+    if success:
+      messages.success(request, 'Successfully removed <b>%s</b>.' % filename)
+    else:
+      messages.error(request, "Error removing <b>%s</b>." % filename)
     return list_published(request)
-
-
-

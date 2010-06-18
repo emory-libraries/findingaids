@@ -450,7 +450,7 @@ class AdminViewsTest(TestCase):
     def test_list_published(self):
          # Test admin account can login
         self.client.login(**self.admin_credentials)       
-        db = ExistDB()
+
         dbpath = settings.EXISTDB_TEST_COLLECTION + '/hartsfield588.xml'
         valid_eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml')
         self.db.load(open(valid_eadfile), dbpath, True)
@@ -464,6 +464,27 @@ class AdminViewsTest(TestCase):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, list_published_url))
         # contains pagination
         self.assertPattern('Pages:\s*1', response.content)
+
+
+    def test_delete_ead(self):
+         # Test admin account can login
+        self.client.login(**self.admin_credentials)
+
+        filename = 'hartsfield558.xml'
+        nonexistfile = 'nonexist.xml'
+        delete_url = reverse('fa-admin:delete-ead')
+
+        dbpath = settings.EXISTDB_TEST_COLLECTION + '/' + filename
+        valid_eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', filename)
+        self.db.load(open(valid_eadfile), dbpath, True)
+        
+        # Test delete a file that doesn't exist
+        response = self.client.post(delete_url, {'filename' : nonexistfile})
+        self.assertContains(response, "Error removing <b>%s</b>." % nonexistfile)
+
+        # Test delete an existing file
+        response = self.client.post(delete_url, {'filename' : filename})
+        self.assertContains(response, "Successfully removed <b>%s</b>." % filename)
 
 class UtilsTest(TestCase):
     db = ExistDB()
