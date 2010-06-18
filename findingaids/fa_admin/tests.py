@@ -448,8 +448,13 @@ class AdminViewsTest(TestCase):
 
 
     def test_list_published(self):
-        # Test admin account can login
-        self.client.login(**self.admin_credentials)
+         # Test admin account can login
+        self.client.login(**self.admin_credentials)       
+        db = ExistDB()
+        dbpath = settings.EXISTDB_TEST_COLLECTION + '/hartsfield588.xml'
+        valid_eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml')
+        self.db.load(open(valid_eadfile), dbpath, True)
+
         list_published_url = reverse('fa-admin:list_published')
         response = self.client.get(list_published_url)
         self.assertContains(response, "Published Finding Aids")
@@ -457,6 +462,8 @@ class AdminViewsTest(TestCase):
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as ad,oe' % (expected, code, list_published_url))
+        # contains pagination
+        self.assertPattern('Pages:\s*1', response.content)
 
 class UtilsTest(TestCase):
     db = ExistDB()
