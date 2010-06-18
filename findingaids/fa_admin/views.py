@@ -12,7 +12,7 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
-from django.contrib.auth.forms import UserChangeForm
+#from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
@@ -28,6 +28,7 @@ from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection, pages_to_show
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 from findingaids.fa_admin.models import Permissions
+from findingaids.fa_admin.forms import FAUserChangeForm
 
 @login_required
 def main(request):
@@ -99,7 +100,7 @@ def edit_user(request, user_id):
     user = User.objects.get(id = user_id)
     if request.user.is_superuser:
         if request.method == 'POST': # If the form has been submitted...
-            userForm = UserChangeForm(request.POST, instance=user) # A form bound to the POST data
+            userForm = FAUserChangeForm(request.POST, instance=user) # A form bound to the POST data
             if userForm.is_valid():
                 # All validation rules pass
                 # Process the data in form.cleaned_data
@@ -119,7 +120,7 @@ def edit_user(request, user_id):
                 messages.success(request, 'There are errors in you submission, please review the form.')
                 return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
         else:
-            userForm = UserChangeForm(instance=user)            
+            userForm = FAUserChangeForm(instance=user)
         return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
     else:
         messages.warning(request, 'You do not have permission to view this page.')
