@@ -1,0 +1,23 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Delete Confirmation {% endblock %}
+
+{% block content-title %} Please confirm the deletion {% endblock %}
+
+{% block content-body %}
+
+{% if fa.document_name %}
+    <form action="{% url fa-admin:delete-ead %}" method="post">{% csrf_token %}
+    <b>Filename:</b> <input type = 'hidden'name = "document_name" value = "{{ fa.document_name }}"> {{ fa.document_name }} </input><br/>
+    <div><b>Title:</b> <input type = 'hidden' name = "unittitle" value = "{{ fa.unittitle }}" >{{ fa.unittitle }}</input></div><br/>
+
+        <div>  <b>Reason For Deletion: </b></div><br/>
+        <textarea rows="2" cols="60" name = "reason">Finding Aid transferred.</textarea><br/>
+        <button type="submit" >CONFIRM</button><br/>
+    </form>
+{% else %}
+  <tr><td colspan="2">No files found</td></tr>
+{% endif %}
+
+{% endblock %}
+
