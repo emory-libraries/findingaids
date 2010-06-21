@@ -18,5 +18,6 @@ urlpatterns = patterns('findingaids.fa_admin.views',
             namespace='preview')),
     url(r'^documents/$', 'list_published', name="list_published"),
     url(r'^delete$', 'delete_ead', name="delete-ead"),
+    url(r'^deleteconfirm$', 'delete_ead_confirmation', name="delete-ead-confirm"),
 )
 

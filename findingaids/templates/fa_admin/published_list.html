@@ -21,8 +21,8 @@
     <tr>
         <td><a href="{% url fa:view-fa fa.eadid %}">{{ fa.document_name }}</a></td>
         <td>
-            <form action="{% url fa-admin:delete-ead %}" method="post">{% csrf_token %}
-                <button type="submit" name="filename" value="{{ fa.document_name }}" >DELETE</button>
+            <form action="{% url fa-admin:delete-ead-confirm %}" method="post">{% csrf_token %}
+                <button type="submit" name="eadid" value="{{ fa.eadid }}" >DELETE</button>
             </form>
         </td>
         <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>

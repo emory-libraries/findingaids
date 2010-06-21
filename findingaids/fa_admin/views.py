@@ -27,7 +27,7 @@ from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_st
 from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection, pages_to_show
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
-from findingaids.fa_admin.models import Permissions
+from findingaids.fa_admin.models import Permissions, EAD_Deletion
 from findingaids.fa_admin.forms import FAUserChangeForm
 
 @login_required
@@ -432,20 +432,40 @@ def delete_ead(request):
     """Delete a published EAD"""
     
     if request.method != 'POST':
-      return list_published(request)
+        return list_published(request)
 
     db = ExistDB()
-    filename = request.POST['filename']
-    success = True
-    try:
-      #remove the document from the public collection
-      success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + filename)
-                    # FindingAid instance ead already set above
-    except ExistDBException:
-      success = False
 
+    document_name = request.POST['document_name']
+    unittitle = request.POST['unittitle']
+    deletereason = request.POST['reason']
+    success = True
+ 
+    try:
+        #remove the document from the public collection
+        success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + document_name)
+    except ExistDBException:
+        success = False
+    
     if success:
-      messages.success(request, 'Successfully removed <b>%s</b>.' % filename)
+        deletion_record = EAD_Deletion(filename = document_name, title = unittitle, datetime = datetime.now(), reason = deletereason)
+        deletion_record.save() 
+        messages.success(request, 'Successfully removed <b>%s</b>.' % document_name)
     else:
-      messages.error(request, "Error removing <b>%s</b>." % filename)
-    return list_published(request)
+        messages.error(request, "Error removing <b>%s</b>." % document_name)
+    return list_published(request) 
+
+@login_required
+def delete_ead_confirmation(request):
+    """Confirmation to deleting a published EAD"""
+#    return list_published(request)
+    if request.method != 'POST':
+        return list_published(request)
+
+    id = request.POST['eadid']
+    fa = FindingAid.objects.only('document_name', 'unittitle').get(eadid = id)
+    return render_to_response('fa_admin/delete_confirm.html', {'fa' : fa},
+       context_instance=RequestContext(request))
+    
+    
+    
