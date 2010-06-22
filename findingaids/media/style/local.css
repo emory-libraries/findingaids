@@ -96,10 +96,14 @@ table.box-folder .bf {
 table.box-folder .section {
   font-weight: bold;
 }
-div#keyword-search {
+div#sidebar-left-inner div {
     border: 1px solid #D9D9D9;
     background-color: #f2f3f5;
     padding: 5px;
+    margin-bottom: 10px;
+}
+div#keyword-search input {
+    margin: 2px;
 }
 
 div#print-links {
@@ -166,6 +170,17 @@ div.diff p {
 p.removed { background-color: #ffdddd; }
 p.added { background-color: #ddffdd; }
 
-body.preview div#main { background: url('/static/images/preview.png') repeat scroll 0 0}
+body.preview div#main { background: url('../images/preview.png') repeat scroll 0 0}
 span.preview-label { color: red; }
 form#preview-publish { float: right; }
+
+div.section {
+    border-top: 3px solid #D9D9D9;
+}
+
+div#task-results li {list-style-type: circle; margin-left:15px; }
+div#task-results li.success { list-style-image: url('../images/check.png'); }
+div#task-results li.failure { list-style-image: url('../images/x.png'); }
+
+div#task-results li.success span.code { color: green }
+div#task-results li.failure span.code { color: red }

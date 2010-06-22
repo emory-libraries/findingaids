@@ -2,6 +2,21 @@
 {% block page-subtitle %}: Administration Page {% endblock %}
 {% block content-title %}Administer Finding Aids{% endblock %}
 
+{% block sidebar-left %}
+  {{ block.super }}
+
+  <div id="task-results">
+      <h3>Task Results</h3>
+      <ul>
+      {% for r in task_results %}
+        <li class="{{r.task.status|lower}}">{{ r.label }} {{ r.eadid }}: <span class="code">{{ r.task.status }}</span></li>
+      {% empty %}
+        <li>No recent tasks.</li>
+      {% endfor %}
+      </ul>
+  </div>
+{% endblock %}
+
 {% block content-body %}
   {% if user.is_authenticated %}
   <div id="print-links">
@@ -10,9 +25,9 @@
   <div>
     <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong></p>
   </div>
-  <hr/>
   {% endif %}
-  <div id="record_list">
+  
+  <div class="section">
       <h2>Manage user accounts</h2>
       {% if user.is_superuser %}
           <ul>
@@ -27,12 +42,14 @@
       </p>
      {% endif %}
   </div>
-  <hr/>
+
+  <div class="section">
   <h2>Manage documents</h2>
     <ul>
       <li><a href="{% url fa-admin:list_published %}">Published documents</a></li>
       <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
   </ul>
-  <hr/>
+  </div>
+ 
   {% include "fa_admin/_list_files.html" %}
 {% endblock %}

@@ -1,10 +1,9 @@
 import os
 import glob
-import httplib
+
 from datetime import datetime
 import difflib
 from lxml.etree import XMLSyntaxError
-from time import sleep
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.conf import settings
@@ -27,8 +26,10 @@ from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_st
 from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection, pages_to_show
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
-from findingaids.fa_admin.models import Permissions, EAD_Deletion
+from findingaids.fa_admin.models import EAD_Deletion
 from findingaids.fa_admin.forms import FAUserChangeForm
+from findingaids.fa_admin.tasks import reload_cached_pdf
+from findingaids.fa_admin.models import TaskResult
 
 @login_required
 def main(request):
@@ -62,9 +63,12 @@ def main(request):
     except (EmptyPage, InvalidPage):
         recent_files = paginator.page(paginator.num_pages)
 
+    # get the 10 most recent task results to display status
+    recent_tasks = TaskResult.objects.order_by('-created')[:10]
     return render_to_response('fa_admin/index.html', {'files' : recent_files,
                             'show_pages' : show_pages,
-                            'error' : error},
+                            'error' : error,
+                            'task_results': recent_tasks },
                             context_instance=RequestContext(request))
 
 def logout(request):
@@ -236,9 +240,10 @@ def publish(request):
                     success = False
                 
             if success:
-                # request the cache to reload the PDF
-                # NOTE: need to do this asynchronously, otherwise request times out
-                #reload_cached_pdf(ead.eadid)
+                # request the cache to reload the PDF - queue asynchronous task
+                result = reload_cached_pdf.delay(ead.eadid)
+                task = TaskResult(label='PDF reload', eadid=ead.eadid, task_id=result.task_id)
+                task.save()
 
                 ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
                 change = "updated" if replaced else "added"
@@ -397,16 +402,6 @@ def _get_recent_xml_files(dir):
     recent_files = [ (filename, datetime.utcfromtimestamp(mtime)) for mtime, filename in files ]
     return recent_files
 
-def reload_cached_pdf(eadid):
-    """Hit the configured proxy and request the PDF of a finding aid so the proxy will
-    cache the latest version."""
-    if hasattr(settings, 'PROXY_HOST') and hasattr(settings, 'SITE_BASE_URL'):
-        sleep(3)    # may need to sleep for a few seconds so cache will recognized as modified (?)
-        connection = httplib.HTTPConnection(settings.PROXY_HOST)
-        url = "%s%s" % (settings.SITE_BASE_URL.rstrip('/'), reverse('fa:printable-fa', kwargs={'id': eadid }))
-        connection.request('GET', url, None, {'Pragma': 'no-cache'})
-        r = connection.getresponse()
-    # TODO: what to do if settings are not found?
 
 @login_required
 def list_published (request):

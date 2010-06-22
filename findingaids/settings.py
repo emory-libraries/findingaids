@@ -125,6 +125,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
+    'celery',
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
     'eulcore.django.existdb',

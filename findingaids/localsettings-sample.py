@@ -97,3 +97,10 @@ ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
+
+# settings for celery & rabbit-mq, for asynchronous task handling
+BROKER_HOST = '127.0.0.1'
+BROKER_PORT = 5672
+BROKER_VHOST = '/'
+BROKER_USER = 'guest'
+BROKER_PASSWORD = 'guest'

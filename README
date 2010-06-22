@@ -6,6 +6,7 @@ Dependencies
  * django 1.2
  * eXist-db 1.4 
  * xhtml2pdf/Pisa for PDF generation (http://www.xhtml2pdf.com)
+ * celery and RabbitMQ
  * eulcore (currently included as a subversion external); see
    :ref:`eulcore dependencies <eulcore-deps>` for per-module
    dependencies. eulcore modules currently in use:
@@ -52,6 +53,18 @@ should be sufficient::
 .. _xhtml2pdf/Pisa: http://www.xhtml2pdf.com/doc/pisa-en.html
 
 
+Install `celery` and `rabbitmq` for asynchronous task handling.  On
+Ubuntu, this can be done as follows::
+
+  $ sudo easy_install celery
+  $ sudo apt-get install rabbitmq-server
+
+There is a celery daemon that should be running in order to process any 
+celery tasks that are scheduled. It can be started via manage.py::
+
+  $ python manage.py celeryd
+
+
 .. _eulcore-deps:
 
 eulcore dependencies
@@ -63,7 +76,8 @@ eulcore dependencies
 To install all the necessary components for a development environment
 on an Ubuntu 10.04 workstation:
 
-sudo apt-get install python-ldap python-pisa python-lxml python-4suite-xml
+sudo apt-get install python-ldap python-pisa python-lxml python-ply rabbitmq-server
+easy_install celery
 
 This assumes you already have a django 1.2 installation and python bindings
 for the database platform you are using (e.g., python-mysqldb for mysql).
