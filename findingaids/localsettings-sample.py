@@ -33,6 +33,13 @@ EXISTDB_ROOT_COLLECTION = ""
 # preview collection - should be outside main findingaids collection
 EXISTDB_PREVIEW_COLLECTION = ""
 EXISTDB_TEST_COLLECTION = ""
+# NOTE: EXISTDB_INDEX_CONFIGFILE is configured in settings.py
+
+# a bug in python xmlrpclib loses the timezone; override it here
+# most likely, you want either tz.tzlocal() or tz.tzutc()
+from dateutil import tz
+EXISTDB_SERVER_TIMEZONE = tz.tzlocal()
+
 
 # EULCORE LDAP SETTINGS
 # LDAP login settings. These are configured for emory, but you'll need

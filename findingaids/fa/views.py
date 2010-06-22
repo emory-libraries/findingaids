@@ -1,4 +1,5 @@
 import datetime
+from dateutil.tz import tzlocal
 
 from django.http import HttpResponse
 from django.http import Http404
@@ -35,10 +36,12 @@ def _ead_lastmodified(request, id, preview=False, *args, **kwargs):
 
         db = ExistDB()
         info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
-        # returns an xmlrpc DateTime object - convert into datetime format required by django
-        mod_time = info['modified'].timetuple()
-        modified = datetime.datetime(mod_time.tm_year, mod_time.tm_mon, mod_time.tm_mday,
-                                 mod_time.tm_hour, mod_time.tm_min, mod_time.tm_sec)
+        dt = info['modified']
+        # NOTE: current version of xmlrpc ignores timezone, which messes up last-modified
+        # use a configured timezone from django settings
+        tz = settings.EXISTDB_SERVER_TIMEZONE
+        # use the generated time to create a timezone-aware
+        modified = datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond, tz)
     except DoesNotExist:
         raise Http404    
     finally:
