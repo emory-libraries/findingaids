@@ -1,5 +1,7 @@
 import os
-from lxml.etree import XMLSyntaxError
+from lxml.etree import XMLSyntaxError, Resolver
+from django.conf import settings
+
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from findingaids.fa.models import FindingAid
 
@@ -27,12 +29,12 @@ def check_ead(filename, dbpath, xml=None):
         content = filename
     
     try:
-        ead = load_xml(content, FindingAid, validate=True)
+        ead = load_xml(content, FindingAid, validate=True, resolver=EadDTDResolver())
     except XMLSyntaxError, e:
         errors.append(e)        # TODO: use etree error_log to get all errors
         # if not dtd-valid, then appempt to load without validation to do additional checking
         try:
-            ead = load_xml(content, FindingAid, validate=False)
+            ead = load_xml(content, FindingAid, validate=False, resolver=EadDTDResolver())
         except XMLSyntaxError, e:
             # if this fails, document is not well-formed xml
             # don't bother appending the syntax error, it will be the same one found above
@@ -126,5 +128,17 @@ def _set_series_ids(series, eadid, position):
     if series.hasSubseries():
         for j, c in enumerate(series.c):
             _set_series_ids(c, eadid, j)
+
+
+class EadDTDResolver(Resolver):
+    "Custom lxml.etree Resolver so we can load ead.dtd from a known, local location."
+    def resolve(self, url, id, context):
+        if url == 'ead.dtd' or url.split('/')[-1] == 'ead.dtd':
+            # when loading a file, the 'url' gets set to the fullpath of that file plus ead.dtd
+            # assuming that anything coming in as ead.dtd can use our local copy (no variant DTDs)
+            filepath = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'ead.dtd')
+            return self.resolve_filename(filepath, context)
+        else:
+            return super(EadDTDResolver, self).resolve(url, id, context)
 
     
