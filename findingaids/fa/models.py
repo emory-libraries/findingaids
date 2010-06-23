@@ -151,7 +151,7 @@ class Series(XmlModel, Component):
     ead = xmlmap.NodeField("ancestor::ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
-    parent = xmlmap.NodeField("parent::node", "self")
+    parent = xmlmap.NodeField("parent::node()", "self")
 
     objects = Manager('//c01')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
@@ -252,7 +252,7 @@ class Index(XmlModel, EadIndex):
     ead = xmlmap.NodeField("ancestor::ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
-    parent = xmlmap.NodeField("parent::node", "self")
+    parent = xmlmap.NodeField("parent::node()", "self")
 
     objects = Manager('//index')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
