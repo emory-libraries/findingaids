@@ -12,7 +12,7 @@ from findingaids.fa.models import FindingAid
 from findingaids.fa_admin.utils import clean_ead, check_ead
 
 class Command(BaseCommand):
-    help = """Clean all or specified EAD xml files in the configured source directory.
+    """Clean all or specified EAD xml files in the configured source directory.
 
 Runs EAD xml files through a "cleaning" process to set ids, etc., as needed
 to be published, verifies that the resulting EAD is valid and passes all
@@ -22,6 +22,7 @@ If filenames are specified as arguments, only those files will be cleaned.
 Files should be specified by basename only (assumed to be in the configured
 EAD source directory). Otherwise, all .xml files in the configured EAD source
 directory will be cleaned."""
+    help = __doc__
 
     args = '[<filename filename ... >]'
     

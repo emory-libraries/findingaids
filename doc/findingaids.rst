@@ -70,9 +70,13 @@ Admin Functions
 
 
 Custom manage commands
----------------------
+----------------------
 The following management commands are available.
-    For more details on these commands, use manage.py <command> help
+For more details, use manage.py help <command>
 
- * **check_eadids** - compares ead ids against a predefined regular expression
-
+ * **check_eadids**
+    .. autoclass:: findingaids.fa.management.commands.check_eadids.Command
+       :members:
+ * **clean_ead**
+    .. autoclass:: findingaids.fa_admin.management.commands.clean_ead.Command
+       :members:
