@@ -26,7 +26,6 @@ from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_st
 from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection, pages_to_show
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
-from findingaids.fa_admin.models import EAD_Deletion
 from findingaids.fa_admin.forms import FAUserChangeForm
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin.models import TaskResult
