@@ -173,8 +173,26 @@ class AdminViewsTest(BaseAdminViewsTest):
                              % (expected, code, preview_url))
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "No declaration for attribute invalid")   # DTD validation error
+        self.assertContains(response, "Additional Instructions",
+                msg_prefix="error page displays instructions & next steps to user")
+
         docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/hartsfield558_invalid.xml')
-        self.assertEqual({}, docinfo)   # invalid document not loaded to exist
+        self.assertEqual({}, docinfo, "invalid xml document not loaded to exist preview")
+
+
+        # exist save error should be caught & handled gracefully
+        # - force an error by setting preview collection to a non-existent collection
+        real_preview_collection = settings.EXISTDB_PREVIEW_COLLECTION
+        settings.EXISTDB_PREVIEW_COLLECTION = "/bogus/doesntexist"
+        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not preview")
+        self.assertContains(response,
+                "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)     
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        # restore settings
+        settings.EXISTDB_PREVIEW_COLLECTION = real_preview_collection
+        
 
     def test_login_admin(self):
         admin_index = reverse('fa-admin:index')
@@ -500,6 +518,20 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Unescaped &#39;&lt;&#39; not allowed in attributes values",
             msg_prefix="syntax error detail for badly formed XML displays")
 
+        # force an exist save error by setting collection to a non-existent collection
+        real_collection = settings.EXISTDB_ROOT_COLLECTION
+        settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
+        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not publish",
+                msg_prefix="exist save error on publish displays error to user")
+        self.assertContains(response,
+                "Collection %s not found" % settings.EXISTDB_ROOT_COLLECTION,
+                msg_prefix="specific exist save error displayed to user")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        # restore settings
+        settings.EXISTDB_ROOT_COLLECTION = real_collection
+
     def test_publish_from_preview(self):
         # test publishing a document that has been loaded for preview
         publish_url = reverse('fa-admin:publish-ead')
@@ -540,11 +572,31 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
         self.assertEqual({}, docinfo)
 
+        task = TaskResult.objects.get(eadid='hartsfield558')
+        self.assert_(isinstance(task, TaskResult),
+            "TaskResult was created in db for pdf reload after successful publish from preview")
+
         # attempt to publish a document NOT loaded to preview
         response =  self.client.post(publish_url, {'preview_id': 'bogus345'}, follow=True)
         messages = [ str(msg) for msg in response.context['messages'] ]
         self.assert_('Publish failed. Could not retrieve' in messages[0],
             'error message set in response context attempting to publish a document not in preview')
+
+        # force an exist save error by setting collection to a non-existent collection
+        real_collection = settings.EXISTDB_ROOT_COLLECTION
+        settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
+        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not publish",
+                msg_prefix="exist save error on publish displays error to user")
+        self.assertContains(response,
+                "Collection %s not found" % settings.EXISTDB_ROOT_COLLECTION,
+                msg_prefix="specific exist save error displayed to user")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+
+        # restore settings
+        settings.EXISTDB_ROOT_COLLECTION = real_collection
+
 
 ### unit tests for findingaids.fa_admin.utils
 

@@ -183,86 +183,88 @@ def publish(request):
     On GET, displays a list of files available for publication.
     """
     if request.method == 'POST':
-        try:
-            if 'filename' in request.POST:
-                publish_mode = 'file'
-                filename = request.POST['filename']
-                xml = None
+        if 'filename' in request.POST:
+            publish_mode = 'file'
+            filename = request.POST['filename']
+            xml = None
 
-            elif 'preview_id' in request.POST:
-                publish_mode = 'preview'
-                id = request.POST['preview_id']
+        elif 'preview_id' in request.POST:
+            publish_mode = 'preview'
+            id = request.POST['preview_id']
 
-                # retrieve info about the document from preview collection
-                _use_preview_collection()
-                try:
-                    ead = FindingAid.objects.also('document_name').get(eadid=id)
-                except ExistDBException:
-                    ead = None
-                    messages.error(request,
-                        "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
-                _restore_publish_collection()
+            # retrieve info about the document from preview collection
+            _use_preview_collection()
+            try:
+                ead = FindingAid.objects.also('document_name').get(eadid=id)
+            except ExistDBException:
+                ead = None
+                messages.error(request,
+                    "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
+            _restore_publish_collection()
 
-                if ead is None:
-                    # if ead could not be retrieved from preview mode, skip processing
-                    return
-                
-                filename = ead.document_name
-                xml = ead.serialize()
-
-            ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
-            if ok is not True and publish_mode != 'preview':
-                # FIXME: currently, doctype declaration is getting lost when we load to eXist
-                # so validation fails on pre-publication check
-                # ignoring validation errors for now, since preview files *should*
-                # already have been checked when loaded for preview...
+            if ead is None:
+                # if ead could not be retrieved from preview mode, skip processing
+                response = HttpResponse(status=303)     # redirect, see other
+                response['Location'] = reverse('fa-admin:index')
                 return response
 
-            # only load to exist if there are no errors found
-            db = ExistDB()
-            # get information to determine if an existing file is being replaced
-            replaced = db.describeDocument(dbpath)
+            filename = ead.document_name
+            xml = ead.serialize()
 
-            if publish_mode == 'file':
+        ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
+        if ok is not True and publish_mode != 'preview':
+            # FIXME: currently, doctype declaration is getting lost when we load to eXist
+            # so validation fails on pre-publication check
+            # ignoring validation errors for now, since preview files *should*
+            # already have been checked when loaded for preview...
+            return response
+
+        # only load to exist if there are no errors found
+        db = ExistDB()
+        # get information to determine if an existing file is being replaced
+        replaced = db.describeDocument(dbpath)
+        errors = []
+
+        if publish_mode == 'file':
+            try:
                 # load the document to the configured collection in eXist with the same fileneame
                 success = db.load(open(fullpath, 'r'), dbpath, overwrite=True)
                 # load the file as a FindingAid object so we can generate a url to the document
                 ead = load_xmlobject_from_file(fullpath, FindingAid)
-            elif publish_mode == 'preview' and ead is not None:
-                try:
-                    # move the document from preview collection to configured public collection
-                    success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
-                            settings.EXISTDB_ROOT_COLLECTION, filename)
-                    # FindingAid instance ead already set above
-                except ExistDBException:
-                    messages.error(request,
-                        "Error moving document %s from preview collection to main collection." % filename)
-                    success = False
-                
-            if success:
-                # request the cache to reload the PDF - queue asynchronous task
-                result = reload_cached_pdf.delay(ead.eadid)
-                task = TaskResult(label='PDF reload', eadid=ead.eadid, task_id=result.task_id)
-                task.save()
+            except ExistDBException, e:
+                errors.append(e.message())
+                success = False
+        elif publish_mode == 'preview' and ead is not None:
+            try:
+                # move the document from preview collection to configured public collection
+                success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
+                        settings.EXISTDB_ROOT_COLLECTION, filename)
+                # FindingAid instance ead already set above
+            except ExistDBException, e:
+                errors.append("Failed to move document %s from preview collection to main collection." \
+                                % filename)
+                errors.append(e.message())
+                success = False
 
-                ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
-                change = "updated" if replaced else "added"
-                messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
-                        % (change, filename, ead_url, unicode(ead.unittitle)))
-            else:
-                messages.error(request, "Error publishing <b>%s</b>." % filename)
-                
-        finally:
-            # if there is at least one error or success message, redirect to admin
-            msg = messages.get_messages(request)
-            if len(msg):
-                msg.used = False
-                # redirect to main admin page with code 303 (See Other)
-                response = HttpResponse(status=303)
-                response['Location'] = reverse('fa-admin:index')
-                return response
-            
-            # otherwise, should display prepublication-check error page
+        if success:
+            # request the cache to reload the PDF - queue asynchronous task
+            result = reload_cached_pdf.delay(ead.eadid)
+            task = TaskResult(label='PDF reload', eadid=ead.eadid, task_id=result.task_id)
+            task.save()
+
+            ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
+            change = "updated" if replaced else "added"
+            messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
+                    % (change, filename, ead_url, unicode(ead.unittitle)))
+
+            # redirect to main admin page and display messages
+            response = HttpResponse(status=303)     # redirect, see other
+            response['Location'] = reverse('fa-admin:index')
+            return response
+        else:
+            return render_to_response('fa_admin/publish-errors.html',
+                {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e },
+                context_instance=RequestContext(request))
     else:
         # if not POST, display list of files available for publication
         # for now, just using main admin page
@@ -280,8 +282,14 @@ def preview(request):
         
         db = ExistDB()
         # load the document to the *preview* collection in eXist with the same fileneame
-        preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename        
-        success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
+        preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename
+        errors = []
+        try:
+            success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
+        except ExistDBException, e:
+            success = False
+            errors.append(e.message())
+
         if success:
             # load the file as a FindingAid object so we can generate the preview url
             ead = load_xmlobject_from_file(fullpath, FindingAid)
@@ -291,11 +299,9 @@ def preview(request):
             response['Location'] = reverse('fa-admin:preview:view-fa', kwargs={'id': ead.eadid })
             return response
         else:
-            messages.error("Error loading <b>%s</b> for preview." % filename)
-            # redirect to main admin page with code 303 (See Other)
-            response = HttpResponse(status=303)
-            response['Location'] = reverse('fa-admin:index')
-            return response
+            return render_to_response('fa_admin/publish-errors.html',
+                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e },
+                    context_instance=RequestContext(request))
     else:
         _use_preview_collection()    
         fa = FindingAid.objects.order_by('last_modified').only('eadid', 'list_title', 'last_modified')
