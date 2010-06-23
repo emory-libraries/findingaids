@@ -1,5 +1,8 @@
-#from django import forms
+from django.forms import HiddenInput, Textarea
 from django.contrib.auth.forms import UserChangeForm
+from findingaids.fa.models import Deleted
+from django.forms import ModelForm
+from django.db.models.fields import DateTimeField
 
 class FAUserChangeForm(UserChangeForm):
     """
@@ -11,6 +14,7 @@ class FAUserChangeForm(UserChangeForm):
             'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions'
         )
 
-
-
-
+class DeleteConfirmationForm(ModelForm):
+    class Meta:
+        model = Deleted
+        exclude = ['date_time']

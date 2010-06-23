@@ -11,12 +11,6 @@ class Permissions(models.Model):
                 ("can_preview", "Can preview a finding aid"),
         )
 
-class EAD_Deletion(models.Model):
-    filename = models.CharField(max_length = 50)
-    title = models.CharField(max_length = 200)
-    datetime = models.DateTimeField('date and time deleted')
-    reason = models.CharField(max_length = 400)
-
 # store details about pdf reload celery task results for display on admin page
 class TaskResult(models.Model):
     label = models.CharField(max_length=100)

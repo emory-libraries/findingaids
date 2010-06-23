@@ -2,6 +2,8 @@ from eulcore import xmlmap
 from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, SubordinateComponents, Index as EadIndex
 from eulcore.django.existdb.manager import Manager
 from eulcore.django.existdb.models import XmlModel
+from django.db import models
+from datetime import datetime
 
 
 # finding aid model
@@ -262,3 +264,15 @@ class Index(XmlModel, EadIndex):
         Configured to use *//index* as base search path.
     """
 
+class Deleted(models.Model):
+    """
+      The records of the deleted finding aids.
+    """
+    eadid = models.CharField(max_length = 50)
+    "EAD ID"
+    title = models.CharField(max_length = 200)
+    "EAD title - unittitle"
+    date_time = models.DateTimeField('date and time deleted', default = datetime.now())
+    "The date and time that the EAD was deleted"
+    comments = models.CharField(max_length = 400, blank = True)
+    "An optional comments provided on deletion"
