@@ -22,10 +22,14 @@ from django.views.decorators.cache import cache_page
 
 from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
+from eulcore.existdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import pages_to_show, get_findingaid
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
+from findingaids.fa_admin.models import Permissions
+from findingaids.fa_admin.forms import FAUserChangeForm, DeleteConfirmationForm
+from findingaids.fa.models import Deleted
 from findingaids.fa_admin.forms import FAUserChangeForm
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin.models import TaskResult
@@ -426,44 +430,42 @@ def list_published (request):
        context_instance=RequestContext(request))
 
 @login_required
-def delete_ead(request):
+def delete_ead(request, id):
     """Delete a published EAD"""
-    
+   
     if request.method != 'POST':
+        try:
+            #display the confirmation form
+            fa = FindingAid.objects.only('eadid', 'unittitle').get(eadid = id)
+            confirmation = Deleted(eadid = fa.eadid, title = fa.unittitle)
+            confirmation_form = DeleteConfirmationForm(instance = confirmation)
+#            print confirmation_form
+            return render_to_response('fa_admin/delete_confirm.html', {'fa' : fa, 'form' : confirmation_form },
+                                      context_instance=RequestContext(request))
+        except DoesNotExist:
+            messages.error(request, "Could not find <b>%s</b>." % id)
+            return list_published(request)
+        
+    confirmation_form = DeleteConfirmationForm(request.POST)
+    success = True
+       
+    try:
+        fa = FindingAid.objects.only('document_name').get(eadid = id)
+    except DoesNotExist:
+        messages.error(request, "Could not find <b>%s</b>." % id)
         return list_published(request)
 
     db = ExistDB()
-
-    document_name = request.POST['document_name']
-    unittitle = request.POST['unittitle']
-    deletereason = request.POST['reason']
-    success = True
- 
     try:
         #remove the document from the public collection
-        success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + document_name)
+        success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + fa.document_name)
+        success = True
     except ExistDBException:
         success = False
     
     if success:
-        deletion_record = EAD_Deletion(filename = document_name, title = unittitle, datetime = datetime.now(), reason = deletereason)
-        deletion_record.save() 
-        messages.success(request, 'Successfully removed <b>%s</b>.' % document_name)
+        confirmation_form.save(True)
+        messages.success(request, 'Successfully removed <b>%s</b>.' % id)
     else:
-        messages.error(request, "Error removing <b>%s</b>." % document_name)
+        messages.error(request, "Error removing <b>%s</b>." % id)
     return list_published(request) 
-
-@login_required
-def delete_ead_confirmation(request):
-    """Confirmation to deleting a published EAD"""
-#    return list_published(request)
-    if request.method != 'POST':
-        return list_published(request)
-
-    id = request.POST['eadid']
-    fa = FindingAid.objects.only('document_name', 'unittitle').get(eadid = id)
-    return render_to_response('fa_admin/delete_confirm.html', {'fa' : fa},
-       context_instance=RequestContext(request))
-    
-    
-    

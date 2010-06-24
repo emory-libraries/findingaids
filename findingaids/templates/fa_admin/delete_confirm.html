@@ -6,18 +6,23 @@
 
 {% block content-body %}
 
-{% if fa.document_name %}
-    <form action="{% url fa-admin:delete-ead %}" method="post">{% csrf_token %}
-    <b>Filename:</b> <input type = 'hidden'name = "document_name" value = "{{ fa.document_name }}"> {{ fa.document_name }} </input><br/>
-    <div><b>Title:</b> <input type = 'hidden' name = "unittitle" value = "{{ fa.unittitle }}" >{{ fa.unittitle }}</input></div><br/>
-
-        <div>  <b>Reason For Deletion: </b></div><br/>
-        <textarea rows="2" cols="60" name = "reason">Finding Aid transferred.</textarea><br/>
+{% if form.eadid %}
+    <form action = "{% url fa-admin:delete-ead fa.eadid %}" method="post">{% csrf_token %}
+        <div class="fieldWrapper">
+            <b>EAD ID: </b> {{form.eadid}}
+        </div>
+        <div class="fieldWrapper">
+            <b>Title: </b>{{form.title}}
+        </div>
+        <div class="fieldWrapper">
+            <b>Comments (Optional):</b><br/>{{form.comments}}
+        </div>
         <button type="submit" >CONFIRM</button><br/>
-    </form>
+        </form>
 {% else %}
-  <tr><td colspan="2">No files found</td></tr>
+    <tr><td colspan="2">No files found</td></tr>
 {% endif %}
+
 
 {% endblock %}
 

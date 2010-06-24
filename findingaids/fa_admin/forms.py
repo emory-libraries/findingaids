@@ -1,8 +1,7 @@
-from django.forms import HiddenInput, Textarea
+from django.forms import HiddenInput, Textarea, TextInput
 from django.contrib.auth.forms import UserChangeForm
 from findingaids.fa.models import Deleted
 from django.forms import ModelForm
-from django.db.models.fields import DateTimeField
 
 class FAUserChangeForm(UserChangeForm):
     """

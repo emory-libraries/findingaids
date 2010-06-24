@@ -19,11 +19,9 @@
     </tr>
 {% for fa in findingaids.object_list %}
     <tr>
-        <td><a href="{% url fa:view-fa fa.eadid %}">{{ fa.document_name }}</a></td>
+        <td><a href ="{% url fa:view-fa fa.eadid %}">{{ fa.eadid }}</a></td>
         <td>
-            <form action="{% url fa-admin:delete-ead-confirm %}" method="post">{% csrf_token %}
-                <button type="submit" name="eadid" value="{{ fa.eadid }}" >DELETE</button>
-            </form>
+                <a href ="{% url fa-admin:delete-ead fa.eadid %}"> DELETE </a>
         </td>
         <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>
     </tr>

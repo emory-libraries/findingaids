@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from findingaids.fa.urls import document_urls
+from findingaids.fa.urls import document_urls, EADID_URL_REGEX
 
 urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^$', 'main', name="index"),
@@ -17,7 +17,6 @@ urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^preview/documents/', include(document_urls(preview=True),
             namespace='preview')),
     url(r'^documents/$', 'list_published', name="list_published"),
-    url(r'^delete$', 'delete_ead', name="delete-ead"),
-    url(r'^deleteconfirm$', 'delete_ead_confirmation', name="delete-ead-confirm"),
+    url(r'^%s/delete$' % EADID_URL_REGEX, 'delete_ead', name="delete-ead"),
 )
 
