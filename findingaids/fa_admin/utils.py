@@ -131,7 +131,8 @@ def _set_series_ids(series, eadid, position):
 
 
 class EadDTDResolver(Resolver):
-    "Custom lxml.etree Resolver so we can load ead.dtd from a known, local location."
+    """Custom :class:`lxml.etree.Resolver` that loads the **ead.dtd** from a
+    known location (packaged with the source code)."""
     def resolve(self, url, id, context):
         if url == 'ead.dtd' or url.split('/')[-1] == 'ead.dtd':
             # when loading a file, the 'url' gets set to the fullpath of that file plus ead.dtd

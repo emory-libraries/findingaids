@@ -16,15 +16,14 @@ Because finding aids is an eXist/xml-based site, models are based on
 EAD xml, and for search and retrieval within the eXist database.
 
 
-
 Finding Aid (EAD)
 ^^^^^^^^^^^^^^^^^
 .. autoclass:: findingaids.fa.models.FindingAid
    :members:
    :inherited-members:
 
-Series
-^^^^^^
+Series and other Finding Aid sections
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autoclass:: findingaids.fa.models.Series
    :members:
@@ -36,6 +35,11 @@ Series
 .. autoclass:: findingaids.fa.models.Subsubseries
    :members:
 
+.. autoclass:: findingaids.fa.models.Index
+   :members:
+
+.. autoclass:: findingaids.fa.models.ListTitle
+   :members:
 
 Views
 -----
