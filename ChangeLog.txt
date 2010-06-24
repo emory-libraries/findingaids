@@ -19,19 +19,37 @@ To upgrade from the previous version:
    for installation instructions.
 2. The application now requires that the celery daemon be running;
    consult the README for more details.
-3. Make sure localsettings.py is updated with configurations that
+3. Update localsettings.py with configuration settings that
    have been added since the last version: (examples in
    localsettings-sample.py)
 
   * EXISTDB_SERVER_TIMEZONE and EXISTDB_PREVIEW_COLLECTION
+
+    * You should make sure that EXISTDB_PREVIEW_COLLECTION is present
+      in eXist, and that the configured eXist user has permission to
+      write to that collection.
+
   * FINDINGAID_EAD_SOURCE 
   * Proxy/cache settings: PROXY_HOST & SITE_BASE_URL
   * RabbitMQ settings (BROKER_*)
 
-4. Run ``python manage.py clean_ead`` to clean all the EAD documents in
+4. The Finding Aids site now requires a sql database (for user
+   management and tracking deleted finding aids).  You should set up
+   a database, configure it in localsettings.pi, and run ``python
+   manage.py syncdb``.
+5. Run ``python manage.py clean_ead`` to clean all the EAD documents in
    the configured EAD source directory.  Note that this will **modify**
    the EAD files; running the script should be coordinated with anyone
    who might be editing those files.
+6. Run ``python manage.py load_ead`` to load all EAD documents in the
+   configured EAD source directory to the configured collection in
+   eXist.  Note that if you are loading to a new collection, you
+   should use the existdb index manage scripts to either load the
+   index configuration before loading data, or load the index and
+   reindex after the data is loaded.
+7. The admin section of the site is at /admin/ (under your site url).
+   This uses Emory LDAP for login, so should be configured to run
+   under SSL. 
 
 
 **Features**
@@ -78,7 +96,6 @@ To upgrade from the previous version:
 
 0.1 Port to Django
 ------------------
-
 
 Reimplementation of the functionality of the existing PHP Finding Aids
 site in django and eXist 1.4.
