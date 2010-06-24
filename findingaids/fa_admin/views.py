@@ -25,7 +25,7 @@ from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_st
 from eulcore.existdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid
-from findingaids.fa.utils import pages_to_show, get_findingaid
+from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 from findingaids.fa_admin.models import Permissions
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteConfirmationForm
@@ -413,18 +413,10 @@ def _get_recent_xml_files(dir):
 @login_required
 def list_published (request):
     """List all published EADs"""
-
     fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')
-    paginator = Paginator(fa, 30, orphans=5)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-    show_pages = pages_to_show(paginator, page)
-    try:
-        fa_subset = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        fa_subset = paginator.page(paginator.num_pages)
+    fa_subset, paginator = paginate_queryset(request, fa, per_page=30, orphans=5)
+    show_pages = pages_to_show(paginator, fa_subset.number)
+    
     return render_to_response('fa_admin/published_list.html', {'findingaids' : fa_subset,
                                                    'querytime': [fa.queryTime()], 'show_pages' : show_pages},
        context_instance=RequestContext(request))
