@@ -899,9 +899,7 @@ class UtilsTest(TestCase):
                 overwrite=True)        
         preview_modified = ead_lastmodified('rqst', 'raoul548', preview=True)
         self.assert_(isinstance(preview_modified, datetime),
-                     "_ead_lastmodified should return a datetime object")
-        self.assert_(preview_modified > modified,
-                    "modified time for preview document more recent than non-preview fixture")
+                     "ead_lastmodified should return a datetime object")
         # clean up
         db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
         

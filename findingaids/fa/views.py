@@ -17,7 +17,7 @@ from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, t
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
-            ead_lastmodified, ead_etag
+            ead_lastmodified, ead_etag, paginate_queryset
 
 def site_index(request):
     "Site home page"
@@ -40,17 +40,8 @@ def titles_by_letter(request, letter):
 
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*_fa_listfields())   
     show_pages = []
-    paginator = Paginator(fa, 10, orphans=5)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-    show_pages = pages_to_show(paginator, page)
-    try:
-        fa_subset = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        fa_subset = paginator.page(paginator.num_pages)
-
+    fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
+    show_pages = pages_to_show(paginator, fa_subset.number)
     query_times = [first_letters.queryTime(), fa.queryTime()]
 
     return render_to_response('findingaids/titles_list.html',
@@ -60,24 +51,6 @@ def titles_by_letter(request, letter):
          'current_letter': letter,
          'show_pages' : show_pages},
          context_instance=RequestContext(request))
-
-# object pagination - adapted directly from django paginator documentation
-def _paginate_queryset(request, qs, per_page=10):
-    # FIXME: should num-per-page be configurable via local settings?
-    paginator = Paginator(qs, per_page)
-     # Make sure page request is an int. If not, deliver first page.
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-
-    # If page request (9999) is out of range, deliver last page of results.
-    try:
-        paginated_qs = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        paginated_qs = paginator.page(paginator.num_pages)
-
-    return paginated_qs
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_fa(request, id, preview=False):
@@ -174,7 +147,7 @@ def keyword_search(request):
         return_fields = _fa_listfields()
         return_fields.append('fulltext_score')
         results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('fulltext_score').only(*return_fields)
-        result_subset = _paginate_queryset(request, results)
+        result_subset, paginator = paginate_queryset(request, results)
 
         query_times = results.queryTime()
         # FIXME: does not currently include keyword param in generated urls
