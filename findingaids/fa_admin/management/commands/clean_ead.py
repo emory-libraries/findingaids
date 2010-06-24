@@ -29,6 +29,7 @@ directory will be cleaned."""
     def handle(self, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
+        v_all = 2
         
         # check for required settings
         if not hasattr(settings, 'EXISTDB_ROOT_COLLECTION') or not settings.EXISTDB_ROOT_COLLECTION:
@@ -37,6 +38,10 @@ directory will be cleaned."""
         if not hasattr(settings, 'FINDINGAID_EAD_SOURCE') or not settings.FINDINGAID_EAD_SOURCE:
             raise CommandError("FINDINGAID_EAD_SOURCE setting is missing")
             return
+
+        if verbosity == v_all:
+            print "Cleaning documents from configured EAD source directory: %s" \
+                    % settings.FINDINGAID_EAD_SOURCE
 
         updated = 0
         unchanged = 0
@@ -56,7 +61,6 @@ directory will be cleaned."""
                     ead = clean_ead(ead, file)
                     # sanity check before saving
                     dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
-                    # FIXME: DTD validation is an issue here (no longer file, not on path...)
                     errors = check_ead(file, dbpath, xml=ead.serialize())
                     if errors:
                         errored += 1                        
