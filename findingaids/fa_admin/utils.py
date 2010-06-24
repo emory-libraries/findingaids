@@ -74,7 +74,7 @@ def check_eadxml(ead):
     # check that series ids are set
     if ead.dsc and ead.dsc.hasSeries():
         for series in ead.dsc.c:
-            errors.extend(_check_series_ids(series))
+            errors.extend(check_series_ids(series))
 
     # check that any index ids are set
     for index in ead.archdesc.index:
@@ -83,15 +83,19 @@ def check_eadxml(ead):
                 % { 'node' : index.node.tag, 'label' : index.head })
     return errors
    
-def _check_series_ids(series):
-    # recursive function to check that series and subseries ids are present
+def check_series_ids(series):
+    """Recursive function to check that series and subseries ids are present.
+    
+    :param series: :class:`findingaids.fa.models.Series`
+    :returns: list of errors, if any
+    """
     errors = []
     if not series.id:
         errors.append("%(level)s %(node)s id attribute is not set for %(label)s"
                 % { 'node' : series.node.tag, 'level' : series.level, 'label' : series.display_label() })
     if series.hasSubseries():
         for c in series.c:
-            errors.extend(_check_series_ids(c))
+            errors.extend(check_series_ids(c))
     return errors
 
 
@@ -110,7 +114,7 @@ def clean_ead(ead, filename):
     # set series ids
     if ead.dsc and ead.dsc.hasSeries():
         for i, series in enumerate(ead.dsc.c):
-            _set_series_ids(series, ead.eadid, i)
+            set_series_ids(series, ead.eadid, i)
     # set index ids 
     for i, index in enumerate(ead.archdesc.index):
         # generate index ids based on eadid and index number (starting at 1, not 0)
@@ -118,8 +122,19 @@ def clean_ead(ead, filename):
 
     return ead
 
-def _set_series_ids(series, eadid, position):
-    # recursive function to set series and subseries ids
+def set_series_ids(series, eadid, position):
+    """Recursive function to set series and subseries ids.  Series id will be set
+    to something like ''eadid_series1'', where series1 is a lower-case, spaceless
+    version of the series unitid.  If no unitid is present, the second half of
+    the series id will be set based on the series level (e.g., series, subseries)
+    and its position in the list of series in the document.
+
+    :param series: :class:`findingaids.fa.models.Series`
+    :param eadid: eadid of the document this series belongs to
+    :param position: numerical position in series-- used as fall-back to generate
+            series id when series does not have a unitid
+    :returns: list of errors, if any
+    """
     if series.did.unitid:
         series.id = "%s_%s" % (eadid, series.did.unitid.replace(' ', '').lower())
     else:
@@ -127,7 +142,7 @@ def _set_series_ids(series, eadid, position):
         series.id = "%s_%s%s" % (eadid, series.level.lower(), position + 1)
     if series.hasSubseries():
         for j, c in enumerate(series.c):
-            _set_series_ids(c, eadid, j)
+            set_series_ids(c, eadid, j)
 
 
 class EadDTDResolver(Resolver):

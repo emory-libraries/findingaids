@@ -8,6 +8,9 @@ from django.template import Context
 from django.template.loader import get_template
 
 from eulcore.django.existdb.db import ExistDB
+from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+
+from findingaids.fa.models import FindingAid
 
 # adapted from django snippets example - http://www.djangosnippets.org/snippets/659/
 def render_to_pdf(template_src, context_dict, filename=None):
@@ -23,6 +26,7 @@ def render_to_pdf(template_src, context_dict, filename=None):
         if filename:
             response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
+    # FIXME: this error handling probably needs some work
     print "ERR", pdf.err
     return http.HttpResponse('Error generating PDF')
     return http.HttpResponse('Error generating PDF<pre>%s</pre>' % cgi.escape(html))
@@ -51,7 +55,7 @@ def pages_to_show(paginator, page):
 
 _stored_publish_collection = None
 
-def _use_preview_collection():
+def use_preview_collection():
     # for preview mode: store real exist collection, and switch to preview collection
     global _stored_publish_collection
     _stored_publish_collection = getattr(settings, "EXISTDB_ROOT_COLLECTION", None)
@@ -60,11 +64,49 @@ def _use_preview_collection():
     settings.EXISTDB_ROOT_COLLECTION = settings.EXISTDB_PREVIEW_COLLECTION
     db = ExistDB()
     # create preview collection, but don't complain if it already exists
-    db.createCollection(settings.EXISTDB_ROOT_COLLECTION, True)
+    db.createCollection(settings.EXISTDB_ROOT_COLLECTION, overwrite=True)
 
-def _restore_publish_collection():
+def restore_publish_collection():
     # for preview mode: switch back to real exist collection
     global _stored_publish_collection
 
     if _stored_publish_collection is not None:
         settings.EXISTDB_ROOT_COLLECTION = _stored_publish_collection
+
+def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=None):
+    """Retrieve a finding aid (or finding aid queryset) from eXist by eadid,
+    with any query options specified.  Raises an Http404 if the requested
+    document is not found in eXist.
+
+    Handles switching to preview collection and then switching back when
+    preview is set to True.
+
+    :param eadid: eadid of the :class:`~findingaids.fa.models.FindingAid` to
+            retrieve; if not specified, a :class:`eulcore.django.existdb.manager.Manager`
+            will be returned instead
+    :param preview: optional; set to True to load the finding aid from the
+            preview collection; defaults to False
+    :param only: optional list of fields to return (**only** return the specified fields)
+    :param also: optional list of additional fields to return
+    :param order_by: optional field to use for sorting
+    :returns: :class:`~findingaids.fa.models.FindingAid` (when eadid is specified)
+            or a :class:`~findingaids.fa.models.FindingAid` :class:`eulcore.django.existdb.manager.Manager`
+            (if no eadid is specified)
+    """
+    if preview:
+        use_preview_collection()
+    try:
+        fa = FindingAid.objects
+        if only is not None:
+            fa = fa.only(*only)
+        if also is not None:
+            fa = fa.also(*also)
+        if order_by is not None:
+            fa = fa.order_by(order_by)
+        if eadid is not None:
+            fa = fa.get(eadid=eadid)
+    except DoesNotExist:
+        raise http.Http404
+    if preview:
+        restore_publish_collection()
+    return fa

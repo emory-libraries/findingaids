@@ -11,8 +11,7 @@ from datetime import datetime
 # with a exist queryset initialized using django-exist settings and ead model
 
 class FindingAid(XmlModel, EncodedArchivalDescription):
-    """
-      Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
+    """Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
 
       Additional fields and methods are used for search, browse, and display.
     """
@@ -266,13 +265,11 @@ class Index(XmlModel, EadIndex):
 
 class Deleted(models.Model):
     """
-      The records of the deleted finding aids.
+    Information about a previously published finding aid that has been deleted.
     """
-    eadid = models.CharField(max_length = 50)
-    "EAD ID"
-    title = models.CharField(max_length = 200)
-    "EAD title - unittitle"
-    date_time = models.DateTimeField('date and time deleted', default = datetime.now())
-    "The date and time that the EAD was deleted"
-    comments = models.CharField(max_length = 400, blank = True)
-    "An optional comments provided on deletion"
+    eadid = models.CharField(max_length=50)
+    title = models.CharField('EAD unittitle', max_length=200)
+    date_time = models.DateTimeField('Date and time record of deletion', default=datetime.now())
+    comments = models.CharField(max_length=400, blank=True, 
+            help_text="Optional: reason this document is being deleted. " +
+                      "For display to anyone who had the finding aid bookmarked and returns after it is gone.")

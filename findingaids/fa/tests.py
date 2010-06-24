@@ -825,8 +825,7 @@ class FaViewsTest(TestCase):
     def test_ead_lastmodified(self):
         modified = _ead_lastmodified('rqst', 'abbey244')
         self.assert_(isinstance(modified, datetime),
-                     "_ead_lastmodified should return a datetime object")
-        today = datetime.now()
+                     "_ead_lastmodified should return a datetime object")        
         date_format = '%Y-%m-%d'
         expected = datetime.now().strftime(date_format)
         value = modified.strftime(date_format)
@@ -835,6 +834,20 @@ class FaViewsTest(TestCase):
 
         # invalid eadid
         self.assertRaises(Http404, _ead_lastmodified, 'rqst', 'bogusid')
+
+        # preview document - load fixture to preview collection
+        fullpath = path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
+        self.db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml',
+                overwrite=True)
+        # remove equivalent non-preview document, to ensure we are getting a preview doc
+        self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/raoul548.xml')
+        preview_modified = _ead_lastmodified('rqst', 'raoul548', preview=True)
+        self.assert_(isinstance(preview_modified, datetime),
+                     "_ead_lastmodified should return a datetime object")
+        self.assert_(preview_modified > modified,
+                    "modified time for preview document more recent than non-preview fixture")
+        # clean up
+        self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
         
 
     def test_ead_etag(self):

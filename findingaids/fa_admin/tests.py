@@ -65,12 +65,21 @@ class BaseAdminViewsTest(TestCase):
             self._stored_ead_src = settings.FINDINGAID_EAD_SOURCE
         settings.FINDINGAID_EAD_SOURCE = self.tmpdir
 
+        # save the exist collection configs for restoring
+        # (some tests changes to simulate an eXist save error)
+        self.real_collection = settings.EXISTDB_ROOT_COLLECTION
+        self.preview_collection = settings.EXISTDB_PREVIEW_COLLECTION
+
     def tearDown(self):
         if hasattr(self, '_stored_ead_src'):
             settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
 
         # clean up temp files & dir
         rmtree(self.tmpdir)
+
+        # restore existdb collections
+        settings.EXISTDB_ROOT_COLLECTION = self.real_collection
+        settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection
 
 class AdminViewsTest(BaseAdminViewsTest):
 
@@ -182,7 +191,6 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # exist save error should be caught & handled gracefully
         # - force an error by setting preview collection to a non-existent collection
-        real_preview_collection = settings.EXISTDB_PREVIEW_COLLECTION
         settings.EXISTDB_PREVIEW_COLLECTION = "/bogus/doesntexist"
         response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
         self.assertContains(response, "Could not preview")
@@ -190,10 +198,7 @@ class AdminViewsTest(BaseAdminViewsTest):
                 "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)     
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        # restore settings
-        settings.EXISTDB_PREVIEW_COLLECTION = real_preview_collection
         
-
     def test_login_admin(self):
         admin_index = reverse('fa-admin:index')
         # Test admin account can login
@@ -450,7 +455,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # swap out celery task in views with our mock version
         self.real_reload = views.reload_cached_pdf
         views.reload_cached_pdf = Mock_reload_pdf()
-        
+
     def tearDown(self):
         super(CeleryAdminViewsTest, self).tearDown()
         _celerytest_tearDown(self)
@@ -518,8 +523,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Unescaped &#39;&lt;&#39; not allowed in attributes values",
             msg_prefix="syntax error detail for badly formed XML displays")
 
-        # force an exist save error by setting collection to a non-existent collection
-        real_collection = settings.EXISTDB_ROOT_COLLECTION
+        # force an exist save error by setting collection to a non-existent collection        
         settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
         response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
         self.assertContains(response, "Could not publish",
@@ -529,8 +533,6 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="specific exist save error displayed to user")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        # restore settings
-        settings.EXISTDB_ROOT_COLLECTION = real_collection
 
     def test_publish_from_preview(self):
         # test publishing a document that has been loaded for preview
@@ -637,6 +639,7 @@ class UtilsTest(TestCase):
         errors = check_ead(valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database contains eadid 'hartsfield558' in a different document" in errors[0])
+        # clean up
         self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml')
 
     def test_clean_ead(self):

@@ -5,7 +5,7 @@ from datetime import datetime
 import difflib
 from lxml.etree import XMLSyntaxError
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -24,7 +24,7 @@ from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 
 from findingaids.fa.models import FindingAid
-from findingaids.fa.utils import _use_preview_collection, _restore_publish_collection, pages_to_show
+from findingaids.fa.utils import pages_to_show, get_findingaid
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 from findingaids.fa_admin.forms import FAUserChangeForm
 from findingaids.fa_admin.tasks import reload_cached_pdf
@@ -192,14 +192,12 @@ def publish(request):
             id = request.POST['preview_id']
 
             # retrieve info about the document from preview collection
-            _use_preview_collection()
             try:
-                ead = FindingAid.objects.also('document_name').get(eadid=id)
-            except ExistDBException:
+                ead = get_findingaid(id, preview=True, also=['document_name'])
+            except Http404:     # not found in exist
                 ead = None
                 messages.error(request,
                     "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
-            _restore_publish_collection()
 
             if ead is None:
                 # if ead could not be retrieved from preview mode, skip processing
@@ -284,6 +282,7 @@ def preview(request):
         preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename
         errors = []
         try:
+            # make sure the preview collection exists, but don't complain if it's already there
             success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
         except ExistDBException, e:
             success = False
@@ -302,9 +301,8 @@ def preview(request):
                     {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e },
                     context_instance=RequestContext(request))
     else:
-        _use_preview_collection()    
-        fa = FindingAid.objects.order_by('last_modified').only('eadid', 'list_title', 'last_modified')
-        _restore_publish_collection()
+        fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
+                            order_by='last_modified')
         return render_to_response('fa_admin/preview_list.html',
                 {'findingaids' : fa, 'querytime': [fa.queryTime()]},
                 context_instance=RequestContext(request))

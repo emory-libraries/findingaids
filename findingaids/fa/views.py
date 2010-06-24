@@ -15,8 +15,8 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
-from findingaids.fa.utils import render_to_pdf, _use_preview_collection, _restore_publish_collection
-from findingaids.fa.utils import pages_to_show
+from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
+        restore_publish_collection, get_findingaid, pages_to_show
 
 # TODO: consolidate common logic for getting a single finding aid with or without preview mode
 
@@ -26,44 +26,26 @@ def _ead_lastmodified(request, id, preview=False, *args, **kwargs):
     Used to generate last-modified header for views based on a single EAD document.
     
     :param id: eadid
+    :param preview: load document from preview collection; defaults to False
     :rtype: :class:`datetime.datetime`
     """
     # get document name and path by eadid, then call describeDocument
-    if preview:
-        _use_preview_collection()    
-    try:
-        fa = FindingAid.objects.only('document_name', 'collection_name').get(eadid=id)
-
-        db = ExistDB()
-        info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
-        dt = info['modified']
-        # NOTE: current version of xmlrpc ignores timezone, which messes up last-modified
-        # use a configured timezone from django settings
-        tz = settings.EXISTDB_SERVER_TIMEZONE
-        # use the generated time to create a timezone-aware
-        modified = datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second, dt.microsecond, tz)
-    except DoesNotExist:
-        raise Http404    
-    finally:
-        if preview:
-            _restore_publish_collection()
-        
-    return modified
+    fa = get_findingaid(id, preview=preview, only=['document_name', 'collection_name'])    
+    db = ExistDB()
+    info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
+    dt = info['modified']
+    # NOTE: current version of xmlrpc ignores timezone, which messes up last-modified
+    # use a configured timezone from django settings
+    tz = settings.EXISTDB_SERVER_TIMEZONE
+    # use the exist time and configured timezone to create a timezone-aware datetime
+    return datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute,
+                             dt.second, dt.microsecond, tz)
 
 
 def _ead_etag(request, id, preview=False, *args, **kwargs):
     """Generate an Etag for an ead by eadid by requesting a SHA-1 checksum
     of the entire EAD xml document from eXist."""
-    if preview:
-        _use_preview_collection()    
-    try:
-        fa = FindingAid.objects.only('hash').get(eadid=id)
-    except DoesNotExist:
-        raise Http404
-    finally:
-        if preview:
-            _restore_publish_collection()
-        
+    fa = get_findingaid(id, preview=preview, only=['hash'])        
     return fa.hash
 
 def site_index(request):
@@ -129,16 +111,7 @@ def _paginate_queryset(request, qs, per_page=10):
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def view_fa(request, id, preview=False):
     "View a single finding aid"
-
-    if preview:
-        _use_preview_collection()                
-    try:
-        fa = FindingAid.objects.get(eadid=id)
-    except DoesNotExist:   
-        raise Http404
-    # FIXME: handle other exceptions
-    if preview:
-        _restore_publish_collection()
+    fa = get_findingaid(id, preview=preview)
         
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview)
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
@@ -150,8 +123,7 @@ def view_fa(request, id, preview=False):
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def series_or_index(request, id, series_id, preview=False):
     "View a single series (c01) or index from a finding aid"
-    return _view_series(request, id, series_id,
-                        preview=preview)
+    return _view_series(request, id, series_id, preview=preview)
 
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def view_subseries(request, id, series_id, subseries_id, preview=False):
@@ -167,18 +139,19 @@ def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id, pre
 
 def _view_series(request, eadid, *series_ids, **kwargs):
     if 'preview' in kwargs and kwargs['preview']:
-        _use_preview_collection()
+        use_preview_collection()
         
     # get the item to be displayed (series, subseries, index)
     result = _get_series_or_index(eadid, *series_ids)
     # info needed to construct navigation links within this ead
     # - summary info for all top-level series in this finding aid
-    all_series = Series.objects.only('id', 'level', 'did__unitid', 'did__unittitle').filter(ead__eadid=eadid).all()
+    all_series = Series.objects.only('id', 'level', 'did__unitid', \
+                            'did__unittitle').filter(ead__eadid=eadid).all()
     # - summary info for any indexes
     all_indexes = Index.objects.only('id', 'head').filter(ead__eadid=eadid).all()
     
     if 'preview' in kwargs and kwargs['preview']:
-        _restore_publish_collection()
+        restore_publish_collection()
 
     render_opts = { 'ead': result.ead,
                     'all_series' : all_series,
@@ -251,16 +224,7 @@ def keyword_search(request):
 @condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
 def full_fa(request, id, mode, preview=False):
     "View the full contents of a single finding aid as PDF or plain html"
-    
-    if preview:
-        _use_preview_collection()          
-    try:
-        fa = FindingAid.objects.get(eadid=id)
-    except DoesNotExist:
-        raise Http404
-    if preview:
-        _restore_publish_collection()
-        
+    fa = get_findingaid(id, preview=preview)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
 
     template = 'findingaids/full.html'
@@ -360,13 +324,6 @@ def xml_fa(request, id, preview=False):
 
     :param id: the ID of an EAD
     """
-    if preview:
-        _use_preview_collection()
-    try:
-        fa = FindingAid.objects.get(eadid=id)
-    except DoesNotExist:
-        raise Http404
-    if preview:
-        _restore_publish_collection()
-    xml_ead = fa.serialize(pretty = True)
+    fa = get_findingaid(id, preview=preview)
+    xml_ead = fa.serialize(pretty=True)
     return HttpResponse(xml_ead, mimetype='application/xml')
