@@ -1,6 +1,7 @@
 import ho.pisa as pisa
 import cStringIO as StringIO
 import cgi
+from datetime import datetime
 
 from django import http
 from django.conf import settings
@@ -74,9 +75,10 @@ def restore_publish_collection():
         settings.EXISTDB_ROOT_COLLECTION = _stored_publish_collection
 
 def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=None):
-    """Retrieve a finding aid (or finding aid queryset) from eXist by eadid,
-    with any query options specified.  Raises an Http404 if the requested
-    document is not found in eXist.
+    """Retrieve a  :class:`~findingaids.fa.models.FindingAid` (or
+    :class:`~findingaids.fa.models.FindingAid`  :class:`eulcore.django.existdb.manager.Manager`)
+    from eXist by eadid, with any query options specified.  Raises a 
+    :class:`django.http.Http404` if the requested document is not found in eXist.
 
     Handles switching to preview collection and then switching back when
     preview is set to True.
@@ -110,3 +112,35 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
     if preview:
         restore_publish_collection()
     return fa
+
+def ead_lastmodified(request, id, preview=False, *args, **kwargs):
+    """Get the last modification time for a finding aid in eXist by eadid.
+    Used to generate last-modified header for views based on a single EAD document.
+
+    :param id: eadid
+    :param preview: load document from preview collection; defaults to False
+    :rtype: :class:`datetime.datetime`
+    """
+    # get document name and path by eadid, then call describeDocument
+    fa = get_findingaid(id, preview=preview, only=['document_name', 'collection_name'])
+    db = ExistDB()
+    info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
+    dt = info['modified']
+    # NOTE: current version of xmlrpc ignores timezone, which messes up last-modified
+    # use a configured timezone from django settings
+    tz = settings.EXISTDB_SERVER_TIMEZONE
+    # use the exist time and configured timezone to create a timezone-aware datetime
+    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute,
+                    dt.second, dt.microsecond, tz)
+
+
+def ead_etag(request, id, preview=False, *args, **kwargs):
+    """Generate an Etag for an ead (specified by eadid) by requesting a SHA-1
+    checksum of the entire EAD xml document from eXist.
+
+    :param id: eadid
+    :param preview: requested document is in the preview collection; defaults to False
+    :rtype: string
+    """
+    fa = get_findingaid(id, preview=preview, only=['hash'])
+    return fa.hash

@@ -16,10 +16,9 @@ from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
-from findingaids.fa.views import _series_url, _subseries_links, _series_anchor, \
-	_ead_lastmodified, _ead_etag
+from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.templatetags.ead import format_ead
-from findingaids.fa.utils import pages_to_show
+from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
@@ -822,41 +821,6 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "Container List",
             msg_prefix="finding aid with no subseries should include container list in printable mode")
 
-    def test_ead_lastmodified(self):
-        modified = _ead_lastmodified('rqst', 'abbey244')
-        self.assert_(isinstance(modified, datetime),
-                     "_ead_lastmodified should return a datetime object")        
-        date_format = '%Y-%m-%d'
-        expected = datetime.now().strftime(date_format)
-        value = modified.strftime(date_format)
-        self.assertEqual(expected, value,
-                     'ead lastmodified should be today, expected %s, got %s' % (expected, value))
-
-        # invalid eadid
-        self.assertRaises(Http404, _ead_lastmodified, 'rqst', 'bogusid')
-
-        # preview document - load fixture to preview collection
-        fullpath = path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
-        self.db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml',
-                overwrite=True)
-        # remove equivalent non-preview document, to ensure we are getting a preview doc
-        self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/raoul548.xml')
-        preview_modified = _ead_lastmodified('rqst', 'raoul548', preview=True)
-        self.assert_(isinstance(preview_modified, datetime),
-                     "_ead_lastmodified should return a datetime object")
-        self.assert_(preview_modified > modified,
-                    "modified time for preview document more recent than non-preview fixture")
-        # clean up
-        self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
-        
-
-    def test_ead_etag(self):
-        checksum = _ead_etag('rqst', 'abbey244')
-        self.assert_(re.match('[0-9a-f]{40}$', checksum),
-                     'ead etag should be 40-character hex checksum, got %s' % checksum)
-        # invalid eadid
-        self.assertRaises(Http404, _ead_lastmodified, 'rqst', 'bogusid')
-
     def test_xml_fa(self):
         nonexistent_ead = reverse('fa:xml-fa', kwargs={'id': 'nonexistent'})
         response = self.client.get(nonexistent_ead)
@@ -882,6 +846,9 @@ class FaViewsTest(TestCase):
             "response content should be the full, valid XML content of the requested EAD document")
 
 class UtilsTest(TestCase):
+    exist_fixtures = {'files': [
+            path.join(exist_fixture_path, 'abbey244.xml'),
+    ]}
 
     def test_pages_to_show(self):
         paginator = Paginator(range(300), 10)
@@ -912,6 +879,38 @@ class UtilsTest(TestCase):
         self.assert_(24 in pages,
             "show pages includes 6 pages before last page for last page of results")
 
+    def test_ead_lastmodified(self):
+        modified = ead_lastmodified('rqst', 'abbey244')
+        self.assert_(isinstance(modified, datetime),
+                     "_ead_lastmodified should return a datetime object")
+        date_format = '%Y-%m-%d'
+        expected = datetime.now().strftime(date_format)
+        value = modified.strftime(date_format)
+        self.assertEqual(expected, value,
+                     'ead lastmodified should be today, expected %s, got %s' % (expected, value))
+
+        # invalid eadid
+        self.assertRaises(Http404, ead_lastmodified, 'rqst', 'bogusid')
+
+        db = ExistDB()
+        # preview document - load fixture to preview collection
+        fullpath = path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
+        db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml',
+                overwrite=True)        
+        preview_modified = ead_lastmodified('rqst', 'raoul548', preview=True)
+        self.assert_(isinstance(preview_modified, datetime),
+                     "_ead_lastmodified should return a datetime object")
+        self.assert_(preview_modified > modified,
+                    "modified time for preview document more recent than non-preview fixture")
+        # clean up
+        db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
+        
+    def test_ead_etag(self):
+        checksum = ead_etag('rqst', 'abbey244')
+        self.assert_(re.match('[0-9a-f]{40}$', checksum),
+                     'ead etag should be 40-character hex checksum, got %s' % checksum)
+        # invalid eadid
+        self.assertRaises(Http404, ead_etag, 'rqst', 'bogusid')
 
 
 class FullTextFaViewsTest(TestCase):

@@ -16,37 +16,8 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
-        restore_publish_collection, get_findingaid, pages_to_show
-
-# TODO: consolidate common logic for getting a single finding aid with or without preview mode
-
-
-def _ead_lastmodified(request, id, preview=False, *args, **kwargs):
-    """Get the last modification time for a finding aid in eXist by eadid.
-    Used to generate last-modified header for views based on a single EAD document.
-    
-    :param id: eadid
-    :param preview: load document from preview collection; defaults to False
-    :rtype: :class:`datetime.datetime`
-    """
-    # get document name and path by eadid, then call describeDocument
-    fa = get_findingaid(id, preview=preview, only=['document_name', 'collection_name'])    
-    db = ExistDB()
-    info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
-    dt = info['modified']
-    # NOTE: current version of xmlrpc ignores timezone, which messes up last-modified
-    # use a configured timezone from django settings
-    tz = settings.EXISTDB_SERVER_TIMEZONE
-    # use the exist time and configured timezone to create a timezone-aware datetime
-    return datetime.datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute,
-                             dt.second, dt.microsecond, tz)
-
-
-def _ead_etag(request, id, preview=False, *args, **kwargs):
-    """Generate an Etag for an ead by eadid by requesting a SHA-1 checksum
-    of the entire EAD xml document from eXist."""
-    fa = get_findingaid(id, preview=preview, only=['hash'])        
-    return fa.hash
+            restore_publish_collection, get_findingaid, pages_to_show, \
+            ead_lastmodified, ead_etag
 
 def site_index(request):
     "Site home page"
@@ -108,7 +79,7 @@ def _paginate_queryset(request, qs, per_page=10):
 
     return paginated_qs
 
-@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_fa(request, id, preview=False):
     "View a single finding aid"
     fa = get_findingaid(id, preview=preview)
@@ -120,18 +91,18 @@ def view_fa(request, id, preview=False):
                                                          'preview': preview},
                                             context_instance=RequestContext(request, current_app='preview'))
 
-@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def series_or_index(request, id, series_id, preview=False):
     "View a single series (c01) or index from a finding aid"
     return _view_series(request, id, series_id, preview=preview)
 
-@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_subseries(request, id, series_id, subseries_id, preview=False):
     "View a single subseries (c02) from a finding aid"   
     return _view_series(request, id, series_id, subseries_id,
                         preview=preview)
 
-@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id, preview=False):
     "View a single subseries (c03) from a finding aid"
     return _view_series(request, id, series_id, subseries_id, subsubseries_id,
@@ -221,7 +192,7 @@ def keyword_search(request):
                     {'form' : form, 'request': request },
                     context_instance=RequestContext(request))
 
-@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def full_fa(request, id, mode, preview=False):
     "View the full contents of a single finding aid as PDF or plain html"
     fa = get_findingaid(id, preview=preview)
@@ -317,7 +288,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                     url_callback=url_callback, preview=preview))
     return links
 
-@condition(etag_func=_ead_etag, last_modified_func=_ead_lastmodified)
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def xml_fa(request, id, preview=False):
     """
     Display the XML content of a finding aid
