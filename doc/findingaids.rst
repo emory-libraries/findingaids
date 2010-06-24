@@ -46,6 +46,10 @@ Views
 .. automodule:: findingaids.fa.views
    :members:
 
+Other Functions
+---------------
+.. automodule:: findingaids.fa.utils
+   :members:
 
 Custom Template Filters & Tags
 ------------------------------
