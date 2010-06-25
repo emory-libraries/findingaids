@@ -6,8 +6,9 @@ from findingaids.fa.urls import EADID_URL_REGEX, TITLE_LETTERS
 from findingaids.fa.models import FindingAid
  
 class Command(BaseCommand):        
-    """Check specified fields in all Finding Aids loaded in the configured
-eXist collection against the regular expressions used for URLs in the site.
+    """Check the specified field in all Finding Aids loaded in the configured
+eXist collection against the regular expressions used for URLs in the site,
+and reports on any documents that fail.
 
 If ``eadid`` is specified, checks that each eadid matches the regular expression
 in the single document URL pattern.
@@ -26,14 +27,14 @@ included in the allowed first-letters for the browse URL.
         v_all = 2
 
         if not len(args):
-            print "A command is required; please choose one of the following: %s" \
+            print "A command is required; please choose one of the following: %s\n" \
                     % ' '.join(self._args)
             print self.help
             return
 
         cmd = args[0]
         if cmd not in self._args:
-            print "Command '%s' not recognized" % cmd
+            print "Command '%s' not recognized\n" % cmd
             print self.help
             return
 
@@ -47,15 +48,15 @@ included in the allowed first-letters for the browse URL.
                     % settings.EXISTDB_ROOT_COLLECTION
 
         if cmd == 'eadid':
-        eadids = FindingAid.objects.only('eadid').distinct()
+            eadids = FindingAid.objects.only('eadid').distinct()
             mismatch = 0
-        regextest = re.compile(EADID_URL_REGEX)
+            regextest = re.compile(EADID_URL_REGEX)
             if verbosity == v_all:
                 print "Checking each eadid against the regex '%s'" % EADID_URL_REGEX
-        for ead in eadids:
+            for ead in eadids:
                 if verbosity == v_all:
                     print "Checking %s" % ead
-            if not regextest.match(ead):
+                if not regextest.match(ead):
                     mismatch += 1
                     print "Error: '%s' does not match" % ead
 

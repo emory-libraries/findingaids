@@ -46,6 +46,11 @@ Views
 .. automodule:: findingaids.fa.views
    :members:
 
+.. 
+    NOTE: documentation for views with condition decorator is NOT currently
+    working; even though the django code uses the functools.wraps as specified,
+    the docstring is getting lost because of the decorator.
+
 Other Functions
 ---------------
 .. automodule:: findingaids.fa.utils
@@ -82,9 +87,12 @@ Custom manage commands
 The following management commands are available.
 For more details, use manage.py help <command>
 
- * **check_eadids**
-    .. autoclass:: findingaids.fa.management.commands.check_eadids.Command
+ * **check_ead**
+    .. autoclass:: findingaids.fa.management.commands.check_ead.Command
        :members:
  * **clean_ead**
     .. autoclass:: findingaids.fa_admin.management.commands.clean_ead.Command
+       :members:
+ * **load_ead**
+    .. autoclass:: findingaids.fa_admin.management.commands.load_ead.Command
        :members:
