@@ -16,7 +16,10 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
       Additional fields and methods are used for search, browse, and display.
     """
 
-    list_title_xpaths = ["archdesc/did/origination/node()", "archdesc/did[not(origination/node())]/unittitle"]
+    list_title_xpaths = ["archdesc/did/origination/corpname",
+        "archdesc/did/origination/famname",
+        "archdesc/did/origination/persname",
+        "archdesc/did[not(origination/corpname or origination/famname or origination/persname)]/unittitle"]
     list_title_xpath = "|".join("./%s" % xp for xp in list_title_xpaths)
     #./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
 
@@ -25,8 +28,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     "list title used for alphabetical browse - any origination name, or unittitle if there is none"
 
     # first letter of title field
-    # NOTE: probably not needed here any longer; using ListTitle for browse query
-    first_letter = xmlmap.ItemField("substring(%s,1,1)" % list_title_xpath)
+    first_letter = xmlmap.StringField("substring(%s,1,1)" % list_title_xpath)
     "First letter of list title"
 
     dc_subjects = xmlmap.StringListField ('archdesc//controlaccess/subject[@encodinganalog = "650"] | \
