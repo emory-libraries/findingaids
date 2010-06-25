@@ -44,8 +44,6 @@ class FindingAidTestCase(DjangoTestCase):
         for file, fa in self.findingaid.iteritems():
             self.assert_(isinstance(fa, FindingAid))
 
-        # TODO: test queryset/manager? (current implementation will change when eulcore existdb model is created)
-
     def test_custom_fields(self):
         # list title variants
         # NOTE: list_title is now a NodeField; calling __unicode__ explicitly to do a string compare
@@ -73,15 +71,11 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_(u'Thurman, Howard, 1900-1981.' in self.findingaid['bailey807'].dc_contributors)
         self.assert_(u'Thurman, Sue Bailey.' in self.findingaid['bailey807'].dc_contributors)
 
-    # FIXME/TODO: test admin info, collection description ?  (tested in view_series to some extent)
-
     def test_series_info(self):
         info = self.findingaid['raoul548'].dsc.c[0].series_info()
         self.assert_(isinstance(info, ListType))
         self.assertEqual("Scope and Content Note", info[0].head)
         self.assertEqual("Arrangement Note", info[1].head)
-
-        # FIXME/TODO: test other possible fields not present in this series?
 
         # series info problem when scopecontent is missing a <head>; contains use restriction
         info = self.findingaid['raoul548'].dsc.c[-1].c[-1].series_info()
@@ -526,7 +520,6 @@ class FaViewsTest(TestCase):
             response.content, "subseries arrangment note")
 
         # subseries contents
-        # TODO/FIXME: test for box/folder headings? test for section headings?
         self.assertPattern('20.*1.*1886-1887', response.content,
             "first content of subseries 1.6")
         self.assertPattern('22.*14.*Journal,.*1888', response.content,

@@ -31,7 +31,12 @@ def check_ead(filename, dbpath, xml=None):
     try:
         ead = load_xml(content, FindingAid, validate=True, resolver=EadDTDResolver())
     except XMLSyntaxError, e:
-        errors.append(e)        # TODO: use etree error_log to get all errors
+        # NOTE: we could report all syntax/validation errors if we validate with
+        # a dtd object and access the error_log on the dtd object.
+        # It's probably sufficient to report the first error and direct the user
+        # to validate offline; possibly when we switch to an XSD schema this could
+        # be revisited - load without validation, then validate and report all errors
+        errors.append(e)       
         # if not dtd-valid, then appempt to load without validation to do additional checking
         try:
             ead = load_xml(content, FindingAid, validate=False, resolver=EadDTDResolver())

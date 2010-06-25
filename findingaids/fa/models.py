@@ -202,11 +202,9 @@ class Series(XmlModel, Component):
         "Series display label - *unitid : unittitle* (if unitid) or *unittitle* (if no unitid)"
         return ': '.join([u for u in [self.did.unitid, unicode(self.did.unittitle)] if u])
 
-# TODO: how to configure base ead class so component classtype can be overridden ?
-
 # override component.c node_class
 # subcomponents need to be initialized as Series to get display_label, series list...
-# FIXME: there must be a better way to do this!
+# FIXME: look for a a better way to do this kind of XmlObject extension
 Component._fields['c'].node_class = Series
 SubordinateComponents._fields['c'].node_class = Series
 
