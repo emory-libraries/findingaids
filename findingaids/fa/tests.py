@@ -303,6 +303,7 @@ class FaViewsTest(TestCase):
 
         # format_ead
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'pomerantz890.xml'}))
+        self.assertContains(response, 'href="/documents/pomerantz890.xml/EAD"')
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
 
         # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
@@ -607,6 +608,10 @@ class FaViewsTest(TestCase):
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, fa_url))
+
+        ead_url = reverse('fa-admin:preview:xml-fa', kwargs={'id':'raoul548'})
+        self.assertContains(response, 'href="%s"' % ead_url)
+
 
         series_url = reverse('fa-admin:preview:series-or-index',
                         kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'})

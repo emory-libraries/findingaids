@@ -7,6 +7,7 @@
   {% with findingaid.dc_fields as dc_fields %}
     {% include "findingaids/sections/_dc_meta.html" %}
   {% endwith %}
+  <link rel="alternate" type="application/xml" href="{% ifurl preview fa-admin:preview:xml-fa fa:xml-fa id=findingaid.eadid %}" />
 {% endblock %}
 
 {% block page-subtitle %}: {{ findingaid.title }}{% endblock %}
