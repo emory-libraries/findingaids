@@ -19,8 +19,11 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset
 
+fa_listfields = ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
+"List of fields that should be returned for brief list display of a finding aid."
+
 def site_index(request):
-    "Site home page"
+    "Site home page.  Currently includes browse letter links."
     first_letters = title_letters()
     return render_to_response('findingaids/index.html', { 'letters' : first_letters,
                                                           'querytime': [first_letters.queryTime()]},
@@ -28,17 +31,19 @@ def site_index(request):
                                                           )
 
 def browse_titles(request):
-    "List all first letters in finding aid list title, link to browse by letter."
+    "List all first letters in finding aid list title, with a link to browse by letter."
     first_letters = title_letters()
     return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
                                                            'querytime': [first_letters.queryTime()]},
                                                           context_instance=RequestContext(request))
 
 def titles_by_letter(request, letter):
-    "Paginated list of finding aids by first letter in list title"
+    """Paginated list of finding aids by first letter in list title.
+    Includes list of browse first-letters as in :meth:`browse_titles`.
+    """
     first_letters = title_letters()
 
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*_fa_listfields())   
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)   
     show_pages = []
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
     show_pages = pages_to_show(paginator, fa_subset.number)
@@ -54,9 +59,13 @@ def titles_by_letter(request, letter):
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_fa(request, id, preview=False):
-    "View a single finding aid"
-    fa = get_findingaid(id, preview=preview)
-        
+    """View a single finding aid.   In preview mode, pulls the document from the
+    configured eXist-db preview collection instead of the default public one.
+    
+    :param id: eadid for the document to view
+    :param preview: boolean indicating preview mode, defaults to False
+    """
+    fa = get_findingaid(id, preview=preview)        
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview)
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
                                                          'series' : series,
@@ -65,23 +74,81 @@ def view_fa(request, id, preview=False):
                                             context_instance=RequestContext(request, current_app='preview'))
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
+def xml_fa(request, id, preview=False):
+    """Display the full EAD XML content of a finding aid.
+
+    :param id: eadid for the document to be displayed
+    :param preview: boolean indicating preview mode, defaults to False
+    """
+    fa = get_findingaid(id, preview=preview)
+    xml_ead = fa.serialize(pretty=True)
+    return HttpResponse(xml_ead, mimetype='application/xml')
+
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
+def full_fa(request, id, mode, preview=False):
+    """View the full contents of a single finding aid as PDF or plain html.
+
+    :param id: eadid for the document to be displayed
+    :param mode: one of 'html' or 'pdf' - not that the html mode is not publicly
+            linked anywhere, and is intended mostly for development and testing
+            of the PDF display
+    :param preview: boolean indicating preview mode, defaults to False
+    """
+    fa = get_findingaid(id, preview=preview)
+    series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
+
+    template = 'findingaids/full.html'
+    template_args = { 'findingaid' : fa, 'series' : series,
+                    'mode' : mode, 'preview': preview, 'request' : request}
+    if mode == 'html':
+        return render_to_response(template, template_args)
+    elif mode == 'pdf':
+        return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid)
+
+
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def series_or_index(request, id, series_id, preview=False):
-    "View a single series (c01) or index from a finding aid"
+    """View a single series (c01) or index from a finding aid.
+
+    :param id: eadid for the document the series belongs to
+    :param series_id: series or index id
+    :param preview: boolean indicating preview mode, defaults to False
+    """
     return _view_series(request, id, series_id, preview=preview)
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_subseries(request, id, series_id, subseries_id, preview=False):
-    "View a single subseries (c02) from a finding aid"   
+    """View a single subseries (c02) from a finding aid.
+    
+    :param id: eadid for the document the subseries belongs to
+    :param series_id: id for the top-level series (c01) the subseries belongs to
+    :param subseries_id: id for the subseries (c02) to display
+    :param preview: boolean indicating preview mode, defaults to False
+    """
     return _view_series(request, id, series_id, subseries_id,
                         preview=preview)
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id, preview=False):
-    "View a single subseries (c03) from a finding aid"
+    """View a single sub-subseries (c03) from a finding aid.
+    
+    :param id: eadid for the document the sub-subseries belongs to
+    :param series_id: top-level series (c01) the sub-subseries belongs to
+    :param subseries_id: subseries (c02) the sub-subseries belongs to
+    :param subsubseries_id: sub-subseries (c03) to display
+    :param preview: boolean indicating preview mode, defaults to False"
+    """
     return _view_series(request, id, series_id, subseries_id, subsubseries_id,
                         preview=preview)
 
 def _view_series(request, eadid, *series_ids, **kwargs):
+    """Common logic for retrieving and displaying a series, subseries, or index.
+
+    :param eadid: eadid for the document the series or index belongs to
+    :param series_ids: list of series ids - number of ids determines series level
+
+    Also takes an optional named argument for preview mode.
+    """
     if 'preview' in kwargs and kwargs['preview']:
         use_preview_collection()
         
@@ -114,6 +181,12 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                             render_opts, context_instance=RequestContext(request))
 
 def _get_series_or_index(eadid, *series_ids):
+    """Retrieve a series or index from a Finding Aid.
+
+    :param eadid: eadid for the document the series or index belongs to
+    :param series_ids: list of series ids or an index id; for series,
+            the number of ids determines series level to be retrieved
+    """
     # additional fields to be returned
     return_fields = ['ead__eadid', 'ead__title', 'ead__archdesc__controlaccess__head',
         'ead__dsc__head']
@@ -144,7 +217,7 @@ def keyword_search(request):
         # not yet implemented - if no search terms, display search form
         search_terms = request.GET.get('keywords')
         # common ead fields for list display, plus full-text relevance score
-        return_fields = _fa_listfields()
+        return_fields = fa_listfields
         return_fields.append('fulltext_score')
         results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('fulltext_score').only(*return_fields)
         result_subset, paginator = paginate_queryset(request, results)
@@ -165,29 +238,13 @@ def keyword_search(request):
                     {'form' : form, 'request': request },
                     context_instance=RequestContext(request))
 
-@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def full_fa(request, id, mode, preview=False):
-    "View the full contents of a single finding aid as PDF or plain html"
-    fa = get_findingaid(id, preview=preview)
-    series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
-
-    template = 'findingaids/full.html'
-    template_args = { 'findingaid' : fa, 'series' : series,
-                    'mode' : mode, 'preview': preview, 'request' : request}
-    if mode == 'html':
-        return render_to_response(template, template_args)
-    elif mode == 'pdf':
-        return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid)
-
-def _fa_listfields():
-    "List of fields that should be returned for brief list display of a finding aid."
-    return ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
-
 def _series_url(eadid, series_id, *ids, **extra_opts):
     """
     Generate a series or subseries url when given an eadid and list of series ids.
     Requires at least ead document id and top-level series id.  Number of additional
     series ids provided determines type of series url generated.
+
+    Default url callback for :meth:`_subseries_links`.
     """
     # common args for generating all urls
     args = {'id' : eadid, 'series_id' : series_id}
@@ -209,17 +266,30 @@ def _series_url(eadid, series_id, *ids, **extra_opts):
     return reverse('%s:%s' % (view_namespace, view_name), kwargs=args)
 
 def _series_anchor(*ids, **extra_opts):
-    """Generate a same-page id-based anchor link for a series"""
+    """Generate a same-page id-based anchor link for a series.
+
+    Used as url callback for :meth:`_subseries_links` for generating a single-page
+    version of the full finding aid (see :meth:`full_fa`).
+    """
     # only actually use the last of all ids passed in
     return "#%s" % ids[-1]
 
 def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=False):
     """
     Recursive function to build a nested list of links to series and subseries
-    to simplify template display logic for complicated series.
+    to simplify template display logic for complicated series.  Note that the list
+    elements include ``<a href="...">`` tags, so the output of should not be
+    escaped in the template where it is rendered.
 
     Series element must include ead.eadid; if series is c02 or c03, must also
     include parent c01 (and c02) id, in order to generate urls.
+
+    :param series: :class:`findingaids.fa.models.Series` instance (with access 
+            to eadid for the document and parent series ids if a subseries)
+    :param url_ids: list of series ids for generating urls
+    :param url_callback: method to use for generating the series url
+    :param preview: boolean; when True, links will be generated for preview urls.
+            Optional, defaults to False.
     """
     # construct url ids if none are passed
     if url_ids is None:
@@ -260,14 +330,3 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                 links.append(_subseries_links(component, url_ids=current_url_ids, \
                     url_callback=url_callback, preview=preview))
     return links
-
-@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def xml_fa(request, id, preview=False):
-    """
-    Display the XML content of a finding aid
-
-    :param id: the ID of an EAD
-    """
-    fa = get_findingaid(id, preview=preview)
-    xml_ead = fa.serialize(pretty=True)
-    return HttpResponse(xml_ead, mimetype='application/xml')
