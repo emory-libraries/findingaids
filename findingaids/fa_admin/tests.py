@@ -2,6 +2,7 @@ import os
 import tempfile
 from time import sleep
 from shutil import rmtree
+from datetime import datetime
 
 from django.test import Client, TestCase
 from django.conf import settings
@@ -415,25 +416,38 @@ class AdminViewsTest(BaseAdminViewsTest):
     # NOTE: temporarily disabled this test because it is failing
     # and delete view is going to be reworked to use ModelForm,
     # so not much point in fixing the current test
-    def DISABLED_test_delete_ead(self):
-         # Test admin account can login
+    def test_delete_ead(self):
+        # Test admin account can login
         self.client.login(**self.admin_credentials)
 
+        id = 'hartsfield558'
         filename = 'hartsfield558.xml'
-        nonexistfile = 'nonexist.xml'
-        delete_url = reverse('fa-admin:delete-ead')
-
         dbpath = settings.EXISTDB_TEST_COLLECTION + '/' + filename
         valid_eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', filename)
         self.db.load(open(valid_eadfile), dbpath, True)
         
-        # Test delete a file that doesn't exist
-        response = self.client.post(delete_url, {'filename' : nonexistfile})
-        self.assertContains(response, "Error removing <b>%s</b>." % nonexistfile)
-
+        noneid = 'nonexist.xml'
+        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': id})
+        delete_none = reverse('fa-admin:delete-ead', kwargs={'id': noneid})
+        
+        # GET should just display the delete confirmation form
+        response = self.client.get(delete_none)
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assert_("Could not find <b>%s</b>." % noneid in messages[0],
+                "file not found message present in response context")
+        response = self.client.get(delete_url)
+        self.assertContains(response, '<b>EAD ID: </b> <input name="eadid" value="%s" readonly="readonly" maxlength="50" type="text" id="id_eadid" />' % id)
+        self.assertContains(response, 'id="id_title" value="William Berry Hartsfield papers, circa 1860s-1983" size="80" />')
+        self.assertContains(response, '<b>Comments (Optional):</b><br/><textarea id="id_comments" rows="10" cols="80" name="comments"></textarea>')
+        
+        #POST should trigger the deletion
+        fa = FindingAid.objects.only('unittitle').get(eadid = id)
         # Test delete an existing file
-        response = self.client.post(delete_url, {'filename' : filename})
-        self.assertContains(response, "Successfully removed <b>%s</b>." % filename)
+        response = self.client.post(delete_url, {'eadid' : id, 'title' : fa.unittitle, 'date_time' : datetime.now(), 'comments' : ''})
+        self.assertContains(response, 'Successfully removed <b>%s</b>.' % id)   
+        # Test delete a file that doesn't exist
+        response = self.client.post(delete_none)
+        self.assertContains(response, 'Could not find <b>%s</b>.' % noneid)
 
 # unit tests for views that make use of celery tasks (additional setup required)
 
@@ -547,7 +561,6 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # publish the preview file
         response =  self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
         code = response.status_code
-        #print response
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
                              % (expected, code, publish_url))

@@ -13,7 +13,7 @@ class FAUserChangeForm(UserChangeForm):
             'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions'
         )
 
-class DeleteConfirmationForm(ModelForm):
+class Delete(ModelForm):
     class Meta:
         model = Deleted
         exclude = ['date_time']

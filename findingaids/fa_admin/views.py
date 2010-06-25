@@ -28,7 +28,7 @@ from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 from findingaids.fa_admin.models import Permissions
-from findingaids.fa_admin.forms import FAUserChangeForm, DeleteConfirmationForm
+from findingaids.fa_admin.forms import FAUserChangeForm, Delete
 from findingaids.fa.models import Deleted
 from findingaids.fa_admin.forms import FAUserChangeForm
 from findingaids.fa_admin.tasks import reload_cached_pdf
@@ -430,15 +430,13 @@ def delete_ead(request, id):
             #display the confirmation form
             fa = FindingAid.objects.only('eadid', 'unittitle').get(eadid = id)
             confirmation = Deleted(eadid = fa.eadid, title = fa.unittitle)
-            confirmation_form = DeleteConfirmationForm(instance = confirmation)
-#            print confirmation_form
-            return render_to_response('fa_admin/delete_confirm.html', {'fa' : fa, 'form' : confirmation_form },
+            confirmation_form = Delete(instance = confirmation)
+            return render_to_response('fa_admin/delete.html', {'fa' : fa, 'form' : confirmation_form },
                                       context_instance=RequestContext(request))
         except DoesNotExist:
             messages.error(request, "Could not find <b>%s</b>." % id)
             return list_published(request)
-        
-    confirmation_form = DeleteConfirmationForm(request.POST)
+    confirmation_form = Delete(request.POST)
     success = True
        
     try:
