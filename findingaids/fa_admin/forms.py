@@ -17,3 +17,8 @@ class DeleteConfirmationForm(ModelForm):
     class Meta:
         model = Deleted
         exclude = ['date_time']
+        widgets = {'comments': Textarea(attrs={'cols': 80, 'rows': 10}) ,
+                   'eadid': TextInput(attrs={'readonly':'readonly'}),
+                   'title': TextInput(attrs={'size':'80', 'readonly': 'readonly'})}
+
+
