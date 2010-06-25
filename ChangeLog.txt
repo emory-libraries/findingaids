@@ -47,7 +47,9 @@ To upgrade from the previous version:
    should use the existdb index manage scripts to either load the
    index configuration before loading data, or load the index and
    reindex after the data is loaded.
-7. The admin section of the site is at /admin/ (under your site url).
+7. After loading the data, you may wish check the data using the
+   ``python manage.py check_ead`` command.
+8. The admin section of the site is at /admin/ (under your site url).
    This uses Emory LDAP for login, so should be configured to run
    under SSL. 
 
