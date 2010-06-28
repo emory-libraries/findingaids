@@ -84,8 +84,9 @@ Admin Functions
 
 Custom manage commands
 ----------------------
-The following management commands are available.
-For more details, use manage.py help <command>
+The following management commands are available.  For more details, use
+``manage.py help <command>``.  As much as possible, all custom commands honor the
+built-in django verbosity options.
 
  * **check_ead**
     .. autoclass:: findingaids.fa.management.commands.check_ead.Command

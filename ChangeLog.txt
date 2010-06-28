@@ -43,10 +43,12 @@ To upgrade from the previous version:
    who might be editing those files.
 6. Run ``python manage.py load_ead`` to load all EAD documents in the
    configured EAD source directory to the configured collection in
-   eXist.  Note that if you are loading to a new collection, you
-   should use the existdb index manage scripts to either load the
-   index configuration before loading data, or load the index and
-   reindex after the data is loaded.
+   eXist.  If you are loading to a new collection, it is recommend that
+   you use the existdb index manage scripts to load the index
+   configuration before loading data.  Because the load_ead script
+   triggers celery tasks to reload PDFs in the cache and waits until
+   all celery tasks have completed, loading all the Finding Aids will
+   take a while.
 7. After loading the data, you may wish check the data using the
    ``python manage.py check_ead`` command.
 8. The admin section of the site is at /admin/ (under your site url).
