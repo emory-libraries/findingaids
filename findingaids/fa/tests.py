@@ -452,7 +452,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Series 1.*Correspondence,.*1855-1995.*</h2>',
             response.content, "series title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s">Bailey and Thurman.+families papers' % fa_url,
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel=\"contents\">Bailey and Thurman.+families papers' % fa_url,
             response.content, "finding aid title displayed, links to main record page")
         # ead toc
         self.assertPattern('<a href="%s#descriptive_summary">Descriptive Summary</a>' % fa_url,
@@ -466,10 +466,10 @@ class FaViewsTest(TestCase):
         # series nav
         self.assertPattern('<li>[^<]*Series 1:.*Correspondence.*</li>',
             response.content, "series nav - current series not a link")
-        self.assertPattern('<li>.*<a href="%s">.*Series 2:.*Writings by Bailey family.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*rel="next">.*Series 2:.*Writings by Bailey family.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'bailey807', 'series_id': 'bailey807_series2'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="%s">.*Series 9:.*Audiovisual material.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*rel="">.*Series 9:.*Audiovisual material.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'bailey807', 'series_id': 'bailey807_series9'}),
             response.content, "series nav - link to series 9")
 
@@ -496,18 +496,18 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 1\.6.*Gaston C\. Raoul papers,.*1882-1959.*</h2>',
             response.content, "subseries title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s">Raoul family papers,.*1865-1985' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">Raoul family papers,.*1865-1985' % \
             reverse('fa:view-fa', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
             
         # series nav
-        self.assertPattern('<li>.*<a href="%s">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*rel="start">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'}),
             response.content, "series nav - series 1 link")
-        self.assertPattern('<li>.*<a href="%s">.*Series 2:.*Photographs.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*rel="next">.*Series 2:.*Photographs.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003649'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="%s">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*rel="">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}),
             response.content, "series nav - link to series 4")
 
@@ -555,18 +555,18 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
             response.content, "sub-subseries title displayed, no physdesc")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s">Raoul family papers,.*1865-1985' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">Raoul family papers,.*1865-1985' % \
             reverse('fa:view-fa', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
 
         # series nav
-        self.assertPattern('<li>.*<a href="%s">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*rel="start">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'}),
             response.content, "series nav - series 1 link")
-        self.assertPattern('<li>.*<a href="%s">.*Series 2:.*Photographs.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s.* rel="next">.*Series 2:.*Photographs.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003649'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="%s">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*rel="">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}),
             response.content, "series nav - link to series 4")
 
@@ -724,7 +724,7 @@ class FaViewsTest(TestCase):
         # subseries links for a top-level series that has subseries with sub-subseries (nested list)
         series = Series.objects.also('ead__eadid').get(id='raoul548_s4')
         links = _subseries_links(series)
-        
+
         self.assert_("Subseries 4.1: Misc" in links[0])
         self.assert_("href='%s'" % reverse('fa:view-subseries',
             kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
@@ -779,8 +779,10 @@ class FaViewsTest(TestCase):
 
         self.assert_("Series 1: Letters and personal papers" in links[0])
         self.assert_("href='#raoul548_1003223'" in links[0])
+        self.assert_("rel='section'" in links[0])
         # subseries
         self.assert_("href='#raoul548_100355'" in links[1][0])
+        self.assert_("rel='subsection'" in links[1][0])
 
 
 
@@ -806,7 +808,7 @@ class FaViewsTest(TestCase):
         # series list, and all series down to c03 level
         self.assertContains(response, "Description of Series")
         # series links are anchors in the same page
-        self.assertPattern('<a href=\'#raoul548_s1\.10\'>Subseries 1.10', response.content)
+        self.assertPattern('<a href=\'#raoul548_s1\.10\' rel=\'subsection\'>Subseries 1.10', response.content)
         self.assertPattern('<h2 class="series">.*Series 1 .*Letters and personal papers,.* 1865-1982.*</h2>', response.content)
         self.assertPattern('<h2 class="subseries">.*Subseries 1.2 .*Mary Wadley Raoul papers,.* 1865-1936.*</h2>', response.content)
         # index
