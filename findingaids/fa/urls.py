@@ -1,9 +1,10 @@
 from django.conf.urls.defaults import *
 
+TITLE_LETTERS = '[a-zA-Z]'
+
 title_urlpatterns = patterns('findingaids.fa.views',
     url('^$', 'browse_titles', name='browse-titles'),
-    url(r'^(?P<letter>[a-zA-Z0-9])$', 'titles_by_letter', name='titles-by-letter')
-    # TEMPORARY: allow numeric - shouldn't get this, but a weird query glitch is happening...
+    url(r'^(?P<letter>%s)$' % TITLE_LETTERS, 'titles_by_letter', name='titles-by-letter')    
 )
 
 # patterns for ead document id and series id (used in multiple urls)
