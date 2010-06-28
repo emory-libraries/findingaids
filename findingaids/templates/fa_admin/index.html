@@ -9,7 +9,11 @@
       <h3>Task Results</h3>
       <ul>
       {% for r in task_results %}
-        <li class="{{r.task.status|lower}}">{{ r.label }} {{ r.eadid }}: <span class="code">{{ r.task.status }}</span></li>
+        <li class="{{r.task.status|lower}}">{{ r.label }}
+            {% if r.eadid %}<a href="{% url fa:view-fa id=r.eadid %}">{{ r.eadid }}</a>{% endif %}:
+            <span class="code">{{ r.task.status }}</span>
+            {% if r.task_end %}<div class="task_end">ended {{ r.task_end|timesince }} ago</div>{% endif %}
+            </li>
       {% empty %}
         <li>No recent tasks.</li>
       {% endfor %}

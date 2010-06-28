@@ -184,3 +184,4 @@ div#task-results li.failure { list-style-image: url('../images/x.png'); }
 
 div#task-results li.success span.code { color: green }
 div#task-results li.failure span.code { color: red }
+div#task-results div.task_end { border:0px; padding: 0px; margin:0px; font-size: 80%; }
