@@ -8,20 +8,16 @@
 
 {% if form.eadid %}
     <form action = "{% url fa-admin:delete-ead fa.eadid %}" method="post">{% csrf_token %}
-        <div class="fieldWrapper">
-            <b>EAD ID: </b> {{form.eadid}}
-        </div>
-        <div class="fieldWrapper">
-            <b>Title: </b>{{form.title}}
-        </div>
-        <div class="fieldWrapper">
-            <b>Comments (Optional):</b><br/>{{form.comments}}
-        </div>
+        <table>
+            {{form.as_table}}
+        </table>
         <button type="submit" >CONFIRM</button><br/>
         </form>
 {% else %}
     <tr><td colspan="2">No files found</td></tr>
 {% endif %}
+
+
 
 
 {% endblock %}

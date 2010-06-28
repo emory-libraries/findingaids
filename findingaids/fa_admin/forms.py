@@ -1,4 +1,4 @@
-from django.forms import HiddenInput, Textarea, TextInput
+from django.forms import Textarea, TextInput
 from django.contrib.auth.forms import UserChangeForm
 from findingaids.fa.models import Deleted
 from django.forms import ModelForm
@@ -13,7 +13,7 @@ class FAUserChangeForm(UserChangeForm):
             'is_superuser', 'last_login', 'date_joined', 'groups', 'user_permissions'
         )
 
-class Delete(ModelForm):
+class DeleteForm(ModelForm):
     class Meta:
         model = Deleted
         exclude = ['date_time']

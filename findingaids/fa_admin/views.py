@@ -28,7 +28,7 @@ from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 from findingaids.fa_admin.models import Permissions
-from findingaids.fa_admin.forms import FAUserChangeForm, Delete
+from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
 from findingaids.fa.models import Deleted
 from findingaids.fa_admin.forms import FAUserChangeForm
 from findingaids.fa_admin.tasks import reload_cached_pdf
@@ -426,36 +426,44 @@ def delete_ead(request, id):
     """Delete a published EAD"""
    
     if request.method != 'POST':
+    # It's a GET request
         try:
             #display the confirmation form
             fa = FindingAid.objects.only('eadid', 'unittitle').get(eadid = id)
             confirmation = Deleted(eadid = fa.eadid, title = fa.unittitle)
-            confirmation_form = Delete(instance = confirmation)
+            confirmation_form = DeleteForm(instance = confirmation)
             return render_to_response('fa_admin/delete.html', {'fa' : fa, 'form' : confirmation_form },
                                       context_instance=RequestContext(request))
         except DoesNotExist:
             messages.error(request, "Could not find <b>%s</b>." % id)
             return list_published(request)
-    confirmation_form = Delete(request.POST)
+
+    # It's a POST request
+    
+    confirmation_form = DeleteForm(request.POST)
     success = True
-       
+    
+    #get the document_name which is used to form a path of the the EAD in the Exist DB
     try:
         fa = FindingAid.objects.only('document_name').get(eadid = id)
     except DoesNotExist:
         messages.error(request, "Could not find <b>%s</b>." % id)
         return list_published(request)
 
+    # try to remove the EAD from the Exist DB
     db = ExistDB()
     try:
-        #remove the document from the public collection
         success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + fa.document_name)
         success = True
     except ExistDBException:
         success = False
     
+    # set the message depending on the result of the removal
     if success:
         confirmation_form.save(True)
         messages.success(request, 'Successfully removed <b>%s</b>.' % id)
     else:
         messages.error(request, "Error removing <b>%s</b>." % id)
+    
+    # No matter the removal is successful or not, return to the page that lists all the published EAD
     return list_published(request) 

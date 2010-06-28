@@ -17,6 +17,6 @@ urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^preview/documents/', include(document_urls(preview=True),
             namespace='preview')),
     url(r'^documents/$', 'list_published', name="list_published"),
-    url(r'^%s/delete$' % EADID_URL_REGEX, 'delete_ead', name="delete-ead"),
+    url(r'^documents/%s/delete$' % EADID_URL_REGEX, 'delete_ead', name="delete-ead"),
 )
 
