@@ -427,7 +427,7 @@ def delete_ead(request, id):
         When it's a POST request, try to remove the EAD from the ExistDB.
     """
    
-    if request.method != 'POST':
+    if request.method == 'GET':
     # It's a GET request
         try:
             #display the confirmation form
@@ -438,8 +438,9 @@ def delete_ead(request, id):
                                       context_instance=RequestContext(request))
         except DoesNotExist:
             messages.error(request, "Could not find <b>%s</b>." % id)
-            return list_published(request)
-
+            response = HttpResponse(status=303)
+            response['Location'] = reverse('fa-admin:list_published')
+            return response
     # It's a POST request
     
     confirmation_form = DeleteForm(request.POST)
@@ -450,8 +451,9 @@ def delete_ead(request, id):
         fa = FindingAid.objects.only('document_name').get(eadid = id)
     except DoesNotExist:
         messages.error(request, "Could not find <b>%s</b>." % id)
-        return list_published(request)
-
+        response = HttpResponse(status=303)
+        response['Location'] = reverse('fa-admin:list_published')
+        return response
     # try to remove the EAD from the Exist DB
     db = ExistDB()
     try:
@@ -466,5 +468,7 @@ def delete_ead(request, id):
     else:
         messages.error(request, "Error removing <b>%s</b>." % id)
     
-    # No matter the removal is successful or not, return to the page that lists all the published EAD
-    return list_published(request)
+    # No matter the removal is successful or not, redirect to the page that lists all the published EAD
+    response = HttpResponse(status=303)
+    response['Location'] = reverse('fa-admin:list_published')
+    return response
