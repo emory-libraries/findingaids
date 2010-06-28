@@ -17,7 +17,7 @@ from findingaids.fa_admin import tasks, views
 from findingaids.fa_admin.models import TaskResult
 from findingaids.fa_admin.views import _get_recent_xml_files
 from findingaids.fa_admin.utils import check_ead, clean_ead
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Deleted
 
 
 ### unit tests for findingaids.fa_admin.views
@@ -420,35 +420,50 @@ class AdminViewsTest(BaseAdminViewsTest):
         #  login as admin to test admin-only feature
         self.client.login(**self.admin_credentials)
 
+        # load a fixture in order to test delete an existing EAD
         id = 'hartsfield558'
         filename = 'hartsfield558.xml'
         dbpath = settings.EXISTDB_TEST_COLLECTION + '/' + filename
         valid_eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', filename)
         self.db.load(open(valid_eadfile), dbpath, True)
         
+        # make up a non-existing EAD in order to test delete an non-existing EAD
         noneid = 'nonexist.xml'
         delete_url = reverse('fa-admin:delete-ead', kwargs={'id': id})
         delete_none = reverse('fa-admin:delete-ead', kwargs={'id': noneid})
         
+        # Test a GET request
         # GET should just display the delete confirmation form
         response = self.client.get(delete_none)
         messages = [ str(msg) for msg in response.context['messages'] ]
         self.assert_("Could not find <b>%s</b>." % noneid in messages[0],
                 "file not found message present in response context")
         response = self.client.get(delete_url)
-#        print response
-#        self.assertContains(response, '<b>EAD ID: </b> <input name="eadid" value="%s" readonly="readonly" maxlength="50" type="text" id="id_eadid" />' % id)
-#        self.assertContains(response, 'id="id_title" value="William Berry Hartsfield papers, circa 1860s-1983" size="80" />')
-#        self.assertContains(response, '<b>Comments (Optional):</b><br/><textarea id="id_comments" rows="10" cols="80" name="comments"></textarea>')
+        self.assertContains(response, '<label for="id_eadid">EAD Identifier:</label></th><td><input name="eadid" value="%s"' % id)
+        self.assertContains(response, 'id="id_title" value="William Berry Hartsfield papers, circa 1860s-1983"')
+        self.assertContains(response, '<label for="id_comments">Comments:</label></th><td><textarea id="id_comments"')
         
-        #POST should trigger the deletion
+        # Test a POST request
+        # POST should trigger the deletion
+
+        # Test delete an existing file        
+        # Test response
         fa = FindingAid.objects.only('unittitle').get(eadid = id)
-        # Test delete an existing file
-        response = self.client.post(delete_url, {'eadid' : id, 'title' : fa.unittitle, 'date_time' : datetime.now(), 'comments' : ''})
-        self.assertContains(response, 'Successfully removed <b>%s</b>.' % id)   
+        response = self.client.post(delete_url, {'eadid' : id, 'title' : fa.unittitle, 'comments' : 'comments for testing'})
+        self.assertContains(response, 'Successfully removed <b>%s</b>.' % id)
+        # Test the EAD has been removed from the ExistDB
+        self.assertFalse(self.db.hasDocument(dbpath))
+        # Test a record has been saved to the relational db
+        deleted = Deleted.objects.only('eadid', 'title', 'comments').get(eadid = id)
+        self.assertEqual(deleted.eadid, 'hartsfield558')
+#       print deleted.title
+#       self.assertEqual(deleted.title, fa.unittitle.__unicode__())
+        self.assertEqual(deleted.comments, 'comments for testing')
+
         # Test delete a file that doesn't exist
         response = self.client.post(delete_none)
         self.assertContains(response, 'Could not find <b>%s</b>.' % noneid)
+        self.assertContains(response, 'Published Finding Aids')
 
 # unit tests for views that make use of celery tasks (additional setup required)
 

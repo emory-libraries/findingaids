@@ -423,14 +423,16 @@ def list_published (request):
 
 @login_required
 def delete_ead(request, id):
-    """Delete a published EAD"""
+    """ Delete a published EAD. When it's a GET request, display the delete confirmation form. 
+        When it's a POST request, try to remove the EAD from the ExistDB.
+    """
    
     if request.method != 'POST':
     # It's a GET request
         try:
             #display the confirmation form
             fa = FindingAid.objects.only('eadid', 'unittitle').get(eadid = id)
-            confirmation = Deleted(eadid = fa.eadid, title = fa.unittitle)
+            confirmation = Deleted(eadid = fa.eadid, title = fa.unittitle.__unicode__())
             confirmation_form = DeleteForm(instance = confirmation)
             return render_to_response('fa_admin/delete.html', {'fa' : fa, 'form' : confirmation_form },
                                       context_instance=RequestContext(request))
@@ -454,7 +456,6 @@ def delete_ead(request, id):
     db = ExistDB()
     try:
         success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + fa.document_name)
-        success = True
     except ExistDBException:
         success = False
     
@@ -466,4 +467,4 @@ def delete_ead(request, id):
         messages.error(request, "Error removing <b>%s</b>." % id)
     
     # No matter the removal is successful or not, return to the page that lists all the published EAD
-    return list_published(request) 
+    return list_published(request)
