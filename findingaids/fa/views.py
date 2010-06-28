@@ -164,10 +164,20 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     if 'preview' in kwargs and kwargs['preview']:
         restore_publish_collection()
 
+    #find index of requested object so next and prev can be determined
+    index = 0
+    for i, s in enumerate(all_series):
+        if(s.id == result.id):
+            index = i
+    prev= index -1
+    next = index +1
+
     render_opts = { 'ead': result.ead,
                     'all_series' : all_series,
                     'all_indexes' : all_indexes,
-                    "querytime" : [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()]}
+                    "querytime" : [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()],
+                    'prev': prev,
+                    'next': next}
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
@@ -323,8 +333,12 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
     if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
         for component in series.c:            
             current_url_ids = url_ids + [component.id]
-            text = "<a href='%s'>%s</a>" % (url_callback(*current_url_ids, preview=preview), \
-                            component.display_label())
+            #set c01 rel attrib to 'section' c02 and c03 to 'subsection'
+            if (component.node.tag == 'c01'):
+                rel='section'
+            elif (component.node.tag in ['c02', 'c03']):
+                rel='subsection'
+            text = "<a href='%s' rel='%s'>%s</a>" % (url_callback(*current_url_ids, preview=preview), rel,  component.display_label())
             links.append(text)
             if component.hasSubseries():
                 links.append(_subseries_links(component, url_ids=current_url_ids, \
