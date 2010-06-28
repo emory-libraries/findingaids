@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 
-from eulcore.django.existdb.db import ExistDB
+from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.django.test import TestCase
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
@@ -650,7 +650,15 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
 
 class UtilsTest(TestCase):
     db = ExistDB()
-    
+
+    def tearDown(self):
+        # ensure test file gets removed even if tests fail
+        try:
+            self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml')
+        except ExistDBException, e:
+            # not an error if this fails - not used by every test
+            pass
+
     def test_check_ead(self):
         # check valid EAD - no errors  -- good fixture, should pass all tests
         dbpath = settings.EXISTDB_TEST_COLLECTION + '/hartsfield558.xml'
@@ -685,9 +693,7 @@ class UtilsTest(TestCase):
         errors = check_ead(valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database contains eadid 'hartsfield558' in a different document" in errors[0])
-        # clean up
-        self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml')
-
+        
     def test_clean_ead(self):
         # ead with series/subseries, and index
         eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml')
