@@ -452,7 +452,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         # Test delete an existing file        
         # The page should be redirected and the response shall contain the right message
         expected = 303      # redirect
-#        code = response.status_code
         published_url = reverse('fa-admin:list_published')
         response = self.client.post(delete_url, {'eadid' : id, 'title' : 'William Berry Hartsfield papers, circa 1860s-1983', 'comments' : 'comments for testing'}, follow=True)
         (redirect_url, code) = response.redirect_chain[0]
