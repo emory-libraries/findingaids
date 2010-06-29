@@ -3,12 +3,17 @@ from celery.result import AsyncResult
 from celery.signals import task_prerun, task_postrun
 from django.db import models
 
-class Permissions(models.Model):
+class Findingaids(models.Model):
+    """
+    This model is used as a place holder for custom permissions needed with the
+    admin portion of the site.
+    """
     pass
     class Meta:
         permissions =(
                 ("can_publish", "Can publish a finding aid"),
                 ("can_preview", "Can preview a finding aid"),
+                ("can_delete", "Can delete a finding aid"),
         )
 
 # store details about pdf reload celery task results for display on admin page
