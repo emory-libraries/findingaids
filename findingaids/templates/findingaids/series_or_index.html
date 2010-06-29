@@ -29,9 +29,10 @@
            {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
             {{ component.did.unittitle|format_ead }}
         {# all other links that are not currently selected page #}
+        {# next prev and start rel attributes are calculated in the view #}
         {% else %}
            <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=component.id %}"
-           rel="{% ifequal forloop.counter0 next %}next{% endifequal %}{% ifequal forloop.counter0 prev %}prev{% endifequal %}{% if forloop.first %}start{% endif %}">
+           {% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% if forloop.first %}rel="start"{% endif %}>
             {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
                 {{ component.did.unittitle|format_ead }}</a>
         {% endifequal %}

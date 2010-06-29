@@ -469,7 +469,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<li>.*<a href="%s".*rel="next">.*Series 2:.*Writings by Bailey family.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'bailey807', 'series_id': 'bailey807_series2'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="%s".*rel="">.*Series 9:.*Audiovisual material.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*>.*Series 9:.*Audiovisual material.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'bailey807', 'series_id': 'bailey807_series9'}),
             response.content, "series nav - link to series 9")
 
@@ -507,7 +507,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<li>.*<a href="%s".*rel="next">.*Series 2:.*Photographs.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003649'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="%s".*rel="">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*>.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}),
             response.content, "series nav - link to series 4")
 
@@ -566,7 +566,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<li>.*<a href="%s.* rel="next">.*Series 2:.*Photographs.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003649'}),
             response.content, "series nav - link to series 2")
-        self.assertPattern('<li>.*<a href="%s".*rel="">.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
+        self.assertPattern('<li>.*<a href="%s".*>.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}),
             response.content, "series nav - link to series 4")
 
