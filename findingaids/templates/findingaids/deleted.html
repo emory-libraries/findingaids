@@ -1,0 +1,14 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: {{deleted.title}}{% endblock %}
+
+{% block content-body %}
+
+<div> 
+<font size = "3">
+This record <br/><h1> {{deleted.title}} </h1> has been removed for <b> {{deleted.date_time|timesince}}</b>. <br/>Please contact MARBL regarding access to this collection
+</font>
+</div>
+
+{% endblock %}
+

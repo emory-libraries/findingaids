@@ -17,7 +17,7 @@ from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, t
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
-            ead_lastmodified, ead_etag, paginate_queryset
+            ead_lastmodified, ead_etag, paginate_queryset, ead_deleted
 
 fa_listfields = ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
 "List of fields that should be returned for brief list display of a finding aid."
@@ -57,6 +57,7 @@ def titles_by_letter(request, letter):
          'show_pages' : show_pages},
          context_instance=RequestContext(request))
 
+@ead_deleted
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def view_fa(request, id, preview=False):
     """View a single finding aid.   In preview mode, pulls the document from the
@@ -72,7 +73,7 @@ def view_fa(request, id, preview=False):
                                                          'all_indexes' : fa.archdesc.index,
                                                          'preview': preview},
                                             context_instance=RequestContext(request, current_app='preview'))
-
+@ead_deleted
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def xml_fa(request, id, preview=False):
     """Display the full EAD XML content of a finding aid.
@@ -84,6 +85,7 @@ def xml_fa(request, id, preview=False):
     xml_ead = fa.serialize(pretty=True)
     return HttpResponse(xml_ead, mimetype='application/xml')
 
+@ead_deleted
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def full_fa(request, id, mode, preview=False):
     """View the full contents of a single finding aid as PDF or plain html.

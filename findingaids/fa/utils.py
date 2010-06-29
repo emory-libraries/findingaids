@@ -8,11 +8,14 @@ from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import Context
 from django.template.loader import get_template
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.core.exceptions import ObjectDoesNotExist
 
 from eulcore.django.existdb.db import ExistDB
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Deleted
 
 # adapted from django snippets example - http://www.djangosnippets.org/snippets/659/
 def render_to_pdf(template_src, context_dict, filename=None):
@@ -162,3 +165,26 @@ def paginate_queryset(request, qs, per_page=10, orphans=0):    # 0 is django def
         paginated_qs = paginator.page(paginator.num_pages)
 
     return paginated_qs, paginator
+
+def ead_deleted(orig_function):
+    """
+    Decorator to notify the user if an EAD has been previously published then deleted.
+    The orig_function should take a parameter called 'id' which is the EAD Identifier
+    It determines an EAD has been deleted by checking the if there's an object in the 'Deleted' model
+    Return: 
+    - The orig_fucntion: If the EAD hasn't been deleted. Or
+    - A HTTP 410 response (Gone) if the EAD has been deleted
+    """
+    def decorator (request, id, **kwargs):
+        try:
+            deleted = Deleted.objects.only('eadid', 'title', 'date_time', 'comments').get(eadid = id)
+            t = get_template('findingaids/deleted.html')
+            context = Context({'deleted' : deleted})
+            context = RequestContext(request, {'deleted' : deleted})
+            response = http.HttpResponse(t.render(context), status = 410)
+            return response
+        except ObjectDoesNotExist:
+            return orig_function(request, id, **kwargs)
+    return decorator
+
+            
