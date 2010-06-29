@@ -27,7 +27,7 @@ from eulcore.existdb.exceptions import DoesNotExist
 from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
 from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
-from findingaids.fa_admin.models import Permissions
+from findingaids.fa_admin.models import Findingaids
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
 from findingaids.fa.models import Deleted
 from findingaids.fa_admin.forms import FAUserChangeForm
