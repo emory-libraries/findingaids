@@ -32,7 +32,7 @@ from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
 from findingaids.fa.models import Deleted
 from findingaids.fa_admin.forms import FAUserChangeForm
 from findingaids.fa_admin.tasks import reload_cached_pdf
-from findingaids.fa_admin.models import TaskResult
+from findingaids.fa_admin.models import TaskResult, Findingaids
 
 @login_required
 def main(request):
@@ -81,7 +81,7 @@ def logout(request):
     Logout user and redirect to admin login page.
     
     """
-    login_url = settings.LOGIN_URL
+    #login_url = settings.LOGIN_URL
     messages.success(request, 'You have logged out of finding aids.')
     return logout_then_login(request)
 
@@ -410,7 +410,7 @@ def _get_recent_xml_files(dir):
     return recent_files
 
 
-@login_required
+@permission_required('fa_admin.can_publish')
 def list_published (request):
     """List all published EADs"""
     fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')

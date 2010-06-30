@@ -50,8 +50,16 @@
   <div class="section">
   <h2>Manage documents</h2>
     <ul>
+      {% if perms.fa_admin.can_publish %}
       <li><a href="{% url fa-admin:list_published %}">Published documents</a></li>
+      {% else %}
+      <li>You do not have the correct permissions to list published documents.</li>
+      {% endif %}
+      {% if perms.fa_admin.can_publish %}
       <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
+      {% else %}
+      <li>You do not have the correct permissions to view documents available for preview.</li>
+      {% endif %}
   </ul>
   </div>
  
