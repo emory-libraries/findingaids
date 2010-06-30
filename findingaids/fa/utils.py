@@ -169,7 +169,8 @@ def paginate_queryset(request, qs, per_page=10, orphans=0):    # 0 is django def
 def ead_deleted(orig_function):
     """
     Decorator to notify the user if an EAD has been previously published then deleted.
-    The orig_function should take a parameter called 'id' which is the EAD Identifier
+    The orig_function should take at least two parameters, one called 'id' which is the EAD Identifier,
+    the other called 'request', which corresponds to the http request
     It determines an EAD has been deleted by checking the if there's an object in the 'Deleted' model
     Return: 
     - The orig_fucntion: If the EAD hasn't been deleted. Or
@@ -177,14 +178,15 @@ def ead_deleted(orig_function):
     """
     def decorator (request, id, **kwargs):
         try:
+            # look up if the EAD has been published and deleted
             deleted = Deleted.objects.only('eadid', 'title', 'date_time', 'comments').get(eadid = id)
             t = get_template('findingaids/deleted.html')
-            context = Context({'deleted' : deleted})
             context = RequestContext(request, {'deleted' : deleted})
             response = http.HttpResponse(t.render(context), status = 410)
             return response
         except ObjectDoesNotExist:
+            # the EAD has not been published and deleted. This means it can be either of
+            # 1) This EAD has never existed.
+            # 2) This EAD has been published but not deleted.
             return orig_function(request, id, **kwargs)
     return decorator
-
-            

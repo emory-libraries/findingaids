@@ -15,7 +15,7 @@ from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries
+from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, Deleted
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag
@@ -910,7 +910,34 @@ class UtilsTest(TestCase):
         # invalid eadid
         self.assertRaises(Http404, ead_etag, 'rqst', 'bogusid')
 
+    def test_ead_deleted(self):
+        def test_ead_deleted_response(url):
+            expected = 410
+            self.assertEqual(response.status_code, expected,
+                             'Expected %s but returned %s for %s' % \
+                             (expected, response.status_code, url))
+            self.assertContains(response, 'This record <br/><h1> Title of a deleted EAD </h1> has been removed for <b> 0 minutes</b>.', status_code = 410)
+            self.assertContains(response, 'comments for testing', status_code = 410)
+        # Save a record to the Deleted model for testing
+        id = 'deleted.xml'
+        deleted = Deleted(eadid = id, title = 'Title of a deleted EAD', comments = 'comments for testing')
+        deleted.save()
+        # test the decorator
+        # test full_fa is decorated
+        full_fa_url = reverse('fa:full-fa', kwargs={'id': id})
+        response = self.client.get(full_fa_url, follow = 'True')
+        test_ead_deleted_response(full_fa_url)
 
+        # test view_fa is decorated
+        view_fa_url = reverse('fa:view-fa', kwargs={'id': id})
+        response = self.client.get(view_fa_url, follow = 'True')
+        test_ead_deleted_response(view_fa_url)
+        
+        # test xml_fa is decorated
+        xml_fa_url = reverse('fa:xml-fa', kwargs={'id': id})
+        response = self.client.get(xml_fa_url, follow = 'True')
+        test_ead_deleted_response(xml_fa_url)
+        
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index
     exist_fixtures = { 'index' : exist_index_path,

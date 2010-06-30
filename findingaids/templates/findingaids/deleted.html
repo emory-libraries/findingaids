@@ -6,7 +6,11 @@
 
 <div> 
 <font size = "3">
-This record <br/><h1> {{deleted.title}} </h1> has been removed for <b> {{deleted.date_time|timesince}}</b>. <br/>Please contact MARBL regarding access to this collection
+This record <br/><h1> {{deleted.title}} </h1> has been removed for <b> {{deleted.date_time|timesince}}</b>. <br/>Please contact MARBL regarding access to this collection.<br/>
+{% if deleted.comments%}
+Comments: <br/>
+{{deleted.comments}}
+{% endif %}
 </font>
 </div>
 
