@@ -4,15 +4,11 @@
 
 {% block content-body %}
 
-<div> 
-<font size = "3">
-This record <br/><h1> {{deleted.title}} </h1> has been removed for <b> {{deleted.date_time|timesince}}</b>. <br/>Please contact MARBL regarding access to this collection.<br/>
-{% if deleted.comments%}
-Comments: <br/>
-{{deleted.comments}}
-{% endif %}
-</font>
+<div class='removed-notice'> 
+     <div> This collection <div id="control_access"> <h3> {{deleted.title}} </h3></div> has been removed. {{deleted.comments}}</div>
+     <p> Please contact MARBL regarding access to this collection.</p>
 </div>
-
+<div id="footer"> Removed {{deleted.date_time|timesince}} ago.</div>
 {% endblock %}
+
 

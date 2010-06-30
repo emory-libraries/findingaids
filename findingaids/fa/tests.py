@@ -916,7 +916,7 @@ class UtilsTest(TestCase):
             self.assertEqual(response.status_code, expected,
                              'Expected %s but returned %s for %s' % \
                              (expected, response.status_code, url))
-            self.assertContains(response, 'This record <br/><h1> Title of a deleted EAD </h1> has been removed for <b> 0 minutes</b>.', status_code = 410)
+            self.assertContains(response, '<div> This collection <div id="control_access"> <h3> Title of a deleted EAD </h3></div> has been removed', status_code = 410)
             self.assertContains(response, 'comments for testing', status_code = 410)
         # Save a record to the Deleted model for testing
         id = 'deleted.xml'

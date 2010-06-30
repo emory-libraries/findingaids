@@ -2,13 +2,15 @@ import ho.pisa as pisa
 import cStringIO as StringIO
 import cgi
 from datetime import datetime
+from functools import wraps
 
 from django import http
 from django.conf import settings
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import Context
 from django.template.loader import get_template
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
+
 from django.template import RequestContext
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -166,27 +168,25 @@ def paginate_queryset(request, qs, per_page=10, orphans=0):    # 0 is django def
 
     return paginated_qs, paginator
 
-def ead_deleted(orig_function):
-    """
-    Decorator to notify the user if an EAD has been previously published then deleted.
+def ead_deleted(org_function):
+    """Decorator to notify the user if an EAD has been previously published then deleted.
     The orig_function should take at least two parameters, one called 'id' which is the EAD Identifier,
     the other called 'request', which corresponds to the http request
-    It determines an EAD has been deleted by checking the if there's an object in the 'Deleted' model
-    Return: 
-    - The orig_fucntion: If the EAD hasn't been deleted. Or
-    - A HTTP 410 response (Gone) if the EAD has been deleted
+
+    :return: :class:`http.Http404` when the EAD has never existed
+             the original function when the EAD exists in the ExistDB
+             A 410 page when the EAD has been published and deleted
     """
+    @wraps(org_function)
     def decorator (request, id, **kwargs):
         try:
+            return org_function(request, id, **kwargs)
+        except http.Http404:
             # look up if the EAD has been published and deleted
-            deleted = Deleted.objects.only('eadid', 'title', 'date_time', 'comments').get(eadid = id)
+            deleted = get_object_or_404(Deleted, eadid=id)
+            deleted = Deleted.objects.only('eadid', 'title', 'date_time', 'comments').get(eadid=id)
             t = get_template('findingaids/deleted.html')
             context = RequestContext(request, {'deleted' : deleted})
-            response = http.HttpResponse(t.render(context), status = 410)
+            response = http.HttpResponse(t.render(context), status=410)
             return response
-        except ObjectDoesNotExist:
-            # the EAD has not been published and deleted. This means it can be either of
-            # 1) This EAD has never existed.
-            # 2) This EAD has been published but not deleted.
-            return orig_function(request, id, **kwargs)
     return decorator
