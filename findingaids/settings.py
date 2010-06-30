@@ -108,7 +108,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # Enable additional backends.
 # Enable this for LDAP and see ReadMe for install dependencies.
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 
-                           'eulcore.django.ldap.emory.EmoryLDAPBackend')
+                           'eulcore.django.emory_ldap.backends.EmoryLDAPBackend')
+
+AUTH_PROFILE_MODULE = 'emory_ldap.EmoryLDAPUserProfile'
 
 LOGIN_URL="/accounts/login/"
 LOGIN_REDIRECT_URL="/admin/"
@@ -129,7 +131,7 @@ INSTALLED_APPS = (
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
     'eulcore.django.existdb',
-    'eulcore.django.ldap.emory',
+    'eulcore.django.emory_ldap',
     'eulcore.django.util',
     'findingaids.fa',
     'findingaids.fa_admin',
