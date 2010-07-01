@@ -845,6 +845,23 @@ class FaViewsTest(TestCase):
         self.assertEqual(ead.serialize(), abbey.serialize(),
             "response content should be the full, valid XML content of the requested EAD document")
 
+    def test_deco(self):
+        url = reverse('fa:view-fa', kwargs={'id': 'raoul548'})
+
+        #normal browser request
+        response = self.client.get(url)
+        self.assertEqual(response['Content-Type'], "text/html; charset=utf-8", "Should return html")
+
+
+        #application request
+        response = self.client.get(url, HTTP_ACCEPT = "application/xml")
+        self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
+
+        #xml request
+        response = self.client.get(url, HTTP_ACCEPT = "text/xml")
+        self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
+
+
 class UtilsTest(TestCase):
     exist_fixtures = {'files': [
             path.join(exist_fixture_path, 'abbey244.xml'),

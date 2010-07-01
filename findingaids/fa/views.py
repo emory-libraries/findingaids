@@ -18,6 +18,7 @@ from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_deleted
+from findingaids.decorators import content_neg
 
 fa_listfields = ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
 "List of fields that should be returned for brief list display of a finding aid."
@@ -59,6 +60,19 @@ def titles_by_letter(request, letter):
 
 @ead_deleted
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
+def xml_fa(request, id, preview=False):
+    """Display the full EAD XML content of a finding aid.
+
+    :param id: eadid for the document to be displayed
+    :param preview: boolean indicating preview mode, defaults to False
+    """
+    fa = get_findingaid(id, preview=preview)
+    xml_ead = fa.serialize(pretty=True)
+    return HttpResponse(xml_ead, mimetype='application/xml')
+
+@ead_deleted
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
+@content_neg({'text/xml' : xml_fa, 'application/xml' : xml_fa})
 def view_fa(request, id, preview=False):
     """View a single finding aid.   In preview mode, pulls the document from the
     configured eXist-db preview collection instead of the default public one.
@@ -72,18 +86,8 @@ def view_fa(request, id, preview=False):
                                                          'series' : series,
                                                          'all_indexes' : fa.archdesc.index,
                                                          'preview': preview},
-                                            context_instance=RequestContext(request, current_app='preview'))
-@ead_deleted
-@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def xml_fa(request, id, preview=False):
-    """Display the full EAD XML content of a finding aid.
+                                                         context_instance=RequestContext(request, current_app='preview'))
 
-    :param id: eadid for the document to be displayed
-    :param preview: boolean indicating preview mode, defaults to False
-    """
-    fa = get_findingaid(id, preview=preview)
-    xml_ead = fa.serialize(pretty=True)
-    return HttpResponse(xml_ead, mimetype='application/xml')
 
 @ead_deleted
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
