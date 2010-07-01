@@ -12,7 +12,6 @@ from django.template.loader import get_template
 from django.shortcuts import render_to_response, get_object_or_404
 
 from django.template import RequestContext
-from django.core.exceptions import ObjectDoesNotExist
 
 from eulcore.django.existdb.db import ExistDB
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
@@ -115,8 +114,10 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
             fa = fa.get(eadid=eadid)
     except DoesNotExist:
         raise http.Http404
-    if preview:
-        restore_publish_collection()
+    finally:
+        # collection setting should be restored no matter what goes wrong
+        if preview:    
+            restore_publish_collection()
     return fa
 
 def ead_lastmodified(request, id, preview=False, *args, **kwargs):
@@ -168,25 +169,29 @@ def paginate_queryset(request, qs, per_page=10, orphans=0):    # 0 is django def
 
     return paginated_qs, paginator
 
-def ead_deleted(org_function):
-    """Decorator to notify the user if an EAD has been previously published then deleted.
-    The orig_function should take at least two parameters, one called 'id' which is the EAD Identifier,
-    the other called 'request', which corresponds to the http request
+def ead_gone_or_404(view_method):
+    """This decorator is intended for use with single-ead views to determine if
+    an EAD not found in eXist is gone or really not found.  If a requested
+    EAD document is not found in the eXist database, the view method should raise
+    a :class:`django.http.Http404` exception.  This decorator will catch that
+    and check for a deleted record which indicates the EAD has been removed.
 
-    :return: :class:`http.Http404` when the EAD has never existed
-             the original function when the EAD exists in the ExistDB
-             A 410 page when the EAD has been published and deleted
+    View method is expected to take a request parameter and an eadid.
+
+    Raises an :class:`django.http.Http404` when requested EAD was not found in
+    the original view method and no deleted record was found.
+
+    :return: :class:`django.http.HttpResponse` with status 410 and a notice
+            indicating that the document has been removed
     """
-    @wraps(org_function)
-    def decorator (request, id, **kwargs):
+    @wraps(view_method)
+    def decorator (request, id, *args, **kwargs):
         try:
-            return org_function(request, id, **kwargs)
+            return view_method(request, id, *args, **kwargs)
         except http.Http404:
-            # look up if the EAD has been published and deleted
+            # not found in eXist - check for a deleted record 
             deleted = get_object_or_404(Deleted, eadid=id)
-            deleted = Deleted.objects.only('eadid', 'title', 'date_time', 'comments').get(eadid=id)
             t = get_template('findingaids/deleted.html')
-            context = RequestContext(request, {'deleted' : deleted})
-            response = http.HttpResponse(t.render(context), status=410)
-            return response
+            return http.HttpResponseGone(t.render(RequestContext(request,
+                                                        {'deleted' : deleted})))
     return decorator

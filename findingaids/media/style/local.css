@@ -187,4 +187,12 @@ div#task-results li.failure span.code { color: red }
 div#task-results div.task_end { border:0px; padding: 0px; margin:0px; font-size: 80%; }
 
 /* styles for deleted ead */
-div.removed-notice {color: red; font-size: 180%; line-height:22px;}
+div.removed-notice {
+    margin:10px 60px;
+    padding: 15px;
+    width: 500px;
+    border: 5px double black;
+    font-size: 150%;
+    line-height:22px;
+    background-color: #f2f3f5;
+}

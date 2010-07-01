@@ -4,11 +4,19 @@
 
 {% block content-body %}
 
-<div class='removed-notice'> 
-     <div> This collection <div id="control_access"> <h3> {{deleted.title}} </h3></div> has been removed. {{deleted.comments}}</div>
-     <p> Please contact MARBL regarding access to this collection.</p>
+<h1>{{deleted.title}}</h1>
+
+<div class='removed-notice'>
+  <p>This collection has been removed.</p>
+  {% if deleted.comments %}<p>{{deleted.comments}}</p>{% endif %}
+  <p>Please contact MARBL regarding access to this collection.</p>
 </div>
-<div id="footer"> Removed {{deleted.date_time|timesince}} ago.</div>
+
+{% endblock %}
+
+{% block content-outer-bottom %}
+This collection was removed {{deleted.date_time|timesince}} ago.
+{{ block.super }}
 {% endblock %}
 
 

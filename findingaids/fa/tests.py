@@ -199,6 +199,63 @@ class FaViewsTest(TestCase):
                         'Expected %s but returned %s for nonexistent EAD at %s'
                             % (expected, response.status_code, nonexistent_ead))
 
+    def test_deleted(self):
+        # 410 gone - not found in exist, but deleted record
+        def test_ead_deleted_response(url):
+            expected = 410
+            self.assertEqual(response.status_code, expected,
+                             'Expected %s but returned %s for %s' % \
+                             (expected, response.status_code, url))
+            self.assertContains(response, '<div> This collection <div id="control_access"> <h3> Title of a deleted EAD </h3></div> has been removed', status_code = 410)
+            self.assertContains(response, 'comments for testing', status_code = 410)
+        # Save a record to the Deleted model for testing
+        id, title, note = 'deleted', 'Deleted EAD record', 'removed because of foo'
+        Deleted(eadid=id, title=title, comments=note).save()
+
+        # test a deleted record in all 3 single-finding aid top-level views
+        # view_fa (main html view)
+        fa_url = reverse('fa:view-fa', kwargs={'id': id})
+        response = self.client.get(fa_url)
+        expected, got = 410, response.status_code
+        self.assertEqual(expected, got,
+                'Expected %s but returned %s for deleted EAD at %s' % \
+                 (expected, response.status_code, fa_url))
+        self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
+                msg_prefix="title from deleted record is displayed in response")
+        self.assertContains(response, note, status_code=410,
+                msg_prefix="comments from deleted record are displayed in response")
+        
+        # full_fa (single-page html version of entire Finding Aid, basis for PDF)
+        full_url = reverse('fa:full-fa', kwargs={'id': id})
+        response = self.client.get(full_url)
+        expected, got = 410, response.status_code
+        self.assertEqual(expected, got, 
+                'Expected %s but returned %s for deleted EAD at %s' % \
+                 (expected, response.status_code, full_url))
+        self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
+                msg_prefix="title from deleted record is displayed in response")
+
+        # printable_fa - single-page PDF of entire Finding Aid
+        pdf_url = reverse('fa:printable-fa', kwargs={'id': id})
+        response = self.client.get(pdf_url)
+        expected, got = 410, response.status_code
+        self.assertEqual(expected, got,
+                'Expected %s but returned %s for deleted EAD at %s' % \
+                 (expected, response.status_code, pdf_url))
+        self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
+                msg_prefix="title from deleted record is displayed in response")
+
+        # xml_fa - full XML EAD content for a single finding aid
+        xml_url = reverse('fa:xml-fa', kwargs={'id': id})
+        response = self.client.get(xml_url)
+        expected, got = 410, response.status_code
+        self.assertEqual(expected, got,
+                'Expected %s but returned %s for deleted EAD at %s' % \
+                 (expected, response.status_code, full_url))
+        self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
+                msg_prefix="title from deleted record is displayed in response")
+
+
     def test_view_dc_fields(self):
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'abbey244'}))
         # TODO: would be nice to validate the DC output...  (if possible)
@@ -845,19 +902,18 @@ class FaViewsTest(TestCase):
         self.assertEqual(ead.serialize(), abbey.serialize(),
             "response content should be the full, valid XML content of the requested EAD document")
 
-    def test_deco(self):
+    def test_content_negotiation(self):
         url = reverse('fa:view-fa', kwargs={'id': 'raoul548'})
 
-        #normal browser request
+        # normal request 
         response = self.client.get(url)
         self.assertEqual(response['Content-Type'], "text/html; charset=utf-8", "Should return html")
 
-
-        #application request
+        # request application/xml
         response = self.client.get(url, HTTP_ACCEPT = "application/xml")
         self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
 
-        #xml request
+        # request text/xml 
         response = self.client.get(url, HTTP_ACCEPT = "text/xml")
         self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
 
@@ -926,34 +982,6 @@ class UtilsTest(TestCase):
                      'ead etag should be 40-character hex checksum, got %s' % checksum)
         # invalid eadid
         self.assertRaises(Http404, ead_etag, 'rqst', 'bogusid')
-
-    def test_ead_deleted(self):
-        def test_ead_deleted_response(url):
-            expected = 410
-            self.assertEqual(response.status_code, expected,
-                             'Expected %s but returned %s for %s' % \
-                             (expected, response.status_code, url))
-            self.assertContains(response, '<div> This collection <div id="control_access"> <h3> Title of a deleted EAD </h3></div> has been removed', status_code = 410)
-            self.assertContains(response, 'comments for testing', status_code = 410)
-        # Save a record to the Deleted model for testing
-        id = 'deleted.xml'
-        deleted = Deleted(eadid = id, title = 'Title of a deleted EAD', comments = 'comments for testing')
-        deleted.save()
-        # test the decorator
-        # test full_fa is decorated
-        full_fa_url = reverse('fa:full-fa', kwargs={'id': id})
-        response = self.client.get(full_fa_url, follow = 'True')
-        test_ead_deleted_response(full_fa_url)
-
-        # test view_fa is decorated
-        view_fa_url = reverse('fa:view-fa', kwargs={'id': id})
-        response = self.client.get(view_fa_url, follow = 'True')
-        test_ead_deleted_response(view_fa_url)
-        
-        # test xml_fa is decorated
-        xml_fa_url = reverse('fa:xml-fa', kwargs={'id': id})
-        response = self.client.get(xml_fa_url, follow = 'True')
-        test_ead_deleted_response(xml_fa_url)
         
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index
