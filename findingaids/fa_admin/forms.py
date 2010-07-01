@@ -16,9 +16,12 @@ class FAUserChangeForm(UserChangeForm):
 class DeleteForm(ModelForm):
     class Meta:
         model = Deleted
-        exclude = ['date_time']
-        widgets = {'comments': Textarea(attrs={'cols': 80, 'rows': 10}) ,
+        # NOTE: not excluding date from edit form because on an update it MAY
+        # need to be changed, but only a person can determine that
+        widgets = {'note': Textarea(attrs={'cols': 80, 'rows': 10}),
+                    # display eadid and title, but don't allow them to be edited
                    'eadid': TextInput(attrs={'readonly':'readonly'}),
-                   'title': TextInput(attrs={'size':'80', 'readonly': 'readonly'})}
+                   'title': TextInput(attrs={'size':'80', 'readonly': 'readonly'})
+                   }
 
 

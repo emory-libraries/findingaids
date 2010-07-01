@@ -2,7 +2,6 @@ import os
 import tempfile
 from time import sleep
 from shutil import rmtree
-from datetime import datetime
 
 from django.test import Client, TestCase
 from django.conf import settings
@@ -413,75 +412,94 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertPattern('Pages:\s*1', response.content,
             "response contains pagination")
 
-    # NOTE: temporarily disabled this test because it is failing
-    # and delete view is going to be reworked to use ModelForm,
-    # so not much point in fixing the current test
     def test_delete_ead(self):
         # login as admin to test admin-only feature
         self.client.login(**self.admin_credentials)
 
-        # load a fixture in order to test delete an existing EAD later
-        id = 'hartsfield558'
-        filename = 'hartsfield558.xml'
-        dbpath = settings.EXISTDB_TEST_COLLECTION + '/' + filename
-        valid_eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', filename)
-        self.db.load(open(valid_eadfile), dbpath, True)
-        
-        # make up a non-existing EAD in order to test delete an non-existing EAD later
-        noneid = 'nonexist.xml'
-        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': id})
-        delete_none = reverse('fa-admin:delete-ead', kwargs={'id': noneid})
-        
-        # Test a GET request
-        # GET should just display the delete confirmation form
-        
-        # A GET request for deleting a non-existing ead
-        response = self.client.get(delete_none, follow=True)
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_("Could not find <b>%s</b>." % noneid in messages[0],
-                "file not found message present in response context")
-        # A GET request for deleting a non-existing ead
+        eadid = 'hartsfield558'
+        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
+        # GET - should display delete form with eadid & title from document
         response = self.client.get(delete_url)
-        self.assertContains(response, '<label for="id_eadid">EAD Identifier:</label></th><td><input name="eadid" value="%s"' % id)
+        self.assertContains(response, '<input name="eadid" value="%s"' % eadid)
         self.assertContains(response, 'id="id_title" value="William Berry Hartsfield papers, circa 1860s-1983"')
-        self.assertContains(response, '<label for="id_comments">Comments:</label></th><td><textarea id="id_comments"')
+
+        # POST form data to trigger a deletion
+        title, note = 'William Berry Hartsfield papers', 'Moved to another archive.'
+        response = self.client.post(delete_url, {'eadid': eadid, 'title': title,
+                                    'note' : note, 'date': '2010-07-01 15:01:20'}, follow=True)
+        # on success:
+        # - the document should have been removed from eXist
+        self.assertFalse(self.db.hasDocument('%s/%s.xml' % (settings.EXISTDB_TEST_COLLECTION, eadid)),
+            "document should no longer be present in eXist collection after delete_ead")
+        # - a Deleted db record should have been created with posted data
+        deleted_info = Deleted.objects.get(eadid=eadid)
+        self.assertEqual(eadid, deleted_info.eadid, "deleted record has correct eadid")
+        self.assertEqual(title, deleted_info.title, "deleted record has correct ead title")
+        self.assertEqual(note, deleted_info.note, "deleted record has posted note")
+        # - the user should be redirected with a success message
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(redirect_url.endswith(reverse('fa-admin:list_published')),
+            "response redirects to list of published documents")
+        expected = 303      # redirect - see other
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST)'
+                             % (expected, code, delete_url))
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assert_('Successfully removed <b>%s</b>.' % eadid in messages[0],
+                "delete success message is set in response context")
+
+
+        # test for expected failures for a non-existent eadid
+        eadid = 'bogus-id'
+        delete_nonexistent = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
+        # GET - attempt to load form to delete an ead not present in eXist db
+        response = self.client.get(delete_nonexistent, follow=True)
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assertEqual("Error: could not retrieve <b>%s</b> for deletion." \
+                % eadid, messages[0],
+                "'not found' message set in response context when attempting to " +
+                " GET delete form for a nonexistent eadid")
+        # POST - attempt to actually delete an ead that isn't in eXist        
+        response = self.client.post(delete_nonexistent, {'eadid': eadid, 'title': title,
+                                                'note' : note}, follow=True)
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assertEqual("Error: could not retrieve <b>%s</b> for deletion." \
+                % eadid, messages[0],
+                "'not found' message set in response context when attempting to " +
+                "POST delete form for a nonexistent eadid")
+
+        # FIXME: not sure how to trigger or simulate the error case where the
+        # finding aid is loaded from eXist but actual deletion fails...
+
+    def test_redelete(self):
+        # test deleting when there is already an existing deleted record in the DB
+        # (e.g., document was published, deleted, re-published, and now being deleted again)
+        # - update existing delete_info with new values to simplify testing
         
-        # Test a POST request
-        # POST should trigger the deletion
+        self.client.login(**self.admin_credentials)
+        eadid = 'hartsfield558'
+        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
+        
+        title, note = 'Deleted EAD record', 'removed because of foo'
+        Deleted(eadid=eadid, title=title, note=note).save()
 
-        # Test delete an existing file        
-        # The page should be redirected and the response shall contain the right message
-        expected = 303      # redirect
-        published_url = reverse('fa-admin:list_published')
-        response = self.client.post(delete_url, {'eadid' : id, 'title' : 'William Berry Hartsfield papers, circa 1860s-1983', 'comments' : 'comments for testing'}, follow=True)
-        (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(reverse('fa-admin:list_published') in redirect_url)
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST)'
-                             % (expected, code, published_url))
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_('Successfully removed <b>%s</b>.' % id in messages[0],
-                "Successfully removed message present in response context")
+        # GET: form should display info from existing Deleted record
+        response = self.client.get(delete_url)
+        self.assertContains(response, 'id="id_title" value="William Berry Hartsfield papers',
+            msg_prefix="edit form contains title from Finding Aid (overrides title from DB)")
+        self.assertContains(response, '%s</textarea>' % note,
+            msg_prefix="edit form contains notes from previous deletion")
+        # POST form data to trigger a deletion and update deleted record
+        new_title, new_note = 'William Berry Hartsfield papers', 'Moved to another archive.'
+        new_date = '2011-08-09 15:01:20'
+        response = self.client.post(delete_url, {'eadid': eadid, 'title': new_title,
+                                    'note' : new_note, 'date': new_date }, follow=True)
+        # *existing* deleted DB record should be updated with posted data
+        deleted_info = Deleted.objects.get(eadid=eadid)
+        self.assertEqual(new_title, deleted_info.title)
+        self.assertEqual(new_note, deleted_info.note)
+        
 
-        # the EAD should have been removed from the ExistDB
-        self.assertFalse(self.db.hasDocument(dbpath))
-        # A record should have been saved to the relational db
-        deleted = Deleted.objects.only('eadid', 'title', 'comments').get(eadid = id)
-        self.assertEqual(deleted.eadid, 'hartsfield558')
-        self.assertEqual(deleted.title, 'William Berry Hartsfield papers, circa 1860s-1983')
-        self.assertEqual(deleted.comments, 'comments for testing')
-
-        # Test delete a non-exist EAD
-        # The user shall be redirected and the message should indicate file not found
-        response = self.client.post(delete_none, follow=True)
-        (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(reverse('fa-admin:list_published') in redirect_url)
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST)'
-                             % (expected, code, published_url))
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_('Could not find <b>%s</b>.' % noneid in messages[0],
-                "File not found message present in response context")
-
-
+ 
 # unit tests for views that make use of celery tasks (additional setup required)
 
 # in test mode, celery task returns an EagerResult with no task id

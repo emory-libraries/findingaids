@@ -1,6 +1,7 @@
 import os
 from lxml.etree import XMLSyntaxError, Resolver
 from django.conf import settings
+from django.http import HttpResponseRedirect
 
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from findingaids.fa.models import FindingAid
@@ -162,4 +163,12 @@ class EadDTDResolver(Resolver):
         else:
             return super(EadDTDResolver, self).resolve(url, id, context)
 
-    
+
+class HttpResponseSeeOther(HttpResponseRedirect):
+    """Variant of Django's :class:`django.http.HttpResponseRedirect`.  Used to
+    simplify redirecting with status code 303, since this type of redirect is
+    used frequently in fa_admin.
+
+    303 See Other - not a replacement for the requested content, but a different resource
+    """
+    status_code = 303   # See Other - not a replacement for the requested content, but a different resource

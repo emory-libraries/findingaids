@@ -200,15 +200,8 @@ class FaViewsTest(TestCase):
                             % (expected, response.status_code, nonexistent_ead))
 
     def test_deleted(self):
-        # 410 gone - not found in exist, but deleted record
-        def test_ead_deleted_response(url):
-            expected = 410
-            self.assertEqual(response.status_code, expected,
-                             'Expected %s but returned %s for %s' % \
-                             (expected, response.status_code, url))
-            self.assertContains(response, '<div> This collection <div id="control_access"> <h3> Title of a deleted EAD </h3></div> has been removed', status_code = 410)
-            self.assertContains(response, 'comments for testing', status_code = 410)
-        # Save a record to the Deleted model for testing
+        # 410 gone - not found in exist, but there is a record indicating it was deleted
+        # create a Deleted record for testing
         id, title, note = 'deleted', 'Deleted EAD record', 'removed because of foo'
         Deleted(eadid=id, title=title, comments=note).save()
 

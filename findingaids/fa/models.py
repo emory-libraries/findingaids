@@ -267,10 +267,10 @@ class Deleted(models.Model):
     """
     Information about a previously published finding aid that has been deleted.
     """
-    eadid = models.CharField('EAD Identifier', max_length=50)
+    eadid = models.CharField('EAD Identifier', max_length=50, unique=True)
     title = models.CharField(max_length=200)
-    date_time = models.DateTimeField('Date and time of record deletion', default=datetime.now())
-    comments = models.CharField(max_length=400, blank=True, 
+    date = models.DateTimeField('Date removed', default=datetime.now())
+    note = models.CharField(max_length=400, blank=True,
             help_text="Optional: Enter the reason this document is being deleted. " +
                       "These comments will be displayed to anyone who had the finding " +
                       "aid bookmarked and returns after it is gone.")

@@ -1,21 +1,19 @@
+{# page for a finding aid that has been removed from the site #}
 {% extends "site_base.html" %}
-
 {% block page-subtitle %}: {{deleted.title}}{% endblock %}
 
 {% block content-body %}
-
 <h1>{{deleted.title}}</h1>
 
 <div class='removed-notice'>
   <p>This collection has been removed.</p>
-  {% if deleted.comments %}<p>{{deleted.comments}}</p>{% endif %}
+  {% if deleted.note %}<p>{{deleted.note}}</p>{% endif %}
   <p>Please contact MARBL regarding access to this collection.</p>
 </div>
-
 {% endblock %}
 
 {% block content-outer-bottom %}
-This collection was removed {{deleted.date_time|timesince}} ago.
+This collection was removed {{deleted.date|timesince}} ago.
 {{ block.super }}
 {% endblock %}
 

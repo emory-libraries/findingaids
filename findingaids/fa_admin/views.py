@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
 #from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth.decorators import permission_required
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -26,13 +26,12 @@ from eulcore.existdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
-from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
-from findingaids.fa_admin.models import Findingaids
+from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead, HttpResponseSeeOther
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
 from findingaids.fa.models import Deleted
 from findingaids.fa_admin.forms import FAUserChangeForm
 from findingaids.fa_admin.tasks import reload_cached_pdf
-from findingaids.fa_admin.models import TaskResult, Findingaids
+from findingaids.fa_admin.models import TaskResult
 
 @login_required
 def main(request):
@@ -76,7 +75,7 @@ def main(request):
 
 def logout(request):
     """
-    Admin Login page.
+    Admin Logout page.
 
     Logout user and redirect to admin login page.
     
@@ -205,9 +204,7 @@ def publish(request):
 
             if ead is None:
                 # if ead could not be retrieved from preview mode, skip processing
-                response = HttpResponse(status=303)     # redirect, see other
-                response['Location'] = reverse('fa-admin:index')
-                return response
+                return HttpResponseSeeOther(reverse('fa-admin:index'))
 
             filename = ead.document_name
             xml = ead.serialize()
@@ -259,9 +256,7 @@ def publish(request):
                     % (change, filename, ead_url, unicode(ead.unittitle)))
 
             # redirect to main admin page and display messages
-            response = HttpResponse(status=303)     # redirect, see other
-            response['Location'] = reverse('fa-admin:index')
-            return response
+            return HttpResponseSeeOther(reverse('fa-admin:index'))
         else:
             return render_to_response('fa_admin/publish-errors.html',
                 {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e },
@@ -297,9 +292,7 @@ def preview(request):
             ead = load_xmlobject_from_file(fullpath, FindingAid)
             messages.success(request, 'Successfully loaded <b>%s</b> for preview.' % filename)                
             # redirect to document preview page with code 303 (See Other)
-            response = HttpResponse(status=303)
-            response['Location'] = reverse('fa-admin:preview:view-fa', kwargs={'id': ead.eadid })
-            return response
+            return HttpResponseSeeOther(reverse('fa-admin:preview:view-fa', kwargs={'id': ead.eadid }))
         else:
             return render_to_response('fa_admin/publish-errors.html',
                     {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e },
@@ -381,9 +374,7 @@ def cleaned_ead(request, filename, mode):
             if not changes:
                 messages.info(request, 'No changes made to <b>%s</b>; EAD is already clean.' % filename)
                 # redirect to main admin page with code 303 (See Other)
-                response = HttpResponse(status=303)
-                response['Location'] = reverse('fa-admin:index')
-                return response        
+                return HttpResponseSeeOther(reverse('fa-admin:index'))
     elif cleaned_ead.status_code == 500:
         # something went wrong with generating cleaned xml - most likely, non-well-formed xml
         errors = [cleaned_ead.content]        
@@ -426,49 +417,56 @@ def delete_ead(request, id):
     """ Delete a published EAD. When it's a GET request, display the delete confirmation form. 
         When it's a POST request, try to remove the EAD from the ExistDB.
     """
+
+    # FIXME: needs additional logic to avoid creating duplicate delete records for the same findingaid
+    # (probably shouldn't happen normally - but we should guard against it)
    
-    if request.method == 'GET':
-    # It's a GET request
-        try:
-            #display the confirmation form
-            fa = FindingAid.objects.only('eadid', 'unittitle').get(eadid = id)
-            confirmation = Deleted(eadid = fa.eadid, title = fa.unittitle.__unicode__())
-            confirmation_form = DeleteForm(instance = confirmation)
-            return render_to_response('fa_admin/delete.html', {'fa' : fa, 'form' : confirmation_form },
-                                      context_instance=RequestContext(request))
-        except DoesNotExist:
-            messages.error(request, "Could not find <b>%s</b>." % id)
-            response = HttpResponse(status=303)
-            response['Location'] = reverse('fa-admin:list_published')
-            return response
-    # It's a POST request
-    
-    confirmation_form = DeleteForm(request.POST)
-    success = True
-    
-    #get the document_name which is used to form a path of the the EAD in the Exist DB
+    # retrieve the finding aid to be deleted with fields needed for
+    # form display or actual deletion
     try:
-        fa = FindingAid.objects.only('document_name').get(eadid = id)
+        fa = FindingAid.objects.only('eadid', 'unittitle',
+                            'document_name', 'collection_name').get(eadid=id)
+
+        # if this record has been deleted before, get that record and update it
+        deleted_info, created = Deleted.objects.get_or_create(eadid=fa.eadid)
+        deleted_info.title = unicode(fa.unittitle)   # update with title from current document
+
+        render_form = False
+        
+        # on GET, display delete form
+        if request.method == 'GET':     
+            # pre-populate the form with info from the finding aid to be removed
+            delete_form = DeleteForm(instance=deleted_info)            
+            render_form = True
+
+        else:   # POST : actually delete the document
+            delete_form = DeleteForm(request.POST, instance=deleted_info)
+            if delete_form.is_valid():
+                delete_form.save()
+                db = ExistDB()
+                try:
+                    success = db.removeDocument(fa.collection_name + '/' + fa.document_name)
+                    if success:
+                        DeleteForm(request.POST, instance=deleted_info).save()
+                        messages.success(request, 'Successfully removed <b>%s</b>.' % id)
+                    else:
+                        # remove exited normally but was not successful
+                        messages.error(request, 'Error: failed to removed <b>%s</b>.' % id)
+                except ExistDBException, e:
+                    messages.error(request, "Error: failed to remove <b>%s</b> - %s." \
+                                % (id, e.message()))
+            else:
+                render_form = True
+
+        if render_form:
+            return render_to_response('fa_admin/delete.html',
+                                    {'fa' : fa, 'form' : delete_form },
+                                    context_instance=RequestContext(request))
     except DoesNotExist:
-        messages.error(request, "Could not find <b>%s</b>." % id)
-        response = HttpResponse(status=303)
-        response['Location'] = reverse('fa-admin:list_published')
-        return response
-    # try to remove the EAD from the Exist DB
-    db = ExistDB()
-    try:
-        success = db.removeDocument(settings.EXISTDB_ROOT_COLLECTION + '/' + fa.document_name)
-    except ExistDBException:
-        success = False
-    
-    # set the message depending on the result of the removal
-    if success:
-        confirmation_form.save(True)
-        messages.success(request, 'Successfully removed <b>%s</b>.' % id)
-    else:
-        messages.error(request, "Error removing <b>%s</b>." % id)
-    
-    # No matter the removal is successful or not, redirect to the page that lists all the published EAD
-    response = HttpResponse(status=303)
-    response['Location'] = reverse('fa-admin:list_published')
-    return response
+        # requested finding aid was not found
+        messages.error(request, "Error: could not retrieve <b>%s</b> for deletion." % id)
+
+
+    # if we get to this point, either there was an error or the document was 
+    # successfully deleted - in any of those cases, redirect to publish list
+    return HttpResponseSeeOther(reverse('fa-admin:list_published'))
