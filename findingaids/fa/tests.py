@@ -203,7 +203,7 @@ class FaViewsTest(TestCase):
         # 410 gone - not found in exist, but there is a record indicating it was deleted
         # create a Deleted record for testing
         id, title, note = 'deleted', 'Deleted EAD record', 'removed because of foo'
-        Deleted(eadid=id, title=title, comments=note).save()
+        Deleted(eadid=id, title=title, note=note).save()
 
         # test a deleted record in all 3 single-finding aid top-level views
         # view_fa (main html view)
@@ -216,7 +216,7 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
                 msg_prefix="title from deleted record is displayed in response")
         self.assertContains(response, note, status_code=410,
-                msg_prefix="comments from deleted record are displayed in response")
+                msg_prefix="note from deleted record are displayed in response")
         
         # full_fa (single-page html version of entire Finding Aid, basis for PDF)
         full_url = reverse('fa:full-fa', kwargs={'id': id})

@@ -8,7 +8,6 @@ class Findingaids(models.Model):
     This model is used as a place holder for custom permissions needed with the
     admin portion of the site.
     """
-    pass
     class Meta:
         permissions =(
                 ("can_publish", "Can publish a finding aid"),
