@@ -15,8 +15,9 @@ from eulcore.xmlmap.core import load_xmlobject_from_file
 from findingaids.fa_admin import tasks, views
 from findingaids.fa_admin.models import TaskResult
 from findingaids.fa_admin.views import _get_recent_xml_files
-from findingaids.fa_admin.utils import check_ead, clean_ead
+from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
 from findingaids.fa.models import FindingAid, Deleted
+from findingaids.fa.urls import TITLE_LETTERS
 
 
 ### unit tests for findingaids.fa_admin.views
@@ -711,6 +712,52 @@ class UtilsTest(TestCase):
         errors = check_ead(valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database contains eadid 'hartsfield558' in a different document" in errors[0])
+
+    def test_check_eadxml(self):
+        eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558_invalid.xml')
+        ead = load_xmlobject_from_file(eadfile, FindingAid)
+        ead.eadid = 'foo#~@/'    # set invalid eadid for this test only
+
+        # invalid fixture has several errors
+        errors = check_eadxml(ead)
+        self.assertNotEqual(0, len(errors))
+        # - series/subseries ids missing, index id missing
+        self.assert_("series c01 id attribute is not set for Series 1: Personal papers, 1918-1986"
+                    in errors, 'c01 missing id error reported')
+        self.assert_("subseries c02 id attribute is not set for Subseries 6.1: Minerals and mining files, 1929-1970"
+                    in errors, 'c02 missing id error reported')
+        self.assert_("index id attribute is not set for Index of Selected Correspondents"
+                    in errors, 'index missing id error reported')
+        # - origination count error
+        self.assert_("Site expects only one archdesc/did/origination; found 2" in errors,
+                    'multiple origination error reported')
+        # - whitespace in list title
+        self.assert_("Found leading whitespace in list title field (origination/persname): " +
+                    "'  Hartsfield, William Berry.'" in errors, 'leading whitespace in origination reported')
+        # - eadid regex
+        self.assert_("eadid '%s' does not match site URL regular expression" % ead.eadid
+                    in errors, 'eadid regex error reported')
+
+        # - list title first letter regex
+        # simulate non-whitespace, non-alpha first letter in list title
+        ead.list_title.node.text = "1234" # list title is not normally settable; overriding for test
+        errors = check_eadxml(ead)
+        self.assert_("First letter ('1') of list title field origination/persname does not match browse letter URL regex '%s'" \
+                     % TITLE_LETTERS in errors, 'title first letter regex error reported')
+
+        # - whitespace in control access terms
+        self.assert_("Found leading whitespace in controlaccess term ' Gone with the wind (Motion picture)' (title)"
+                    in errors, 'controlaccess title leading whitespace reported')
+        self.assert_("Found leading whitespace in controlaccess term '  \t   Selznick, David O., 1902-1965.' (persname)" 
+                    in errors, 'controlaccess name leading whitespace reported')
+        self.assert_("Found leading whitespace in controlaccess term '  \t   Mines and mineral resources--Georgia.' (subject)"
+                    in errors, 'controlaccess subject leading whitespace reported')
+        self.assert_("Found leading whitespace in controlaccess term ' Motion pictures.' (genreform)"
+                    in errors, 'controlaccess genre leading whitespace reported')
+
+        
+        
+
         
     def test_clean_ead(self):
         # ead with series/subseries, and index

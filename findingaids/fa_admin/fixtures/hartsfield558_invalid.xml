@@ -30,8 +30,8 @@
   <archdesc level="collection" relatedencoding="MARC21"> 
 	 <did> 
 		<origination> 
-		  <persname source="lcnaf" encodinganalog="100">Hartsfield, William Berry.</persname></origination> 
-		 
+		  <persname source="lcnaf" encodinganalog="100">  Hartsfield, William Berry.</persname></origination>
+		 <origination> </origination>
 		 
 		<unittitle encodinganalog="245$a">William Berry Hartsfield papers, 
 		  <unitdate type="inclusive" encodinganalog="245$f" normal="1860-1983" era="ce" calendar="gregorian">circa 1860s-1983</unitdate></unittitle> 
@@ -100,11 +100,12 @@
 		<head>Selected Search Terms</head> 
 		<controlaccess> 
 		  <head>Uniform Title</head> 
-		  <title encodinganalog="630" source="lcnaf">Gone with the wind (Motion picture)</title> 
+		  <title encodinganalog="630" source="lcnaf"> Gone with the wind (Motion picture)</title>
 		</controlaccess> 
 		<controlaccess> 
 		  <head>Personal Names</head> 
-		  <persname source="lcnaf" encodinganalog="600">Allen, Ivan.</persname> 
+		  <persname source="lcnaf" encodinganalog="600">
+              Allen, Ivan.</persname>
 		  <persname source="lcnaf" encodinganalog="600">Bullard, Helen, 1908-1979.</persname><persname source="lcnaf" encodinganalog="600">Maddox, Lester, 1915-2003.</persname><persname source="lcnaf" encodinganalog="600">McGill, Ralph, 1898-1969.</persname><persname source="lcnaf" encodinganalog="600">Robert, Lawrence Wood, 1889-1976.</persname><persname source="lcnaf" encodinganalog="600">Russell, Richard B. (Richard Brevard), 1897-1971.</persname><persname source="lcnaf" encodinganalog="600">  	   Selznick, David O., 1902-1965.</persname><persname source="lcnaf" encodinganalog="600">Talmadge, Herman E. (Herman Eugene), 1913-2002.</persname><persname source="lcnaf" encodinganalog="600">  	   Woodruff, Robert Winship.</persname> 
 		</controlaccess> 
 		<controlaccess> 
@@ -121,7 +122,7 @@
 		<geogname encodinganalog="651">Atlanta (Ga.)--Race relations.</geogname><geogname encodinganalog="651">Atlanta (Ga.)--Transportation--Aviation.</geogname><geogname encodinganalog="651">Georgia--Politics and government--1865-1950.</geogname><geogname encodinganalog="651">Georgia--Politics and government--1951-</geogname><geogname encodinganalog="651">Georgia--Race relations.</geogname><geogname encodinganalog="651">Georgia--Transportation--Aviation.</geogname></controlaccess> 
 		<controlaccess> 
 		  <head>Form/Genre Terms</head> 
-		  <genreform source="aat" encodinganalog="655">Motion pictures.</genreform><genreform source="aat" encodinganalog="655">Sound recordings.</genreform> 
+		  <genreform source="aat" encodinganalog="655"> Motion pictures.</genreform><genreform source="aat" encodinganalog="655">Sound recordings.</genreform>
 		</controlaccess> 
 		 
 	 </controlaccess> 

@@ -105,7 +105,7 @@
 		<controlaccess> 
 		  <head>Personal Names</head> 
 		  <persname source="lcnaf" encodinganalog="600">Allen, Ivan.</persname> 
-		  <persname source="lcnaf" encodinganalog="600">Bullard, Helen, 1908-1979.</persname><persname source="lcnaf" encodinganalog="600">Maddox, Lester, 1915-2003.</persname><persname source="lcnaf" encodinganalog="600">McGill, Ralph, 1898-1969.</persname><persname source="lcnaf" encodinganalog="600">Robert, Lawrence Wood, 1889-1976.</persname><persname source="lcnaf" encodinganalog="600">Russell, Richard B. (Richard Brevard), 1897-1971.</persname><persname source="lcnaf" encodinganalog="600">  	   Selznick, David O., 1902-1965.</persname><persname source="lcnaf" encodinganalog="600">Talmadge, Herman E. (Herman Eugene), 1913-2002.</persname><persname source="lcnaf" encodinganalog="600">  	   Woodruff, Robert Winship.</persname> 
+		  <persname source="lcnaf" encodinganalog="600">Bullard, Helen, 1908-1979.</persname><persname source="lcnaf" encodinganalog="600">Maddox, Lester, 1915-2003.</persname><persname source="lcnaf" encodinganalog="600">McGill, Ralph, 1898-1969.</persname><persname source="lcnaf" encodinganalog="600">Robert, Lawrence Wood, 1889-1976.</persname><persname source="lcnaf" encodinganalog="600">Russell, Richard B. (Richard Brevard), 1897-1971.</persname><persname source="lcnaf" encodinganalog="600">Selznick, David O., 1902-1965.</persname><persname source="lcnaf" encodinganalog="600">Talmadge, Herman E. (Herman Eugene), 1913-2002.</persname><persname source="lcnaf" encodinganalog="600">Woodruff, Robert Winship.</persname> 
 		</controlaccess> 
 		<controlaccess> 
 		  <head>Corporate Names</head> 
@@ -114,7 +114,7 @@
 		<controlaccess> 
 		  <head>Topical Terms</head> 
 		  <subject source="lcsh" encodinganalog="650">Elections--Georgia.</subject> 
-		<subject source="lcsh" encodinganalog="650">  	   Mines and mineral resources--Georgia.</subject><subject source="lcsh" encodinganalog="650">Motion pictures--Georgia.</subject><subject source="lcsh" encodinganalog="650">Municipal government--Georgia.</subject><subject source="lcsh" encodinganalog="650">Municipal water supply--Georgia.</subject><subject source="lcsh" encodinganalog="650">Talc industry--Georgia.</subject><subject source="lcsh" encodinganalog="650">Water--Fluoridation--Georgia.</subject></controlaccess> 
+		<subject source="lcsh" encodinganalog="650">Mines and mineral resources--Georgia.</subject><subject source="lcsh" encodinganalog="650">Motion pictures--Georgia.</subject><subject source="lcsh" encodinganalog="650">Municipal government--Georgia.</subject><subject source="lcsh" encodinganalog="650">Municipal water supply--Georgia.</subject><subject source="lcsh" encodinganalog="650">Talc industry--Georgia.</subject><subject source="lcsh" encodinganalog="650">Water--Fluoridation--Georgia.</subject></controlaccess> 
 		<controlaccess> 
 		  <head>Geographic Names</head> 
 		  <geogname encodinganalog="651">Atlanta (Ga.)--Politics and government.</geogname> 

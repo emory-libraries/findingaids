@@ -1,10 +1,13 @@
 import os
 from lxml.etree import XMLSyntaxError, Resolver
+import re
+
 from django.conf import settings
 from django.http import HttpResponseRedirect
 
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from findingaids.fa.models import FindingAid
+from findingaids.fa.urls import EADID_URL_REGEX, TITLE_LETTERS
 
 def check_ead(filename, dbpath, xml=None):
     """
@@ -12,9 +15,9 @@ def check_ead(filename, dbpath, xml=None):
 
     Checks the following:
      - DTD valid (file must include doctype declaration)
-     - eadid matches expected pattern (filename without .xml)
+     - eadid matches expected pattern-- filename without .xml
      - check that eadid is unique within the database (only present once, in the file that will be updated)
-     - series and index ids are present     
+     - additional checks done by :meth:`check_eadxml`
 
     :param filename: full path to the EAD file to be checked
     :param dbpath: full path within eXist where the document will be saved
@@ -69,7 +72,14 @@ def check_ead(filename, dbpath, xml=None):
 
 def check_eadxml(ead):
     """Sanity checks specific to the EAD xml, independent of file or eXist.
-    Currently checks that expected ids are set (series, subseries, index).
+
+    Checks the following:
+     - series and index ids are present
+     - fields used for search/browse title match code expectations:
+        - at most one top-level origination
+        - no leading whitespace in list-title (origination or unittitle)
+        - alphabetical first letter (for first-letter browse)
+     - eadid matches site URL regex
 
     :param ead: :class:`~findingaids.fa.models.FindingAid` ead instance to be checked
     :returns: list of all errors found
@@ -87,6 +97,38 @@ def check_eadxml(ead):
         if not index.id:
             errors.append("%(node)s id attribute is not set for %(label)s"
                 % { 'node' : index.node.tag, 'label' : index.head })
+
+    # eadid matches appropriate site URL regex
+    if not re.match('^%s$' % EADID_URL_REGEX, ead.eadid):   # entire eadid should match regex
+        errors.append("eadid '%s' does not match site URL regular expression" \
+                      % ead.eadid)
+
+    # multiple tests to ensure xml used for search/browse list-title matches what code expects
+    # -- since list title is pulled from multiple places, give enough context so it can be found & corrected
+    list_title_path = "%s/%s" % (ead.list_title.node.getparent().tag, ead.list_title.node.tag)
+    # - check for at most one top-level origination
+    origination_count = ead.node.xpath('count(archdesc/did/origination)')
+    if int(origination_count)  > 1:
+        errors.append("Site expects only one archdesc/did/origination; found %d" \
+                        % origination_count)
+    # - no leading whitespace in list title
+    if re.match('\s+', ead.list_title.node.text):
+        # using node.text because unicode() normalizes, which obscures whitespace problems
+        errors.append("Found leading whitespace in list title field (%s): '%s'" % \
+                        (list_title_path, ead.list_title.node.text) )
+        # report with enough context that they can find the appropriate element to fix
+        
+    # - first letter of title matches regex   -- only check if whitespace test fails
+    elif not re.match(TITLE_LETTERS, ead.first_letter):
+        errors.append("First letter ('%s') of list title field %s does not match browse letter URL regex '%s'" % \
+                      (ead.first_letter, list_title_path, TITLE_LETTERS) )
+
+    # leading whitespace in control access fields
+    for ca in ead.archdesc.controlaccess.controlaccess:
+        for term in ca.terms:
+            if re.match('\s+', term.value):
+                errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
+                             % (term.value, term.node.tag)) 
     return errors
    
 def check_series_ids(series):
