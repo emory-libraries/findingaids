@@ -8,11 +8,9 @@ from lxml.etree import XMLSyntaxError
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import logout
+#from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
-#from django.contrib.auth.forms import UserChangeForm
-from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
@@ -20,18 +18,17 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 
+from eulcore.django.auth import permission_required_with_403
 from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.existdb.exceptions import DoesNotExist
 
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
-from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead, HttpResponseSeeOther
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
-from findingaids.fa.models import Deleted
-from findingaids.fa_admin.forms import FAUserChangeForm
-from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin.models import TaskResult
+from findingaids.fa_admin.tasks import reload_cached_pdf
+from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead, HttpResponseSeeOther
 
 @login_required
 def main(request):
@@ -81,7 +78,7 @@ def logout(request):
     messages.success(request, 'You are now logged out.')
     return logout_then_login(request)
 
-@permission_required('auth.user.can_change')
+@permission_required_with_403('auth.user.can_change')
 def list_staff(request):
     """
     Displays a list of user accounts, with summary information about each user
@@ -91,7 +88,7 @@ def list_staff(request):
     return render_to_response('fa_admin/list-users.html', {'users' : users},
                               context_instance=RequestContext(request))
 
-@permission_required('auth.user.can_change')
+@permission_required_with_403('auth.user.can_change')
 def edit_user(request, user_id):
     """Display and process a form for editing a user account.
 
@@ -151,7 +148,7 @@ def _prepublication_check(request, filename, mode='publish', xml=None):
         response = None
     return [ok, response, dbpath, fullpath]
 
-@permission_required('fa_admin.can_publish')
+@permission_required_with_403('fa_admin.can_publish')
 def publish(request):
     """
     Admin publication form.  Allows publishing an EAD file by updating or adding
@@ -250,7 +247,7 @@ def publish(request):
         return main(request)
 
 
-@permission_required('fa_admin.can_preview')
+@permission_required_with_403('fa_admin.can_preview')
 def preview(request):
     if request.method == 'POST':
         filename = request.POST['filename']
@@ -395,7 +392,7 @@ def list_published (request):
                               'querytime': [fa.queryTime()], 'show_pages' : show_pages},
                               context_instance=RequestContext(request))
 
-@permission_required('fa_admin.can_delete')
+@permission_required_with_403('fa_admin.can_delete')
 def delete_ead(request, id):
     """ Delete a published EAD.
     
