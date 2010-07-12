@@ -6,6 +6,7 @@
 
 {% if error %}<p class="error">Error: {{ error }}</p>{% endif %}
 
+<div>{{ files.paginator.count }} files total</div>
 {% with files as items %}
     {% include "snippets/page_navigator.html" %}
 {% endwith %}
@@ -18,14 +19,18 @@
     <tr>
         <td>{{ file }}</td>
         <td>
+            {% if perms.fa_admin.can_publish %}
             <form action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
                 <button type="submit" name="filename" value="{{ file }}" >PUBLISH</button>
             </form>
+            {% endif %}
         </td>
         <td>
+            {% if perms.fa_admin.can_preview %}
             <form action="{% url fa-admin:preview-ead %}" method="post">{% csrf_token %}
                 <button type="submit" name="filename" value="{{ file }}" >PREVIEW</button>
             </form>
+            {% endif %}
         </td>
         <td><a href="{% url fa-admin:cleaned-ead-about file %}">CLEAN</a></td>
         <td>{{ mtime|date}} ({{ mtime|timesince }} ago)</td>

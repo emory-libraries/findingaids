@@ -5,7 +5,7 @@ urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^$', 'main', name="index"),
     url(r'^accounts/$', 'list_staff', name="list-staff"),
     url(r'^accounts/user/(?P<user_id>[0-9.]+)/$', 'edit_user', name="edit-user"),
-    url(r'^logout$', 'logout', name="logout"),
+    url(r'^accounts/logout$', 'logout', name="logout"),
     url(r'^publish$', 'publish', name="publish-ead"),
     url(r'^preview$', 'preview', name="preview-ead"),
     url(r'^(?P<filename>[^/]+)/cleaned$', 'cleaned_eadxml', name="cleaned-ead"),
@@ -16,7 +16,14 @@ urlpatterns = patterns('findingaids.fa_admin.views',
     # include finding document urls for preview
     url(r'^preview/documents/', include(document_urls(preview=True),
             namespace='preview')),
-    url(r'^documents/$', 'list_published', name="list_published"),
+    url(r'^documents/$', 'list_published', name="list-published"),
     url(r'^documents/%s/delete$' % EADID_URL_REGEX, 'delete_ead', name="delete-ead"),
+)
+
+# contrib views 
+urlpatterns += patterns('django.contrib.auth.views',
+    url(r'^accounts/login/$', 'login', name='login'),
+    # note: could use contrib logout; custom view simply adds a message
+    #url(r'^accounts/logout$', 'logout_then_login', name="logout"),
 )
 

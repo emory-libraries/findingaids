@@ -28,8 +28,10 @@ from findingaids.fa.urls import TITLE_LETTERS
 class BaseAdminViewsTest(TestCase):
     "Base TestCase for admin views tests.  Common setup/teardown for admin view tests."
     fixtures =  ['user']
-    admin_credentials = {'username': 'testadmin', 'password': 'secret'}
-    
+    credentials = {'superuser': {'username': 'testadmin', 'password': 'secret'},
+                   'admin': {'username': 'marbl', 'password': 'marbl'},
+                   'no_perms': {'username': 'peon', 'password': 'peon'},
+    }    
     exist_fixtures = {'files': [
             os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
     ]}
@@ -84,9 +86,46 @@ class BaseAdminViewsTest(TestCase):
 
 class AdminViewsTest(BaseAdminViewsTest):
 
+    def test_index(self):
+        admin_index = reverse('fa-admin:index')
+
+        # user who can't do anything
+        self.client.login(**self.credentials['no_perms'])
+        response = self.client.get(admin_index)
+        self.assertContains(response, "You don't have permission to do anything",
+            msg_prefix='response for user with no permissions includes appropriate message')
+        self.assertContains(response, reverse('fa-admin:list-published'), 0,
+            msg_prefix='response for user with no permissions does not include link to published docs')
+        self.assertContains(response, reverse('fa-admin:preview-ead'), 0,
+            msg_prefix='response for user with no permissions does not include link to preview docs')
+        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
+            msg_prefix='response for user with no permissions does not include link to list/edit staff')
+        self.assertContains(response, reverse('admin:index'), 0,
+            msg_prefix='response for user with no permissions does not include link to django db admin')
+            
+        # user with limited permissions - in findingaid group
+        self.client.login(**self.credentials['admin'])
+        response = self.client.get(admin_index)
+        self.assertContains(response, reverse('fa-admin:list-published'), 
+            msg_prefix='response for FA admin includes link to published docs')
+        self.assertContains(response, reverse('fa-admin:preview-ead'),
+            msg_prefix='response for FA admin includes link to preview docs')
+        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
+            msg_prefix='response for (non super) FA admin does not include link to list/edit staff')
+        self.assertContains(response, reverse('admin:index'), 0,
+            msg_prefix='response for (non super) FA admin does not include link to django db admin')
+
+        # superuser
+        self.client.login(**self.credentials['superuser'])
+        response = self.client.get(admin_index)
+        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'),
+            msg_prefix='response for superuser includes link to list/edit staff')
+        self.assertContains(response, reverse('admin:index'),
+            msg_prefix='response for superuser includes link to django db admin')
+
     def test_recent_files(self):
         admin_index = reverse('fa-admin:index')
-        # note: recent files list is *currently* displayed on main admin page
+        # note: recent files list is currently displayed on main admin page
 
         # not logged in
         response = self.client.get(admin_index)
@@ -101,7 +140,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assert_("?next=%s" % admin_index in redirect_url)
         
         # log in as an admin user
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
         response = self.client.get(admin_index)
         self.assertEqual(response.status_code, 200)
         code = response.status_code
@@ -138,15 +177,16 @@ class AdminViewsTest(BaseAdminViewsTest):
 
     def test_preview(self):
         preview_url = reverse('fa-admin:preview-ead')
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
         
         # use fixture directory to test preview
         filename = 'hartsfield558.xml'
+        eadid = 'hartsfield558'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
         response = self.client.post(preview_url, {'filename' : filename},
                 follow=True) # follow redirect so we can inspect message on response
         (redirect_url, code) = response.redirect_chain[0]
-        preview_docurl = reverse('fa-admin:preview:view-fa', kwargs={'id': 'hartsfield558'})
+        preview_docurl = reverse('fa-admin:preview:view-fa', kwargs={'id': eadid})
         self.assert_(preview_docurl in redirect_url)
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
@@ -172,6 +212,17 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, 'last modified: 0 minutes ago',
             msg_prefix="preview summary listing includes modification time")
             
+        # preview page should include publish form for users with permission to publish
+        preview_fa_url = reverse('fa-admin:preview:view-fa', kwargs={'id': eadid})
+        response = self.client.get(preview_fa_url)
+        self.assertContains(response,
+                '<form id="preview-publish" action="%s" method="post"' % reverse('fa-admin:publish-ead'),
+                msg_prefix="preview page includes publish form")
+        publish_submit = '<button type="submit" name="preview_id" value="%s">PUBLISH' % eadid
+        self.assertContains(response, publish_submit,
+                msg_prefix="publish form submit button has document eadid for value")
+
+
         # clean up
         self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
@@ -200,91 +251,34 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
         
-    def test_login_admin(self):
-        admin_index = reverse('fa-admin:index')
-        # Test admin account can login
-        response = self.client.post('/accounts/login/',
-                {'username': 'testadmin', 'password': 'secret'})
-        response = self.client.get(admin_index)
-        self.assertContains(response, '<p>You are logged in as,')
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' \
-                % (expected, code, admin_index))
-        
-    def test_login_staff(self):
-        admin_index = reverse('fa-admin:index')
-        staff = User.objects.create_user('staffmember', 'staff.member@emory.edu', 'staffpassword')
-        staff.is_staff = True
-        staff.save()
-        # Test staff account can login
-        response = self.client.post('/accounts/login/',
-                {'username': 'staffmember', 'password': 'staffpassword'})
-        response = self.client.get(admin_index)
-        self.assertContains(response, '<p>You are logged in as,')
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' \
-                % (expected, code, admin_index))
-
-    def test_login_non_existent(self):
-        admin_index = reverse('fa-admin:index')    
-        # Test a none existent account cannot login
-        response = self.client.post('/accounts/login/',
-                {'username': 'non_existent', 'password': 'whatever'})
-        self.assertContains(response, """<p>Your username and password didn't match. Please try again.</p>""")
-        self.assertEqual(response.status_code, 200)
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' \
-                % (expected, code, admin_index))
-        
     def test_logout(self):
-        admin_index = reverse('fa-admin:index')
-        # Test admin account can login
-        response = self.client.post('/accounts/login/', {'username': 'testadmin', 'password': 'secret'})
-        response = self.client.get('/admin/')
-        self.assertContains(response, '<p>You are logged in as,')
-        self.assertEqual(response.status_code, 200)
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' \
-                % (expected, code, admin_index))
-        response = self.client.get('/admin/logout')
-        response = self.client.get('/accounts/login/')
-        self.assertContains(response, '<li class="success">You have logged out of finding aids.</li>')
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' \
-                % (expected, code, admin_index))
+        admin_logout = reverse('fa-admin:logout')
+        # log in as admin user to test logging out
+        self.client.login(**self.credentials['admin'])        
+        response = self.client.get(admin_logout, follow=True)
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assert_('You are now logged out' in messages[0])
 
     def test_list_staff(self):
-        admin_index = reverse('fa-admin:index')
-        # Test admin account can login
-        self.client.login(**self.admin_credentials)
-        response = self.client.get('/admin/accounts/')
+        list_staff = reverse('fa-admin:list-staff')
+        # test as an admin with permissions to edit accounts
+        self.client.login(**self.credentials['superuser'])
+        response = self.client.get(list_staff)
         self.assertContains(response, "Current users")
-        self.assertEqual(response.status_code, 200)
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' \
-                % (expected, code, admin_index))
+        # should list users from fixture
+        self.assertContains(response, "marbl")
+        self.assertContains(response, "peon")
 
     def test_edit_user(self):
-        admin_index = reverse('fa-admin:index')
-        # Test admin account can login
-        self.client.login(**self.admin_credentials)
+        edit_user = reverse('fa-admin:edit-user', args=[2]) # edit 2nd user fixture
+        # Test as an admin with permission to edit users
+        self.client.login(**self.credentials['superuser'])
         user = User.objects.create_user('test', 'test@emory.edu', 'testpassword')
         user.is_staff = True
         user.save()
-        response = self.client.get('/admin/accounts/user/%d/' % user.id)
-        self.assertContains(response, "<p>Please edit the user settings...</p>")
-        self.assertEqual(response.status_code, 200)
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin' \
-                % (expected, code, admin_index))
-
+        response = self.client.get(edit_user)
+        self.assertContains(response, "Edit the user account")
+        
     def test_cleaned_ead(self):
          # use fixture directory to test publication
         filename = 'hartsfield558.xml'
@@ -294,7 +288,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
         cleaned_diff = reverse('fa-admin:cleaned-ead-diff', args=[filename])
         
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
         response = self.client.get(cleaned_summary)
         
         code = response.status_code
@@ -361,7 +355,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
         cleaned_diff = reverse('fa-admin:cleaned-ead-diff', args=[filename])
 
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
         response = self.client.get(cleaned_xml)
         expected = 500
         self.assertEqual(response.status_code, expected,
@@ -400,9 +394,9 @@ class AdminViewsTest(BaseAdminViewsTest):
 
     def test_list_published(self):
         # login to test admin-only view
-        self.client.login(**self.admin_credentials)       
+        self.client.login(**self.credentials['admin'])
 
-        list_published_url = reverse('fa-admin:list_published')
+        list_published_url = reverse('fa-admin:list-published')
         response = self.client.get(list_published_url)
         self.assertContains(response, "Published Finding Aids")
 
@@ -415,7 +409,7 @@ class AdminViewsTest(BaseAdminViewsTest):
 
     def test_delete_ead(self):
         # login as admin to test admin-only feature
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
 
         eadid = 'hartsfield558'
         delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
@@ -439,7 +433,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(note, deleted_info.note, "deleted record has posted note")
         # - the user should be redirected with a success message
         (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(redirect_url.endswith(reverse('fa-admin:list_published')),
+        self.assert_(redirect_url.endswith(reverse('fa-admin:list-published')),
             "response redirects to list of published documents")
         expected = 303      # redirect - see other
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST)'
@@ -476,7 +470,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # (e.g., document was published, deleted, re-published, and now being deleted again)
         # - update existing delete_info with new values to simplify testing
         
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
         eadid = 'hartsfield558'
         delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
         
@@ -531,7 +525,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
 
     def test_publish(self):       
         publish_url = reverse('fa-admin:publish-ead')
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
         # GET should just list files available to be published
         response = self.client.get(publish_url)
         code = response.status_code
@@ -603,7 +597,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
     def test_publish_from_preview(self):
         # test publishing a document that has been loaded for preview
         publish_url = reverse('fa-admin:publish-ead')
-        self.client.login(**self.admin_credentials)
+        self.client.login(**self.credentials['admin'])
 
         # load a file to preview to test
         filename = 'hartsfield558.xml'
@@ -753,10 +747,7 @@ class UtilsTest(TestCase):
         self.assert_("Found leading whitespace in controlaccess term '  \t   Mines and mineral resources--Georgia.' (subject)"
                     in errors, 'controlaccess subject leading whitespace reported')
         self.assert_("Found leading whitespace in controlaccess term ' Motion pictures.' (genreform)"
-                    in errors, 'controlaccess genre leading whitespace reported')
-
-        
-        
+                    in errors, 'controlaccess genre leading whitespace reported')        
 
         
     def test_clean_ead(self):

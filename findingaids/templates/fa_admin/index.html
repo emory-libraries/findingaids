@@ -1,10 +1,8 @@
-{% extends "site_base.html" %}
-{% block page-subtitle %}: Administration Page {% endblock %}
-{% block content-title %}Administer Finding Aids{% endblock %}
+{% extends "fa_admin/base.html" %}
+{% block content-title %}Manage Finding Aids{% endblock %}
 
 {% block sidebar-left %}
   {{ block.super }}
-
   <div id="task-results">
       <h3>Task Results</h3>
       <ul>
@@ -21,47 +19,37 @@
   </div>
 {% endblock %}
 
-{% block content-body %}
-  {% if user.is_authenticated %}
-  <div id="print-links">
-    <a href="{% url fa-admin:logout %}">logout</a>
-  </div>
-  <div>
-    <p>You are logged in as, <strong>{{ user.first_name|default:"Admin" }} {{ user.last_name|default:"" }}</strong></p>
-  </div>
-  {% endif %}
-  
+{% block content-body %} {# no permissions to do any finding aid tasks #}
+{% if not perms.fa_admin.can_publish and not perms.fa_admin.can_preview and not perms.fa_admin.can_preview %}
+<p>You don't have permission to do anything yet.  If you don't have the permissions
+you require to do your work, please contact a site administrator and ask them to
+give your account the appropriate permissions.</p>
+{% endif %}
+
+{% if user.is_superuser %}
   <div class="section">
-      <h2>Manage user accounts</h2>
-      {% if user.is_superuser %}
+      <h2>Manage users and site</h2>
           <ul>
             <li> <a href="{% url fa-admin:list-staff %}">Manage user accounts</a></li>
+            <li><a href="{% url admin:index %}">Django DB admin site</a></li>
           </ul>
-     {% else %}
-      <p>
-         Your user account may not have the correct permissions you require to do your work.
-         If this is your first time logging into the finding aids site your user account needs
-         to have permissions assigned, to do this please contact either a staff member who has
-         an administration account or email systems at 78888@emory.edu.
-      </p>
-     {% endif %}
   </div>
+{% endif %}
 
-  <div class="section">
+{% if perms.fa_admin.can_delete or perms.fa_admin.can_preview %}
+ <div class="section">
   <h2>Manage documents</h2>
     <ul>
-      {% if perms.fa_admin.can_publish %}
-      <li><a href="{% url fa-admin:list_published %}">Published documents</a></li>
-      {% else %}
-      <li>You do not have the correct permissions to list published documents.</li>
-      {% endif %}
-      {% if perms.fa_admin.can_publish %}
-      <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
-      {% else %}
-      <li>You do not have the correct permissions to view documents available for preview.</li>
+      <li><a href="{% url fa-admin:list-published %}">Published documents</a></li>
+      {% if perms.fa_admin.can_preview %}
+        <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
       {% endif %}
   </ul>
-  </div>
- 
+ </div>
+{% endif %}
+
+{% if perms.fa_admin.can_publish or perms.fa_admin.can_preview %}
   {% include "fa_admin/_list_files.html" %}
+{% endif %}
+
 {% endblock %}

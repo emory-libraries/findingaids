@@ -1,12 +1,14 @@
 from django.conf.urls.defaults import *
 from django.conf import settings
+from django.contrib import admin
+admin.autodiscover()
 
-urlpatterns = patterns('',                                                                                  
-                       url(r'^admin/', include('findingaids.fa_admin.urls', namespace='fa-admin')),
-                       (r'^accounts/login/$', 'django.contrib.auth.views.login'),
-                       url(r'^$', 'findingaids.fa.views.site_index', name="site-index"),
-                       # everything else should fall through to the main app
-                       url(r'^', include('findingaids.fa.urls', namespace='fa')),
+urlpatterns = patterns('',
+   (r'^db-admin/', include(admin.site.urls)),
+   url(r'^admin/', include('findingaids.fa_admin.urls', namespace='fa-admin')),
+   url(r'^$', 'findingaids.fa.views.site_index', name="site-index"),
+   # everything else should fall through to the main app
+   url(r'^', include('findingaids.fa.urls', namespace='fa')),
 )
 
 # DISABLE THIS IN PRODUCTION

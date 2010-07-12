@@ -72,65 +72,48 @@ def main(request):
                             'error' : error,
                             'task_results': recent_tasks },
                             context_instance=RequestContext(request))
-
+                            
+@login_required
 def logout(request):
+    """Admin Logout view. Displays a message and then calls
+    :meth:`django.contrib.auth.views.logout_then_login`.   
     """
-    Admin Logout page.
-
-    Logout user and redirect to admin login page.
-    
-    """
-    #login_url = settings.LOGIN_URL
-    messages.success(request, 'You have logged out of finding aids.')
+    messages.success(request, 'You are now logged out.')
     return logout_then_login(request)
 
-
+@permission_required('auth.user.can_change')
 def list_staff(request):
     """
-    List user page.
-
-    Displays a list of users which may be selected for editing.
-
+    Displays a list of user accounts, with summary information about each user
+    and a link to edit each user account.
     """
     users = User.objects.all()
-    return render_to_response('fa_admin/list-users.html', {'users' : users,},context_instance=RequestContext(request))
+    return render_to_response('fa_admin/list-users.html', {'users' : users},
+                              context_instance=RequestContext(request))
 
-
+@permission_required('auth.user.can_change')
 def edit_user(request, user_id):
+    """Display and process a form for editing a user account.
+
+    On GET, display the edit form. On POST, process the form.
     """
-    Edit user page.
-
-    Displays a user object for editing
-
-    """
-    user = User.objects.get(id = user_id)
-    if request.user.is_superuser:
-        if request.method == 'POST': # If the form has been submitted...
-            userForm = FAUserChangeForm(request.POST, instance=user) # A form bound to the POST data
-            if userForm.is_valid():
-                # All validation rules pass
-                # Process the data in form.cleaned_data
-                user.first_name = userForm.cleaned_data['first_name']
-                user.last_name = userForm.cleaned_data['last_name']
-                user.email = userForm.cleaned_data['email']
-                user.is_staff = userForm.cleaned_data['is_staff']
-                user.is_active = userForm.cleaned_data['is_active']
-                user.is_superuser = userForm.cleaned_data['is_superuser']
-                user.groups = userForm.cleaned_data['groups']
-                user.user_permissions = userForm.cleaned_data['user_permissions']
-                user.save()
-                messages.success(request, "The changes you have selected for '%s' have been saved." % user.username)
-                return HttpResponseRedirect("/admin/")
-
-            else: # Handle validation errors
-                messages.success(request, 'There are errors in you submission, please review the form.')
-                return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
+    user = User.objects.get(id=user_id)
+    if request.method == 'POST': # If the form has been submitted...
+        userForm = FAUserChangeForm(request.POST, instance=user) # A form bound to the POST data
+        if userForm.is_valid():  # form is valid - save data
+            userForm.save()
+            messages.success(request, "Changes to user '%s' have been saved." \
+                            % user.username)
+            return HttpResponseRedirect(reverse('fa-admin:index'))
         else:
-            userForm = FAUserChangeForm(instance=user)
-        return render_to_response('fa_admin/account-management.html', {'form' : userForm, 'user_id': user_id,}, context_instance=RequestContext(request))
-    else:
-        messages.warning(request, 'You do not have permission to view this page.')
-        return HttpResponseRedirect("/admin/")
+            # form validation errors -- allow to fall through to render form
+            pass
+    else:   # GET - display the form
+        userForm = FAUserChangeForm(instance=user)
+        
+    return render_to_response('fa_admin/account-management.html', 
+                              {'form' : userForm, 'user_id': user_id},
+                              context_instance=RequestContext(request))
         
 def _prepublication_check(request, filename, mode='publish', xml=None):
     """
@@ -168,7 +151,7 @@ def _prepublication_check(request, filename, mode='publish', xml=None):
         response = None
     return [ok, response, dbpath, fullpath]
 
-@login_required
+@permission_required('fa_admin.can_publish')
 def publish(request):
     """
     Admin publication form.  Allows publishing an EAD file by updating or adding
@@ -267,7 +250,7 @@ def publish(request):
         return main(request)
 
 
-@login_required
+@permission_required('fa_admin.can_preview')
 def preview(request):
     if request.method == 'POST':
         filename = request.POST['filename']
@@ -401,26 +384,26 @@ def _get_recent_xml_files(dir):
     return recent_files
 
 
-@permission_required('fa_admin.can_publish')
+@login_required
 def list_published (request):
-    """List all published EADs"""
+    """List all published EADs."""
     fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')
     fa_subset, paginator = paginate_queryset(request, fa, per_page=30, orphans=5)
     show_pages = pages_to_show(paginator, fa_subset.number)
     
     return render_to_response('fa_admin/published_list.html', {'findingaids' : fa_subset,
-                                                   'querytime': [fa.queryTime()], 'show_pages' : show_pages},
-       context_instance=RequestContext(request))
+                              'querytime': [fa.queryTime()], 'show_pages' : show_pages},
+                              context_instance=RequestContext(request))
 
-@login_required
+@permission_required('fa_admin.can_delete')
 def delete_ead(request, id):
-    """ Delete a published EAD. When it's a GET request, display the delete confirmation form. 
-        When it's a POST request, try to remove the EAD from the ExistDB.
-    """
+    """ Delete a published EAD.
+    
+    On GET, display a form with information about the document to be removed.
 
-    # FIXME: needs additional logic to avoid creating duplicate delete records for the same findingaid
-    # (probably shouldn't happen normally - but we should guard against it)
-   
+    On POST, actually remove the specified EAD document from eXist and create (or
+    update) a deleted record for that document in the relational DB.
+    """   
     # retrieve the finding aid to be deleted with fields needed for
     # form display or actual deletion
     try:
@@ -463,10 +446,10 @@ def delete_ead(request, id):
                                     {'fa' : fa, 'form' : delete_form },
                                     context_instance=RequestContext(request))
     except DoesNotExist:
-        # requested finding aid was not found
+        # requested finding aid was not found (on either GET or POST)
         messages.error(request, "Error: could not retrieve <b>%s</b> for deletion." % id)
 
 
     # if we get to this point, either there was an error or the document was 
     # successfully deleted - in any of those cases, redirect to publish list
-    return HttpResponseSeeOther(reverse('fa-admin:list_published'))
+    return HttpResponseSeeOther(reverse('fa-admin:list-published'))

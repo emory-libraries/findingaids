@@ -1,1 +1,54 @@
-[{"pk": 2, "model": "auth.user", "fields": {"username": "testadmin", "first_name": "", "last_name": "", "is_active": true, "is_superuser": true, "is_staff": true, "last_login": "2010-05-12 16:39:59", "groups": [], "user_permissions": [], "password": "sha1$691c4$f0e2a436dc6b084840e7a11b58dd9f14ec7e1e19", "email": "testadmin@emory.edu", "date_joined": "2010-05-12 16:39:59"}}]
+[
+    {
+        "pk": 1,
+        "model": "auth.user",
+        "fields": {
+            "username": "testadmin",
+            "first_name": "",
+            "last_name": "",
+            "is_active": true,
+            "is_superuser": true,
+            "is_staff": true,
+            "last_login": "2010-05-12 16:39:59",
+            "groups": [],
+            "user_permissions": [],
+            "password": "sha1$691c4$f0e2a436dc6b084840e7a11b58dd9f14ec7e1e19",
+            "email": "testadmin@emory.edu",
+            "date_joined": "2010-05-12 16:39:59"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "auth.user",
+        "fields": {
+            "username": "peon",
+            "first_name": "",
+            "last_name": "",
+            "is_active": true,
+            "is_superuser": false,
+            "is_staff": false,
+            "last_login": "2010-07-02 16:53:21", "groups": [],
+            "user_permissions": [],
+            "password": "sha1$fe665$92ab9aec48042a36083983eb36e440b80cb18af4",
+            "email": "",
+            "date_joined": "2010-07-02 16:52:56"
+        }
+    },
+    {
+        "pk": 3,
+        "model": "auth.user",
+        "fields": {
+            "username": "marbl",
+            "first_name": "",
+            "last_name": "",
+            "is_active": true,
+            "is_superuser": false,
+            "is_staff": true,
+            "last_login": "2010-07-02 17:11:54",
+            "groups": [1], "user_permissions": [],
+            "password": "sha1$d9de8$f8d7b9f812e91c72f717764ec516aa5747d7de32",
+            "email": "",
+            "date_joined": "2010-07-02 17:11:33"
+        }
+    }
+]

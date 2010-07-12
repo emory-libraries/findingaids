@@ -112,7 +112,7 @@ AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
 
 AUTH_PROFILE_MODULE = 'emory_ldap.EmoryLDAPUserProfile'
 
-#LOGIN_URL="/accounts/login/"
+LOGIN_URL="/admin/accounts/login/"
 LOGIN_REDIRECT_URL="/admin/"
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'

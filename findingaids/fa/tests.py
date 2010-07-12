@@ -640,7 +640,7 @@ class FaViewsTest(TestCase):
 
     def test_preview_mode(self):
         # test preview mode of all main finding aid views
-        
+
         # load fixture to preview collection
         fullpath = path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
         self.db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml',
@@ -671,13 +671,7 @@ class FaViewsTest(TestCase):
                         kwargs={'id': 'raoul548', 'series_id': 'index1'})
         self.assertContains(response, 'href="%s"' % index_url,
             msg_prefix='preview version of main finding aid should link to index in preview mode')
-        # publish form
-        self.assertContains(response,
-                '<form id="preview-publish" action="%s" method="post"' % reverse('fa-admin:publish-ead'),
-                msg_prefix="preview page includes publish form")
-        publish_submit = '<button type="submit" name="preview_id" value="raoul548" >PUBLISH'
-        self.assertContains(response, publish_submit,
-                msg_prefix="publish form submit button has document eadid for value")
+        # publish form - requires logging in, really an admin feature - tested in fa_admin.tests
 
         # load series page
         series_url = reverse('fa-admin:preview:series-or-index',
@@ -687,8 +681,6 @@ class FaViewsTest(TestCase):
             msg_prefix='preview version of series should link to main finding aid page in preview mode')
         self.assertContains(response, 'href="%s"' % index_url,
             msg_prefix='preview version of series should link to index in preview mode')
-        self.assertContains(response, publish_submit,
-                msg_prefix="publish form submit button on series page has document eadid for value")
 
         # clean up
         self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')

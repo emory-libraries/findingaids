@@ -1,12 +1,9 @@
-{% extends "site_base.html" %}
-
-{% block page-subtitle %}: Published {% endblock %}
-
-{% block content-title %} Published Finding Aids {% endblock %}
+{% extends "fa_admin/base.html" %}
+{% block page-subtitle %}: Published Finding Aids{% endblock %}
+{% block content-title %}Published Finding Aids{% endblock %}
 
 {% block content-body %}
-
-<div>Total Number: {{findingaids.paginator.count}} </div>
+<div>{{findingaids.paginator.count}} documents</div>
 
 {% with findingaids as items %}
     {% include "snippets/page_navigator.html" %}
@@ -20,8 +17,9 @@
 {% for fa in findingaids.object_list %}
     <tr>
         <td><a href ="{% url fa:view-fa fa.eadid %}">{{ fa.document_name }}</a></td>
-        <td>
-                <a href ="{% url fa-admin:delete-ead fa.eadid %}"> DELETE </a>
+        <td>{% if perms.fa_admin.can_delete %}
+              <a href ="{% url fa-admin:delete-ead fa.eadid %}">DELETE</a>
+            {% endif %}
         </td>
         <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>
     </tr>
