@@ -148,9 +148,11 @@ def check_series_ids(series):
 
 
 def clean_ead(ead, filename):
-    """Clean up EAD xml so it can be published. Sets the eadid and
-    ids on any series, subseries, and index elements based on filename and series
-    unitid or index number.
+    """Clean up EAD xml so it can be published.  Currently does the following:
+    
+     - sets the eadid and ids on any series, subseries, and index elements based
+       on filename and series unitid or index number.
+     - removes any leading whitespace from controlaccess terms
 
     :param ead: :class:`~findingaids.fa.models.FindingAid` ead instance to be cleaned
     :param string: filename of the EAD file (used as base eadid)
@@ -167,6 +169,17 @@ def clean_ead(ead, filename):
     for i, index in enumerate(ead.archdesc.index):
         # generate index ids based on eadid and index number (starting at 1, not 0)
         index.id = "%s_index%s" % (ead.eadid, i+1)
+
+    # remove any leading whitespace in list title fields
+    # NOTE: only removing *leading* whitespace because these fields
+    # can contain mixed content, and trailing whitespace here may be significant
+    # - list title fields - origination nodes and unittitle (text only - not any subelements like unitdate)
+    for field in ead.node.xpath('/ead/archdesc/origination/node()|/ead/archdesc/unittitle/text()'):
+        field = str(field).lstrip()
+    # - controlaccess fields
+    for ca in ead.archdesc.controlaccess.controlaccess:
+        for term in ca.terms:
+            term.value = term.value.lstrip()            
 
     return ead
 

@@ -774,6 +774,24 @@ class UtilsTest(TestCase):
         ead = clean_ead(ead, eadfile)
         self.assertEqual(u'raoul548_series3', ead.dsc.c[2].id)
 
+        # whitespace cleanup
+        eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558_invalid.xml')
+        ead = load_xmlobject_from_file(eadfile, FindingAid)
+        ead = clean_ead(ead, eadfile)
+        self.assertEqual(u'Hartsfield, William Berry.', unicode(ead.archdesc.origination))
+
+        self.assertEqual(u'William Berry Hartsfield papers, circa 1860s-1983', unicode(ead.unittitle))
+        self.assertEqual(u'Gone with the wind (Motion picture)',
+                        ead.archdesc.controlaccess.controlaccess[0].title[0].value)
+        self.assertEqual(u'Allen, Ivan.',
+                        ead.archdesc.controlaccess.controlaccess[1].person_name[0].value)
+        self.assertEqual(u'Mines and mineral resources--Georgia.',
+                        ead.archdesc.controlaccess.controlaccess[3].subject[1].value)
+        self.assertEqual(u'Motion pictures.',
+                        ead.archdesc.controlaccess.controlaccess[-1].genre_form[0].value)
+
+
+
 ### unit tests for findingaids.fa_admin.tasks
 
 
