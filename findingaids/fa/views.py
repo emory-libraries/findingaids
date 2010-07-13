@@ -11,6 +11,7 @@ from django.template import RequestContext
 from django.views.decorators.http import condition
 
 from eulcore.django.existdb.db import ExistDB
+from eulcore.django.http import content_negotiation
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
@@ -18,7 +19,6 @@ from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404
-from findingaids.decorators import content_neg
 
 fa_listfields = ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
 "List of fields that should be returned for brief list display of a finding aid."
@@ -72,7 +72,7 @@ def xml_fa(request, id, preview=False):
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-@content_neg({'text/xml' : xml_fa, 'application/xml' : xml_fa})
+@content_negotiation({'text/xml' : xml_fa, 'application/xml' : xml_fa})
 def view_fa(request, id, preview=False):
     """View a single finding aid.   In preview mode, pulls the document from the
     configured eXist-db preview collection instead of the default public one.

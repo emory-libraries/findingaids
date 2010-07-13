@@ -47,8 +47,8 @@ To upgrade from the previous version:
    you use the existdb index manage scripts to load the index
    configuration before loading data.  Because the load_ead script
    triggers celery tasks to reload PDFs in the cache and waits until
-   all celery tasks have completed, loading all the Finding Aids will
-   take a while.
+   all celery tasks have completed, loading all the Finding Aids may
+   take a long time.
 7. After loading the data, you may wish check the data using the
    ``python manage.py check_ead`` command.
 8. The admin section of the site is at /admin/ (under your site url).

@@ -15,6 +15,7 @@ Dependencies
    * eulcore.existdb and eulcore.django.existdb
    * eulcore.django.ldap
    * eulcore.django.testsetup
+   * eulcore.django.http
 
 Installation
 ------------
@@ -77,7 +78,7 @@ To install all the necessary components for a development environment
 on an Ubuntu 10.04 workstation:
 
 sudo apt-get install python-ldap python-pisa python-lxml python-ply rabbitmq-server
-easy_install celery
+sudo easy_install celery mimeparse
 
 This assumes you already have a django 1.2 installation and python bindings
 for the database platform you are using (e.g., python-mysqldb for mysql).
