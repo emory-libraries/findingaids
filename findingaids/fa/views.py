@@ -25,35 +25,28 @@ fa_listfields = ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
-    first_letters = title_letters()
-    return render_to_response('findingaids/index.html', { 'letters' : first_letters,
-                                                          'querytime': [first_letters.queryTime()]},
+    return render_to_response('findingaids/index.html', {'letters': title_letters()},
                                                           context_instance=RequestContext(request)
                                                           )
-
 def browse_titles(request):
     "List all first letters in finding aid list title, with a link to browse by letter."
-    first_letters = title_letters()
-    return render_to_response('findingaids/browse_letters.html', { 'letters' : first_letters,
-                                                           'querytime': [first_letters.queryTime()]},
-                                                          context_instance=RequestContext(request))
+    return render_to_response('findingaids/browse_letters.html',
+                              {'letters': title_letters()},
+                              context_instance=RequestContext(request))
 
 def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
-    first_letters = title_letters()
-
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)   
     show_pages = []
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
     show_pages = pages_to_show(paginator, fa_subset.number)
-    query_times = [first_letters.queryTime(), fa.queryTime()]
 
     return render_to_response('findingaids/titles_list.html',
         {'findingaids' : fa_subset,
-         'querytime': query_times,
-         'letters': first_letters,
+         'querytime': [fa.queryTime()],
+         'letters': title_letters(),
          'current_letter': letter,
          'show_pages' : show_pages},
          context_instance=RequestContext(request))

@@ -1,9 +1,15 @@
+from datetime import datetime
+
+from django.core.cache import cache
+from django.db import models
+
 from eulcore import xmlmap
-from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, SubordinateComponents, Index as EadIndex
+from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, \
+        SubordinateComponents, Index as EadIndex
 from eulcore.django.existdb.manager import Manager
 from eulcore.django.existdb.models import XmlModel
-from django.db import models
-from datetime import datetime
+
+
 
 
 # finding aid model
@@ -141,8 +147,13 @@ class ListTitle(XmlModel):
     objects = Manager(xpath)
 
 def title_letters():
-    "List of distinct, sorted first letters present in all Finding Aid titles."
-    return ListTitle.objects.only('first_letter').order_by('first_letter').distinct()
+    """Cached list of distinct, sorted first letters present in all Finding Aid titles.
+    Cached results should be refreshed after half an hour."""
+    cache_key = 'browse-title-letters'
+    if cache.get(cache_key) is None:
+        letters = ListTitle.objects.only('first_letter').order_by('first_letter').distinct()
+        cache.set(cache_key, list(letters), 30*60)  # refresh every half hour
+    return cache.get(cache_key)
 
 
 class Series(XmlModel, Component):
