@@ -62,6 +62,7 @@ def check_ead(filename, dbpath, xml=None):
         elif fa.count() == 1:
             # some inconsistency in when /db is included on exist collection names
             path = fa[0].collection_name.replace('/db', '') + "/" + fa[0].document_name
+#            print "DEBUG: comparing path %s with dbpath %s" % (path, dbpath)
             if path != dbpath:
                 errors.append("Database contains eadid '%s' in a different document (%s)"
                     % (ead.eadid, fa[0].document_name))            
@@ -112,7 +113,12 @@ def check_eadxml(ead):
         errors.append("Site expects only one archdesc/did/origination; found %d" \
                         % origination_count)
     # - no leading whitespace in list title
-    if re.match('\s+', ead.list_title.node.text):
+    title_node = ead.node.xpath("%s/text()" % ead.list_title_xpath)    
+    if hasattr(title_node[0], 'text'):
+        title_text = title_node[0].text
+    else:
+        title_text = str(title_node)
+    if re.match('\s+', title_text):
         # using node.text because unicode() normalizes, which obscures whitespace problems
         errors.append("Found leading whitespace in list title field (%s): '%s'" % \
                         (list_title_path, ead.list_title.node.text) )
@@ -123,12 +129,13 @@ def check_eadxml(ead):
         errors.append("First letter ('%s') of list title field %s does not match browse letter URL regex '%s'" % \
                       (ead.first_letter, list_title_path, TITLE_LETTERS) )
 
-    # leading whitespace in control access fields
-    for ca in ead.archdesc.controlaccess.controlaccess:
-        for term in ca.terms:
-            if re.match('\s+', term.value):
-                errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
-                             % (term.value, term.node.tag)) 
+    # leading whitespace in control access fields (if any)
+    if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:
+        for ca in ead.archdesc.controlaccess.controlaccess:
+            for term in ca.terms:
+                if re.match('\s+', term.value):
+                    errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
+                                 % (term.value, term.node.tag))
     return errors
    
 def check_series_ids(series):
@@ -173,13 +180,15 @@ def clean_ead(ead, filename):
     # remove any leading whitespace in list title fields
     # NOTE: only removing *leading* whitespace because these fields
     # can contain mixed content, and trailing whitespace here may be significant
-    # - list title fields - origination nodes and unittitle (text only - not any subelements like unitdate)
-    for field in ead.node.xpath('/ead/archdesc/origination/node()|/ead/archdesc/unittitle/text()'):
-        field = str(field).lstrip()
-    # - controlaccess fields
-    for ca in ead.archdesc.controlaccess.controlaccess:
-        for term in ca.terms:
-            term.value = term.value.lstrip()            
+    # - list title fields - origination nodes and unittitle
+    for field in ead.node.xpath('archdesc/did/origination/node()|archdesc/did/unittitle'):
+        if hasattr(field, 'text'):
+            field.text = str(field.text).lstrip()
+    # - controlaccess fields (if any)
+    if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:
+        for ca in ead.archdesc.controlaccess.controlaccess:
+            for term in ca.terms:
+                term.value = term.value.lstrip()            
 
     return ead
 

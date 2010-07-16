@@ -778,9 +778,12 @@ class UtilsTest(TestCase):
         eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558_invalid.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = clean_ead(ead, eadfile)
-        self.assertEqual(u'Hartsfield, William Berry.', unicode(ead.archdesc.origination))
-
-        self.assertEqual(u'William Berry Hartsfield papers, circa 1860s-1983', unicode(ead.unittitle))
+        # - no leading whitespace in list title
+        # ead.archdesc.origination is getting normalized, so can't be used for testing
+        origination = ead.node.xpath('//origination/persname')        
+        self.assertEqual(u'Hartsfield, William Berry.', origination[0].text)
+        # test the node text directly (does not include unitdate)
+        self.assertEqual(u'William Berry Hartsfield papers, ', ead.unittitle.node.text)        
         self.assertEqual(u'Gone with the wind (Motion picture)',
                         ead.archdesc.controlaccess.controlaccess[0].title[0].value)
         self.assertEqual(u'Allen, Ivan.',
@@ -789,7 +792,13 @@ class UtilsTest(TestCase):
                         ead.archdesc.controlaccess.controlaccess[3].subject[1].value)
         self.assertEqual(u'Motion pictures.',
                         ead.archdesc.controlaccess.controlaccess[-1].genre_form[0].value)
+        self.assertEqual(1, len(check_eadxml(ead)),
+            "only one error (duplicate origination) should be left in invalid test fixture after cleaning")
 
+        # special case - unittitle begins with a <title>  -- should not cause errors
+        eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
+        ead = load_xmlobject_from_file(eadfile, FindingAid)
+        ead = clean_ead(ead, eadfile)
 
 
 ### unit tests for findingaids.fa_admin.tasks
