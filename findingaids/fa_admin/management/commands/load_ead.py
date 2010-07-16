@@ -1,5 +1,6 @@
 from datetime import datetime
 import glob
+from optparse import make_option
 import os
 import sys
 from time import sleep
@@ -28,6 +29,14 @@ directory will be loaded."""
 
     args = '[<filename filename ... >]'
 
+    option_list = BaseCommand.option_list + (
+        make_option('--skip-pdf-reload', '-s',
+            action='store_true',
+            dest='skip_pdf_reload',
+            help='Skip reloading PDFs in the cache.'),
+        )
+
+
     def handle(self, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
@@ -46,6 +55,9 @@ directory will be loaded."""
                     % settings.FINDINGAID_EAD_SOURCE
             print 'Documents will be loaded to configured eXist collection: %s' \
                     % settings.EXISTDB_ROOT_COLLECTION
+            if options['skip_pdf_reload']:
+                print "** Skipping PDFs cache reload"
+                
         db = ExistDB()
 
         loaded = 0
@@ -68,7 +80,7 @@ directory will be loaded."""
                     if errors:
                         # report errors, don't load
                         errored += 1
-                        print "Error: document %s does not pass publication checks; not loading to eXist." % file
+                        print "Error: %s does not pass publication checks; not loading to eXist." % file
                         if verbosity >= v_normal:
                             print "  Errors found:"
                             for err in errors:
@@ -83,11 +95,14 @@ directory will be loaded."""
                                 print "Loaded %s" % file
                             # load the file as a FindingAid object to get the eadid for PDF reload
                             ead = load_xmlobject_from_file(file, FindingAid)
+
                             # trigger PDF regeneration in the cache and store task result
-                            pdf_tasks[ead.eadid] = reload_cached_pdf.delay(ead.eadid)
-                            # NOTE: unlike the web admin publish, this does not
-                            # generate TaskResult db records; task outcomes will be
-                            # checked & reported before the script finishes
+                            # - unless user has requested PDF reload be skipped
+                            if not options['skip_pdf_reload']:
+                                pdf_tasks[ead.eadid] = reload_cached_pdf.delay(ead.eadid)
+                                # NOTE: unlike the web admin publish, this does not
+                                # generate TaskResult db records; task outcomes will be
+                                # checked & reported before the script finishes
                         else:
                             errored += 1
                             print "Error: failed to load %s to eXist" % file
@@ -100,37 +115,38 @@ directory will be loaded."""
             print "%d document%s loaded" % (loaded, 's' if loaded != 1 else '')
             print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
 
-            # check on the status of PDF cache reload tasks and wait until they all finish
-            success, failed, pending = check_tasks(pdf_tasks)
-            msg = ''
-            while pending:
+            if not options['skip_pdf_reload']:
+                # check on the status of PDF cache reload tasks and wait until they all finish
+                success, failed, pending = check_tasks(pdf_tasks)
+                msg = ''
+                while pending:
+                    if verbosity >= v_normal:
+                        # back up the length of the last message so it can be overwritten
+                        for i in range(len(msg)):
+                            sys.stdout.write('\r')
+                        msg = "Waiting for %d PDF cache reload task%s to complete..." % \
+                                (len(pending), 's' if len(pending) != 1 else '')
+                        sys.stdout.write(msg)
+                        sys.stdout.flush()
+                    sleep(5)
+                    # check the remaining incomplete tasks, updating success/failure lists
+                    s, f, pending = check_tasks(pending)
+                    success.update(s)
+                    failed.update(f)
+
                 if verbosity >= v_normal:
-                    # back up the length of the last message so it can be overwritten
+                    # remove any last pending output message
                     for i in range(len(msg)):
                         sys.stdout.write('\r')
-                    msg = "Waiting for %d PDF cache reload task%s to complete..." % \
-                            (len(pending), 's' if len(pending) != 1 else '')
-                    sys.stdout.write(msg)
-                    sys.stdout.flush()
-                sleep(5)
-                # check the remaining incomplete tasks, updating success/failure lists
-                s, f, pending = check_tasks(pending)
-                success.update(s)
-                failed.update(f)
+                    print ''    # print a newline after any pending output
 
-            if verbosity >= v_normal:
-                # remove any last pending output message
-                for i in range(len(msg)):
-                    sys.stdout.write('\r')
-                print ''    # print a newline after any pending output
-                
-            print "Successfully reloaded PDFs for %d document%s" % \
-                    (len(success), 's' if len(success) != 1 else '')
-            if verbosity >= v_all:
-                print ', '.join(success.keys())
-            print "Failed to reloaded PDFs for %d document%s" % \
-                    (len(failed), 's' if len(failed) != 1 else '')
-            print ', '.join(failed.keys())
+                print "Successfully reloaded PDFs for %d document%s" % \
+                        (len(success), 's' if len(success) != 1 else '')
+                if verbosity >= v_all:
+                    print ', '.join(success.keys())
+                print "Failed to reloaded PDFs for %d document%s" % \
+                        (len(failed), 's' if len(failed) != 1 else '')
+                print ', '.join(failed.keys())
                     
             end_time = datetime.now()
             if verbosity >= v_normal:
