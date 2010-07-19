@@ -97,3 +97,6 @@ built-in django verbosity options.
  * **load_ead**
     .. autoclass:: findingaids.fa_admin.management.commands.load_ead.Command
        :members:
+* **response_times**
+    .. autoclass:: findingaids.fa.management.commands.response_times.Command
+       :members:
