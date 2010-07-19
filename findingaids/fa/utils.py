@@ -128,18 +128,9 @@ def ead_lastmodified(request, id, preview=False, *args, **kwargs):
     :param preview: load document from preview collection; defaults to False
     :rtype: :class:`datetime.datetime`
     """
-    # get document name and path by eadid, then call describeDocument
-    fa = get_findingaid(id, preview=preview, only=['document_name', 'collection_name'])
-    db = ExistDB()
-    info = db.describeDocument("%s/%s" % (fa.collection_name, fa.document_name))
-    dt = info['modified']
-    # NOTE: current version of xmlrpc ignores timezone, which messes up last-modified
-    # use a configured timezone from django settings
-    tz = settings.EXISTDB_SERVER_TIMEZONE
-    # use the exist time and configured timezone to create a timezone-aware datetime
-    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute,
-                    dt.second, dt.microsecond, tz)
-
+    # get document name last modified by eadid
+    fa = get_findingaid(id, preview=preview, only=['last_modified'])
+    return exist_datetime_with_timezone(fa.last_modified)
 
 def ead_etag(request, id, preview=False, *args, **kwargs):
     """Generate an Etag for an ead (specified by eadid) by requesting a SHA-1
@@ -151,6 +142,22 @@ def ead_etag(request, id, preview=False, *args, **kwargs):
     """
     fa = get_findingaid(id, preview=preview, only=['hash'])
     return fa.hash
+
+def collection_lastmodified(request, *args, **kwargs):
+    """Get the last modification time for the entire finding aid collection.
+    Used to generate last-modified header for :meth:`~findingaids.fa.views.titles_by_letter` view.
+    """
+    # most recently modified document in the eXist collection
+    fa_last = FindingAid.objects.order_by('-last_modified').only('last_modified')[0].last_modified
+    # most recently deleted document from sql DB
+    deleted = Deleted.objects.order_by('-date').all()
+    if deleted.exists():
+        deleted_last = deleted[0].date
+        # get most recent of the two
+        if deleted_last > fa_last:            
+            fa_last = deleted_last
+    # NOTE: potentially using configured exist TZ for non-eXist date...    
+    return exist_datetime_with_timezone(fa_last)
 
 # object pagination - adapted directly from django paginator documentation
 def paginate_queryset(request, qs, per_page=10, orphans=0):    # 0 is django default
@@ -164,7 +171,9 @@ def paginate_queryset(request, qs, per_page=10, orphans=0):    # 0 is django def
     # If page request (9999) is out of range, deliver last page of results.
     try:
         paginated_qs = paginator.page(page)
-    except (EmptyPage, InvalidPage):
+    except InvalidPage:
+        raise http.Http404
+    except EmptyPage:       # ??
         paginated_qs = paginator.page(paginator.num_pages)
 
     return paginated_qs, paginator
@@ -195,3 +204,16 @@ def ead_gone_or_404(view_method):
             return http.HttpResponseGone(t.render(RequestContext(request,
                                                         {'deleted' : deleted})))
     return decorator
+
+def exist_datetime_with_timezone(dt):
+    """Convert an 'offset-naive' datetime object into an 'offset-aware' datetime
+    using a configured timezone.
+
+    The current version of xmlrpclib ignores timezones, which messes up dates 
+    (e.g., when used for last-modified header).  This function uses a configured
+    timezone from django settings to convert a datetime to offset-aware.
+    """    
+    tz = settings.EXISTDB_SERVER_TIMEZONE
+    # use the exist time and configured timezone to create a timezone-aware datetime
+    return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute,
+                    dt.second, dt.microsecond, tz)

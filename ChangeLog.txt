@@ -7,6 +7,20 @@ any necessary information about installation, upgrade, or deployment
 notes.
 
 
+
+0.3 Enhanced Search
+-------------------
+
+Upgrade notes:
+
+1. Browse pages now include a last-modified header to enable caching.
+   However, any cache (e.g., Squid) should be configured so that
+   cached PDFs will be  kept and not released in order to cache pages
+   like these.
+
+
+
+
 0.2 Data Preparation / Admin site
 ---------------------------------
 

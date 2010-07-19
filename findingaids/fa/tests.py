@@ -1,6 +1,7 @@
 from datetime import datetime
 from os import path
 import re
+from time import sleep
 from types import ListType
 from lxml import etree
 
@@ -18,7 +19,8 @@ from eulcore.django.test import TestCase
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, Deleted
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.templatetags.ead import format_ead
-from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag
+from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
+    collection_lastmodified, exist_datetime_with_timezone
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
@@ -940,7 +942,7 @@ class UtilsTest(TestCase):
     def test_ead_lastmodified(self):
         modified = ead_lastmodified('rqst', 'abbey244')
         self.assert_(isinstance(modified, datetime),
-                     "_ead_lastmodified should return a datetime object")
+                     "ead_lastmodified should return a datetime object")
         date_format = '%Y-%m-%d'
         expected = datetime.now().strftime(date_format)
         value = modified.strftime(date_format)
@@ -967,6 +969,24 @@ class UtilsTest(TestCase):
                      'ead etag should be 40-character hex checksum, got %s' % checksum)
         # invalid eadid
         self.assertRaises(Http404, ead_etag, 'rqst', 'bogusid')
+
+    def test_collection_lastmodified(self):
+        modified = collection_lastmodified('rqst')
+        self.assert_(isinstance(modified, datetime),
+                     "collection_lastmodified should return a datetime object")
+       
+        # should equal last modified of abbey244 (last document loaded)
+        fa = FindingAid.objects.only('last_modified').get(eadid='abbey244')
+        self.assertEqual(exist_datetime_with_timezone(fa.last_modified), modified,
+            'collection last modified should be datetime of most recently modified document in collection')
+
+        # delete something after eXist document last-modified
+        sleep(1) # ensure deleted record is picked up as most recent
+        Deleted(eadid='eadid', title='test deleted record', date=datetime.now()).save()
+        record = Deleted.objects.get(eadid='eadid')     # retrieve datetime from DB
+        modified = collection_lastmodified('rqst')
+        self.assertEqual(exist_datetime_with_timezone(record.date), modified,
+            'collection last modified should be datetime of most recently deleted document in collection')
         
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index

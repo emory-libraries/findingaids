@@ -18,7 +18,8 @@ from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, t
 from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
-            ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404
+            ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
+            collection_lastmodified
 
 fa_listfields = ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
 "List of fields that should be returned for brief list display of a finding aid."
@@ -34,11 +35,15 @@ def browse_titles(request):
                               {'letters': title_letters()},
                               context_instance=RequestContext(request))
 
+@condition(last_modified_func=collection_lastmodified)
 def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)   
+    # NOTE: adding the "only" filter makes the query slower; removing it requires
+    # transferring and loading full xml for each document; currently, the view
+    # seems to load faster *with* only 
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)
     show_pages = []
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
     show_pages = pages_to_show(paginator, fa_subset.number)
@@ -228,7 +233,10 @@ def keyword_search(request):
         # common ead fields for list display, plus full-text relevance score
         return_fields = fa_listfields
         return_fields.append('fulltext_score')
-        results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('fulltext_score').only(*return_fields)
+        # NOTE: adding the "only" filter makes the query slower because eXist has
+        # to construct return results; the more documents in a result set, the bigger
+        # the cost in time - currently returning entire document plus fulltext relevance score
+        results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('-fulltext_score').also('fulltext_score') #.only(*return_fields)
         result_subset, paginator = paginate_queryset(request, results)
 
         query_times = results.queryTime()
