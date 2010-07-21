@@ -22,6 +22,12 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
       Additional fields and methods are used for search, browse, and display.
     """
 
+    # NOTE: overridding these fields from EncodedArchivalDescription to allow
+    # for efficiently retrieving unittitle and abstract in the full document OR
+    # in the constructed return object returned from eXist for search/browse
+    unittitle = xmlmap.NodeField('//unittitle[not(ancestor::dsc)]', xmlmap.XmlObject)
+    abstract = xmlmap.NodeField('//abstract[not(ancestor::dsc)]', xmlmap.XmlObject)
+
     list_title_xpaths = ["archdesc/did/origination/corpname",
         "archdesc/did/origination/famname",
         "archdesc/did/origination/persname",
@@ -138,7 +144,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
 
-    xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)    
+    xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)
     # xpath to use for alpha-browse - using list title xpaths from FindingAid
     
     # first letter of list title field (using generic item field to avoid string() conversion)

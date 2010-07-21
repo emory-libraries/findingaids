@@ -1020,9 +1020,9 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search for "family papers" should return 5 test finding aids')
         self.assertContains(response, "Fannie Lee Leverette scrapbooks",
             msg_prefix='search for "family papers" should include Leverette')
-        self.assertContains(response, "Raoul family papers",
+        self.assertPattern("Raoul .*family.* .*papers", response.content,   # exist-match highlighting
             msg_prefix='search for "family papers" should include raoul')
-        self.assertContains(response, "Bailey and Thurman families papers",
+        self.assertPattern("Bailey and Thurman families .*papers", response.content,
             msg_prefix='search for "family papers" should include bailey')
         self.assertContains(response, "Abbey Theatre collection",
             msg_prefix='search for "family papers" should include abbey theatre')

@@ -21,8 +21,12 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified
 
-fa_listfields = ['eadid', 'list_title','unittitle', 'abstract', 'physical_desc']
+fa_listfields = ['eadid', 'list_title','archdesc__did']
 "List of fields that should be returned for brief list display of a finding aid."
+# NOTE: returning archdesc/did as a single chunk instead of unittitle, abstract,
+# and physdesc individually because eXist can construct the return xml much more
+# efficiently; unittitle and abstract should be accessed via FindingAid.unittitle
+# and FindingAid.abstract
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
@@ -93,7 +97,7 @@ def full_fa(request, id, mode, preview=False):
     """View the full contents of a single finding aid as PDF or plain html.
 
     :param id: eadid for the document to be displayed
-    :param mode: one of 'html' or 'pdf' - not that the html mode is not publicly
+    :param mode: one of 'html' or 'pdf' - note that the html mode is not publicly
             linked anywhere, and is intended mostly for development and testing
             of the PDF display
     :param preview: boolean indicating preview mode, defaults to False
@@ -236,7 +240,7 @@ def keyword_search(request):
         # NOTE: adding the "only" filter makes the query slower because eXist has
         # to construct return results; the more documents in a result set, the bigger
         # the cost in time - currently returning entire document plus fulltext relevance score
-        results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('-fulltext_score').also('fulltext_score') #.only(*return_fields)
+        results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('-fulltext_score').only(*return_fields) #.also('fulltext_score') #.only(*return_fields)
         result_subset, paginator = paginate_queryset(request, results)
 
         query_times = results.queryTime()
