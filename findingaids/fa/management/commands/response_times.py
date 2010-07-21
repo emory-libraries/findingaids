@@ -26,10 +26,6 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
             action='store_true',
             dest='xquery_only',
             help='Only test xquery times'),
-        make_option('--url', '-u',
-            action='store',
-            dest='url',
-            help='Base url - required for testing page load times'),
         )
 
     threshold = 5000
@@ -41,8 +37,6 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
         v_all = 2
-
-        url = options['url']
 
         if cmd not in self._args:
             print "Command '%s' not recognized\n" % cmd
@@ -62,7 +56,7 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
                 # eXist query times only (without page rendering / content returned)
                 for letter in first_letters:
                     # same query used in browse view
-                    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title') #.only(*fa_listfields)
+                    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)
                     time, total = fa.queryTime(), fa.count()
                     query_times[letter] = time
                     if verbosity >= v_normal:
@@ -81,7 +75,7 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
                 query_times = {}
                 for letter in first_letters:
                     current_times = {}  # times for the current letter
-                    uri = "%s/titles/%s" % (url.rstrip('/'), letter)
+                    uri = "/titles/%s" % letter
                     if verbosity == v_all:
                         print letter
                     for page in range(1,11):
