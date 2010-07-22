@@ -79,7 +79,8 @@ def restore_publish_collection():
     if _stored_publish_collection is not None:
         settings.EXISTDB_ROOT_COLLECTION = _stored_publish_collection
 
-def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=None):
+def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=None,
+        filter=None):
     """Retrieve a  :class:`~findingaids.fa.models.FindingAid` (or
     :class:`~findingaids.fa.models.FindingAid`  :class:`eulcore.django.existdb.manager.Manager`)
     from eXist by eadid, with any query options specified.  Raises a 
@@ -96,6 +97,7 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
     :param only: optional list of fields to return (**only** return the specified fields)
     :param also: optional list of additional fields to return
     :param order_by: optional field to use for sorting
+    :param filter: optional queryset filter to apply, in dictionary form
     :returns: :class:`~findingaids.fa.models.FindingAid` (when eadid is specified)
             or a :class:`~findingaids.fa.models.FindingAid` :class:`eulcore.django.existdb.manager.Manager`
             (if no eadid is specified)
@@ -110,6 +112,8 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
             fa = fa.also(*also)
         if order_by is not None:
             fa = fa.order_by(order_by)
+        if filter is not None:
+            fa = fa.filter(**filter)
         if eadid is not None:
             fa = fa.get(eadid=eadid)
     except DoesNotExist:

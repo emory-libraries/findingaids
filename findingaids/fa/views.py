@@ -48,7 +48,7 @@ def titles_by_letter(request, letter):
     """
     # NOTE: adding the "only" filter makes the query slower; removing it requires
     # transferring and loading full xml for each document; currently, the view
-    # seems to load faster *with* only 
+    # seems to load faster *with* only
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)
     show_pages = []
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
@@ -87,9 +87,11 @@ def view_fa(request, id, preview=False):
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms})
+        filter = {'fulltext_terms': search_terms}
     else:
         url_params = ''
-    fa = get_findingaid(id, preview=preview)
+        filter = {}
+    fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
@@ -173,10 +175,12 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms})
+        filter = {'fulltext_terms': search_terms}
     else:
         url_params = ''
+        filter = {}
     # get the item to be displayed (series, subseries, index)
-    result = _get_series_or_index(eadid, *series_ids)
+    result = _get_series_or_index(eadid, *series_ids, filter=filter)
     # info needed to construct navigation links within this ead
     # - summary info for all top-level series in this finding aid
     all_series = Series.objects.only('id', 'level', 'did__unitid', \
@@ -229,21 +233,40 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
         'ead__dsc__head']
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
+
+    if 'filter' in kwargs:
+        filter = kwargs['filter']
     try:
         if len(series_ids) == 1:
             # if there is only on id, either a series or index is requested
             try:
-                record = Series.objects.also(*return_fields).get(**search_fields)
+                # try to find a series first (more common)
+                queryset = Series.objects.also(*return_fields).filter(**search_fields)
+                if filter:
+                    queryset = queryset.filter(**filter)
+                record = queryset.get()
             except DoesNotExist:
-                record = Index.objects.also(*return_fields).get(**search_fields)
+                # if series is not found, look for an index
+                queryset = Index.objects.also(*return_fields).filter(**search_fields)
+                if filter:
+                    queryset = queryset.filter(**filter)
+                record = queryset.get()
         elif len(series_ids) == 2:
             return_fields.append('series__id')
             search_fields["series__id"] = series_ids[0]
-            record = Subseries.objects.also(*return_fields).get(**search_fields)
+            queryset = Subseries.objects
         elif len(series_ids) == 3:
             return_fields.extend(['series__id', 'subseries__id'])
             search_fields.update({"series__id": series_ids[0], "subseries__id" : series_ids[1]})
-            record = Subsubseries.objects.also(*return_fields).get(**search_fields)
+            queryset = Subsubseries.objects
+        
+        queryset = queryset.filter(**search_fields).also(*return_fields)
+        # if there are any additional filters specified, apply before getting item
+        # NOTE: applying search fields filter first because it should be faster (find by id)
+        if filter:
+            queryset = queryset.filter(**filter)
+        record = queryset.get()
+        
     except DoesNotExist:
         raise Http404
     return record
