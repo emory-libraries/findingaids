@@ -46,50 +46,47 @@ directory will be cleaned."""
         updated = 0
         unchanged = 0
         errored = 0
-        try:
-            if len(args):
-                files = [os.path.join(settings.FINDINGAID_EAD_SOURCE, name) for name in args]
-            else:
-                files = glob.iglob(os.path.join(settings.FINDINGAID_EAD_SOURCE, '*.xml'))
-                self.db = ExistDB()
+
+        if len(args):
+            files = [os.path.join(settings.FINDINGAID_EAD_SOURCE, name) for name in args]
+        else:
+            files = glob.iglob(os.path.join(settings.FINDINGAID_EAD_SOURCE, '*.xml'))
+            self.db = ExistDB()
 
 
-            for file in files:
-                try:
-                    ead = load_xmlobject_from_file(file, FindingAid)
-                    orig_xml = ead.serialize(pretty=True)
-                    ead = clean_ead(ead, file)
-                    # sanity check before saving
-                    dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
-                    errors = check_ead(file, dbpath, xml=ead.serialize())
-                    if errors:
-                        errored += 1                        
-                        print "Cleaned EAD for %s does not pass sanity checks, not saving." % file
-                        if verbosity >= v_normal:
-                            print "  Errors found:"
-                            for err in errors:
-                                print "    %s" % err
-                    elif orig_xml == ead.serialize(pretty=True):
-                        if verbosity >= v_normal:
-                            print "No changes made to %s" % file
-                        unchanged += 1
-                    else:
-                        with open(file, 'w') as f:
-                            ead.serialize(f, pretty=True)
-                        if verbosity >= v_normal:
-                            print "Updated %s" % file
-                        updated += 1
-                except XMLSyntaxError, e:
-                    # xml is not well-formed
-                    print "Error: failed to load %s (document not well-formed XML?)" \
-                                % file
+        for file in files:
+            try:
+                ead = load_xmlobject_from_file(file, FindingAid)
+                orig_xml = ead.serialize(pretty=True)
+                ead = clean_ead(ead, file)
+                # sanity check before saving
+                dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
+                errors = check_ead(file, dbpath, xml=ead.serialize())
+                if errors:
                     errored += 1
+                    print "Cleaned EAD for %s does not pass sanity checks, not saving." % file
+                    if verbosity >= v_normal:
+                        print "  Errors found:"
+                        for err in errors:
+                            print "    %s" % err
+                elif orig_xml == ead.serialize(pretty=True):
+                    if verbosity >= v_normal:
+                        print "No changes made to %s" % file
+                    unchanged += 1
+                else:
+                    with open(file, 'w') as f:
+                        ead.serialize(f, pretty=True)
+                    if verbosity >= v_normal:
+                        print "Updated %s" % file
+                    updated += 1
+            except XMLSyntaxError, e:
+                # xml is not well-formed
+                print "Error: failed to load %s (document not well-formed XML?)" \
+                            % file
+                errored += 1
 
-            # summary of what was done
-            print "%d document%s updated" % (updated, 's' if updated != 1 else '')
-            print "%d document%s unchanged" % (unchanged, 's' if unchanged != 1 else '')
-            print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
+        # summary of what was done
+        print "%d document%s updated" % (updated, 's' if updated != 1 else '')
+        print "%d document%s unchanged" % (unchanged, 's' if unchanged != 1 else '')
+        print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
             
-        except Exception, err:
-            raise CommandError(err)
-
