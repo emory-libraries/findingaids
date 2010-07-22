@@ -27,6 +27,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # in the constructed return object returned from eXist for search/browse
     unittitle = xmlmap.NodeField('//unittitle[not(ancestor::dsc)]', xmlmap.XmlObject)
     abstract = xmlmap.NodeField('//abstract[not(ancestor::dsc)]', xmlmap.XmlObject)
+    physical_desc = xmlmap.StringField('//physdesc[not(ancestor::dsc)]')
 
     list_title_xpaths = ["archdesc/did/origination/corpname",
         "archdesc/did/origination/famname",
@@ -137,7 +138,8 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         fields["language"] = set(self.profiledesc.language_codes)
         fields["subject"] = set(self.dc_subjects)
         fields["contributor"] = set(self.dc_contributors)
-        fields["identifier"] = set([self.eadid])
+        # TODO: use ARKs for dc:identifier when we have them
+        #fields["identifier"] = set([self.eadid])
         
         return fields
 
