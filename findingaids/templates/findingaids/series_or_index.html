@@ -5,6 +5,13 @@
 
 {% block page-subtitle %}: {{ ead.title }} : {% firstof series.display_label index.head %}{% endblock %}
 
+{% block page-head %}
+  {{block.super}}
+  {% if url_params %}  {# don't index highlighted pages, link non-highlighted page as canonical #}
+   <meta name="robots" content="noindex,nofollow" />
+   <link rel="canonical" href="{{ canonical_url }}" />
+  {% endif %}
+{% endblock %}
 
 {% block content-title %}
 {# generate and store url for main finding aid page #}

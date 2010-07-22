@@ -3,12 +3,16 @@
 
 {% block page-head %}
   {{block.super}}
+  {% if url_params %}  {# don't index highlighted pages, link non-highlighted page as canonical #}
+   <meta name="robots" content="noindex,nofollow" />
+   <link rel="canonical" href="{% ifurl preview fa-admin:preview:view-fa fa:view-fa id=findingaid.eadid %}" />
+  {% endif %}
+  <link rel="alternate" type="application/xml" href="{% ifurl preview fa-admin:preview:xml-fa fa:xml-fa id=findingaid.eadid %}" />
+  <link rel="alternate" media="print" type="application/pdf" href="{% ifurl preview fa-admin:preview:printable-fa fa:printable-fa id=findingaid.eadid %}" />
   {# embed Dublin Core metadata for this finding aid in the html header #}
   {% with findingaid.dc_fields as dc_fields %}
     {% include "findingaids/sections/_dc_meta.html" %}
   {% endwith %}
-  <link rel="alternate" type="application/xml" href="{% ifurl preview fa-admin:preview:xml-fa fa:xml-fa id=findingaid.eadid %}" />
-  <link rel="alternate" media="print" type="application/pdf" href="{% ifurl preview fa-admin:preview:printable-fa fa:printable-fa id=findingaid.eadid %}" />
 {% endblock %}
 
 {% block page-subtitle %}: {{ findingaid.title }}{% endblock %}

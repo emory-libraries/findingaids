@@ -2,6 +2,12 @@
 
 {% block page-subtitle %}: Search Results {% endblock %}
 
+{% block page-head %}
+  {{block.super}}  {# direct search engines not to index search pages #}
+  <meta name="robots" content="noindex,nofollow" />
+{% endblock %}
+
+
 {% block content-title %}Search Results{% endblock %}
 
 {% block content-body %}

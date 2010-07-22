@@ -365,6 +365,9 @@ class FaViewsTest(TestCase):
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'bailey807'}))
         self.assertNotContains(response, 'Creator:')
 
+        self.assertNotContains(response, '<meta name="robots" content="noindex,nofollow"',
+            msg_prefix="non-highlighted finding aid does NOT include robots directives noindex, nofollow")
+
     def test_view__fa_with_series(self):
         fa_url = reverse('fa:view-fa', kwargs={'id': 'abbey244'})
         response = self.client.get(fa_url)
@@ -534,6 +537,8 @@ class FaViewsTest(TestCase):
         self.assertPattern('3.*13.*Miscellaneous correspondence, undated', response.content,
             "last content of series 1")
 
+        self.assertNotContains(response, '<meta name="robots" content="noindex,nofollow"',
+            msg_prefix="non-highlighted series does NOT include robots directives noindex, nofollow")
 
     def test_view_subseries__raoul_series1_6(self):
         subseries_url = reverse('fa:view-subseries', kwargs={'id': 'raoul548',
@@ -1017,6 +1022,9 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '%s?keywords=raoul' % reverse('fa:view-fa', kwargs={'id': 'raoul548'}),
             msg_prefix='link to finding aid includes search terms')
 
+        self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
+            msg_prefix="search results page includes robots directives - noindex, nofollow")
+
         response = self.client.get(search_url, { 'keywords' : 'family papers'})
         expected = 200
         self.assertEqual(response.status_code, expected,
@@ -1049,7 +1057,7 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search for nonexistent term should indicate no matches found')
 
 
-    def test_view_fa_highlighted(self):
+    def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting
         fa_url = reverse('fa:view-fa', kwargs={'id': 'raoul548'})
         response = self.client.get(fa_url, {'keywords': 'raoul georgia'})
@@ -1067,8 +1075,15 @@ class FullTextFaViewsTest(TestCase):
                         'subseries_id': 'raoul548_100904'}),
                 msg_prefix="subseries link includes search terms")
 
-    def test_view_series_highlighted(self):
+        self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
+            msg_prefix="highlighted finding aid includes robots directives - noindex, nofollow")
+        self.assertContains(response, '<link rel="canonical" href="%s"' % fa_url,
+            msg_prefix="highlighted finding aid includes link to canonical finding aid url")
+
+
+    def test_view_highlighted_series(self):
         # single series in a finding aid, with search-term highlighting
+        # NOTE: series, subseries, and index all use the same view
         series_url = reverse('fa:series-or-index',
                     kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'})
         response = self.client.get(series_url, {'keywords': 'raoul georgia'})
@@ -1085,6 +1100,28 @@ class FullTextFaViewsTest(TestCase):
                 %  reverse('fa:view-subseries', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
                         'subseries_id': 'raoul548_4.1'}),
                 msg_prefix="subseries link includes search terms")      
+
+        self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
+            msg_prefix="highlighted finding aid series includes robots directives - noindex, nofollow")
+        self.assertContains(response, '<link rel="canonical" href="%s"' % series_url,
+            msg_prefix="highlighted finding aid series includes link to canonical url")
+
+    def test_view_highlighted_subseries(self):
+        # single subseries in a finding aid, with search-term highlighting
+        series_url = reverse('fa:view-subseries', kwargs={'id': 'raoul548',
+                'series_id': 'raoul548_s4', 'subseries_id': 'raoul548_4.1'})
+        response = self.client.get(series_url, {'keywords': 'raoul georgia'})
+        self.assertContains(response, '<link rel="canonical" href="%s"' % series_url,
+            msg_prefix="highlighted finding aid subseries includes link to canonical url")
+
+    def test_view_highlighted_index(self):
+        # single index in a finding aid, with search-term highlighting
+        index_url = reverse('fa:series-or-index',
+                    kwargs={'id': 'raoul548', 'series_id': 'index1'})
+        response = self.client.get(index_url, {'keywords': 'raoul georgia'})
+        self.assertContains(response, '<link rel="canonical" href="%s"' % index_url,
+            msg_prefix="highlighted finding aid index includes link to canonical url")
+
 
 
 class FormatEadTestCase(DjangoTestCase):

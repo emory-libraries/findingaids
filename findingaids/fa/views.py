@@ -22,7 +22,7 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified
 
-fa_listfields = ['eadid', 'list_title','archdesc__did'] 
+fa_listfields = ['eadid', 'list_title','archdesc__did']
 "List of fields that should be returned for brief list display of a finding aid."
 # NOTE: returning archdesc/did as a single chunk instead of unittitle, abstract,
 # and physdesc individually because eXist can construct the return xml much more
@@ -84,12 +84,12 @@ def view_fa(request, id, preview=False):
     :param id: eadid for the document to view
     :param preview: boolean indicating preview mode, defaults to False
     """
-    fa = get_findingaid(id, preview=preview)
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms})
     else:
         url_params = ''
+    fa = get_findingaid(id, preview=preview)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
@@ -169,7 +169,12 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     """
     if 'preview' in kwargs and kwargs['preview']:
         use_preview_collection()
-        
+
+    if 'keywords' in request.GET:
+        search_terms = request.GET['keywords']
+        url_params = '?' + urlencode({'keywords': search_terms})
+    else:
+        url_params = ''
     # get the item to be displayed (series, subseries, index)
     result = _get_series_or_index(eadid, *series_ids)
     # info needed to construct navigation links within this ead
@@ -190,12 +195,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     prev= index -1
     next = index +1
 
-    if 'keywords' in request.GET:
-        search_terms = request.GET['keywords']
-        url_params = '?' + urlencode({'keywords': search_terms})
-    else:
-        url_params = ''
-
+    
     render_opts = { 'ead': result.ead,
                     'all_series' : all_series,
                     'all_indexes' : all_indexes,
@@ -203,6 +203,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'prev': prev,
                     'next': next,
                     'url_params': url_params,
+                    'canonical_url' : _series_url(eadid, *series_ids),
                     }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
@@ -216,7 +217,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     return render_to_response('findingaids/series_or_index.html',
                             render_opts, context_instance=RequestContext(request))
 
-def _get_series_or_index(eadid, *series_ids):
+def _get_series_or_index(eadid, *series_ids, **kwargs):
     """Retrieve a series or index from a Finding Aid.
 
     :param eadid: eadid for the document the series or index belongs to
@@ -230,10 +231,11 @@ def _get_series_or_index(eadid, *series_ids):
     search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
     try:
         if len(series_ids) == 1:
+            # if there is only on id, either a series or index is requested
             try:
                 record = Series.objects.also(*return_fields).get(**search_fields)
             except DoesNotExist:
-                record = Index.objects.also(*return_fields).get(**search_fields)                
+                record = Index.objects.also(*return_fields).get(**search_fields)
         elif len(series_ids) == 2:
             return_fields.append('series__id')
             search_fields["series__id"] = series_ids[0]
