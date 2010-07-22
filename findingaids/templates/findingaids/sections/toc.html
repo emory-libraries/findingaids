@@ -6,17 +6,17 @@
 <div id="toc">
     <h2>Table of contents:</h2>
     <ul>
-         <li><a href="{{ ead_url }}#descriptive_summary">Descriptive Summary</a></li>
-         <li><a href="{{ ead_url }}#administrative_information">Administrative Information</a></li>
-         <li><a href="{{ ead_url }}#collection_description">Collection Description</a></li>
+         <li><a href="{{ ead_url }}{{ url_params }}#descriptive_summary">Descriptive Summary</a></li>
+         <li><a href="{{ ead_url }}{{ url_params }}#administrative_information">Administrative Information</a></li>
+         <li><a href="{{ ead_url }}{{ url_params }}#collection_description">Collection Description</a></li>
          {% if ead.archdesc.controlaccess.head %}
-           <li><a href="{{ ead_url }}#control_access">{{ ead.archdesc.controlaccess.head }}</a></li>
+           <li><a href="{{ ead_url }}{{ url_params }}#control_access">{{ ead.archdesc.controlaccess.head }}</a></li>
          {% endif %}         
           {% if all_indexes %}
              {% for toc_index in all_indexes %}
                 {% ifequal index.id toc_index.id %}<li>{{ toc_index.head }}</li>
                 {% else %} {# if on index page, don't link currently displayed index #}
-                    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=toc_index.id %}">{{ toc_index.head }}</a></li>
+                    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=toc_index.id %}{{ url_params }}">{{ toc_index.head }}</a></li>
                 {% endifequal %}
              {% endfor %}
          {% endif %}

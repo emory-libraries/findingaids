@@ -1,5 +1,6 @@
 import datetime
 from dateutil.tz import tzlocal
+from urllib import urlencode
 
 from django.http import HttpResponse
 from django.http import Http404
@@ -21,12 +22,13 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified
 
-fa_listfields = ['eadid', 'list_title','archdesc__did']
+fa_listfields = ['eadid', 'list_title','archdesc__did'] 
 "List of fields that should be returned for brief list display of a finding aid."
 # NOTE: returning archdesc/did as a single chunk instead of unittitle, abstract,
 # and physdesc individually because eXist can construct the return xml much more
 # efficiently; unittitle and abstract should be accessed via FindingAid.unittitle
 # and FindingAid.abstract
+# FIXME: could list title be pulled from did also?
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
@@ -82,12 +84,20 @@ def view_fa(request, id, preview=False):
     :param id: eadid for the document to view
     :param preview: boolean indicating preview mode, defaults to False
     """
-    fa = get_findingaid(id, preview=preview)        
-    series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview)
+    fa = get_findingaid(id, preview=preview)
+    if 'keywords' in request.GET:
+        search_terms = request.GET['keywords']
+        url_params = '?' + urlencode({'keywords': search_terms})
+    else:
+        url_params = ''
+    series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
+        url_params=url_params)
     return render_to_response('findingaids/view.html', { 'findingaid' : fa,
                                                          'series' : series,
-                                                         'all_indexes' : fa.archdesc.index,
-                                                         'preview': preview},
+                                                         'all_indexes' : fa.archdesc.index,                                                         
+                                                         'preview': preview,
+                                                         'url_params': url_params,
+                                                         },
                                                          context_instance=RequestContext(request, current_app='preview'))
 
 
@@ -180,12 +190,20 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     prev= index -1
     next = index +1
 
+    if 'keywords' in request.GET:
+        search_terms = request.GET['keywords']
+        url_params = '?' + urlencode({'keywords': search_terms})
+    else:
+        url_params = ''
+
     render_opts = { 'ead': result.ead,
                     'all_series' : all_series,
                     'all_indexes' : all_indexes,
                     "querytime" : [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()],
                     'prev': prev,
-                    'next': next}
+                    'next': next,
+                    'url_params': url_params,
+                    }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
@@ -193,7 +211,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         render_opts['index'] = result
     else:
         render_opts['series'] = result
-        render_opts['subseries'] = _subseries_links(result)
+        render_opts['subseries'] = _subseries_links(result, url_params=url_params)
 
     return render_to_response('findingaids/series_or_index.html',
                             render_opts, context_instance=RequestContext(request))
@@ -250,6 +268,7 @@ def keyword_search(request):
         return render_to_response('findingaids/search_results.html',
                 {'findingaids' : result_subset,
                  'keywords'  : search_terms,
+                 'url_params' : '?' + urlencode({'keywords': search_terms}),
                  'querytime': [query_times]},
                  context_instance=RequestContext(request))
     else:
@@ -295,7 +314,8 @@ def _series_anchor(*ids, **extra_opts):
     # only actually use the last of all ids passed in
     return "#%s" % ids[-1]
 
-def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=False):
+def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=False,
+        url_params=''):
     """
     Recursive function to build a nested list of links to series and subseries
     to simplify template display logic for complicated series.  Note that the list
@@ -311,6 +331,8 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
     :param url_callback: method to use for generating the series url
     :param preview: boolean; when True, links will be generated for preview urls.
             Optional, defaults to False.
+    :param url_params: optional string to add to the end of urls (e.g., for search
+            term highlighting)
     """
     # construct url ids if none are passed
     if url_ids is None:
@@ -349,9 +371,13 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                 rel='section'
             elif (component.node.tag in ['c02', 'c03']):
                 rel='subsection'
-            text = "<a href='%s' rel='%s'>%s</a>" % (url_callback(*current_url_ids, preview=preview), rel,  component.display_label())
+            text = "<a href='%(url)s%(url_params)s' rel='%(rel)s'>%(linktext)s</a>" % \
+                {'url': url_callback(*current_url_ids, preview=preview),
+                 'url_params': url_params,
+                 'rel': rel,
+                 'linktext':  component.display_label()}
             links.append(text)
             if component.hasSubseries():
                 links.append(_subseries_links(component, url_ids=current_url_ids, \
-                    url_callback=url_callback, preview=preview))
+                    url_callback=url_callback, preview=preview, url_params=url_params))
     return links

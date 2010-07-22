@@ -105,7 +105,8 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_("Irish drama--20th century." in fields["subject"])
         self.assert_("Theater--Ireland--20th century." in fields["subject"])
         self.assert_("Dublin (Ireland)" in fields["subject"])
-        self.assert_("abbey244" in fields["identifier"])
+        # TODO: dc:identifier will be ARK, once we add them
+        #self.assert_("abbey244" in fields["identifier"])
 
         fields = self.findingaid['bailey807'].dc_fields()
         self.assert_("Bailey, I. G. (Issac George), 1847-1914." in fields["contributor"])
@@ -267,8 +268,8 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<meta name="DC.subject" content="Irish drama--20th century." />')
         self.assertContains(response, '<meta name="DC.subject" content="Theater--Ireland--20th century." />')
         self.assertContains(response, '<meta name="DC.subject" content="Dublin (Ireland)" />')
-        #identifier
-        self.assertContains(response, '<meta name="DC.identifier" content="abbey244" />')
+        #identifier - TODO (use ARK)
+        #self.assertContains(response, '<meta name="DC.identifier" content="abbey244" />')
 
         response = self.client.get(reverse('fa:view-fa', kwargs = {'id': 'bailey807'}))
         #title
@@ -730,7 +731,11 @@ class FaViewsTest(TestCase):
         # series 4.1 sub-subseries
         self.assert_(isinstance(links[-1][1], ListType))
         self.assert_("Subseries 4.1a:" in links[-1][1][0])
-        
+
+        # url params to add to url (e.g., keyword search terms)
+        links = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_params='?keywords=search+me')
+        self.assert_("?keywords=search+me'" in links[0]) # series url
+        self.assert_("?keywords=search+me'" in links[1][0]) # subseries url
 
 
     def test__subseries_links(self):
@@ -1009,6 +1014,8 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search for raoul includes link to raoul finding aid')
         self.assertContains(response, "<div class=\"relevance\">",
             msg_prefix='search results include relevance indicator')
+        self.assertContains(response, '%s?keywords=raoul' % reverse('fa:view-fa', kwargs={'id': 'raoul548'}),
+            msg_prefix='link to finding aid includes search terms')
 
         response = self.client.get(search_url, { 'keywords' : 'family papers'})
         expected = 200
@@ -1030,6 +1037,8 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search for "family papers" should include pomerantz')
         self.assertContains(response, "<div class=\"relevance\">", 5,
             msg_prefix='search results return one relevance indicator for each match')
+        self.assertContains(response, '%s?keywords=family+papers' % reverse('fa:view-fa', kwargs={'id': 'leverette135'}),
+            msg_prefix='link to finding aid includes search terms')
 
         response = self.client.get(search_url, { 'keywords' : 'nonexistentshouldmatchnothing'})
         expected = 200
@@ -1038,6 +1047,44 @@ class FullTextFaViewsTest(TestCase):
                         (expected, response.status_code, search_url))
         self.assertContains(response, "No finding aids matched",
             msg_prefix='search for nonexistent term should indicate no matches found')
+
+
+    def test_view_fa_highlighted(self):
+        # view a finding aid with search-term highlighting
+        fa_url = reverse('fa:view-fa', kwargs={'id': 'raoul548'})
+        response = self.client.get(fa_url, {'keywords': 'raoul georgia'})
+        self.assertContains(response, '%s?keywords=raoul+georgia#descriptive_summary' \
+                % reverse('fa:view-fa',  kwargs={'id': 'raoul548'}),
+                msg_prefix="descriptive summary anchor-link includes search terms")
+        self.assertContains(response, '%s?keywords=raoul+georgia' \
+                % reverse('fa:series-or-index',  kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'}),
+                msg_prefix="series link includes search terms")
+        self.assertContains(response, '%s?keywords=raoul+georgia' \
+                % reverse('fa:series-or-index',  kwargs={'id': 'raoul548', 'series_id': 'index1'}),
+                msg_prefix="index link includes search terms")
+        self.assertContains(response, '%s?keywords=raoul+georgia' \
+                %  reverse('fa:view-subseries', kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
+                        'subseries_id': 'raoul548_100904'}),
+                msg_prefix="subseries link includes search terms")
+
+    def test_view_series_highlighted(self):
+        # single series in a finding aid, with search-term highlighting
+        series_url = reverse('fa:series-or-index',
+                    kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'})
+        response = self.client.get(series_url, {'keywords': 'raoul georgia'})
+        self.assertContains(response, '%s?keywords=raoul+georgia' \
+                % reverse('fa:view-fa',  kwargs={'id': 'raoul548'}),
+                msg_prefix="link back to main FA page includes search terms")
+        self.assertContains(response, '%s?keywords=raoul+georgia' \
+                % reverse('fa:series-or-index',  kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223'}),
+                msg_prefix="link to other series includes search terms")
+        self.assertContains(response, '%s?keywords=raoul+georgia' \
+                % reverse('fa:series-or-index',  kwargs={'id': 'raoul548', 'series_id': 'index1'}),
+                msg_prefix="index link includes search terms")
+        self.assertContains(response, '%s?keywords=raoul+georgia' \
+                %  reverse('fa:view-subseries', kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
+                        'subseries_id': 'raoul548_4.1'}),
+                msg_prefix="subseries link includes search terms")      
 
 
 class FormatEadTestCase(DjangoTestCase):

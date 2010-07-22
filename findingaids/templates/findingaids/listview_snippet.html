@@ -7,11 +7,11 @@
 	<div class="score" style="width:{% widthratio fa.fulltext_score  1 100 %}px">&nbsp;</div>
       </div>	
     {% endif %}
-    <p><a href="{% url fa:view-fa fa.eadid %}">{{ fa.list_title|format_ead }}</a> </p>
+    <p><a href="{% url fa:view-fa fa.eadid %}{{ url_params }}">{{ fa.list_title|format_ead }}</a> </p>
     {# only show unittitle if different from list title; usings slugs to ignore whitespace differences #}
     {% ifnotequal fa.unittitle|slugify fa.list_title|slugify %}
         <p>{{ fa.unittitle|format_ead }}</p>
     {% endifnotequal %}
-    <p>{{ fa.physical_desc }}</p>	
+    <p>{{ fa.physical_desc }}</p>
     <p class="abstract">{{ fa.abstract|format_ead }}</p>
 </div>

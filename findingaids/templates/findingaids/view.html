@@ -32,7 +32,7 @@
 <h2><a href="#dsc">{{ findingaid.dsc.head}}</a></h2>
 <ul>
     {% for component in findingaid.dsc.c %}
-    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=findingaid.eadid,series_id=component.id %}" rel="section">
+    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=findingaid.eadid,series_id=component.id %}{{ url_params }}" rel="section">
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
         {{ component.did.unittitle|format_ead }}</a>
      </li>

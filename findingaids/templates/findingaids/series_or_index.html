@@ -9,7 +9,7 @@
 {% block content-title %}
 {# generate and store url for main finding aid page #}
 {% ifurl preview fa-admin:preview:view-fa fa:view-fa id=ead.eadid as ead_url %}
-  <a href="{{ ead_url }}" rel="contents">{{ ead.title }}</a>
+  <a href="{{ ead_url }}{{ url_params }}" rel="contents">{{ ead.title }}</a>
 {% endblock %}
 
 {% block content-body %}
@@ -20,7 +20,7 @@
 <div id="toc_series">
     {% include "findingaids/sections/toc.html" %}
 <div id="series">
-  <h2><a href="{{ ead_url }}#dsc">{{ ead.dsc.head}}</a></h2>
+  <h2><a href="{{ ead_url }}{{ url_params }}#dsc">{{ ead.dsc.head}}</a></h2>
 <ul>
   {% for component in all_series %}
     <li>
@@ -31,7 +31,7 @@
         {# all other links that are not currently selected page #}
         {# next prev and start rel attributes are calculated in the view #}
         {% else %}
-           <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=component.id %}"
+           <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=component.id %}{{ url_params }}"
            {% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% if forloop.first %}rel="start"{% endif %}>
             {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
                 {{ component.did.unittitle|format_ead }}</a>
