@@ -123,7 +123,7 @@ def full_fa(request, id, mode, preview=False):
     if mode == 'html':
         return render_to_response(template, template_args)
     elif mode == 'pdf':
-        return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid)
+        return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid.value)
 
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
