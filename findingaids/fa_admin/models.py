@@ -1,7 +1,10 @@
 from datetime import datetime
 from celery.result import AsyncResult
 from celery.signals import task_prerun, task_postrun
+
+from django.contrib import admin
 from django.db import models
+
 
 class Findingaids(models.Model):
     """
@@ -27,6 +30,15 @@ class TaskResult(models.Model):
     def task(self):
         return AsyncResult(self.task_id)
 
+    def __unicode__(self):
+        return self.label
+
+    def duration(self):
+        if self.task_end and self.task_start:
+            return self.task_end - self.task_start
+        else:
+            return ''
+
 # listeners to celery signals to store start and end time for tasks
 # NOTE: these functions do not filter on the sender/task function
 
@@ -47,4 +59,13 @@ def taskresult_end(sender, task_id, **kwargs):
     except Exception:
         pass
 task_postrun.connect(taskresult_end)
+
+class TaskResultAdmin(admin.ModelAdmin):
+    list_display = ('eadid', 'label', 'created', 'task_start', 'task_end', 'duration')
+    list_filter  = ('created',)
+    # disallow creating task results via admin site
+    def has_add_permission(self, request):
+        return False
+
+admin.site.register(TaskResult, TaskResultAdmin)
 
