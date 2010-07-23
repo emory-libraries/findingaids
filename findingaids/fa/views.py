@@ -250,7 +250,9 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
                 queryset = Index.objects.also(*return_fields).filter(**search_fields)
                 if filter:
                     queryset = queryset.filter(**filter)
-                record = queryset.get()
+                record = queryset.get()                
+            return record
+        
         elif len(series_ids) == 2:
             return_fields.append('series__id')
             search_fields["series__id"] = series_ids[0]
