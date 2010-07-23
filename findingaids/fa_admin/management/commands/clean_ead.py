@@ -84,6 +84,11 @@ directory will be cleaned."""
                 print "Error: failed to load %s (document not well-formed XML?)" \
                             % file
                 errored += 1
+            # FIXME: should we catch UnicodeEncodeError ?
+            except Exception, e:
+                # catch any other exceptions
+                print "Error: failed to clean %s : %s" % (file, e)
+                errored += 1
 
         # summary of what was done
         print "%d document%s updated" % (updated, 's' if updated != 1 else '')
