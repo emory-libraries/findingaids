@@ -875,6 +875,18 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "Container List",
             msg_prefix="finding aid with no subseries should include container list in printable mode")
 
+        # minimal testing on actual PDF
+        pdf_url = reverse('fa:printable-fa', kwargs={'id': 'raoul548'})
+        response = self.client.get(pdf_url)
+        expected = 'application/pdf'
+        self.assertEqual(response['Content-Type'], expected,
+                        "Expected '%s' but returned '%s' for %s mimetype" % \
+                        (expected, response['Content-Type'], pdf_url))
+        expected = 'attachment; filename=raoul548.pdf'
+        self.assertEqual(response['Content-Disposition'], expected,
+                        "Expected '%s' but returned '%s' for %s content-disposition" % \
+                        (expected, response['Content-Disposition'], pdf_url))
+
     def test_xml_fa(self):
         nonexistent_ead = reverse('fa:xml-fa', kwargs={'id': 'nonexistent'})
         response = self.client.get(nonexistent_ead)
