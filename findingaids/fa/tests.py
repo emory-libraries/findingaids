@@ -1136,6 +1136,8 @@ class FormatEadTestCase(DjangoTestCase):
     <title>Contemporary Authors Online</title>, Gale, 2003</bibref>"""
     NESTED = """<abstract>magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>"""
     NOTRANS = """<abstract>magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>"""
+    EXIST_MATCH = """<abstract>Pitts v. <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">Freeman</exist:match>
+school desegregation case files</abstract>"""
 
     def setUp(self):
         self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
@@ -1177,6 +1179,13 @@ class FormatEadTestCase(DjangoTestCase):
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The Smart Set</span>...' in format,
             "nested format rendered correctly")
+
+    def test_exist_match(self):
+        self.content.node = etree.fromstring(self.EXIST_MATCH)
+        format = format_ead(self.content)
+        self.assert_('Pitts v. <span class="exist-match">Freeman</span>'
+            in format, 'exist:match tag converted to span for highlighting')
+        
         
 # test custom template tag ifurl
 class IfUrlTestCase(DjangoTestCase):

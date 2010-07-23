@@ -77,6 +77,10 @@ _RENDER_BOLD = etree.XPath('@render="bold"')
 _RENDER_ITALIC = etree.XPath('@render="italic"')
 _IS_EMPH = etree.XPath('self::emph')
 _IS_TITLE = etree.XPath('self::title')
+# NOTE: exist:match highlighting is not technically part of EAD but result of eXist
+# it might be better to make this logic more modular, less EAD-specific
+_IS_EXIST_MATCH = etree.XPath('self::exist:match',
+                  namespaces={'exist': 'http://exist.sourceforge.net/NS/exist'})
 
 def node_parts(node, escape, include_tail):
     """Recursively convert an xml node to HTML. This function is used
@@ -113,6 +117,8 @@ def _format_node(node, text, contents, tail):
         return _wrap('<em>', text, contents, '</em>', tail)
     elif _IS_TITLE(node):
         return _wrap('<span class="ead-title">', text, contents, '</span>', tail)
+    elif _IS_EXIST_MATCH(node):
+        return _wrap('<span class="exist-match">', text, contents, '</span>', tail)
     else:
         return _wrap(None, text, contents, None, tail)
 
