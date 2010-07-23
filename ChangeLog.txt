@@ -14,7 +14,9 @@ notes.
 Upgrade notes:
 
 1. Browse pages now include a last-modified header to enable caching.
-   However, any cache (e.g., Squid) should be configured so that
+   Pages are indicated via query string, e.g., titles/B?page=2  
+   Some configuration may be required to enable caching on these pages.
+   Be reminded that any cache (e.g., Squid) should be configured so that
    cached PDFs will be  kept and not released in order to cache pages
    like these.
 
