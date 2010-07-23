@@ -226,11 +226,11 @@ def publish(request):
 
         if success:
             # request the cache to reload the PDF - queue asynchronous task
-            result = reload_cached_pdf.delay(ead.eadid)
-            task = TaskResult(label='PDF reload', eadid=ead.eadid, task_id=result.task_id)
+            result = reload_cached_pdf.delay(ead.eadid.value)
+            task = TaskResult(label='PDF reload', eadid=ead.eadid.value, task_id=result.task_id)
             task.save()
 
-            ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid })
+            ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid.value })
             change = "updated" if replaced else "added"
             messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
                     % (change, filename, ead_url, unicode(ead.unittitle)))
