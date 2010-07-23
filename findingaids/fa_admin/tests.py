@@ -402,7 +402,7 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         fa = response.context['findingaids']
         self.assert_(fa,"findingaids is set in response context")
-        self.assertEqual(fa.object_list[0].eadid, 'hartsfield558',
+        self.assertEqual(fa.object_list[0].eadid.value, 'hartsfield558',
             "fixture document is included in findingaids object list")                
         self.assertPattern('Pages:\s*1', response.content,
             "response contains pagination")
@@ -710,7 +710,7 @@ class UtilsTest(TestCase):
     def test_check_eadxml(self):
         eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558_invalid.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
-        ead.eadid = 'foo#~@/'    # set invalid eadid for this test only
+        ead.eadid.value = 'foo#~@/'    # set invalid eadid for this test only
 
         # invalid fixture has several errors
         errors = check_eadxml(ead)
@@ -729,7 +729,7 @@ class UtilsTest(TestCase):
         self.assert_("Found leading whitespace in list title field (origination/persname): " +
                     "'  Hartsfield, William Berry.'" in errors, 'leading whitespace in origination reported')
         # - eadid regex
-        self.assert_("eadid '%s' does not match site URL regular expression" % ead.eadid
+        self.assert_("eadid '%s' does not match site URL regular expression" % ead.eadid.value
                     in errors, 'eadid regex error reported')
 
         # - list title first letter regex
@@ -756,7 +756,7 @@ class UtilsTest(TestCase):
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = clean_ead(ead, eadfile)
         self.assert_(isinstance(ead, FindingAid), "clean_ead should return an instance of FindingAid")
-        self.assertEqual(u'hartsfield558', ead.eadid)
+        self.assertEqual(u'hartsfield558', ead.eadid.value)
         self.assertEqual(u'hartsfield558_series1', ead.dsc.c[0].id)
         self.assertEqual(u'hartsfield558_subseries6.1', ead.dsc.c[5].c[0].id)
         self.assertEqual(u'hartsfield558_index1', ead.archdesc.index[0].id)
@@ -766,7 +766,7 @@ class UtilsTest(TestCase):
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = clean_ead(ead, eadfile)
         self.assert_(isinstance(ead, FindingAid), "clean_ead should return an instance of FindingAid")
-        self.assertEqual(u'pittsfreeman1036', ead.eadid)
+        self.assertEqual(u'pittsfreeman1036', ead.eadid.value)
 
         # series with no unitid
         eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
@@ -790,6 +790,9 @@ class UtilsTest(TestCase):
                         ead.archdesc.controlaccess.controlaccess[1].person_name[0].value)
         self.assertEqual(u'Mines and mineral resources--Georgia.',
                         ead.archdesc.controlaccess.controlaccess[3].subject[1].value)
+        # unicode characters
+        self.assertEqual(u'Motion pictures--Georgia. \u2026',
+                        ead.archdesc.controlaccess.controlaccess[3].subject[2].value)
         self.assertEqual(u'Motion pictures.',
                         ead.archdesc.controlaccess.controlaccess[-1].genre_form[0].value)
         self.assertEqual(1, len(check_eadxml(ead)),

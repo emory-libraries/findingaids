@@ -52,20 +52,20 @@ def check_ead(filename, dbpath, xml=None):
     
     # eadid is expected to match filename without .xml extension
     expected_eadid = os.path.basename(filename).replace('.xml', '')
-    if ead.eadid != expected_eadid :
-        errors.append("eadid '%s' does not match expected value of '%s'" % (ead.eadid, expected_eadid))
+    if ead.eadid.value != expected_eadid :
+        errors.append("eadid '%s' does not match expected value of '%s'" % (ead.eadid.value, expected_eadid))
     else:   # if eadid is acceptable, check for uniqueness in configured database
-        fa = FindingAid.objects.filter(eadid=ead.eadid).only("document_name", "collection_name")
+        fa = FindingAid.objects.filter(eadid=ead.eadid.value).only("document_name", "collection_name")
         if fa.count() > 1:
             errors.append("Database already contains %s instances of eadid '%s'! (%s)"
-                    % (fa.count(), ead.eadid, ", ".join([f.document_name for f in fa])))
+                    % (fa.count(), ead.eadid.value, ", ".join([f.document_name for f in fa])))
         elif fa.count() == 1:
             # some inconsistency in when /db is included on exist collection names
             path = fa[0].collection_name.replace('/db', '') + "/" + fa[0].document_name
 #            print "DEBUG: comparing path %s with dbpath %s" % (path, dbpath)
             if path != dbpath:
                 errors.append("Database contains eadid '%s' in a different document (%s)"
-                    % (ead.eadid, fa[0].document_name))            
+                    % (ead.eadid.value, fa[0].document_name))
 
     errors.extend(check_eadxml(ead))
 
@@ -86,6 +86,7 @@ def check_eadxml(ead):
     :returns: list of all errors found
     :rtype: list
     """
+    # NOTE: throughout, be sure to use unicode instead of string
     errors = []
 
     # check that series ids are set
@@ -100,9 +101,9 @@ def check_eadxml(ead):
                 % { 'node' : index.node.tag, 'label' : index.head })
 
     # eadid matches appropriate site URL regex
-    if not re.match('^%s$' % EADID_URL_REGEX, ead.eadid):   # entire eadid should match regex
+    if not re.match('^%s$' % EADID_URL_REGEX, ead.eadid.value):   # entire eadid should match regex
         errors.append("eadid '%s' does not match site URL regular expression" \
-                      % ead.eadid)
+                      % ead.eadid.value)
 
     # multiple tests to ensure xml used for search/browse list-title matches what code expects
     # -- since list title is pulled from multiple places, give enough context so it can be found & corrected
@@ -117,7 +118,7 @@ def check_eadxml(ead):
     if hasattr(title_node[0], 'text'):
         title_text = title_node[0].text
     else:
-        title_text = str(title_node)
+        title_text = unicode(title_node)
     if re.match('\s+', title_text):
         # using node.text because unicode() normalizes, which obscures whitespace problems
         errors.append("Found leading whitespace in list title field (%s): '%s'" % \
@@ -167,15 +168,15 @@ def clean_ead(ead, filename):
     """
 
     # eadid should be document name without .xml extension
-    ead.eadid = os.path.basename(filename).replace('.xml', '')
+    ead.eadid.value = os.path.basename(filename).replace('.xml', '')
     # set series ids
     if ead.dsc and ead.dsc.hasSeries():
         for i, series in enumerate(ead.dsc.c):
-            set_series_ids(series, ead.eadid, i)
+            set_series_ids(series, ead.eadid.value, i)
     # set index ids 
     for i, index in enumerate(ead.archdesc.index):
         # generate index ids based on eadid and index number (starting at 1, not 0)
-        index.id = "%s_index%s" % (ead.eadid, i+1)
+        index.id = "%s_index%s" % (ead.eadid.value, i+1)
 
     # remove any leading whitespace in list title fields
     # NOTE: only removing *leading* whitespace because these fields
@@ -183,7 +184,7 @@ def clean_ead(ead, filename):
     # - list title fields - origination nodes and unittitle
     for field in ead.node.xpath('archdesc/did/origination/node()|archdesc/did/unittitle'):
         if hasattr(field, 'text'):
-            field.text = str(field.text).lstrip()
+            field.text = unicode(field.text).lstrip()
     # - controlaccess fields (if any)
     if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:
         for ca in ead.archdesc.controlaccess.controlaccess:

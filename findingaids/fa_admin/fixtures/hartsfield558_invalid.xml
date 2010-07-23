@@ -114,7 +114,8 @@
 		<controlaccess> 
 		  <head>Topical Terms</head> 
 		  <subject source="lcsh" encodinganalog="650">Elections--Georgia.</subject> 
-		<subject source="lcsh" encodinganalog="650">  	   Mines and mineral resources--Georgia.</subject><subject source="lcsh" encodinganalog="650">Motion pictures--Georgia.</subject><subject source="lcsh" encodinganalog="650">Municipal government--Georgia.</subject><subject source="lcsh" encodinganalog="650">Municipal water supply--Georgia.</subject><subject source="lcsh" encodinganalog="650">Talc industry--Georgia.</subject><subject source="lcsh" encodinganalog="650">Water--Fluoridation--Georgia.</subject></controlaccess> 
+		<subject source="lcsh" encodinganalog="650">  	   Mines and mineral resources--Georgia.</subject>
+        <subject source="lcsh" encodinganalog="650">Motion pictures--Georgia. …</subject><subject source="lcsh" encodinganalog="650">Municipal government--Georgia.</subject><subject source="lcsh" encodinganalog="650">Municipal water supply--Georgia.</subject><subject source="lcsh" encodinganalog="650">Talc industry--Georgia.</subject><subject source="lcsh" encodinganalog="650">Water--Fluoridation--Georgia. </subject></controlaccess>
 		<controlaccess> 
 		  <head>Geographic Names</head> 
 		  <geogname encodinganalog="651">Atlanta (Ga.)--Politics and government.</geogname> 
