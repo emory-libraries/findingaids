@@ -99,7 +99,7 @@ directory will be loaded."""
                             # trigger PDF regeneration in the cache and store task result
                             # - unless user has requested PDF reload be skipped
                             if not options['skip_pdf_reload']:
-                                pdf_tasks[ead.eadid] = reload_cached_pdf.delay(ead.eadid.value)
+                                pdf_tasks[ead.eadid.value] = reload_cached_pdf.delay(ead.eadid.value)
                                 # NOTE: unlike the web admin publish, this does not
                                 # generate TaskResult db records; task outcomes will be
                                 # checked & reported before the script finishes
