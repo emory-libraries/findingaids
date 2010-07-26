@@ -1,12 +1,24 @@
 <collection xmlns="http://exist-db.org/collection-config/1.0">
+<!-- TODO: figure out catalog stuff so we can force validation ... -->
+    <!-- <validation mode="yes" /> -->
     <index>
 	    <!-- Disable the standard full text index -->
-        <fulltext default="none" attributes="no"/>
+        <fulltext default="none" attributes="false"/>
 	    <!-- configure Lucene index -->
         <lucene>
             <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
             <!-- index everything for full-text keyword search at top-level  -->
             <text qname="ead">
+                <!-- list title fields; using match because query uses full path -->
+                <text match="archdesc/did/origination/*"/>
+                <text match="archdesc/did/unittitle"/>
+
+                <!-- qname only of list-title fields, for query testing -->
+                <text qname="persname"/>
+                <text qname="corpname"/>
+                <text qname="famname"/>
+                <text qname="unittitle"/>
+
                 <ignore qname="filedesc"/>
                 <ignore qname="profiledesc"/>
                 <ignore qname="physdesc"/>
@@ -25,6 +37,13 @@
                 <ignore qname="bibliography"/>
                 <ignore qname="container"/>
             </text>
+
+            <!-- also retrieving at these levels with full-text highlighting -->
+            <text qname="c01"/>
+            <text qname="c02"/>
+            <text qname="c03"/>
+            <text qname="c04"/>
+            <text qname="index"/>
         </lucene>
     </index>
 </collection>
