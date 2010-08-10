@@ -18,13 +18,7 @@
 {% for file, mtime in files.object_list %}
     <tr>
         <td>{{ file }}</td>
-        <td>
-            {% if perms.fa_admin.can_publish %}
-            <form action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
-                <button type="submit" name="filename" value="{{ file }}" >PUBLISH</button>
-            </form>
-            {% endif %}
-        </td>
+        <td><a href="{% url fa-admin:cleaned-ead-about file %}">CLEAN</a></td>
         <td>
             {% if perms.fa_admin.can_preview %}
             <form action="{% url fa-admin:preview-ead %}" method="post">{% csrf_token %}
@@ -32,7 +26,13 @@
             </form>
             {% endif %}
         </td>
-        <td><a href="{% url fa-admin:cleaned-ead-about file %}">CLEAN</a></td>
+        <td>
+            {% if perms.fa_admin.can_publish %}
+            <form action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
+                <button type="submit" name="filename" value="{{ file }}" >PUBLISH</button>
+            </form>
+            {% endif %}
+        </td>
         <td>{{ mtime|date}} ({{ mtime|timesince }} ago)</td>
     </tr>
 {% empty %}
