@@ -34,6 +34,10 @@ directory will be loaded."""
             action='store_true',
             dest='skip_pdf_reload',
             help='Skip reloading PDFs in the cache.'),
+        make_option('--pdf-only', '-p',
+            action='store_true',
+            dest='pdf_only',
+            help='Only reload PDFs in the cache; do not load EAD files to eXist.'),
         )
 
 
@@ -41,6 +45,9 @@ directory will be loaded."""
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
         v_all = 2
+
+        if options['pdf_only'] and options['skip_pdf_reload']:
+            raise CommandError("Options -s and -p are not compatible")
 
         # check for required settings
         if not hasattr(settings, 'EXISTDB_ROOT_COLLECTION') or not settings.EXISTDB_ROOT_COLLECTION:
@@ -66,54 +73,66 @@ directory will be loaded."""
 
         start_time = datetime.now()
         try:
-            if len(args):
-                files = [os.path.join(settings.FINDINGAID_EAD_SOURCE, name) for name in args]
-            else:
-                files = glob.iglob(os.path.join(settings.FINDINGAID_EAD_SOURCE, '*.xml'))
-                self.db = ExistDB()
 
-            for file in files:
-                try:                    
-                    # full path location where file will be loaded in exist db collection
-                    dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
-                    errors = check_ead(file, dbpath)
-                    if errors:
-                        # report errors, don't load
-                        errored += 1
-                        print "Error: %s does not pass publication checks; not loading to eXist." % file
-                        if verbosity >= v_normal:
-                            print "  Errors found:"
-                            for err in errors:
-                                print "    %s" % err                        
-                    else:
-                        with open(file, 'r') as eadfile:
-                            success = db.load(eadfile, dbpath, overwrite=True)
-                        
-                        if success:
-                            loaded += 1
-                            if verbosity >= v_normal:
-                                print "Loaded %s" % file
-                            # load the file as a FindingAid object to get the eadid for PDF reload
-                            ead = load_xmlobject_from_file(file, FindingAid)
+            if not options['pdf_only']:
+            # unless PDF reload only has been specified, load files
 
-                            # trigger PDF regeneration in the cache and store task result
-                            # - unless user has requested PDF reload be skipped
-                            if not options['skip_pdf_reload']:
-                                pdf_tasks[ead.eadid.value] = reload_cached_pdf.delay(ead.eadid.value)
-                                # NOTE: unlike the web admin publish, this does not
-                                # generate TaskResult db records; task outcomes will be
-                                # checked & reported before the script finishes
-                        else:
+                if len(args):
+                    files = [os.path.join(settings.FINDINGAID_EAD_SOURCE, name) for name in args]
+                else:
+                    files = glob.iglob(os.path.join(settings.FINDINGAID_EAD_SOURCE, '*.xml'))
+                    self.db = ExistDB()
+
+                for file in files:
+                    try:
+                        # full path location where file will be loaded in exist db collection
+                        dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
+                        errors = check_ead(file, dbpath)
+                        if errors:
+                            # report errors, don't load
                             errored += 1
-                            print "Error: failed to load %s to eXist" % file
-                except ExistDBException, e:
-                    print "Error: failed to load %s to eXist" % file
-                    print e.message()
-                    errored += 1
-                    
-            # output a summary of what was done
-            print "%d document%s loaded" % (loaded, 's' if loaded != 1 else '')
-            print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
+                            print "Error: %s does not pass publication checks; not loading to eXist." % file
+                            if verbosity >= v_normal:
+                                print "  Errors found:"
+                                for err in errors:
+                                    print "    %s" % err
+                        else:
+                            with open(file, 'r') as eadfile:
+                                success = db.load(eadfile, dbpath, overwrite=True)
+
+                            if success:
+                                loaded += 1
+                                if verbosity >= v_normal:
+                                    print "Loaded %s" % file
+                                # load the file as a FindingAid object to get the eadid for PDF reload
+                                ead = load_xmlobject_from_file(file, FindingAid)
+
+                                # trigger PDF regeneration in the cache and store task result
+                                # - unless user has requested PDF reload be skipped
+                                if not options['skip_pdf_reload']:
+                                    pdf_tasks[ead.eadid.value] = reload_cached_pdf.delay(ead.eadid.value)
+                                    # NOTE: unlike the web admin publish, this does not
+                                    # generate TaskResult db records; task outcomes will be
+                                    # checked & reported before the script finishes
+                            else:
+                                errored += 1
+                                print "Error: failed to load %s to eXist" % file
+                    except ExistDBException, e:
+                        print "Error: failed to load %s to eXist" % file
+                        print e.message()
+                        errored += 1
+
+                # output a summary of what was done
+                print "%d document%s loaded" % (loaded, 's' if loaded != 1 else '')
+                print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
+
+            # only PDF cache reloading requested
+            if options['pdf_only']:
+                findingaids = FindingAid.objects.all()
+                for ead in findingaids:
+                    if verbosity > v_normal:
+                         print "Queuing PDF request for %s" % ead.eadid.value
+                    pdf_tasks[ead.eadid.value] = reload_cached_pdf.delay(ead.eadid.value)
 
             if not options['skip_pdf_reload']:
                 # check on the status of PDF cache reload tasks and wait until they all finish
