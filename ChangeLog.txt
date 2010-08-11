@@ -70,6 +70,10 @@ To upgrade from the previous version:
 8. The admin section of the site is at /admin/ (under your site url).
    This uses Emory LDAP for login, so should be configured to run
    under SSL. 
+9. eXist query response times are reported on templates in Debug mode
+   only.  To view them, set DEBUG = True in the settings, and add any
+   IP addresses that need access to the INTERNAL_IPS.  In staging and
+   production, DEBUG should be set to False. 
 
 
 **Features**

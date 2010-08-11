@@ -46,7 +46,7 @@
   {% if SW_VERSION %}
     <div class="sw-version dev-note">v{{ SW_VERSION }}</div>
   {% endif %}
-  {% if querytime %}
+  {% if querytime and debug %}{# display eXist query times in debug mode only #}
     <div class="query-time dev-note">quer{{ querytime|pluralize:"y,ies" }} took
       {{ querytime|join:", " }} ms</div>
   {% endif %}

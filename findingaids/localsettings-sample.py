@@ -5,6 +5,9 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DEV_ENV = True
 
+# IP addresses that should be allowed to see DEBUG info
+INTERNAL_IPS = ('127.0.0.1', '127.0.1.1')
+
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
