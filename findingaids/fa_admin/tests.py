@@ -72,6 +72,7 @@ class BaseAdminViewsTest(TestCase):
         # (some tests changes to simulate an eXist save error)
         self.real_collection = settings.EXISTDB_ROOT_COLLECTION
         self.preview_collection = settings.EXISTDB_PREVIEW_COLLECTION
+        self.real_exist_url = settings.EXISTDB_SERVER_URL
 
     def tearDown(self):
         if hasattr(self, '_stored_ead_src'):
@@ -80,9 +81,10 @@ class BaseAdminViewsTest(TestCase):
         # clean up temp files & dir
         rmtree(self.tmpdir)
 
-        # restore existdb collections
+        # restore existdb settings
         settings.EXISTDB_ROOT_COLLECTION = self.real_collection
         settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection
+        settings.EXISTDB_SERVER_URL = self.real_exist_url
 
 class AdminViewsTest(BaseAdminViewsTest):
 
@@ -241,7 +243,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual({}, docinfo, "invalid xml document not loaded to exist preview")
 
 
-        # exist save error should be caught & handled gracefully
+        # exist save errors should be caught & handled gracefully
         # - force an error by setting preview collection to a non-existent collection
         settings.EXISTDB_PREVIEW_COLLECTION = "/bogus/doesntexist"
         response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
@@ -250,6 +252,29 @@ class AdminViewsTest(BaseAdminViewsTest):
                 "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)     
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
+
+        # - simulate eXist not running by setting existdb url to non-existent exist
+        settings.EXISTDB_SERVER_URL = 'http://kamina.library.emory.edu:9191/not-exist'
+        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not preview")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "I/O Error: Connection refused",
+                msg_prefix="error page displays specific connection error message")
+
+        # simulate incorrect eXist permissions by not specifying username/password
+        settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection   # restore setting
+        # ensure guest account cannot update
+        self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-update')
+
+        settings.EXISTDB_SERVER_URL = settings.EXISTDB_SERVER_PROTOCOL + settings.EXISTDB_SERVER_HOST
+        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not preview")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "not allowed to write to collection",
+                msg_prefix="error page displays specific eXist permission message")
+
         
     def test_logout(self):
         admin_logout = reverse('fa-admin:logout')
@@ -583,7 +608,8 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Unescaped &#39;&lt;&#39; not allowed in attributes values",
             msg_prefix="syntax error detail for badly formed XML displays")
 
-        # force an exist save error by setting collection to a non-existent collection        
+        # exist save errors should be caught & handled gracefully
+        # - force an exist save error by setting collection to a non-existent collection
         settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
         response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
         self.assertContains(response, "Could not publish",
@@ -593,6 +619,28 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="specific exist save error displayed to user")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
+
+        # - simulate eXist not running by setting existdb url to non-existent exist
+        settings.EXISTDB_SERVER_URL = 'http://kamina.library.emory.edu:9191/not-exist'
+        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not publish")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "I/O Error: Connection refused",
+                msg_prefix="error page displays specific connection error message")
+
+        # simulate incorrect eXist permissions by not specifying username/password
+        settings.EXISTDB_ROOT_COLLECTION = self.real_collection # restore
+        # ensure guest account cannot update
+        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+        settings.EXISTDB_SERVER_URL = settings.EXISTDB_SERVER_PROTOCOL + settings.EXISTDB_SERVER_HOST
+        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not publish")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "update is not allowed",
+                msg_prefix="error page displays specific exist permissions message")
+
 
     def test_publish_from_preview(self):
         # test publishing a document that has been loaded for preview

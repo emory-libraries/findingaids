@@ -189,40 +189,43 @@ def publish(request):
             filename = ead.document_name
             xml = ead.serialize()
 
-        ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
-        if ok is not True and publish_mode != 'preview':
-            # FIXME: currently, doctype declaration is getting lost when we load to eXist
-            # so validation fails on pre-publication check
-            # ignoring validation errors for now, since preview files *should*
-            # already have been checked when loaded for preview...
-            return response
-
-        # only load to exist if there are no errors found
-        db = ExistDB()
-        # get information to determine if an existing file is being replaced
-        replaced = db.describeDocument(dbpath)
         errors = []
+        try:
+            ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
+            if ok is not True and publish_mode != 'preview':
+                # FIXME: currently, doctype declaration is getting lost when we load to eXist
+                # so validation fails on pre-publication check
+                # ignoring validation errors for now, since preview files *should*
+                # already have been checked when loaded for preview...
+                return response
 
-        if publish_mode == 'file':
-            try:
+            # only load to exist if there are no errors found
+            db = ExistDB()
+            # get information to determine if an existing file is being replaced
+            replaced = db.describeDocument(dbpath)
+
+            if publish_mode == 'file':               
                 # load the document to the configured collection in eXist with the same fileneame
                 success = db.load(open(fullpath, 'r'), dbpath, overwrite=True)
                 # load the file as a FindingAid object so we can generate a url to the document
                 ead = load_xmlobject_from_file(fullpath, FindingAid)
-            except ExistDBException, e:
-                errors.append(e.message())
-                success = False
-        elif publish_mode == 'preview' and ead is not None:
-            try:
-                # move the document from preview collection to configured public collection
-                success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
-                        settings.EXISTDB_ROOT_COLLECTION, filename)
-                # FindingAid instance ead already set above
-            except ExistDBException, e:
-                errors.append("Failed to move document %s from preview collection to main collection." \
-                                % filename)
-                errors.append(e.message())
-                success = False
+                
+            elif publish_mode == 'preview' and ead is not None:
+                try:
+                    # move the document from preview collection to configured public collection
+                    success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
+                            settings.EXISTDB_ROOT_COLLECTION, filename)
+                    # FindingAid instance ead already set above
+                except ExistDBException, e:
+                    # special-case error message
+                    errors.append("Failed to move document %s from preview collection to main collection." \
+                                    % filename)
+                    # re-raise and let outer exception handling take care of it
+                    raise e
+                
+        except ExistDBException, e:
+            errors.append(e.message())
+            success = False
 
         if success:
             # request the cache to reload the PDF - queue asynchronous task
@@ -251,16 +254,17 @@ def publish(request):
 def preview(request):
     if request.method == 'POST':
         filename = request.POST['filename']
-        # only load to exist if document passes publication check
-        ok, response, dbpath, fullpath = _prepublication_check(request, filename, mode='preview')
-        if ok is not True:
-            return response
-        
-        db = ExistDB()
-        # load the document to the *preview* collection in eXist with the same fileneame
-        preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename
         errors = []
+        
         try:
+            # only load to exist if document passes publication check
+            ok, response, dbpath, fullpath = _prepublication_check(request, filename, mode='preview')
+            if ok is not True:
+                return response
+        
+            db = ExistDB()
+            # load the document to the *preview* collection in eXist with the same fileneame
+            preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename            
             # make sure the preview collection exists, but don't complain if it's already there
             success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
         except ExistDBException, e:
