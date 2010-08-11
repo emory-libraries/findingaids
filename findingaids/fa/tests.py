@@ -1007,6 +1007,7 @@ class UtilsTest(TestCase):
         Deleted(eadid='eadid', title='test deleted record', date=datetime.now()).save()
         record = Deleted.objects.get(eadid='eadid')     # retrieve datetime from DB
         modified = collection_lastmodified('rqst')
+        #NOTE: THIS TEST DEPENDS ON THE LOCAL MACHINE TIME BEING SET CORRECTLY
         self.assertEqual(exist_datetime_with_timezone(record.date), modified,
             'collection last modified should be datetime of most recently deleted document in collection')
         
