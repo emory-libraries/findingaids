@@ -1,4 +1,6 @@
 {% extends "fa_admin/base.html" %}
+{% block page-subtitle %}{% if files.number != 1 %}: Modified files (page {{ files.number }}){% endif %}{% endblock %}
+
 {% block content-title %}Manage Finding Aids{% endblock %}
 
 {% block sidebar-left %}

@@ -1,5 +1,5 @@
 {% extends "fa_admin/base.html" %}
-{% block page-subtitle %}: Published Finding Aids{% endblock %}
+{% block page-subtitle %}: Published Finding Aids{% if findingaids.number != 1 %} (page {{ findingaids.number }}){% endif %}{% endblock %}
 {% block content-title %}Published Finding Aids{% endblock %}
 
 {% block content-body %}
