@@ -44,6 +44,11 @@
             <text qname="c03"/>
             <text qname="c04"/>
             <text qname="index"/>
+            <text match="//index/*"/>
+            <text match="//c01/*"/>
+            <text match="//c02/*"/>
+            <text match="//c03/*"/>
+            <text match="//c04/*"/>
         </lucene>
     </index>
 </collection>

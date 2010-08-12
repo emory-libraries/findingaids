@@ -11,7 +11,6 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import condition
 
-from eulcore.django.existdb.db import ExistDB
 from eulcore.django.http import content_negotiation
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
@@ -87,7 +86,7 @@ def view_fa(request, id, preview=False):
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms})
-        filter = {'fulltext_terms': search_terms}
+        filter = {'highlight': search_terms}
     else:
         url_params = ''
         filter = {}
@@ -175,7 +174,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms})
-        filter = {'fulltext_terms': search_terms}
+        filter = {'highlight': search_terms}
     else:
         url_params = ''
         filter = {}

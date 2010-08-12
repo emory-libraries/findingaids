@@ -348,11 +348,9 @@ class FaViewsTest(TestCase):
         self.assertPattern('MF1.*4.*Family and personal photos|', response.content,
             "family photos in container list")
 
-        # format_ead
+        # title with formatting
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'pomerantz890.xml'}))
-        self.assertContains(response, 'href="/documents/pomerantz890.xml/EAD"')
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
-
         # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
         self.assertPattern(r'''<h1[^>]*>.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # EAD title
         self.assertPattern(r'''<table id="descriptive_summary">.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # Descriptive Summary title
@@ -364,6 +362,10 @@ class FaViewsTest(TestCase):
         # only descriptive information that is present
         response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'bailey807'}))
         self.assertNotContains(response, 'Creator:')
+
+        # header link to EAD xml
+        response = self.client.get(reverse('fa:view-fa', kwargs={'id': 'pomerantz890.xml'}))
+        self.assertContains(response, 'href="%s"' % reverse('fa:xml-fa', kwargs={'id': 'pomerantz890.xml'}))
 
         self.assertNotContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="non-highlighted finding aid does NOT include robots directives noindex, nofollow")
@@ -1093,6 +1095,12 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '<link rel="canonical" href="%s"' % fa_url,
             msg_prefix="highlighted finding aid includes link to canonical finding aid url")
 
+        # highlighting
+        #print response
+        self.assertContains(response, '<span class="exist-match">Raoul</span>',
+                msg_prefix="search terms are highlighted on main finding aid page")
+        self.assertContains(response, '<span class="exist-match">Raoul</span>, Eleanore',
+                msg_prefix="search terms in control access terms are highlighted")
 
     def test_view_highlighted_series(self):
         # single series in a finding aid, with search-term highlighting
@@ -1119,13 +1127,44 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '<link rel="canonical" href="%s"' % series_url,
             msg_prefix="highlighted finding aid series includes link to canonical url")
 
+        # highlighting
+        self.assertContains(response, '<span class="exist-match">Raoul</span>',
+                msg_prefix="search terms are highlighted on series page")
+        self.assertContains(response, 'genealogy, the <span class="exist-match">Raoul</span> mansion',
+                msg_prefix="search terms in scope/content note are highlighted")
+                
+        # series 3 - box/folder/content
+        series_url = reverse('fa:series-or-index',
+                    kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003798'})
+        response = self.client.get(series_url, {'keywords': 'raoul georgia'})          
+        self.assertContains(response, 'W. G. <span class="exist-match">Raoul</span> estate papers',
+            msg_prefix="search terms in box/folder section headings are highlighted")
+        self.assertContains(response, '<span class="exist-match">Raoul</span> Heirs, Inc.',
+                msg_prefix="search terms in box/folder contents are highlighted")
+
+        # search terms not in current series
+        series_url = reverse('fa:series-or-index',
+                    kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003798'})
+        response = self.client.get(series_url, {'keywords': 'notinthistext'})
+        self.assertContains(response, 'Financial and legal papers',
+            msg_prefix="series without search terms is still returned normally")
+
     def test_view_highlighted_subseries(self):
         # single subseries in a finding aid, with search-term highlighting
         series_url = reverse('fa:view-subseries', kwargs={'id': 'raoul548',
-                'series_id': 'raoul548_s4', 'subseries_id': 'raoul548_4.1'})
+                'series_id': 'raoul548_1003223', 'subseries_id': 'raoul548_100355'})
         response = self.client.get(series_url, {'keywords': 'raoul georgia'})
         self.assertContains(response, '<link rel="canonical" href="%s"' % series_url,
             msg_prefix="highlighted finding aid subseries includes link to canonical url")
+
+        # highlighting
+        self.assertContains(response, '<span class="exist-match">Raoul</span>',
+                msg_prefix="search terms are highlighted on subseries page")
+         # search terms not in current subseries
+        response = self.client.get(series_url, {'keywords': 'notinthistext'})
+        self.assertContains(response, 'Photographs',
+            msg_prefix="subseries without search terms is still returned normally")
+
 
     def test_view_highlighted_index(self):
         # single index in a finding aid, with search-term highlighting
@@ -1135,6 +1174,17 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '<link rel="canonical" href="%s"' % index_url,
             msg_prefix="highlighted finding aid index includes link to canonical url")
 
+        # highlighting
+        self.assertContains(response, '<span class="exist-match">Georgia</span>',
+                msg_prefix="search terms are highlighted on index page")
+        self.assertContains(response, '<span class="exist-match">Georgia</span> Institute of Technology',
+                msg_prefix="search terms in index entry headings are highlighted")
+        self.assertContains(response, 'Peacock School, Atlanta, <span class="exist-match">Georgia</span>',
+                msg_prefix="search terms in index references are highlighted")
+         # search terms not in index
+        response = self.client.get(index_url, {'keywords': 'notinthistext'})
+        self.assertContains(response, 'Index of Selected Correspondents',
+            msg_prefix="index without search terms is still returned normally")
 
 
 class FormatEadTestCase(DjangoTestCase):
