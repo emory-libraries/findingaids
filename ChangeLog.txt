@@ -74,6 +74,7 @@ To upgrade from the previous version:
    only.  To view them, set DEBUG = True in the settings, and add any
    IP addresses that need access to the INTERNAL_IPS.  In staging and
    production, DEBUG should be set to False. 
+10.To check the status of PDFs in the cache, use ``python manage.py check_pdfcache``
 
 
 **Features**
