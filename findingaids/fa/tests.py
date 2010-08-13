@@ -79,6 +79,12 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertEqual("Scope and Content Note", info[0].head)
         self.assertEqual("Arrangement Note", info[1].head)
 
+        #get number of matched keywords in series
+        self.assertEqual(self.findingaid['raoul548'].dsc.c[3].match_count,  1)
+
+        #get number of matched keywords in index
+        self.assertEqual(self.findingaid['raoul548'].archdesc.index[0].match_count,  1)
+        
         # series info problem when scopecontent is missing a <head>; contains use restriction
         info = self.findingaid['raoul548'].dsc.c[-1].c[-1].series_info()
         self.assert_(isinstance(info, ListType))

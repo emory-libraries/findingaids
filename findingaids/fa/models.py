@@ -6,7 +6,7 @@ from django.db import models
 
 from eulcore import xmlmap
 from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, \
-        SubordinateComponents, Index as EadIndex
+        SubordinateComponents, Index as EadIndex, ArchivalDescription
 from eulcore.django.existdb.manager import Manager
 from eulcore.django.existdb.models import XmlModel
 
@@ -171,6 +171,9 @@ class Series(XmlModel, Component):
 
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`
     """
+
+    ROOT_NAMESPACES = { 'exist': 'http://exist.sourceforge.net/NS/exist' }
+
     ead = xmlmap.NodeField("ancestor::ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
@@ -183,6 +186,9 @@ class Series(XmlModel, Component):
 
         Configured to use *//c01* as base search path.
     """
+
+    match_count = xmlmap.IntegerField("count(.//exist:match)")
+    ":class:`findingaids.fa.models.FindingAid` number of keyword matchs"
 
     def series_info(self):
         """"
@@ -270,6 +276,10 @@ class Index(XmlModel, EadIndex):
 
       Customized version of :class:`eulcore.xmlmap.eadmap.Index`
     """
+
+    ROOT_NAMESPACES = { 'exist': 'http://exist.sourceforge.net/NS/exist' }
+
+
     ead = xmlmap.NodeField("ancestor::ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
@@ -282,6 +292,15 @@ class Index(XmlModel, EadIndex):
 
         Configured to use *//index* as base search path.
     """
+
+    match_count = xmlmap.IntegerField("count(.//exist:match)")
+
+
+
+# FIXME: look for a a better way to do this kind of XmlObject extension
+ArchivalDescription._fields['index'].node_class = Index
+
+
 
 class Deleted(models.Model):
     """

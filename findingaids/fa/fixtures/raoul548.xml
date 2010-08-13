@@ -6995,6 +6995,7 @@
                 <scopecontent encodinganalog="520" id="raoul548_1003809">
                     <head id="raoul548_1003804">Scope and Content Note</head>
                     <p id="raoul548_1003805">Miscellaneous items in Series 4 include materials relating to the
+                                             <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">MATCHED TEXT</exist:match>
 
 				Raoul family/genealogy, the Raoul mansion, and writings about the Raoul family.
 
@@ -7164,6 +7165,7 @@
                 <p id="raoul548_1003979">Names of prominent local citizens, Georgia business and political
 
 			 leaders, some nationally prominent figures, and some schools and regional
+                         <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">MATCHED TEXT</exist:match>
 
 			 business concerns, are indexed here. Correspondence throughout Series 1;
 
