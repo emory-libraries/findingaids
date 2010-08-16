@@ -80,7 +80,7 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertEqual("Arrangement Note", info[1].head)
 
         #get number of matched keywords in series
-        self.assertEqual(self.findingaid['raoul548'].dsc.c[3].match_count,  1)
+        self.assertEqual(self.findingaid['raoul548'].dsc.c[3].match_count,  2)
 
         #get number of matched keywords in index
         self.assertEqual(self.findingaid['raoul548'].archdesc.index[0].match_count,  1)
@@ -776,6 +776,13 @@ class FaViewsTest(TestCase):
         self.assert_("href='%s'" % reverse('fa:view-subseries',
             kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
             'subseries_id': 'raoul548_1003222'}) in links[-1])
+
+
+         # check to make suare highlighting   info is correct
+        series = Series.objects.also('ead__eadid').get(id='raoul548_s4')
+        links = _subseries_links(series)
+        self.assertPattern("^((?!class='exist-match').)*$", links[0])       # NO matches for this link
+        self.assertPattern(".*class='exist-match'.*1 matches", links[2])       # matched 1 time on this link
 
         series = Series.objects.get(id='raoul548_1003223')
         # should get exception when top-level ead id is not available
