@@ -12,13 +12,6 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.load_template_source',
 )
 
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-)
-
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -127,7 +120,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'celery',
+    'djcelery',
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
     'eulcore.django.existdb',
