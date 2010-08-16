@@ -176,7 +176,11 @@ def publish(request):
 
             # retrieve info about the document from preview collection
             try:
-                ead = get_findingaid(id, preview=True, also=['document_name'])
+                # because of the way eulcore.existdb.queryset constructs returns with 'also' fields,
+                # it is simpler and better to retrieve document name separately                 
+                ead = get_findingaid(id, preview=True)
+                ead_docname = get_findingaid(id, preview=True, only=['document_name'])
+                filename = ead_docname.document_name
             except Http404:     # not found in exist
                 ead = None
                 messages.error(request,
@@ -186,7 +190,6 @@ def publish(request):
                 # if ead could not be retrieved from preview mode, skip processing
                 return HttpResponseSeeOther(reverse('fa-admin:index'))
 
-            filename = ead.document_name
             xml = ead.serialize()
 
         errors = []
