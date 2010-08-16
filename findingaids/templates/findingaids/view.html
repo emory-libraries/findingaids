@@ -38,7 +38,7 @@
     {% for component in findingaid.dsc.c %}
     <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=findingaid.eadid,series_id=component.id %}{{ url_params }}" rel="section">
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
-    {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count}} matches</span>{% endif %}
+    {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count}} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
      </li>
   {% endfor %}
 </ul>

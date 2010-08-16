@@ -392,7 +392,12 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
     if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
         for component in series.c:
             # get match count for each series / subseries and append it to the link if > 0
-            match_count = "<span class='exist-match'>%s matches</span>" %(component.match_count) if component.match_count > 0 else ""
+            if component.match_count > 0:
+                plural ="es" if component.match_count > 1 else ""
+                match_count = "<span class='exist-match'>%s match%s</span>" %(component.match_count, plural)
+            else:
+                match_count = ""
+
             current_url_ids = url_ids + [component.id]
             #set c01 rel attrib to 'section' c02 and c03 to 'subsection'
             if (component.node.tag == 'c01'):

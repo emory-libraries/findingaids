@@ -782,7 +782,7 @@ class FaViewsTest(TestCase):
         series = Series.objects.also('ead__eadid').get(id='raoul548_s4')
         links = _subseries_links(series)
         self.assertPattern("^((?!class='exist-match').)*$", links[0])       # NO matches for this link
-        self.assertPattern(".*class='exist-match'.*1 matches", links[2])       # matched 1 time on this link
+        self.assertPattern(".*class='exist-match'.*1 match", links[2])       # matched 1 time on this link
 
         series = Series.objects.get(id='raoul548_1003223')
         # should get exception when top-level ead id is not available
