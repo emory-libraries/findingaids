@@ -62,7 +62,8 @@ FINDINGAID_EAD_SOURCE= '/mnt/entity/staff/Special Collections/EADXML/FinishedMAR
 # settings for proxy host and site base url; used to configure cache to reload
 # a PDF when publishing a new or updated EAD
 PROXY_HOST = 'localhost:3128'
-SITE_BASE_URL = 'http://localhost:800/'     
+SITE_BASE_URL = 'http://localhost:8000/'
+PROXY_ICP_PORT = 3130       # ICP port for checking status of objects in cache
 
 ADDITIONAL_DATA_INDEX   = ""
 DOI_PURL_HOST = "http://dx.doi.org/"
