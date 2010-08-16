@@ -74,7 +74,12 @@ To upgrade from the previous version:
    only.  To view them, set DEBUG = True in the settings, and add any
    IP addresses that need access to the INTERNAL_IPS.  In staging and
    production, DEBUG should be set to False. 
-10.To check the status of PDFs in the cache, use ``python manage.py check_pdfcache``
+10.To check the status of PDFs in the cache, use ``python manage.py
+   check_pdfcache``.  This uses Internat Cache Protocal (ICP) to query
+   the configured cache, and requires that PROXY_ICP_PORT be
+   configured in local settings, and that the cache is configured to
+   allow ICP access.  For Squid, you should check the icp_port and
+   icp_access settings.
 
 
 **Features**

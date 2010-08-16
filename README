@@ -7,6 +7,7 @@ Dependencies
  * eXist-db 1.4 
  * xhtml2pdf/Pisa for PDF generation (http://www.xhtml2pdf.com)
  * celery and RabbitMQ
+ * zc.icp for querying cache status
  * eulcore (currently included as a subversion external); see
    :ref:`eulcore dependencies <eulcore-deps>` for per-module
    dependencies. eulcore modules currently in use:
@@ -64,6 +65,11 @@ There is a celery daemon that should be running in order to process any
 celery tasks that are scheduled. It can be started via manage.py::
 
   $ python manage.py celeryd
+
+Install `zc.icp` in order to use the check_pdfcache manage command
+to check the status of PDFs in the configured cache.
+
+  $ sudo easy_install zc.icp
 
 
 .. _eulcore-deps:
