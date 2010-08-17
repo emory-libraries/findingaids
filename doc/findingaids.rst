@@ -100,3 +100,9 @@ built-in django verbosity options.
 * **response_times**
     .. autoclass:: findingaids.fa.management.commands.response_times.Command
        :members:
+* **check_pdfcache**
+    .. autoclass:: findingaids.fa.management.commands.check_pdfcache.Command
+       :members:
+* **ead_to_xsd**
+    .. autoclass:: findingaids.fa.management.commands.ead_to_xsd.Command
+       :members:
