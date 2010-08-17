@@ -13,7 +13,12 @@ notes.
 
 Upgrade notes:
 
-1. Browse pages now include a last-modified header to enable caching.
+1. Run ``python manage.py ead_to_xsd`` to convert all the EAD
+   documents in the configured EAD source directory from DTD to new
+   XSD Schema EAD format. Note that this will **modify** the EAD
+   files; running the script should be coordinated with anyone who
+   might be editing those files.
+2. Browse pages now include a last-modified header to enable caching.
    Pages are indicated via query string, e.g., titles/B?page=2  
    Some configuration may be required to enable caching on these pages.
    Be reminded that any cache (e.g., Squid) should be configured so that
