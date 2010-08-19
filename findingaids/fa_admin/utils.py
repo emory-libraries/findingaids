@@ -98,7 +98,7 @@ def check_eadxml(ead):
     for index in ead.archdesc.index:
         if not index.id:
             errors.append("%(node)s id attribute is not set for %(label)s"
-                % { 'node' : index.node.tag, 'label' : index.head })
+                % { 'node' : index.node.tag, 'label' : unicode(index.head) })
 
     # eadid matches appropriate site URL regex
     if not re.match('^%s$' % EADID_URL_REGEX, ead.eadid.value):   # entire eadid should match regex

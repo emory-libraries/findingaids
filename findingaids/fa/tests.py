@@ -76,8 +76,8 @@ class FindingAidTestCase(DjangoTestCase):
     def test_series_info(self):
         info = self.findingaid['raoul548'].dsc.c[0].series_info()
         self.assert_(isinstance(info, ListType))
-        self.assertEqual("Scope and Content Note", info[0].head)
-        self.assertEqual("Arrangement Note", info[1].head)
+        self.assertEqual("Scope and Content Note", unicode(info[0].head))
+        self.assertEqual("Arrangement Note", unicode(info[1].head))
 
         #get number of matched keywords in series
         self.assertEqual(self.findingaid['raoul548'].dsc.c[3].match_count,  2)
@@ -89,9 +89,9 @@ class FindingAidTestCase(DjangoTestCase):
         info = self.findingaid['raoul548'].dsc.c[-1].c[-1].series_info()
         self.assert_(isinstance(info, ListType))
         self.assert_("contains all materials related to " in info[0].content[0].__unicode__()) # scopecontent with no head
-        self.assertEqual("Arrangement Note", info[1].head)
-        self.assertEqual("Terms Governing Use and Reproduction", info[2].head)
-        self.assertEqual("Restrictions on Access", info[3].head)
+        self.assertEqual("Arrangement Note", unicode(info[1].head))
+        self.assertEqual("Terms Governing Use and Reproduction", unicode(info[2].head))
+        self.assertEqual("Restrictions on Access", unicode(info[3].head))
 
     def test_series_displaylabel(self):
         self.assertEqual("Series 1: Letters and personal papers, 1865-1982",
@@ -647,6 +647,7 @@ class FaViewsTest(TestCase):
         subseries_url = reverse('fa:view-subseries', kwargs={'id': 'raoul548',
             'series_id': 'raoul548_s4', 'subseries_id': 'rushdie1000_subseries2.1'})
         response = self.client.get(subseries_url)
+        print response
         self.assertContains(response, "Subseries 2.1")
         self.assertContains(response, "Additional drafts and notes")
         # missing section head should not be displayed as "none"
