@@ -12,7 +12,7 @@
 {% endwith %}
 <table>
     <tr>
-        <th colspan="4">Filename</th> {# spans columns for publish, preview, & clean #}
+        <th colspan="3">Filename</th> {# spans columns for [publish,] preview, & clean #}
         <th>Last Modified</th>
     </tr>
 {% for file, mtime in files.object_list %}
@@ -26,13 +26,14 @@
             </form>
             {% endif %}
         </td>
+{% comment %} publish temporarily disabled while assessing workflow (publish from preview only)
         <td>
             {% if perms.fa_admin.can_publish %}
             <form action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
                 <button type="submit" name="filename" value="{{ file }}" >PUBLISH</button>
             </form>
             {% endif %}
-        </td>
+        </td> {% endcomment %}
         <td>{{ mtime|date}} ({{ mtime|timesince }} ago)</td>
     </tr>
 {% empty %}
