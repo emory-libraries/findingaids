@@ -155,14 +155,14 @@ def check_series_ids(series):
     return errors
 
 
-def clean_ead(ead, filename):
-    """Clean up EAD xml so it can be published.  Currently does the following:
+def prep_ead(ead, filename):
+    """Prepare EAD xml for publication.  Currently does the following:
     
      - sets the eadid and ids on any series, subseries, and index elements based
        on filename and series unitid or index number.
      - removes any leading whitespace from controlaccess terms
 
-    :param ead: :class:`~findingaids.fa.models.FindingAid` ead instance to be cleaned
+    :param ead: :class:`~findingaids.fa.models.FindingAid` ead instance to be prepared
     :param string: filename of the EAD file (used as base eadid)
     :rtype: :class:`~findingaids.fa.models.FindingAid`
     """

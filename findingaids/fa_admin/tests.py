@@ -15,7 +15,7 @@ from eulcore.xmlmap.core import load_xmlobject_from_file
 from findingaids.fa_admin import tasks, views
 from findingaids.fa_admin.models import TaskResult
 from findingaids.fa_admin.views import _get_recent_xml_files
-from findingaids.fa_admin.utils import check_ead, check_eadxml, clean_ead
+from findingaids.fa_admin.utils import check_ead, check_eadxml, prep_ead
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.urls import TITLE_LETTERS
 
@@ -156,18 +156,19 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
         self.assertContains(response, os.path.basename(self.tmpfiles[2].name))
         # file list contains buttons to publish documents
-        publish_url = reverse('fa-admin:publish-ead')
-        self.assertContains(response, '<form action="%s" method="post"' % publish_url)
-        self.assertContains(response, '<button type="submit" name="filename" value="%s" '
-                % os.path.basename(self.tmpfiles[0].name))
+        # TEMPORARY: suppressing publish on list documents to assess workflow
+        #publish_url = reverse('fa-admin:publish-ead')
+        #self.assertContains(response, '<form action="%s" method="post"' % publish_url)
+        #self.assertContains(response, '<button type="submit" name="filename" value="%s" '
+        #        % os.path.basename(self.tmpfiles[0].name))
         # file list contains buttons to preview documents
         preview_url = reverse('fa-admin:preview-ead')
         self.assertContains(response, '<form action="%s" method="post"' % preview_url)
         self.assertContains(response, '<button type="submit" name="filename" value="%s" '
-                % os.path.basename(self.tmpfiles[0].name), 2)
-        # file list contains link to clean documents
-        clean_url = reverse('fa-admin:cleaned-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
-        self.assertContains(response, '<a href="%s">CLEAN</a>' % clean_url)
+                % os.path.basename(self.tmpfiles[0].name), 1)
+        # file list contains link to prep documents
+        prep_url = reverse('fa-admin:prep-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
+        self.assertContains(response, '<a href="%s">PREP</a>' % prep_url)
         # contains pagination
         self.assertPattern('Pages:\s*1', response.content)
 
@@ -304,48 +305,48 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.get(edit_user)
         self.assertContains(response, "Edit the user account")
         
-    def test_cleaned_ead(self):
+    def test_prep_ead(self):
          # use fixture directory to test publication
         filename = 'hartsfield558.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')        
         
-        cleaned_xml = reverse('fa-admin:cleaned-ead', args=[filename])
-        cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
-        cleaned_diff = reverse('fa-admin:cleaned-ead-diff', args=[filename])
+        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
+        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
+        prep_diff = reverse('fa-admin:prep-ead-diff', args=[filename])
         
         self.client.login(**self.credentials['admin'])
-        response = self.client.get(cleaned_summary)
+        response = self.client.get(prep_summary)
         
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
-                        (expected, code, cleaned_summary))
+                        (expected, code, prep_summary))
         self.assert_(response.context['changes'])
                         
-        self.assertContains(response, 'Cleaned EAD for %s' % filename)
+        self.assertContains(response, 'Prepared EAD for %s' % filename)
         self.assertContains(response, 'View file differences line by line')
-        self.assertContains(response, cleaned_diff,
-                            msg_prefix="cleaned EAD summary should link to line-by-line diff")
+        self.assertContains(response, prep_diff,
+                            msg_prefix="Prepared EAD summary should link to line-by-line diff")
         self.assertPattern('<p class="removed".*>-.*c01.*id=.*s1', response.content)
         self.assertPattern('<p class="added".*>+.*c01.*id=.*hartsfield558_series1.*', response.content)
-        self.assertContains(response, cleaned_xml,
-                            msg_prefix="cleaned EAD summary should link to xml download")
+        self.assertContains(response, prep_xml,
+                            msg_prefix="prepared EAD summary should link to xml download")
 
-        response = self.client.get(cleaned_diff)
+        response = self.client.get(prep_diff)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
-                        (expected, code, cleaned_diff))
+                        (expected, code, prep_diff))
         # output is generated by difflib; just testing that response has content
         self.assertContains(response, '<table')
 
-        response = self.client.get(cleaned_xml)
+        response = self.client.get(prep_xml)
         expected = 200
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s' % \
-                        (expected, response.status_code, cleaned_xml))
+                        (expected, response.status_code, prep_xml))
         expected = 'application/xml'
         self.assertEqual(response['Content-Type'], expected, "Expected '%s' but returned '%s' for %s mimetype" % \
-                        (expected, response['Content-Type'], cleaned_xml))
+                        (expected, response['Content-Type'], prep_xml))
         self.assertEqual(response['Content-Disposition'], "attachment; filename=%s" % filename)
         self.assertContains(response, "<!DOCTYPE ead PUBLIC",
                     msg_prefix="response does not lose doctype declaration from original xml")
@@ -354,53 +355,53 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, '<c02 level="subseries" id="hartsfield558_subseries6.1"')
         self.assertContains(response, '<index id="hartsfield558_index1">')
 
-        # clean an ead that doesn't need any changes
+        # prep an ead that doesn't need any changes
         filename = 'abbey244.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
 
-        cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
-        response = self.client.get(cleaned_summary, follow=True)
+        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
+        response = self.client.get(prep_summary, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (following redirects, clean EAD)'
-                             % (expected, code, cleaned_summary))
+                             % (expected, code, prep_summary))
         (redirect_url, code) = response.redirect_chain[0]
         self.assert_(reverse('fa-admin:index') in redirect_url)
         expected = 303      # redirect
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (clean EAD)'
-                             % (expected, code, cleaned_summary))
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (prepared EAD)'
+                             % (expected, code, prep_summary))
         self.assertContains(response, "No changes made to <b>%s</b>" % filename)
 
-    def test_clean_badlyformedxml(self):
+    def test_prep_badlyformedxml(self):
         # use fixture directory to test publication
         filename = 'badlyformed.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
 
-        cleaned_xml = reverse('fa-admin:cleaned-ead', args=[filename])
-        cleaned_summary = reverse('fa-admin:cleaned-ead-about', args=[filename])
-        cleaned_diff = reverse('fa-admin:cleaned-ead-diff', args=[filename])
+        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
+        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
+        prep_diff = reverse('fa-admin:prep-ead-diff', args=[filename])
 
         self.client.login(**self.credentials['admin'])
-        response = self.client.get(cleaned_xml)
+        response = self.client.get(prep_xml)
         expected = 500
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s (non-well-formed xml)' % \
-                        (expected, response.status_code, cleaned_summary))
+                        (expected, response.status_code, prep_summary))
 
-        response = self.client.get(cleaned_summary)
+        response = self.client.get(prep_summary)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
-                        (expected, code, cleaned_summary))
+                        (expected, code, prep_summary))
 
         self.assertContains(response, 'Could not load document',
                 msg_prefix='error loading document displayed')
         self.assertContains(response, 'not allowed in attributes',
                 msg_prefix='xml syntax error displayed')
-        self.assertNotContains(response, cleaned_diff,
-                msg_prefix="cleaned summary for badly formed xml should NOT link to line-by-line diff")
-        self.assertNotContains(response, cleaned_xml,
-                msg_prefix="cleaned summary for badly formed xml should NOT link to xml for download")
+        self.assertNotContains(response, prep_diff,
+                msg_prefix="prep summary for badly formed xml should NOT link to line-by-line diff")
+        self.assertNotContains(response, prep_xml,
+                msg_prefix="prep summary for badly formed xml should NOT link to xml for download")
         
 
     # tests for view helper functions
@@ -798,12 +799,12 @@ class UtilsTest(TestCase):
                     in errors, 'controlaccess genre leading whitespace reported')        
 
         
-    def test_clean_ead(self):
+    def test_prep_ead(self):
         # ead with series/subseries, and index
         eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
-        ead = clean_ead(ead, eadfile)
-        self.assert_(isinstance(ead, FindingAid), "clean_ead should return an instance of FindingAid")
+        ead = prep_ead(ead, eadfile)
+        self.assert_(isinstance(ead, FindingAid), "prep_ead should return an instance of FindingAid")
         self.assertEqual(u'hartsfield558', ead.eadid.value)
         self.assertEqual(u'hartsfield558_series1', ead.dsc.c[0].id)
         self.assertEqual(u'hartsfield558_subseries6.1', ead.dsc.c[5].c[0].id)
@@ -812,20 +813,20 @@ class UtilsTest(TestCase):
         # ead with no series
         eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
-        ead = clean_ead(ead, eadfile)
-        self.assert_(isinstance(ead, FindingAid), "clean_ead should return an instance of FindingAid")
+        ead = prep_ead(ead, eadfile)
+        self.assert_(isinstance(ead, FindingAid), "prep_ead should return an instance of FindingAid")
         self.assertEqual(u'pittsfreeman1036', ead.eadid.value)
 
         # series with no unitid
         eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
-        ead = clean_ead(ead, eadfile)
+        ead = prep_ead(ead, eadfile)
         self.assertEqual(u'raoul548_series3', ead.dsc.c[2].id)
 
         # whitespace cleanup
         eadfile = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558_invalid.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
-        ead = clean_ead(ead, eadfile)
+        ead = prep_ead(ead, eadfile)
         # - no leading whitespace in list title
         # ead.archdesc.origination is getting normalized, so can't be used for testing
         origination = ead.node.xpath('//origination/persname')        
@@ -849,7 +850,7 @@ class UtilsTest(TestCase):
         # special case - unittitle begins with a <title>  -- should not cause errors
         eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
-        ead = clean_ead(ead, eadfile)
+        ead = prep_ead(ead, eadfile)
 
 
 ### unit tests for findingaids.fa_admin.tasks
