@@ -168,7 +168,7 @@ class AdminViewsTest(BaseAdminViewsTest):
                 % os.path.basename(self.tmpfiles[0].name), 1)
         # file list contains link to prep documents
         prep_url = reverse('fa-admin:prep-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
-        self.assertContains(response, '<a href="%s">PREP</a>' % prep_url)
+        self.assertContains(response, 'href="%s">PREP</a>' % prep_url)
         # contains pagination
         self.assertPattern('Pages:\s*1', response.content)
 
@@ -221,7 +221,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response,
                 '<form id="preview-publish" action="%s" method="post"' % reverse('fa-admin:publish-ead'),
                 msg_prefix="preview page includes publish form")
-        publish_submit = '<button type="submit" name="preview_id" value="%s">PUBLISH' % eadid
+        publish_submit = 'type="submit" name="preview_id" value="%s">PUBLISH' % eadid
         self.assertContains(response, publish_submit,
                 msg_prefix="publish form submit button has document eadid for value")
 

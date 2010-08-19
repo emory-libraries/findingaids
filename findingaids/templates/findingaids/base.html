@@ -9,7 +9,7 @@
 {% block content-header  %}
     {% if preview and perms.fa_admin.can_publish %}
         <form id="preview-publish" action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
-            <button type="submit" name="preview_id" value="{% firstof findingaid.eadid ead.eadid %}">PUBLISH</button>
+            <button class="admin-action" type="submit" name="preview_id" value="{% firstof findingaid.eadid ead.eadid %}">PUBLISH</button>
         </form>
     {% endif %} 
     <h1 class="title">{% if preview %}<span class="preview-label">PREVIEW:</span> {% endif %}{% block content-title %}{% endblock %}</h1>

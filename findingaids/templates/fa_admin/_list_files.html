@@ -18,11 +18,11 @@
 {% for file, mtime in files.object_list %}
     <tr>
         <td>{{ file }}</td>
-        <td><a href="{% url fa-admin:prep-ead-about file %}">PREP</a></td>
+        <td><a class="admin-action" href="{% url fa-admin:prep-ead-about file %}">PREP</a></td>
         <td>
             {% if perms.fa_admin.can_preview %}
             <form action="{% url fa-admin:preview-ead %}" method="post">{% csrf_token %}
-                <button type="submit" name="filename" value="{{ file }}" >PREVIEW</button>
+                <button type="submit" name="filename" value="{{ file }}" class="admin-action">PREVIEW</button>
             </form>
             {% endif %}
         </td>
@@ -30,7 +30,7 @@
         <td>
             {% if perms.fa_admin.can_publish %}
             <form action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
-                <button type="submit" name="filename" value="{{ file }}">PUBLISH</button>
+                <button type="submit" name="filename" value="{{ file }}" class="admin-action">PUBLISH</button>
             </form>
             {% endif %}
         </td> {% endcomment %}

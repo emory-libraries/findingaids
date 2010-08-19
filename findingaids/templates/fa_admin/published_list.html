@@ -18,7 +18,7 @@
     <tr>
         <td><a href ="{% url fa:view-fa fa.eadid %}">{{ fa.document_name }}</a></td>
         <td>{% if perms.fa_admin.can_delete %}
-              <a href ="{% url fa-admin:delete-ead fa.eadid %}">DELETE</a>
+              <a class="admin-action" href ="{% url fa-admin:delete-ead fa.eadid %}">DELETE</a>
             {% endif %}
         </td>
         <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>
