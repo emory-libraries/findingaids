@@ -26,7 +26,7 @@ from eulcore.existdb.exceptions import DoesNotExist
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
-from findingaids.fa_admin.models import TaskResult
+from findingaids.fa_admin.models import TaskResult, EadFile
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin.utils import check_ead, check_eadxml, prep_ead, HttpResponseSeeOther
 
@@ -380,12 +380,9 @@ def _get_recent_xml_files(dir):
     # get all xml files in the specified directory
     filenames = glob.glob(os.path.join(dir, '*.xml'))
     # modified time, base name of the file
-    files = [ (os.path.getmtime(file), os.path.basename(file)) for file in filenames ]
-    # reverse sort - most recently modified first
-    files.sort(reverse=True)
-    # convert modified time into a datetime object
-    recent_files = [ (filename, datetime.utcfromtimestamp(mtime)) for mtime, filename in files ]
-    return recent_files
+    files = [ EadFile(os.path.basename(file), os.path.getmtime(file)) for file in filenames ]
+    # sort by last modified time
+    return sorted(files, key=lambda file: file.mtime, reverse=True)
 
 
 @login_required

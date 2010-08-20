@@ -172,6 +172,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         # contains pagination
         self.assertPattern('Pages:\s*1', response.content)
 
+        # TODO: test last published date / preview load date?
+        # This will require eXist fixtures that match the temp files
+
         # simulate configuration error
         settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
         response = self.client.get(admin_index)
@@ -408,13 +411,13 @@ class AdminViewsTest(BaseAdminViewsTest):
 
     def test_get_recent_xml_files(self):
         recent_xml = _get_recent_xml_files(self.tmpdir)
-        filenames = [file for file, mtime in recent_xml]
         self.assertEqual(3, len(recent_xml))
         # should be in reverse order - last created first
-        self.assertEqual(filenames[0], os.path.basename(self.tmpfiles[2].name))
-        self.assertEqual(filenames[1], os.path.basename(self.tmpfiles[1].name))
-        self.assertEqual(filenames[2], os.path.basename(self.tmpfiles[0].name))
+        self.assertEqual(recent_xml[0].filename, os.path.basename(self.tmpfiles[2].name))
+        self.assertEqual(recent_xml[1].filename, os.path.basename(self.tmpfiles[1].name))
+        self.assertEqual(recent_xml[2].filename, os.path.basename(self.tmpfiles[0].name))
         # non-xml file not included
+        filenames = [eadfile.filename for eadfile in recent_xml]
         self.assert_(os.path.basename(self.nonxml_tmpfile.name) not in filenames)
 
 
