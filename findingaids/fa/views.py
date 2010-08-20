@@ -1,3 +1,4 @@
+import logging
 import datetime
 from dateutil.tz import tzlocal
 from urllib import urlencode
@@ -20,6 +21,10 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified
+
+import logging
+logger = logging.getLogger(__name__);
+
 
 fa_listfields = ['eadid', 'list_title','archdesc__did']
 "List of fields that should be returned for brief list display of a finding aid."
@@ -171,21 +176,38 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     if 'preview' in kwargs and kwargs['preview']:
         use_preview_collection()
 
+    #used to build initial series and index filters and field lists
+    filter_list = {'ead__eadid':eadid}
+    series_fields =['id', 'level', 'did__unitid', 'did__unittitle']
+    index_fields =['id', 'head']
+
+    # info needed to construct navigation links within this ead
+    # - summary info for all top-level series in this finding aid
+    all_series = Series.objects.filter(**filter_list)
+    # - summary info for any indexes
+    all_indexes = Index.objects.filter(**filter_list)
+
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms})
+        #filter further based on highlighting
         filter = {'highlight': search_terms}
+        all_series = all_series.filter(**filter)
+        all_indexes = all_indexes.filter(**filter)
+        series_fields.append('match_count')
+        index_fields.append('match_count')
     else:
         url_params = ''
         filter = {}
     # get the item to be displayed (series, subseries, index)
     result = _get_series_or_index(eadid, *series_ids, filter=filter)
+
     # info needed to construct navigation links within this ead
     # - summary info for all top-level series in this finding aid
-    all_series = Series.objects.only('id', 'level', 'did__unitid', \
-                            'did__unittitle').filter(ead__eadid=eadid).all()
+    all_series = all_series.only(*series_fields).all()
     # - summary info for any indexes
-    all_indexes = Index.objects.only('id', 'head').filter(ead__eadid=eadid).all()
+    all_indexes = all_indexes.only(*index_fields).all()
+   
     
     if 'preview' in kwargs and kwargs['preview']:
         restore_publish_collection()
