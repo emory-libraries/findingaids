@@ -24,6 +24,7 @@ Upgrade notes:
    Be reminded that any cache (e.g., Squid) should be configured so that
    cached PDFs will be  kept and not released in order to cache pages
    like these.
+3. Logging is now avaliable when running via runserver and is configured in localsettngs
 
 
 

@@ -647,7 +647,7 @@ class FaViewsTest(TestCase):
         subseries_url = reverse('fa:view-subseries', kwargs={'id': 'raoul548',
             'series_id': 'raoul548_s4', 'subseries_id': 'rushdie1000_subseries2.1'})
         response = self.client.get(subseries_url)
-        print response
+        #print response
         self.assertContains(response, "Subseries 2.1")
         self.assertContains(response, "Additional drafts and notes")
         # missing section head should not be displayed as "none"

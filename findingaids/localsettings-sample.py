@@ -108,3 +108,11 @@ BROKER_PORT = 5672
 BROKER_VHOST = '/'
 BROKER_USER = 'guest'
 BROKER_PASSWORD = 'guest'
+
+
+#Logger Settings
+import logging
+#logging levels: NOLOG, CRITICAL, ERROR, WARNING, INFO, DEBUG
+LOGGING_LEVEL=logging.NOLOG
+LOGGING_FORMAT="%(asctime)s : %(name)s:  %(levelname)s : %(message)s"
+LOGGING_FILENAME="" # "" will print to stdout

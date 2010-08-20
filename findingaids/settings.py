@@ -1,6 +1,14 @@
 # Django settings for findingaids project.
 from os import path
 
+#Logger Setup
+#Add custom logging level to allow us to tun off logging via tha config file
+import logging
+logging.NOLOG = 60
+logging.addLevelName(logging.NOLOG, "NOLOG")
+
+
+
 # Get the directory of this file for relative dir paths.
 # Django sets too many absolute paths.
 BASE_DIR = path.dirname(path.abspath(__file__))
