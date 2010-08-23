@@ -9,19 +9,19 @@ from eulcore.django.existdb import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
 from findingaids.fa.models import FindingAid
-from findingaids.fa_admin.utils import clean_ead, check_ead
+from findingaids.fa_admin.utils import prep_ead, check_ead
 
 class Command(BaseCommand):
-    """Clean all or specified EAD xml files in the configured source directory.
+    """Prepare all or specified EAD xml files in the configured source directory.
 
-Runs EAD xml files through a "cleaning" process to set ids, etc., as needed
+Runs EAD xml files through a prep process to set ids, etc., as needed
 to be published, verifies that the resulting EAD is valid and passes all
-checks, and if so, updates the original file with the new, cleaned EAD xml.
+checks, and if so, updates the original file with the new, prepared EAD xml.
 
-If filenames are specified as arguments, only those files will be cleaned.
+If filenames are specified as arguments, only those files will be prepared.
 Files should be specified by basename only (assumed to be in the configured
 EAD source directory). Otherwise, all .xml files in the configured EAD source
-directory will be cleaned."""
+directory will be prepared."""
     help = __doc__
 
     args = '[<filename filename ... >]'
@@ -40,7 +40,7 @@ directory will be cleaned."""
             return
 
         if verbosity == v_all:
-            print "Cleaning documents from configured EAD source directory: %s" \
+            print "Preparing documents from configured EAD source directory: %s" \
                     % settings.FINDINGAID_EAD_SOURCE
 
         updated = 0
@@ -58,13 +58,13 @@ directory will be cleaned."""
             try:
                 ead = load_xmlobject_from_file(file, FindingAid)
                 orig_xml = ead.serialize(pretty=True)
-                ead = clean_ead(ead, file)
+                ead = prep_ead(ead, file)
                 # sanity check before saving
                 dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
                 errors = check_ead(file, dbpath, xml=ead.serialize())
                 if errors:
                     errored += 1
-                    print "Cleaned EAD for %s does not pass sanity checks, not saving." % file
+                    print "Prepared EAD for %s does not pass sanity checks, not saving." % file
                     if verbosity >= v_normal:
                         print "  Errors found:"
                         for err in errors:
@@ -87,7 +87,7 @@ directory will be cleaned."""
             # FIXME: should we catch UnicodeEncodeError ?
             except Exception, e:
                 # catch any other exceptions
-                print "Error: failed to clean %s : %s" % (file, e)
+                print "Error: failed to prep %s : %s" % (file, e)
                 errored += 1
 
         # summary of what was done
