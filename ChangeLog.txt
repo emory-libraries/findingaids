@@ -59,7 +59,7 @@ To upgrade from the previous version:
    management and tracking deleted finding aids).  You should set up
    a database, configure it in localsettings.pi, and run ``python
    manage.py syncdb``.
-5. Run ``python manage.py clean_ead`` to clean all the EAD documents in
+5. Run ``python manage.py prep_ead`` to prepare all the EAD documents in
    the configured EAD source directory.  Note that this will **modify**
    the EAD files; running the script should be coordinated with anyone
    who might be editing those files.
@@ -97,9 +97,9 @@ To upgrade from the previous version:
 * Logged in admins can select files from the recently modified list
   for upload directly to publication. 
 * Logged in admins can select a file from the recently modified list
-  for cleaning, see a list of changes made, and optionally download
-  the cleaned-up version if changes were made, in order to safely
-  clean up the canonical copy of the EAD xml files.
+  for preparing, see a list of changes made, and optionally download
+  the prepared version if changes were made, in order to safely
+  prepare the canonical copy of the EAD xml files.
 * Logged in admins can select files from the recently modified list
   for preview; multiple admins can preview different documents
   simultaneously.
@@ -122,7 +122,7 @@ To upgrade from the previous version:
 * A search engine or web crawler can harvest descriptive metadata
   based on the EAD contents along with the HTML data, to improve
   google-ability.
-* A system administrator can run a command to clean all or specified
+* A system administrator can run a command to prepare all or specified
   EAD xml files in the configured directory, in order to easily update
   all existing files to new standards.
 * A system administrator can run a command to load all or specified
