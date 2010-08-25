@@ -57,11 +57,11 @@ directory will be prepared."""
         for file in files:
             try:
                 ead = load_xmlobject_from_file(file, FindingAid)
-                orig_xml = ead.serialize(pretty=True)
+                orig_xml = ead.serializeDocument(pretty=True)
                 ead = prep_ead(ead, file)
                 # sanity check before saving
                 dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
-                errors = check_ead(file, dbpath, xml=ead.serialize())
+                errors = check_ead(file, dbpath, xml=ead.serializeDocument())
                 if errors:
                     errored += 1
                     print "Prepared EAD for %s does not pass sanity checks, not saving." % file
@@ -69,13 +69,13 @@ directory will be prepared."""
                         print "  Errors found:"
                         for err in errors:
                             print "    %s" % err
-                elif orig_xml == ead.serialize(pretty=True):
+                elif orig_xml == ead.serializeDocument(pretty=True):
                     if verbosity >= v_normal:
                         print "No changes made to %s" % file
                     unchanged += 1
                 else:
                     with open(file, 'w') as f:
-                        ead.serialize(f, pretty=True)
+                        ead.serializeDocument(f, pretty=True)
                     if verbosity >= v_normal:
                         print "Updated %s" % file
                     updated += 1
