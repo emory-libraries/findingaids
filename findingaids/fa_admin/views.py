@@ -315,7 +315,7 @@ def prepared_eadxml(request, filename):
         return HttpResponseServerError("Could not load document: %s" % e)
 
     ead = prep_ead(ead, filename)
-    prepped_xml = ead.serialize()
+    prepped_xml = ead.serializeDocument()
 
     response = HttpResponse(prepped_xml, mimetype='application/xml')
     response['Content-Disposition'] = "attachment; filename=%s" % filename
