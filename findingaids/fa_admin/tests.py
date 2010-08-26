@@ -353,6 +353,8 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(response['Content-Disposition'], "attachment; filename=%s" % filename)
         self.assertContains(response, "<!DOCTYPE ead PUBLIC",
                     msg_prefix="response does not lose doctype declaration from original xml")
+        self.assertContains(response, "encoding='UTF-8'",
+                    msg_prefix="response includes charater encoding declaration")
         self.assertContains(response, 'hartsfield558</eadid>')
         self.assertContains(response, '<c01 level="series" id="hartsfield558_series1"')
         self.assertContains(response, '<c02 level="subseries" id="hartsfield558_subseries6.1"')
