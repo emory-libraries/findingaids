@@ -5,9 +5,14 @@ Dependencies
 ------------
  * django 1.2
  * eXist-db 1.4 
- * xhtml2pdf/Pisa for PDF generation (http://www.xhtml2pdf.com)
- * celery and RabbitMQ
- * zc.icp for querying cache status
+ * xhtml2pdf/Pisa for PDF generation.  Stand along python package downloadable 
+   `here <http://www.xhtml2pdf.com>`_ or available via `easy_install pisa`
+ * python-dateutil library `downloadable package
+   <http://labix.org/python-dateutil>`_ or install via `easy_install
+   python-dateutil`
+ * `RabbitMQ <http://www.rabbitmq.com/>`__
+ * `zc.icp <http://pypi.python.org/pypi/zc.icp>`_ for querying cache status
+ * django-celery installed via `easy_install django-celery`
  * eulcore (currently included as a subversion external); see
    :ref:`eulcore dependencies <eulcore-deps>` for per-module
    dependencies. eulcore modules currently in use:
@@ -79,12 +84,11 @@ eulcore dependencies
 .. include:: external/django-modules/eulcore/README.dependencies 
 
 
-
 To install all the necessary components for a development environment
 on an Ubuntu 10.04 workstation:
 
 sudo apt-get install python-ldap python-pisa python-lxml python-ply rabbitmq-server
-sudo easy_install celery mimeparse
+sudo easy_install django-celery mimeparse
 
 This assumes you already have a django 1.2 installation and python bindings
 for the database platform you are using (e.g., python-mysqldb for mysql).

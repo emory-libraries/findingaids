@@ -129,6 +129,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'djcelery',
+    'django.contrib.flatpages', # needed for simplepages below
+    'findingaids.simplepages',
     'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
     'eulcore.django.testsetup',
     'eulcore.django.existdb',
