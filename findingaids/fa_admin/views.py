@@ -345,7 +345,7 @@ def prepared_ead(request, filename, mode):
     
     if prep_ead.status_code == 200:
         orig_ead = load_xmlobject_from_file(fullpath, FindingAid) # validate or not?
-        original_xml = orig_ead.serialize()  # store as serialized by xml object, so xml output will be the same
+        original_xml = orig_ead.serializeDocument()  # store as serialized by xml object, so xml output will be the same
         
         prep_xml = prep_ead.content
         ead = load_xmlobject_from_string(prep_xml, FindingAid) # validate?

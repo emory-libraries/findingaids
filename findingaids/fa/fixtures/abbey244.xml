@@ -1,3 +1,5 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE ead PUBLIC "+//ISBN 1-931666-00-8//DTD ead.dtd (Encoded Archival Description (EAD) Version 2002)//EN" "ead.dtd">
 <ead id="abbey244_102678" relatedencoding="MARC21">
     <eadheader countryencoding="iso3166-1" dateencoding="iso8601" id="abbey244_1020" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
         <eadid countrycode="us" identifier="abbey244.xml" mainagencycode="geu-s">abbey244</eadid>
