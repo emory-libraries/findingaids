@@ -1,0 +1,15 @@
+{% extends "site_base.html" %}
+
+{% block content-header %}
+
+    {% if perms.simplepages.add_simplepage %}
+    <strong>Admin Options:</strong> <a href="{% url admin:simplepages_simplepage_change flatpage.id %}">Edit Page</a> -
+    <a href="{% url admin:simplepages_simplepage_add %}">Add Page</a>
+    {% endif %}
+
+    {{ block.super }}
+{% endblock %}
+
+{% block page-subtitle %}: {{ flatpage.title }}{% endblock %}
+{% block content-title %}{{ flatpage.title }}{% endblock %}
+{% block content-body %}{{ flatpage.content }}{% endblock %}

@@ -1,0 +1,3472 @@
+Created by PLY version 3.3 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> Expr
+Rule 1     Expr -> Expr OR_OP Expr
+Rule 2     Expr -> Expr AND_OP Expr
+Rule 3     Expr -> Expr EQUAL_OP Expr
+Rule 4     Expr -> Expr REL_OP Expr
+Rule 5     Expr -> Expr PLUS_OP Expr
+Rule 6     Expr -> Expr MINUS_OP Expr
+Rule 7     Expr -> Expr MULT_OP Expr
+Rule 8     Expr -> Expr DIV_OP Expr
+Rule 9     Expr -> Expr MOD_OP Expr
+Rule 10    Expr -> Expr UNION_OP Expr
+Rule 11    Expr -> MINUS_OP Expr
+Rule 12    Expr -> FilterExpr PATH_SEP RelativeLocationPath
+Rule 13    Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+Rule 14    Expr -> RelativeLocationPath
+Rule 15    Expr -> AbsoluteLocationPath
+Rule 16    Expr -> AbbreviatedAbsoluteLocationPath
+Rule 17    Expr -> FilterExpr
+Rule 18    AbsoluteLocationPath -> PATH_SEP
+Rule 19    AbsoluteLocationPath -> PATH_SEP RelativeLocationPath
+Rule 20    AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath
+Rule 21    RelativeLocationPath -> Step
+Rule 22    RelativeLocationPath -> RelativeLocationPath PATH_SEP Step
+Rule 23    RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step
+Rule 24    Step -> NodeTest
+Rule 25    Step -> NodeTest PredicateList
+Rule 26    Step -> AxisSpecifier NodeTest
+Rule 27    Step -> AxisSpecifier NodeTest PredicateList
+Rule 28    Step -> ABBREV_STEP_SELF
+Rule 29    Step -> ABBREV_STEP_PARENT
+Rule 30    AxisSpecifier -> AXISNAME AXIS_SEP
+Rule 31    AxisSpecifier -> ABBREV_AXIS_AT
+Rule 32    NodeTest -> NameTest
+Rule 33    NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN
+Rule 34    NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+Rule 35    NameTest -> STAR_OP
+Rule 36    NameTest -> NCNAME COLON STAR_OP
+Rule 37    NameTest -> QName
+Rule 38    QName -> NCNAME COLON NCNAME
+Rule 39    QName -> NCNAME
+Rule 40    FuncQName -> NCNAME COLON FUNCNAME
+Rule 41    FuncQName -> FUNCNAME
+Rule 42    FilterExpr -> VariableReference
+Rule 43    FilterExpr -> LITERAL
+Rule 44    FilterExpr -> Number
+Rule 45    FilterExpr -> FunctionCall
+Rule 46    FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN
+Rule 47    FilterExpr -> FilterExpr Predicate
+Rule 48    PredicateList -> Predicate
+Rule 49    PredicateList -> PredicateList Predicate
+Rule 50    Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET
+Rule 51    VariableReference -> DOLLAR QName
+Rule 52    Number -> FLOAT
+Rule 53    Number -> INTEGER
+Rule 54    FunctionCall -> FuncQName FormalArguments
+Rule 55    FormalArguments -> OPEN_PAREN CLOSE_PAREN
+Rule 56    FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN
+Rule 57    ArgumentList -> Expr
+Rule 58    ArgumentList -> ArgumentList COMMA Expr
+
+Terminals, with rules where they appear
+
+ABBREV_AXIS_AT       : 31
+ABBREV_PATH_SEP      : 13 20 23
+ABBREV_STEP_PARENT   : 29
+ABBREV_STEP_SELF     : 28
+AND_OP               : 2
+AXISNAME             : 30
+AXIS_SEP             : 30
+CLOSE_BRACKET        : 50
+CLOSE_PAREN          : 33 34 46 55 56
+COLON                : 36 38 40
+COMMA                : 58
+DIV_OP               : 8
+DOLLAR               : 51
+EQUAL_OP             : 3
+FLOAT                : 52
+FUNCNAME             : 40 41
+INTEGER              : 53
+LITERAL              : 34 43
+MINUS_OP             : 6 11
+MOD_OP               : 9
+MULT_OP              : 7
+NCNAME               : 36 38 38 39 40
+NODETYPE             : 33 34
+OPEN_BRACKET         : 50
+OPEN_PAREN           : 33 34 46 55 56
+OR_OP                : 1
+PATH_SEP             : 12 18 19 22
+PLUS_OP              : 5
+REL_OP               : 4
+STAR_OP              : 35 36
+UNION_OP             : 10
+error                : 
+
+Nonterminals, with rules where they appear
+
+AbbreviatedAbsoluteLocationPath : 16
+AbsoluteLocationPath : 15
+ArgumentList         : 56 58
+AxisSpecifier        : 26 27
+Expr                 : 1 1 2 2 3 3 4 4 5 5 6 6 7 7 8 8 9 9 10 10 11 46 50 57 58 0
+FilterExpr           : 12 13 17 47
+FormalArguments      : 54
+FuncQName            : 54
+FunctionCall         : 45
+NameTest             : 32
+NodeTest             : 24 25 26 27
+Number               : 44
+Predicate            : 47 48 49
+PredicateList        : 25 27 49
+QName                : 37 51
+RelativeLocationPath : 12 13 14 19 20 22 23
+Step                 : 21 22 23
+VariableReference    : 42
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 16
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 1
+
+    (24) Step -> NodeTest .
+    (25) Step -> NodeTest . PredicateList
+    (48) PredicateList -> . Predicate
+    (49) PredicateList -> . PredicateList Predicate
+    (50) Predicate -> . OPEN_BRACKET Expr CLOSE_BRACKET
+
+    PATH_SEP        reduce using rule 24 (Step -> NodeTest .)
+    ABBREV_PATH_SEP reduce using rule 24 (Step -> NodeTest .)
+    CLOSE_BRACKET   reduce using rule 24 (Step -> NodeTest .)
+    OR_OP           reduce using rule 24 (Step -> NodeTest .)
+    AND_OP          reduce using rule 24 (Step -> NodeTest .)
+    EQUAL_OP        reduce using rule 24 (Step -> NodeTest .)
+    REL_OP          reduce using rule 24 (Step -> NodeTest .)
+    PLUS_OP         reduce using rule 24 (Step -> NodeTest .)
+    MINUS_OP        reduce using rule 24 (Step -> NodeTest .)
+    MULT_OP         reduce using rule 24 (Step -> NodeTest .)
+    DIV_OP          reduce using rule 24 (Step -> NodeTest .)
+    MOD_OP          reduce using rule 24 (Step -> NodeTest .)
+    UNION_OP        reduce using rule 24 (Step -> NodeTest .)
+    $end            reduce using rule 24 (Step -> NodeTest .)
+    CLOSE_PAREN     reduce using rule 24 (Step -> NodeTest .)
+    COMMA           reduce using rule 24 (Step -> NodeTest .)
+    OPEN_BRACKET    shift and go to state 32
+
+    PredicateList                  shift and go to state 33
+    Predicate                      shift and go to state 31
+
+state 2
+
+    (20) AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP . RelativeLocationPath
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+    NCNAME          shift and go to state 34
+
+    NodeTest                       shift and go to state 1
+    NameTest                       shift and go to state 3
+    AxisSpecifier                  shift and go to state 27
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    RelativeLocationPath           shift and go to state 35
+
+state 3
+
+    (32) NodeTest -> NameTest .
+
+    OPEN_BRACKET    reduce using rule 32 (NodeTest -> NameTest .)
+    PATH_SEP        reduce using rule 32 (NodeTest -> NameTest .)
+    ABBREV_PATH_SEP reduce using rule 32 (NodeTest -> NameTest .)
+    OR_OP           reduce using rule 32 (NodeTest -> NameTest .)
+    AND_OP          reduce using rule 32 (NodeTest -> NameTest .)
+    EQUAL_OP        reduce using rule 32 (NodeTest -> NameTest .)
+    REL_OP          reduce using rule 32 (NodeTest -> NameTest .)
+    PLUS_OP         reduce using rule 32 (NodeTest -> NameTest .)
+    MINUS_OP        reduce using rule 32 (NodeTest -> NameTest .)
+    MULT_OP         reduce using rule 32 (NodeTest -> NameTest .)
+    DIV_OP          reduce using rule 32 (NodeTest -> NameTest .)
+    MOD_OP          reduce using rule 32 (NodeTest -> NameTest .)
+    UNION_OP        reduce using rule 32 (NodeTest -> NameTest .)
+    $end            reduce using rule 32 (NodeTest -> NameTest .)
+    CLOSE_PAREN     reduce using rule 32 (NodeTest -> NameTest .)
+    CLOSE_BRACKET   reduce using rule 32 (NodeTest -> NameTest .)
+    COMMA           reduce using rule 32 (NodeTest -> NameTest .)
+
+
+state 4
+
+    (11) Expr -> MINUS_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 36
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 5
+
+    (16) Expr -> AbbreviatedAbsoluteLocationPath .
+
+    CLOSE_PAREN     reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    OR_OP           reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    AND_OP          reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    EQUAL_OP        reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    REL_OP          reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    PLUS_OP         reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    MINUS_OP        reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    MULT_OP         reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    DIV_OP          reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    MOD_OP          reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    UNION_OP        reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    COMMA           reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    $end            reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+    CLOSE_BRACKET   reduce using rule 16 (Expr -> AbbreviatedAbsoluteLocationPath .)
+
+
+state 6
+
+    (54) FunctionCall -> FuncQName . FormalArguments
+    (55) FormalArguments -> . OPEN_PAREN CLOSE_PAREN
+    (56) FormalArguments -> . OPEN_PAREN ArgumentList CLOSE_PAREN
+
+    OPEN_PAREN      shift and go to state 37
+
+    FormalArguments                shift and go to state 38
+
+state 7
+
+    (40) FuncQName -> NCNAME . COLON FUNCNAME
+    (36) NameTest -> NCNAME . COLON STAR_OP
+    (38) QName -> NCNAME . COLON NCNAME
+    (39) QName -> NCNAME .
+
+    COLON           shift and go to state 39
+    OPEN_BRACKET    reduce using rule 39 (QName -> NCNAME .)
+    PATH_SEP        reduce using rule 39 (QName -> NCNAME .)
+    ABBREV_PATH_SEP reduce using rule 39 (QName -> NCNAME .)
+    OR_OP           reduce using rule 39 (QName -> NCNAME .)
+    AND_OP          reduce using rule 39 (QName -> NCNAME .)
+    EQUAL_OP        reduce using rule 39 (QName -> NCNAME .)
+    REL_OP          reduce using rule 39 (QName -> NCNAME .)
+    PLUS_OP         reduce using rule 39 (QName -> NCNAME .)
+    MINUS_OP        reduce using rule 39 (QName -> NCNAME .)
+    MULT_OP         reduce using rule 39 (QName -> NCNAME .)
+    DIV_OP          reduce using rule 39 (QName -> NCNAME .)
+    MOD_OP          reduce using rule 39 (QName -> NCNAME .)
+    UNION_OP        reduce using rule 39 (QName -> NCNAME .)
+    $end            reduce using rule 39 (QName -> NCNAME .)
+    CLOSE_PAREN     reduce using rule 39 (QName -> NCNAME .)
+    CLOSE_BRACKET   reduce using rule 39 (QName -> NCNAME .)
+    COMMA           reduce using rule 39 (QName -> NCNAME .)
+
+
+state 8
+
+    (21) RelativeLocationPath -> Step .
+
+    PATH_SEP        reduce using rule 21 (RelativeLocationPath -> Step .)
+    ABBREV_PATH_SEP reduce using rule 21 (RelativeLocationPath -> Step .)
+    OR_OP           reduce using rule 21 (RelativeLocationPath -> Step .)
+    AND_OP          reduce using rule 21 (RelativeLocationPath -> Step .)
+    EQUAL_OP        reduce using rule 21 (RelativeLocationPath -> Step .)
+    REL_OP          reduce using rule 21 (RelativeLocationPath -> Step .)
+    PLUS_OP         reduce using rule 21 (RelativeLocationPath -> Step .)
+    MINUS_OP        reduce using rule 21 (RelativeLocationPath -> Step .)
+    MULT_OP         reduce using rule 21 (RelativeLocationPath -> Step .)
+    DIV_OP          reduce using rule 21 (RelativeLocationPath -> Step .)
+    MOD_OP          reduce using rule 21 (RelativeLocationPath -> Step .)
+    UNION_OP        reduce using rule 21 (RelativeLocationPath -> Step .)
+    $end            reduce using rule 21 (RelativeLocationPath -> Step .)
+    CLOSE_PAREN     reduce using rule 21 (RelativeLocationPath -> Step .)
+    CLOSE_BRACKET   reduce using rule 21 (RelativeLocationPath -> Step .)
+    COMMA           reduce using rule 21 (RelativeLocationPath -> Step .)
+
+
+state 9
+
+    (46) FilterExpr -> OPEN_PAREN . Expr CLOSE_PAREN
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 40
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 10
+
+    (18) AbsoluteLocationPath -> PATH_SEP .
+    (19) AbsoluteLocationPath -> PATH_SEP . RelativeLocationPath
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    OR_OP           reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    AND_OP          reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    EQUAL_OP        reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    REL_OP          reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    PLUS_OP         reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    MINUS_OP        reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    MULT_OP         reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    DIV_OP          reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    MOD_OP          reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    UNION_OP        reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    $end            reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    CLOSE_PAREN     reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    CLOSE_BRACKET   reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    COMMA           reduce using rule 18 (AbsoluteLocationPath -> PATH_SEP .)
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+    NCNAME          shift and go to state 34
+
+    NodeTest                       shift and go to state 1
+    NameTest                       shift and go to state 3
+    AxisSpecifier                  shift and go to state 27
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    RelativeLocationPath           shift and go to state 41
+
+state 11
+
+    (29) Step -> ABBREV_STEP_PARENT .
+
+    PATH_SEP        reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    ABBREV_PATH_SEP reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    CLOSE_BRACKET   reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    OR_OP           reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    AND_OP          reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    EQUAL_OP        reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    REL_OP          reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    PLUS_OP         reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    MINUS_OP        reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    MULT_OP         reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    DIV_OP          reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    MOD_OP          reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    UNION_OP        reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    $end            reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    CLOSE_PAREN     reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+    COMMA           reduce using rule 29 (Step -> ABBREV_STEP_PARENT .)
+
+
+state 12
+
+    (44) FilterExpr -> Number .
+
+    PATH_SEP        reduce using rule 44 (FilterExpr -> Number .)
+    ABBREV_PATH_SEP reduce using rule 44 (FilterExpr -> Number .)
+    OPEN_BRACKET    reduce using rule 44 (FilterExpr -> Number .)
+    OR_OP           reduce using rule 44 (FilterExpr -> Number .)
+    AND_OP          reduce using rule 44 (FilterExpr -> Number .)
+    EQUAL_OP        reduce using rule 44 (FilterExpr -> Number .)
+    REL_OP          reduce using rule 44 (FilterExpr -> Number .)
+    PLUS_OP         reduce using rule 44 (FilterExpr -> Number .)
+    MINUS_OP        reduce using rule 44 (FilterExpr -> Number .)
+    MULT_OP         reduce using rule 44 (FilterExpr -> Number .)
+    DIV_OP          reduce using rule 44 (FilterExpr -> Number .)
+    MOD_OP          reduce using rule 44 (FilterExpr -> Number .)
+    UNION_OP        reduce using rule 44 (FilterExpr -> Number .)
+    $end            reduce using rule 44 (FilterExpr -> Number .)
+    CLOSE_PAREN     reduce using rule 44 (FilterExpr -> Number .)
+    CLOSE_BRACKET   reduce using rule 44 (FilterExpr -> Number .)
+    COMMA           reduce using rule 44 (FilterExpr -> Number .)
+
+
+state 13
+
+    (53) Number -> INTEGER .
+
+    PATH_SEP        reduce using rule 53 (Number -> INTEGER .)
+    ABBREV_PATH_SEP reduce using rule 53 (Number -> INTEGER .)
+    OPEN_BRACKET    reduce using rule 53 (Number -> INTEGER .)
+    OR_OP           reduce using rule 53 (Number -> INTEGER .)
+    AND_OP          reduce using rule 53 (Number -> INTEGER .)
+    EQUAL_OP        reduce using rule 53 (Number -> INTEGER .)
+    REL_OP          reduce using rule 53 (Number -> INTEGER .)
+    PLUS_OP         reduce using rule 53 (Number -> INTEGER .)
+    MINUS_OP        reduce using rule 53 (Number -> INTEGER .)
+    MULT_OP         reduce using rule 53 (Number -> INTEGER .)
+    DIV_OP          reduce using rule 53 (Number -> INTEGER .)
+    MOD_OP          reduce using rule 53 (Number -> INTEGER .)
+    UNION_OP        reduce using rule 53 (Number -> INTEGER .)
+    $end            reduce using rule 53 (Number -> INTEGER .)
+    CLOSE_PAREN     reduce using rule 53 (Number -> INTEGER .)
+    CLOSE_BRACKET   reduce using rule 53 (Number -> INTEGER .)
+    COMMA           reduce using rule 53 (Number -> INTEGER .)
+
+
+state 14
+
+    (28) Step -> ABBREV_STEP_SELF .
+
+    PATH_SEP        reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    ABBREV_PATH_SEP reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    CLOSE_BRACKET   reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    OR_OP           reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    AND_OP          reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    EQUAL_OP        reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    REL_OP          reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    PLUS_OP         reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    MINUS_OP        reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    MULT_OP         reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    DIV_OP          reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    MOD_OP          reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    UNION_OP        reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    $end            reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    CLOSE_PAREN     reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+    COMMA           reduce using rule 28 (Step -> ABBREV_STEP_SELF .)
+
+
+state 15
+
+    (30) AxisSpecifier -> AXISNAME . AXIS_SEP
+
+    AXIS_SEP        shift and go to state 42
+
+
+state 16
+
+    (0) S' -> Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    OR_OP           shift and go to state 47
+    AND_OP          shift and go to state 45
+    EQUAL_OP        shift and go to state 50
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+
+state 17
+
+    (37) NameTest -> QName .
+
+    OPEN_BRACKET    reduce using rule 37 (NameTest -> QName .)
+    PATH_SEP        reduce using rule 37 (NameTest -> QName .)
+    ABBREV_PATH_SEP reduce using rule 37 (NameTest -> QName .)
+    OR_OP           reduce using rule 37 (NameTest -> QName .)
+    AND_OP          reduce using rule 37 (NameTest -> QName .)
+    EQUAL_OP        reduce using rule 37 (NameTest -> QName .)
+    REL_OP          reduce using rule 37 (NameTest -> QName .)
+    PLUS_OP         reduce using rule 37 (NameTest -> QName .)
+    MINUS_OP        reduce using rule 37 (NameTest -> QName .)
+    MULT_OP         reduce using rule 37 (NameTest -> QName .)
+    DIV_OP          reduce using rule 37 (NameTest -> QName .)
+    MOD_OP          reduce using rule 37 (NameTest -> QName .)
+    UNION_OP        reduce using rule 37 (NameTest -> QName .)
+    $end            reduce using rule 37 (NameTest -> QName .)
+    CLOSE_PAREN     reduce using rule 37 (NameTest -> QName .)
+    CLOSE_BRACKET   reduce using rule 37 (NameTest -> QName .)
+    COMMA           reduce using rule 37 (NameTest -> QName .)
+
+
+state 18
+
+    (51) VariableReference -> DOLLAR . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    NCNAME          shift and go to state 54
+
+    QName                          shift and go to state 53
+
+state 19
+
+    (43) FilterExpr -> LITERAL .
+
+    PATH_SEP        reduce using rule 43 (FilterExpr -> LITERAL .)
+    ABBREV_PATH_SEP reduce using rule 43 (FilterExpr -> LITERAL .)
+    OPEN_BRACKET    reduce using rule 43 (FilterExpr -> LITERAL .)
+    OR_OP           reduce using rule 43 (FilterExpr -> LITERAL .)
+    AND_OP          reduce using rule 43 (FilterExpr -> LITERAL .)
+    EQUAL_OP        reduce using rule 43 (FilterExpr -> LITERAL .)
+    REL_OP          reduce using rule 43 (FilterExpr -> LITERAL .)
+    PLUS_OP         reduce using rule 43 (FilterExpr -> LITERAL .)
+    MINUS_OP        reduce using rule 43 (FilterExpr -> LITERAL .)
+    MULT_OP         reduce using rule 43 (FilterExpr -> LITERAL .)
+    DIV_OP          reduce using rule 43 (FilterExpr -> LITERAL .)
+    MOD_OP          reduce using rule 43 (FilterExpr -> LITERAL .)
+    UNION_OP        reduce using rule 43 (FilterExpr -> LITERAL .)
+    $end            reduce using rule 43 (FilterExpr -> LITERAL .)
+    CLOSE_PAREN     reduce using rule 43 (FilterExpr -> LITERAL .)
+    CLOSE_BRACKET   reduce using rule 43 (FilterExpr -> LITERAL .)
+    COMMA           reduce using rule 43 (FilterExpr -> LITERAL .)
+
+
+state 20
+
+    (15) Expr -> AbsoluteLocationPath .
+
+    CLOSE_PAREN     reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    OR_OP           reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    AND_OP          reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    EQUAL_OP        reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    REL_OP          reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    PLUS_OP         reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    MINUS_OP        reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    MULT_OP         reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    DIV_OP          reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    MOD_OP          reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    UNION_OP        reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    COMMA           reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    $end            reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+    CLOSE_BRACKET   reduce using rule 15 (Expr -> AbsoluteLocationPath .)
+
+
+state 21
+
+    (14) Expr -> RelativeLocationPath .
+    (22) RelativeLocationPath -> RelativeLocationPath . PATH_SEP Step
+    (23) RelativeLocationPath -> RelativeLocationPath . ABBREV_PATH_SEP Step
+
+    CLOSE_PAREN     reduce using rule 14 (Expr -> RelativeLocationPath .)
+    OR_OP           reduce using rule 14 (Expr -> RelativeLocationPath .)
+    AND_OP          reduce using rule 14 (Expr -> RelativeLocationPath .)
+    EQUAL_OP        reduce using rule 14 (Expr -> RelativeLocationPath .)
+    REL_OP          reduce using rule 14 (Expr -> RelativeLocationPath .)
+    PLUS_OP         reduce using rule 14 (Expr -> RelativeLocationPath .)
+    MINUS_OP        reduce using rule 14 (Expr -> RelativeLocationPath .)
+    MULT_OP         reduce using rule 14 (Expr -> RelativeLocationPath .)
+    DIV_OP          reduce using rule 14 (Expr -> RelativeLocationPath .)
+    MOD_OP          reduce using rule 14 (Expr -> RelativeLocationPath .)
+    UNION_OP        reduce using rule 14 (Expr -> RelativeLocationPath .)
+    COMMA           reduce using rule 14 (Expr -> RelativeLocationPath .)
+    $end            reduce using rule 14 (Expr -> RelativeLocationPath .)
+    CLOSE_BRACKET   reduce using rule 14 (Expr -> RelativeLocationPath .)
+    PATH_SEP        shift and go to state 55
+    ABBREV_PATH_SEP shift and go to state 56
+
+
+state 22
+
+    (12) Expr -> FilterExpr . PATH_SEP RelativeLocationPath
+    (13) Expr -> FilterExpr . ABBREV_PATH_SEP RelativeLocationPath
+    (17) Expr -> FilterExpr .
+    (47) FilterExpr -> FilterExpr . Predicate
+    (50) Predicate -> . OPEN_BRACKET Expr CLOSE_BRACKET
+
+    PATH_SEP        shift and go to state 59
+    ABBREV_PATH_SEP shift and go to state 58
+    CLOSE_PAREN     reduce using rule 17 (Expr -> FilterExpr .)
+    OR_OP           reduce using rule 17 (Expr -> FilterExpr .)
+    AND_OP          reduce using rule 17 (Expr -> FilterExpr .)
+    EQUAL_OP        reduce using rule 17 (Expr -> FilterExpr .)
+    REL_OP          reduce using rule 17 (Expr -> FilterExpr .)
+    PLUS_OP         reduce using rule 17 (Expr -> FilterExpr .)
+    MINUS_OP        reduce using rule 17 (Expr -> FilterExpr .)
+    MULT_OP         reduce using rule 17 (Expr -> FilterExpr .)
+    DIV_OP          reduce using rule 17 (Expr -> FilterExpr .)
+    MOD_OP          reduce using rule 17 (Expr -> FilterExpr .)
+    UNION_OP        reduce using rule 17 (Expr -> FilterExpr .)
+    COMMA           reduce using rule 17 (Expr -> FilterExpr .)
+    $end            reduce using rule 17 (Expr -> FilterExpr .)
+    CLOSE_BRACKET   reduce using rule 17 (Expr -> FilterExpr .)
+    OPEN_BRACKET    shift and go to state 32
+
+    Predicate                      shift and go to state 57
+
+state 23
+
+    (35) NameTest -> STAR_OP .
+
+    OPEN_BRACKET    reduce using rule 35 (NameTest -> STAR_OP .)
+    PATH_SEP        reduce using rule 35 (NameTest -> STAR_OP .)
+    ABBREV_PATH_SEP reduce using rule 35 (NameTest -> STAR_OP .)
+    OR_OP           reduce using rule 35 (NameTest -> STAR_OP .)
+    AND_OP          reduce using rule 35 (NameTest -> STAR_OP .)
+    EQUAL_OP        reduce using rule 35 (NameTest -> STAR_OP .)
+    REL_OP          reduce using rule 35 (NameTest -> STAR_OP .)
+    PLUS_OP         reduce using rule 35 (NameTest -> STAR_OP .)
+    MINUS_OP        reduce using rule 35 (NameTest -> STAR_OP .)
+    MULT_OP         reduce using rule 35 (NameTest -> STAR_OP .)
+    DIV_OP          reduce using rule 35 (NameTest -> STAR_OP .)
+    MOD_OP          reduce using rule 35 (NameTest -> STAR_OP .)
+    UNION_OP        reduce using rule 35 (NameTest -> STAR_OP .)
+    $end            reduce using rule 35 (NameTest -> STAR_OP .)
+    CLOSE_PAREN     reduce using rule 35 (NameTest -> STAR_OP .)
+    CLOSE_BRACKET   reduce using rule 35 (NameTest -> STAR_OP .)
+    COMMA           reduce using rule 35 (NameTest -> STAR_OP .)
+
+
+state 24
+
+    (33) NodeTest -> NODETYPE . OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> NODETYPE . OPEN_PAREN LITERAL CLOSE_PAREN
+
+    OPEN_PAREN      shift and go to state 60
+
+
+state 25
+
+    (31) AxisSpecifier -> ABBREV_AXIS_AT .
+
+    NODETYPE        reduce using rule 31 (AxisSpecifier -> ABBREV_AXIS_AT .)
+    STAR_OP         reduce using rule 31 (AxisSpecifier -> ABBREV_AXIS_AT .)
+    NCNAME          reduce using rule 31 (AxisSpecifier -> ABBREV_AXIS_AT .)
+
+
+state 26
+
+    (52) Number -> FLOAT .
+
+    PATH_SEP        reduce using rule 52 (Number -> FLOAT .)
+    ABBREV_PATH_SEP reduce using rule 52 (Number -> FLOAT .)
+    OPEN_BRACKET    reduce using rule 52 (Number -> FLOAT .)
+    OR_OP           reduce using rule 52 (Number -> FLOAT .)
+    AND_OP          reduce using rule 52 (Number -> FLOAT .)
+    EQUAL_OP        reduce using rule 52 (Number -> FLOAT .)
+    REL_OP          reduce using rule 52 (Number -> FLOAT .)
+    PLUS_OP         reduce using rule 52 (Number -> FLOAT .)
+    MINUS_OP        reduce using rule 52 (Number -> FLOAT .)
+    MULT_OP         reduce using rule 52 (Number -> FLOAT .)
+    DIV_OP          reduce using rule 52 (Number -> FLOAT .)
+    MOD_OP          reduce using rule 52 (Number -> FLOAT .)
+    UNION_OP        reduce using rule 52 (Number -> FLOAT .)
+    $end            reduce using rule 52 (Number -> FLOAT .)
+    CLOSE_PAREN     reduce using rule 52 (Number -> FLOAT .)
+    CLOSE_BRACKET   reduce using rule 52 (Number -> FLOAT .)
+    COMMA           reduce using rule 52 (Number -> FLOAT .)
+
+
+state 27
+
+    (26) Step -> AxisSpecifier . NodeTest
+    (27) Step -> AxisSpecifier . NodeTest PredicateList
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    NODETYPE        shift and go to state 24
+    STAR_OP         shift and go to state 23
+    NCNAME          shift and go to state 34
+
+    NodeTest                       shift and go to state 61
+    NameTest                       shift and go to state 3
+    QName                          shift and go to state 17
+
+state 28
+
+    (42) FilterExpr -> VariableReference .
+
+    PATH_SEP        reduce using rule 42 (FilterExpr -> VariableReference .)
+    ABBREV_PATH_SEP reduce using rule 42 (FilterExpr -> VariableReference .)
+    OPEN_BRACKET    reduce using rule 42 (FilterExpr -> VariableReference .)
+    OR_OP           reduce using rule 42 (FilterExpr -> VariableReference .)
+    AND_OP          reduce using rule 42 (FilterExpr -> VariableReference .)
+    EQUAL_OP        reduce using rule 42 (FilterExpr -> VariableReference .)
+    REL_OP          reduce using rule 42 (FilterExpr -> VariableReference .)
+    PLUS_OP         reduce using rule 42 (FilterExpr -> VariableReference .)
+    MINUS_OP        reduce using rule 42 (FilterExpr -> VariableReference .)
+    MULT_OP         reduce using rule 42 (FilterExpr -> VariableReference .)
+    DIV_OP          reduce using rule 42 (FilterExpr -> VariableReference .)
+    MOD_OP          reduce using rule 42 (FilterExpr -> VariableReference .)
+    UNION_OP        reduce using rule 42 (FilterExpr -> VariableReference .)
+    $end            reduce using rule 42 (FilterExpr -> VariableReference .)
+    CLOSE_PAREN     reduce using rule 42 (FilterExpr -> VariableReference .)
+    CLOSE_BRACKET   reduce using rule 42 (FilterExpr -> VariableReference .)
+    COMMA           reduce using rule 42 (FilterExpr -> VariableReference .)
+
+
+state 29
+
+    (41) FuncQName -> FUNCNAME .
+
+    OPEN_PAREN      reduce using rule 41 (FuncQName -> FUNCNAME .)
+
+
+state 30
+
+    (45) FilterExpr -> FunctionCall .
+
+    PATH_SEP        reduce using rule 45 (FilterExpr -> FunctionCall .)
+    ABBREV_PATH_SEP reduce using rule 45 (FilterExpr -> FunctionCall .)
+    OPEN_BRACKET    reduce using rule 45 (FilterExpr -> FunctionCall .)
+    OR_OP           reduce using rule 45 (FilterExpr -> FunctionCall .)
+    AND_OP          reduce using rule 45 (FilterExpr -> FunctionCall .)
+    EQUAL_OP        reduce using rule 45 (FilterExpr -> FunctionCall .)
+    REL_OP          reduce using rule 45 (FilterExpr -> FunctionCall .)
+    PLUS_OP         reduce using rule 45 (FilterExpr -> FunctionCall .)
+    MINUS_OP        reduce using rule 45 (FilterExpr -> FunctionCall .)
+    MULT_OP         reduce using rule 45 (FilterExpr -> FunctionCall .)
+    DIV_OP          reduce using rule 45 (FilterExpr -> FunctionCall .)
+    MOD_OP          reduce using rule 45 (FilterExpr -> FunctionCall .)
+    UNION_OP        reduce using rule 45 (FilterExpr -> FunctionCall .)
+    $end            reduce using rule 45 (FilterExpr -> FunctionCall .)
+    CLOSE_PAREN     reduce using rule 45 (FilterExpr -> FunctionCall .)
+    CLOSE_BRACKET   reduce using rule 45 (FilterExpr -> FunctionCall .)
+    COMMA           reduce using rule 45 (FilterExpr -> FunctionCall .)
+
+
+state 31
+
+    (48) PredicateList -> Predicate .
+
+    OPEN_BRACKET    reduce using rule 48 (PredicateList -> Predicate .)
+    PATH_SEP        reduce using rule 48 (PredicateList -> Predicate .)
+    ABBREV_PATH_SEP reduce using rule 48 (PredicateList -> Predicate .)
+    OR_OP           reduce using rule 48 (PredicateList -> Predicate .)
+    AND_OP          reduce using rule 48 (PredicateList -> Predicate .)
+    EQUAL_OP        reduce using rule 48 (PredicateList -> Predicate .)
+    REL_OP          reduce using rule 48 (PredicateList -> Predicate .)
+    PLUS_OP         reduce using rule 48 (PredicateList -> Predicate .)
+    MINUS_OP        reduce using rule 48 (PredicateList -> Predicate .)
+    MULT_OP         reduce using rule 48 (PredicateList -> Predicate .)
+    DIV_OP          reduce using rule 48 (PredicateList -> Predicate .)
+    MOD_OP          reduce using rule 48 (PredicateList -> Predicate .)
+    UNION_OP        reduce using rule 48 (PredicateList -> Predicate .)
+    $end            reduce using rule 48 (PredicateList -> Predicate .)
+    CLOSE_PAREN     reduce using rule 48 (PredicateList -> Predicate .)
+    CLOSE_BRACKET   reduce using rule 48 (PredicateList -> Predicate .)
+    COMMA           reduce using rule 48 (PredicateList -> Predicate .)
+
+
+state 32
+
+    (50) Predicate -> OPEN_BRACKET . Expr CLOSE_BRACKET
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 62
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 33
+
+    (25) Step -> NodeTest PredicateList .
+    (49) PredicateList -> PredicateList . Predicate
+    (50) Predicate -> . OPEN_BRACKET Expr CLOSE_BRACKET
+
+    PATH_SEP        reduce using rule 25 (Step -> NodeTest PredicateList .)
+    ABBREV_PATH_SEP reduce using rule 25 (Step -> NodeTest PredicateList .)
+    CLOSE_BRACKET   reduce using rule 25 (Step -> NodeTest PredicateList .)
+    OR_OP           reduce using rule 25 (Step -> NodeTest PredicateList .)
+    AND_OP          reduce using rule 25 (Step -> NodeTest PredicateList .)
+    EQUAL_OP        reduce using rule 25 (Step -> NodeTest PredicateList .)
+    REL_OP          reduce using rule 25 (Step -> NodeTest PredicateList .)
+    PLUS_OP         reduce using rule 25 (Step -> NodeTest PredicateList .)
+    MINUS_OP        reduce using rule 25 (Step -> NodeTest PredicateList .)
+    MULT_OP         reduce using rule 25 (Step -> NodeTest PredicateList .)
+    DIV_OP          reduce using rule 25 (Step -> NodeTest PredicateList .)
+    MOD_OP          reduce using rule 25 (Step -> NodeTest PredicateList .)
+    UNION_OP        reduce using rule 25 (Step -> NodeTest PredicateList .)
+    $end            reduce using rule 25 (Step -> NodeTest PredicateList .)
+    CLOSE_PAREN     reduce using rule 25 (Step -> NodeTest PredicateList .)
+    COMMA           reduce using rule 25 (Step -> NodeTest PredicateList .)
+    OPEN_BRACKET    shift and go to state 32
+
+    Predicate                      shift and go to state 63
+
+state 34
+
+    (36) NameTest -> NCNAME . COLON STAR_OP
+    (38) QName -> NCNAME . COLON NCNAME
+    (39) QName -> NCNAME .
+
+    COLON           shift and go to state 64
+    OPEN_BRACKET    reduce using rule 39 (QName -> NCNAME .)
+    PATH_SEP        reduce using rule 39 (QName -> NCNAME .)
+    ABBREV_PATH_SEP reduce using rule 39 (QName -> NCNAME .)
+    OR_OP           reduce using rule 39 (QName -> NCNAME .)
+    AND_OP          reduce using rule 39 (QName -> NCNAME .)
+    EQUAL_OP        reduce using rule 39 (QName -> NCNAME .)
+    REL_OP          reduce using rule 39 (QName -> NCNAME .)
+    PLUS_OP         reduce using rule 39 (QName -> NCNAME .)
+    MINUS_OP        reduce using rule 39 (QName -> NCNAME .)
+    MULT_OP         reduce using rule 39 (QName -> NCNAME .)
+    DIV_OP          reduce using rule 39 (QName -> NCNAME .)
+    MOD_OP          reduce using rule 39 (QName -> NCNAME .)
+    UNION_OP        reduce using rule 39 (QName -> NCNAME .)
+    $end            reduce using rule 39 (QName -> NCNAME .)
+    CLOSE_PAREN     reduce using rule 39 (QName -> NCNAME .)
+    CLOSE_BRACKET   reduce using rule 39 (QName -> NCNAME .)
+    COMMA           reduce using rule 39 (QName -> NCNAME .)
+
+
+state 35
+
+    (20) AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .
+    (22) RelativeLocationPath -> RelativeLocationPath . PATH_SEP Step
+    (23) RelativeLocationPath -> RelativeLocationPath . ABBREV_PATH_SEP Step
+
+    OR_OP           reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    AND_OP          reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    EQUAL_OP        reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    REL_OP          reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    PLUS_OP         reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    MINUS_OP        reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    MULT_OP         reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    DIV_OP          reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    MOD_OP          reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    UNION_OP        reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    $end            reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    CLOSE_PAREN     reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    CLOSE_BRACKET   reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    COMMA           reduce using rule 20 (AbbreviatedAbsoluteLocationPath -> ABBREV_PATH_SEP RelativeLocationPath .)
+    PATH_SEP        shift and go to state 55
+    ABBREV_PATH_SEP shift and go to state 56
+
+
+state 36
+
+    (11) Expr -> MINUS_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    OR_OP           reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    AND_OP          reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    EQUAL_OP        reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    REL_OP          reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    PLUS_OP         reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    MINUS_OP        reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    MULT_OP         reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    DIV_OP          reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    MOD_OP          reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    COMMA           reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    $end            reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 11 (Expr -> MINUS_OP Expr .)
+    UNION_OP        shift and go to state 46
+
+  ! UNION_OP        [ reduce using rule 11 (Expr -> MINUS_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+  ! PLUS_OP         [ shift and go to state 49 ]
+  ! MINUS_OP        [ shift and go to state 44 ]
+  ! MULT_OP         [ shift and go to state 43 ]
+  ! DIV_OP          [ shift and go to state 48 ]
+  ! MOD_OP          [ shift and go to state 52 ]
+
+
+state 37
+
+    (55) FormalArguments -> OPEN_PAREN . CLOSE_PAREN
+    (56) FormalArguments -> OPEN_PAREN . ArgumentList CLOSE_PAREN
+    (57) ArgumentList -> . Expr
+    (58) ArgumentList -> . ArgumentList COMMA Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    CLOSE_PAREN     shift and go to state 67
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    ArgumentList                   shift and go to state 65
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 66
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 38
+
+    (54) FunctionCall -> FuncQName FormalArguments .
+
+    PATH_SEP        reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    ABBREV_PATH_SEP reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    OPEN_BRACKET    reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    OR_OP           reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    AND_OP          reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    EQUAL_OP        reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    REL_OP          reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    PLUS_OP         reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    MINUS_OP        reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    MULT_OP         reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    DIV_OP          reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    MOD_OP          reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    UNION_OP        reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    $end            reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    CLOSE_PAREN     reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    CLOSE_BRACKET   reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+    COMMA           reduce using rule 54 (FunctionCall -> FuncQName FormalArguments .)
+
+
+state 39
+
+    (40) FuncQName -> NCNAME COLON . FUNCNAME
+    (36) NameTest -> NCNAME COLON . STAR_OP
+    (38) QName -> NCNAME COLON . NCNAME
+
+    FUNCNAME        shift and go to state 70
+    STAR_OP         shift and go to state 68
+    NCNAME          shift and go to state 69
+
+
+state 40
+
+    (46) FilterExpr -> OPEN_PAREN Expr . CLOSE_PAREN
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     shift and go to state 71
+    OR_OP           shift and go to state 47
+    AND_OP          shift and go to state 45
+    EQUAL_OP        shift and go to state 50
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+
+state 41
+
+    (19) AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .
+    (22) RelativeLocationPath -> RelativeLocationPath . PATH_SEP Step
+    (23) RelativeLocationPath -> RelativeLocationPath . ABBREV_PATH_SEP Step
+
+    OR_OP           reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    AND_OP          reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    EQUAL_OP        reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    REL_OP          reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    PLUS_OP         reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    MINUS_OP        reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    MULT_OP         reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    DIV_OP          reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    MOD_OP          reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    UNION_OP        reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    $end            reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    CLOSE_PAREN     reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    CLOSE_BRACKET   reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    COMMA           reduce using rule 19 (AbsoluteLocationPath -> PATH_SEP RelativeLocationPath .)
+    PATH_SEP        shift and go to state 55
+    ABBREV_PATH_SEP shift and go to state 56
+
+
+state 42
+
+    (30) AxisSpecifier -> AXISNAME AXIS_SEP .
+
+    NODETYPE        reduce using rule 30 (AxisSpecifier -> AXISNAME AXIS_SEP .)
+    STAR_OP         reduce using rule 30 (AxisSpecifier -> AXISNAME AXIS_SEP .)
+    NCNAME          reduce using rule 30 (AxisSpecifier -> AXISNAME AXIS_SEP .)
+
+
+state 43
+
+    (7) Expr -> Expr MULT_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 72
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 44
+
+    (6) Expr -> Expr MINUS_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 73
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 45
+
+    (2) Expr -> Expr AND_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 74
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 46
+
+    (10) Expr -> Expr UNION_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 75
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 47
+
+    (1) Expr -> Expr OR_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 76
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 48
+
+    (8) Expr -> Expr DIV_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 77
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 49
+
+    (5) Expr -> Expr PLUS_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 78
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 50
+
+    (3) Expr -> Expr EQUAL_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 79
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 51
+
+    (4) Expr -> Expr REL_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 80
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 52
+
+    (9) Expr -> Expr MOD_OP . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 81
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 53
+
+    (51) VariableReference -> DOLLAR QName .
+
+    PATH_SEP        reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    ABBREV_PATH_SEP reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    OPEN_BRACKET    reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    OR_OP           reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    AND_OP          reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    EQUAL_OP        reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    REL_OP          reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    PLUS_OP         reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    MINUS_OP        reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    MULT_OP         reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    DIV_OP          reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    MOD_OP          reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    UNION_OP        reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    $end            reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    CLOSE_PAREN     reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    CLOSE_BRACKET   reduce using rule 51 (VariableReference -> DOLLAR QName .)
+    COMMA           reduce using rule 51 (VariableReference -> DOLLAR QName .)
+
+
+state 54
+
+    (38) QName -> NCNAME . COLON NCNAME
+    (39) QName -> NCNAME .
+
+    COLON           shift and go to state 82
+    PATH_SEP        reduce using rule 39 (QName -> NCNAME .)
+    ABBREV_PATH_SEP reduce using rule 39 (QName -> NCNAME .)
+    OPEN_BRACKET    reduce using rule 39 (QName -> NCNAME .)
+    OR_OP           reduce using rule 39 (QName -> NCNAME .)
+    AND_OP          reduce using rule 39 (QName -> NCNAME .)
+    EQUAL_OP        reduce using rule 39 (QName -> NCNAME .)
+    REL_OP          reduce using rule 39 (QName -> NCNAME .)
+    PLUS_OP         reduce using rule 39 (QName -> NCNAME .)
+    MINUS_OP        reduce using rule 39 (QName -> NCNAME .)
+    MULT_OP         reduce using rule 39 (QName -> NCNAME .)
+    DIV_OP          reduce using rule 39 (QName -> NCNAME .)
+    MOD_OP          reduce using rule 39 (QName -> NCNAME .)
+    UNION_OP        reduce using rule 39 (QName -> NCNAME .)
+    $end            reduce using rule 39 (QName -> NCNAME .)
+    CLOSE_PAREN     reduce using rule 39 (QName -> NCNAME .)
+    CLOSE_BRACKET   reduce using rule 39 (QName -> NCNAME .)
+    COMMA           reduce using rule 39 (QName -> NCNAME .)
+
+
+state 55
+
+    (22) RelativeLocationPath -> RelativeLocationPath PATH_SEP . Step
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+    NCNAME          shift and go to state 34
+
+    NodeTest                       shift and go to state 1
+    NameTest                       shift and go to state 3
+    AxisSpecifier                  shift and go to state 27
+    QName                          shift and go to state 17
+    Step                           shift and go to state 83
+
+state 56
+
+    (23) RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP . Step
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+    NCNAME          shift and go to state 34
+
+    NodeTest                       shift and go to state 1
+    NameTest                       shift and go to state 3
+    AxisSpecifier                  shift and go to state 27
+    QName                          shift and go to state 17
+    Step                           shift and go to state 84
+
+state 57
+
+    (47) FilterExpr -> FilterExpr Predicate .
+
+    PATH_SEP        reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    ABBREV_PATH_SEP reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    OPEN_BRACKET    reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    OR_OP           reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    AND_OP          reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    EQUAL_OP        reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    REL_OP          reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    PLUS_OP         reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    MINUS_OP        reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    MULT_OP         reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    DIV_OP          reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    MOD_OP          reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    UNION_OP        reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    $end            reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    CLOSE_PAREN     reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    CLOSE_BRACKET   reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+    COMMA           reduce using rule 47 (FilterExpr -> FilterExpr Predicate .)
+
+
+state 58
+
+    (13) Expr -> FilterExpr ABBREV_PATH_SEP . RelativeLocationPath
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+    NCNAME          shift and go to state 34
+
+    NodeTest                       shift and go to state 1
+    NameTest                       shift and go to state 3
+    AxisSpecifier                  shift and go to state 27
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    RelativeLocationPath           shift and go to state 85
+
+state 59
+
+    (12) Expr -> FilterExpr PATH_SEP . RelativeLocationPath
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+    NCNAME          shift and go to state 34
+
+    NodeTest                       shift and go to state 1
+    NameTest                       shift and go to state 3
+    AxisSpecifier                  shift and go to state 27
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    RelativeLocationPath           shift and go to state 86
+
+state 60
+
+    (33) NodeTest -> NODETYPE OPEN_PAREN . CLOSE_PAREN
+    (34) NodeTest -> NODETYPE OPEN_PAREN . LITERAL CLOSE_PAREN
+
+    CLOSE_PAREN     shift and go to state 88
+    LITERAL         shift and go to state 87
+
+
+state 61
+
+    (26) Step -> AxisSpecifier NodeTest .
+    (27) Step -> AxisSpecifier NodeTest . PredicateList
+    (48) PredicateList -> . Predicate
+    (49) PredicateList -> . PredicateList Predicate
+    (50) Predicate -> . OPEN_BRACKET Expr CLOSE_BRACKET
+
+    PATH_SEP        reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    ABBREV_PATH_SEP reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    CLOSE_BRACKET   reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    OR_OP           reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    AND_OP          reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    EQUAL_OP        reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    REL_OP          reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    PLUS_OP         reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    MINUS_OP        reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    MULT_OP         reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    DIV_OP          reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    MOD_OP          reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    UNION_OP        reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    $end            reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    CLOSE_PAREN     reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    COMMA           reduce using rule 26 (Step -> AxisSpecifier NodeTest .)
+    OPEN_BRACKET    shift and go to state 32
+
+    PredicateList                  shift and go to state 89
+    Predicate                      shift and go to state 31
+
+state 62
+
+    (50) Predicate -> OPEN_BRACKET Expr . CLOSE_BRACKET
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_BRACKET   shift and go to state 90
+    OR_OP           shift and go to state 47
+    AND_OP          shift and go to state 45
+    EQUAL_OP        shift and go to state 50
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+
+state 63
+
+    (49) PredicateList -> PredicateList Predicate .
+
+    OPEN_BRACKET    reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    PATH_SEP        reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    ABBREV_PATH_SEP reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    OR_OP           reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    AND_OP          reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    EQUAL_OP        reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    REL_OP          reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    PLUS_OP         reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    MINUS_OP        reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    MULT_OP         reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    DIV_OP          reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    MOD_OP          reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    UNION_OP        reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    $end            reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    CLOSE_PAREN     reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    CLOSE_BRACKET   reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+    COMMA           reduce using rule 49 (PredicateList -> PredicateList Predicate .)
+
+
+state 64
+
+    (36) NameTest -> NCNAME COLON . STAR_OP
+    (38) QName -> NCNAME COLON . NCNAME
+
+    STAR_OP         shift and go to state 68
+    NCNAME          shift and go to state 69
+
+
+state 65
+
+    (56) FormalArguments -> OPEN_PAREN ArgumentList . CLOSE_PAREN
+    (58) ArgumentList -> ArgumentList . COMMA Expr
+
+    CLOSE_PAREN     shift and go to state 92
+    COMMA           shift and go to state 91
+
+
+state 66
+
+    (57) ArgumentList -> Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 57 (ArgumentList -> Expr .)
+    COMMA           reduce using rule 57 (ArgumentList -> Expr .)
+    OR_OP           shift and go to state 47
+    AND_OP          shift and go to state 45
+    EQUAL_OP        shift and go to state 50
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+
+state 67
+
+    (55) FormalArguments -> OPEN_PAREN CLOSE_PAREN .
+
+    PATH_SEP        reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    ABBREV_PATH_SEP reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    OPEN_BRACKET    reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    OR_OP           reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    AND_OP          reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    EQUAL_OP        reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    REL_OP          reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    PLUS_OP         reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    MINUS_OP        reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    MULT_OP         reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    DIV_OP          reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    MOD_OP          reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    UNION_OP        reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    $end            reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    CLOSE_PAREN     reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    CLOSE_BRACKET   reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+    COMMA           reduce using rule 55 (FormalArguments -> OPEN_PAREN CLOSE_PAREN .)
+
+
+state 68
+
+    (36) NameTest -> NCNAME COLON STAR_OP .
+
+    OPEN_BRACKET    reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    PATH_SEP        reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    ABBREV_PATH_SEP reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    OR_OP           reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    AND_OP          reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    EQUAL_OP        reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    REL_OP          reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    PLUS_OP         reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    MINUS_OP        reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    MULT_OP         reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    DIV_OP          reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    MOD_OP          reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    UNION_OP        reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    $end            reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    CLOSE_PAREN     reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    CLOSE_BRACKET   reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+    COMMA           reduce using rule 36 (NameTest -> NCNAME COLON STAR_OP .)
+
+
+state 69
+
+    (38) QName -> NCNAME COLON NCNAME .
+
+    OPEN_BRACKET    reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    PATH_SEP        reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    ABBREV_PATH_SEP reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    OR_OP           reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    AND_OP          reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    EQUAL_OP        reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    REL_OP          reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    PLUS_OP         reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    MINUS_OP        reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    MULT_OP         reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    DIV_OP          reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    MOD_OP          reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    UNION_OP        reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    $end            reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    CLOSE_PAREN     reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    CLOSE_BRACKET   reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+    COMMA           reduce using rule 38 (QName -> NCNAME COLON NCNAME .)
+
+
+state 70
+
+    (40) FuncQName -> NCNAME COLON FUNCNAME .
+
+    OPEN_PAREN      reduce using rule 40 (FuncQName -> NCNAME COLON FUNCNAME .)
+
+
+state 71
+
+    (46) FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .
+
+    PATH_SEP        reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    ABBREV_PATH_SEP reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    OPEN_BRACKET    reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    OR_OP           reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    AND_OP          reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    EQUAL_OP        reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    REL_OP          reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    PLUS_OP         reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    MINUS_OP        reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    MULT_OP         reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    DIV_OP          reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    MOD_OP          reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    UNION_OP        reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    $end            reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    CLOSE_PAREN     reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    CLOSE_BRACKET   reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+    COMMA           reduce using rule 46 (FilterExpr -> OPEN_PAREN Expr CLOSE_PAREN .)
+
+
+state 72
+
+    (7) Expr -> Expr MULT_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    OR_OP           reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    AND_OP          reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    EQUAL_OP        reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    REL_OP          reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    PLUS_OP         reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    MINUS_OP        reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    MULT_OP         reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    DIV_OP          reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    MOD_OP          reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    COMMA           reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    $end            reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 7 (Expr -> Expr MULT_OP Expr .)
+    UNION_OP        shift and go to state 46
+
+  ! UNION_OP        [ reduce using rule 7 (Expr -> Expr MULT_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+  ! PLUS_OP         [ shift and go to state 49 ]
+  ! MINUS_OP        [ shift and go to state 44 ]
+  ! MULT_OP         [ shift and go to state 43 ]
+  ! DIV_OP          [ shift and go to state 48 ]
+  ! MOD_OP          [ shift and go to state 52 ]
+
+
+state 73
+
+    (6) Expr -> Expr MINUS_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    OR_OP           reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    AND_OP          reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    EQUAL_OP        reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    REL_OP          reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    PLUS_OP         reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    MINUS_OP        reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    COMMA           reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    $end            reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 6 (Expr -> Expr MINUS_OP Expr .)
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+  ! MULT_OP         [ reduce using rule 6 (Expr -> Expr MINUS_OP Expr .) ]
+  ! DIV_OP          [ reduce using rule 6 (Expr -> Expr MINUS_OP Expr .) ]
+  ! MOD_OP          [ reduce using rule 6 (Expr -> Expr MINUS_OP Expr .) ]
+  ! UNION_OP        [ reduce using rule 6 (Expr -> Expr MINUS_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+  ! PLUS_OP         [ shift and go to state 49 ]
+  ! MINUS_OP        [ shift and go to state 44 ]
+
+
+state 74
+
+    (2) Expr -> Expr AND_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 2 (Expr -> Expr AND_OP Expr .)
+    OR_OP           reduce using rule 2 (Expr -> Expr AND_OP Expr .)
+    AND_OP          reduce using rule 2 (Expr -> Expr AND_OP Expr .)
+    COMMA           reduce using rule 2 (Expr -> Expr AND_OP Expr .)
+    $end            reduce using rule 2 (Expr -> Expr AND_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 2 (Expr -> Expr AND_OP Expr .)
+    EQUAL_OP        shift and go to state 50
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+  ! EQUAL_OP        [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! REL_OP          [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! PLUS_OP         [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! MINUS_OP        [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! MULT_OP         [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! DIV_OP          [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! MOD_OP          [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! UNION_OP        [ reduce using rule 2 (Expr -> Expr AND_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+
+
+state 75
+
+    (10) Expr -> Expr UNION_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    OR_OP           reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    AND_OP          reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    EQUAL_OP        reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    REL_OP          reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    PLUS_OP         reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    MINUS_OP        reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    MULT_OP         reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    DIV_OP          reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    MOD_OP          reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    UNION_OP        reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    COMMA           reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    $end            reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 10 (Expr -> Expr UNION_OP Expr .)
+
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+  ! PLUS_OP         [ shift and go to state 49 ]
+  ! MINUS_OP        [ shift and go to state 44 ]
+  ! MULT_OP         [ shift and go to state 43 ]
+  ! DIV_OP          [ shift and go to state 48 ]
+  ! MOD_OP          [ shift and go to state 52 ]
+  ! UNION_OP        [ shift and go to state 46 ]
+
+
+state 76
+
+    (1) Expr -> Expr OR_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 1 (Expr -> Expr OR_OP Expr .)
+    OR_OP           reduce using rule 1 (Expr -> Expr OR_OP Expr .)
+    COMMA           reduce using rule 1 (Expr -> Expr OR_OP Expr .)
+    $end            reduce using rule 1 (Expr -> Expr OR_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 1 (Expr -> Expr OR_OP Expr .)
+    AND_OP          shift and go to state 45
+    EQUAL_OP        shift and go to state 50
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+  ! AND_OP          [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! EQUAL_OP        [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! REL_OP          [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! PLUS_OP         [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! MINUS_OP        [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! MULT_OP         [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! DIV_OP          [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! MOD_OP          [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! UNION_OP        [ reduce using rule 1 (Expr -> Expr OR_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+
+
+state 77
+
+    (8) Expr -> Expr DIV_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    OR_OP           reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    AND_OP          reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    EQUAL_OP        reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    REL_OP          reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    PLUS_OP         reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    MINUS_OP        reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    MULT_OP         reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    DIV_OP          reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    MOD_OP          reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    COMMA           reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    $end            reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 8 (Expr -> Expr DIV_OP Expr .)
+    UNION_OP        shift and go to state 46
+
+  ! UNION_OP        [ reduce using rule 8 (Expr -> Expr DIV_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+  ! PLUS_OP         [ shift and go to state 49 ]
+  ! MINUS_OP        [ shift and go to state 44 ]
+  ! MULT_OP         [ shift and go to state 43 ]
+  ! DIV_OP          [ shift and go to state 48 ]
+  ! MOD_OP          [ shift and go to state 52 ]
+
+
+state 78
+
+    (5) Expr -> Expr PLUS_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    OR_OP           reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    AND_OP          reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    EQUAL_OP        reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    REL_OP          reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    PLUS_OP         reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    MINUS_OP        reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    COMMA           reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    $end            reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 5 (Expr -> Expr PLUS_OP Expr .)
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+  ! MULT_OP         [ reduce using rule 5 (Expr -> Expr PLUS_OP Expr .) ]
+  ! DIV_OP          [ reduce using rule 5 (Expr -> Expr PLUS_OP Expr .) ]
+  ! MOD_OP          [ reduce using rule 5 (Expr -> Expr PLUS_OP Expr .) ]
+  ! UNION_OP        [ reduce using rule 5 (Expr -> Expr PLUS_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+  ! PLUS_OP         [ shift and go to state 49 ]
+  ! MINUS_OP        [ shift and go to state 44 ]
+
+
+state 79
+
+    (3) Expr -> Expr EQUAL_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .)
+    OR_OP           reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .)
+    AND_OP          reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .)
+    EQUAL_OP        reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .)
+    COMMA           reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .)
+    $end            reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .)
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+  ! REL_OP          [ reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .) ]
+  ! PLUS_OP         [ reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .) ]
+  ! MINUS_OP        [ reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .) ]
+  ! MULT_OP         [ reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .) ]
+  ! DIV_OP          [ reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .) ]
+  ! MOD_OP          [ reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .) ]
+  ! UNION_OP        [ reduce using rule 3 (Expr -> Expr EQUAL_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+
+
+state 80
+
+    (4) Expr -> Expr REL_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    OR_OP           reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    AND_OP          reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    EQUAL_OP        reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    REL_OP          reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    COMMA           reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    $end            reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 4 (Expr -> Expr REL_OP Expr .)
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
+  ! PLUS_OP         [ reduce using rule 4 (Expr -> Expr REL_OP Expr .) ]
+  ! MINUS_OP        [ reduce using rule 4 (Expr -> Expr REL_OP Expr .) ]
+  ! MULT_OP         [ reduce using rule 4 (Expr -> Expr REL_OP Expr .) ]
+  ! DIV_OP          [ reduce using rule 4 (Expr -> Expr REL_OP Expr .) ]
+  ! MOD_OP          [ reduce using rule 4 (Expr -> Expr REL_OP Expr .) ]
+  ! UNION_OP        [ reduce using rule 4 (Expr -> Expr REL_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+
+
+state 81
+
+    (9) Expr -> Expr MOD_OP Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    OR_OP           reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    AND_OP          reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    EQUAL_OP        reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    REL_OP          reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    PLUS_OP         reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    MINUS_OP        reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    MULT_OP         reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    DIV_OP          reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    MOD_OP          reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    COMMA           reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    $end            reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    CLOSE_BRACKET   reduce using rule 9 (Expr -> Expr MOD_OP Expr .)
+    UNION_OP        shift and go to state 46
+
+  ! UNION_OP        [ reduce using rule 9 (Expr -> Expr MOD_OP Expr .) ]
+  ! OR_OP           [ shift and go to state 47 ]
+  ! AND_OP          [ shift and go to state 45 ]
+  ! EQUAL_OP        [ shift and go to state 50 ]
+  ! REL_OP          [ shift and go to state 51 ]
+  ! PLUS_OP         [ shift and go to state 49 ]
+  ! MINUS_OP        [ shift and go to state 44 ]
+  ! MULT_OP         [ shift and go to state 43 ]
+  ! DIV_OP          [ shift and go to state 48 ]
+  ! MOD_OP          [ shift and go to state 52 ]
+
+
+state 82
+
+    (38) QName -> NCNAME COLON . NCNAME
+
+    NCNAME          shift and go to state 69
+
+
+state 83
+
+    (22) RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .
+
+    PATH_SEP        reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    ABBREV_PATH_SEP reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    OR_OP           reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    AND_OP          reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    EQUAL_OP        reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    REL_OP          reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    PLUS_OP         reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    MINUS_OP        reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    MULT_OP         reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    DIV_OP          reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    MOD_OP          reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    UNION_OP        reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    $end            reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    CLOSE_PAREN     reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    CLOSE_BRACKET   reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+    COMMA           reduce using rule 22 (RelativeLocationPath -> RelativeLocationPath PATH_SEP Step .)
+
+
+state 84
+
+    (23) RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .
+
+    PATH_SEP        reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    ABBREV_PATH_SEP reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    OR_OP           reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    AND_OP          reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    EQUAL_OP        reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    REL_OP          reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    PLUS_OP         reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    MINUS_OP        reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    MULT_OP         reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    DIV_OP          reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    MOD_OP          reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    UNION_OP        reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    $end            reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    CLOSE_PAREN     reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    CLOSE_BRACKET   reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+    COMMA           reduce using rule 23 (RelativeLocationPath -> RelativeLocationPath ABBREV_PATH_SEP Step .)
+
+
+state 85
+
+    (13) Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .
+    (22) RelativeLocationPath -> RelativeLocationPath . PATH_SEP Step
+    (23) RelativeLocationPath -> RelativeLocationPath . ABBREV_PATH_SEP Step
+
+    CLOSE_PAREN     reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    OR_OP           reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    AND_OP          reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    EQUAL_OP        reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    REL_OP          reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    PLUS_OP         reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    MINUS_OP        reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    MULT_OP         reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    DIV_OP          reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    MOD_OP          reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    UNION_OP        reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    COMMA           reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    $end            reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    CLOSE_BRACKET   reduce using rule 13 (Expr -> FilterExpr ABBREV_PATH_SEP RelativeLocationPath .)
+    PATH_SEP        shift and go to state 55
+    ABBREV_PATH_SEP shift and go to state 56
+
+
+state 86
+
+    (12) Expr -> FilterExpr PATH_SEP RelativeLocationPath .
+    (22) RelativeLocationPath -> RelativeLocationPath . PATH_SEP Step
+    (23) RelativeLocationPath -> RelativeLocationPath . ABBREV_PATH_SEP Step
+
+    CLOSE_PAREN     reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    OR_OP           reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    AND_OP          reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    EQUAL_OP        reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    REL_OP          reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    PLUS_OP         reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    MINUS_OP        reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    MULT_OP         reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    DIV_OP          reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    MOD_OP          reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    UNION_OP        reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    COMMA           reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    $end            reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    CLOSE_BRACKET   reduce using rule 12 (Expr -> FilterExpr PATH_SEP RelativeLocationPath .)
+    PATH_SEP        shift and go to state 55
+    ABBREV_PATH_SEP shift and go to state 56
+
+
+state 87
+
+    (34) NodeTest -> NODETYPE OPEN_PAREN LITERAL . CLOSE_PAREN
+
+    CLOSE_PAREN     shift and go to state 93
+
+
+state 88
+
+    (33) NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .
+
+    OPEN_BRACKET    reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    PATH_SEP        reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    ABBREV_PATH_SEP reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    OR_OP           reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    AND_OP          reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    EQUAL_OP        reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    REL_OP          reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    PLUS_OP         reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    MINUS_OP        reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    MULT_OP         reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    DIV_OP          reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    MOD_OP          reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    UNION_OP        reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    $end            reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    CLOSE_PAREN     reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    CLOSE_BRACKET   reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+    COMMA           reduce using rule 33 (NodeTest -> NODETYPE OPEN_PAREN CLOSE_PAREN .)
+
+
+state 89
+
+    (27) Step -> AxisSpecifier NodeTest PredicateList .
+    (49) PredicateList -> PredicateList . Predicate
+    (50) Predicate -> . OPEN_BRACKET Expr CLOSE_BRACKET
+
+    PATH_SEP        reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    ABBREV_PATH_SEP reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    CLOSE_BRACKET   reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    OR_OP           reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    AND_OP          reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    EQUAL_OP        reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    REL_OP          reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    PLUS_OP         reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    MINUS_OP        reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    MULT_OP         reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    DIV_OP          reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    MOD_OP          reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    UNION_OP        reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    $end            reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    CLOSE_PAREN     reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    COMMA           reduce using rule 27 (Step -> AxisSpecifier NodeTest PredicateList .)
+    OPEN_BRACKET    shift and go to state 32
+
+    Predicate                      shift and go to state 63
+
+state 90
+
+    (50) Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .
+
+    OPEN_BRACKET    reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    PATH_SEP        reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    ABBREV_PATH_SEP reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    OR_OP           reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    AND_OP          reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    EQUAL_OP        reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    REL_OP          reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    PLUS_OP         reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    MINUS_OP        reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    MULT_OP         reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    DIV_OP          reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    MOD_OP          reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    UNION_OP        reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    $end            reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    CLOSE_PAREN     reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    CLOSE_BRACKET   reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+    COMMA           reduce using rule 50 (Predicate -> OPEN_BRACKET Expr CLOSE_BRACKET .)
+
+
+state 91
+
+    (58) ArgumentList -> ArgumentList COMMA . Expr
+    (1) Expr -> . Expr OR_OP Expr
+    (2) Expr -> . Expr AND_OP Expr
+    (3) Expr -> . Expr EQUAL_OP Expr
+    (4) Expr -> . Expr REL_OP Expr
+    (5) Expr -> . Expr PLUS_OP Expr
+    (6) Expr -> . Expr MINUS_OP Expr
+    (7) Expr -> . Expr MULT_OP Expr
+    (8) Expr -> . Expr DIV_OP Expr
+    (9) Expr -> . Expr MOD_OP Expr
+    (10) Expr -> . Expr UNION_OP Expr
+    (11) Expr -> . MINUS_OP Expr
+    (12) Expr -> . FilterExpr PATH_SEP RelativeLocationPath
+    (13) Expr -> . FilterExpr ABBREV_PATH_SEP RelativeLocationPath
+    (14) Expr -> . RelativeLocationPath
+    (15) Expr -> . AbsoluteLocationPath
+    (16) Expr -> . AbbreviatedAbsoluteLocationPath
+    (17) Expr -> . FilterExpr
+    (42) FilterExpr -> . VariableReference
+    (43) FilterExpr -> . LITERAL
+    (44) FilterExpr -> . Number
+    (45) FilterExpr -> . FunctionCall
+    (46) FilterExpr -> . OPEN_PAREN Expr CLOSE_PAREN
+    (47) FilterExpr -> . FilterExpr Predicate
+    (21) RelativeLocationPath -> . Step
+    (22) RelativeLocationPath -> . RelativeLocationPath PATH_SEP Step
+    (23) RelativeLocationPath -> . RelativeLocationPath ABBREV_PATH_SEP Step
+    (18) AbsoluteLocationPath -> . PATH_SEP
+    (19) AbsoluteLocationPath -> . PATH_SEP RelativeLocationPath
+    (20) AbbreviatedAbsoluteLocationPath -> . ABBREV_PATH_SEP RelativeLocationPath
+    (51) VariableReference -> . DOLLAR QName
+    (52) Number -> . FLOAT
+    (53) Number -> . INTEGER
+    (54) FunctionCall -> . FuncQName FormalArguments
+    (24) Step -> . NodeTest
+    (25) Step -> . NodeTest PredicateList
+    (26) Step -> . AxisSpecifier NodeTest
+    (27) Step -> . AxisSpecifier NodeTest PredicateList
+    (28) Step -> . ABBREV_STEP_SELF
+    (29) Step -> . ABBREV_STEP_PARENT
+    (40) FuncQName -> . NCNAME COLON FUNCNAME
+    (41) FuncQName -> . FUNCNAME
+    (32) NodeTest -> . NameTest
+    (33) NodeTest -> . NODETYPE OPEN_PAREN CLOSE_PAREN
+    (34) NodeTest -> . NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN
+    (30) AxisSpecifier -> . AXISNAME AXIS_SEP
+    (31) AxisSpecifier -> . ABBREV_AXIS_AT
+    (35) NameTest -> . STAR_OP
+    (36) NameTest -> . NCNAME COLON STAR_OP
+    (37) NameTest -> . QName
+    (38) QName -> . NCNAME COLON NCNAME
+    (39) QName -> . NCNAME
+
+    MINUS_OP        shift and go to state 4
+    LITERAL         shift and go to state 19
+    OPEN_PAREN      shift and go to state 9
+    PATH_SEP        shift and go to state 10
+    ABBREV_PATH_SEP shift and go to state 2
+    DOLLAR          shift and go to state 18
+    FLOAT           shift and go to state 26
+    INTEGER         shift and go to state 13
+    ABBREV_STEP_SELF shift and go to state 14
+    ABBREV_STEP_PARENT shift and go to state 11
+    NCNAME          shift and go to state 7
+    FUNCNAME        shift and go to state 29
+    NODETYPE        shift and go to state 24
+    AXISNAME        shift and go to state 15
+    ABBREV_AXIS_AT  shift and go to state 25
+    STAR_OP         shift and go to state 23
+
+    NodeTest                       shift and go to state 1
+    FuncQName                      shift and go to state 6
+    NameTest                       shift and go to state 3
+    Expr                           shift and go to state 94
+    AxisSpecifier                  shift and go to state 27
+    Number                         shift and go to state 12
+    VariableReference              shift and go to state 28
+    QName                          shift and go to state 17
+    Step                           shift and go to state 8
+    FunctionCall                   shift and go to state 30
+    AbbreviatedAbsoluteLocationPath shift and go to state 5
+    AbsoluteLocationPath           shift and go to state 20
+    RelativeLocationPath           shift and go to state 21
+    FilterExpr                     shift and go to state 22
+
+state 92
+
+    (56) FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .
+
+    PATH_SEP        reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    ABBREV_PATH_SEP reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    OPEN_BRACKET    reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    OR_OP           reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    AND_OP          reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    EQUAL_OP        reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    REL_OP          reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    PLUS_OP         reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    MINUS_OP        reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    MULT_OP         reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    DIV_OP          reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    MOD_OP          reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    UNION_OP        reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    $end            reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    CLOSE_PAREN     reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    CLOSE_BRACKET   reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+    COMMA           reduce using rule 56 (FormalArguments -> OPEN_PAREN ArgumentList CLOSE_PAREN .)
+
+
+state 93
+
+    (34) NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .
+
+    OPEN_BRACKET    reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    PATH_SEP        reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    ABBREV_PATH_SEP reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    OR_OP           reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    AND_OP          reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    EQUAL_OP        reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    REL_OP          reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    PLUS_OP         reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    MINUS_OP        reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    MULT_OP         reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    DIV_OP          reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    MOD_OP          reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    UNION_OP        reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    $end            reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    CLOSE_PAREN     reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    CLOSE_BRACKET   reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+    COMMA           reduce using rule 34 (NodeTest -> NODETYPE OPEN_PAREN LITERAL CLOSE_PAREN .)
+
+
+state 94
+
+    (58) ArgumentList -> ArgumentList COMMA Expr .
+    (1) Expr -> Expr . OR_OP Expr
+    (2) Expr -> Expr . AND_OP Expr
+    (3) Expr -> Expr . EQUAL_OP Expr
+    (4) Expr -> Expr . REL_OP Expr
+    (5) Expr -> Expr . PLUS_OP Expr
+    (6) Expr -> Expr . MINUS_OP Expr
+    (7) Expr -> Expr . MULT_OP Expr
+    (8) Expr -> Expr . DIV_OP Expr
+    (9) Expr -> Expr . MOD_OP Expr
+    (10) Expr -> Expr . UNION_OP Expr
+
+    CLOSE_PAREN     reduce using rule 58 (ArgumentList -> ArgumentList COMMA Expr .)
+    COMMA           reduce using rule 58 (ArgumentList -> ArgumentList COMMA Expr .)
+    OR_OP           shift and go to state 47
+    AND_OP          shift and go to state 45
+    EQUAL_OP        shift and go to state 50
+    REL_OP          shift and go to state 51
+    PLUS_OP         shift and go to state 49
+    MINUS_OP        shift and go to state 44
+    MULT_OP         shift and go to state 43
+    DIV_OP          shift and go to state 48
+    MOD_OP          shift and go to state 52
+    UNION_OP        shift and go to state 46
+
