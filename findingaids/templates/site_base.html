@@ -15,7 +15,7 @@
 {% block navbar-items %}
         <li><a href="{% url fa:keyword-search %}" class="{% activebase request '^/search' %}">search</a></li>
         <li><a>collections</a></li>
-        <li><a href="">About</a></li>
+        <li><a href="/content/about">About</a></li>
 {% endblock %}
 {% block admin-url %}{% url fa-admin:index %}{% endblock %}
 

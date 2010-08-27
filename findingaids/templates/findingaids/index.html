@@ -6,7 +6,11 @@
 
    {% include "findingaids/browse_letters.html" %}
 
-
+   <div>
+       <h1>{{intro.title}}</h1>
+       {{ intro.content|safe }} {# FIXME: should safe be necessary? #}
+   </div>
+ {% comment %}
 <p>This database searches detailed descriptions of manuscript collections,
 which are called finding aids. Finding aids generally include:</p>
 <ul>
@@ -16,6 +20,6 @@ which are called finding aids. Finding aids generally include:</p>
 </ul>
 
 <p><i>Please note: this site includes finding aids for unprocessed collections.</i></p>
-
+{% endcomment %}
 
 {% endblock %}

@@ -11,6 +11,10 @@
     <input class="form-submit" type="submit" value="Search" />
 </form>
 
-
+<hr/>
+<div>    
+    <h2>{{ tips.title }}</h2>
+    {{ tips.content|safe }}
+</div>
 
 {% endblock %}
