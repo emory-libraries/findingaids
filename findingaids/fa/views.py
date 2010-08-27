@@ -21,6 +21,7 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified
+from findingaids.simplepages.models import SimplePage
 
 import logging
 logger = logging.getLogger(__name__);
@@ -36,7 +37,9 @@ fa_listfields = ['eadid', 'list_title','archdesc__did']
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
-    return render_to_response('findingaids/index.html', {'letters': title_letters()},
+    intro = SimplePage.objects.get(url='/intro/')   # FIXME: error handling
+    return render_to_response('findingaids/index.html', {'letters': title_letters(),
+                                                         'intro': intro},
                                                           context_instance=RequestContext(request)
                                                           )
 def browse_titles(request):
@@ -321,9 +324,10 @@ def keyword_search(request):
                  context_instance=RequestContext(request))
     else:
         form = KeywordSearchForm()
+        tips = SimplePage.objects.get(url='/search/')   # FIXME: error handling
             
     return render_to_response('findingaids/search_form.html',
-                    {'form' : form, 'request': request },
+                    {'form' : form, 'request': request, 'tips': tips },
                     context_instance=RequestContext(request))
 
 def _series_url(eadid, series_id, *ids, **extra_opts):

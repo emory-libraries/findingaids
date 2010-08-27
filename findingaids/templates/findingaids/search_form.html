@@ -15,6 +15,13 @@
 <div>    
     <h2>{{ tips.title }}</h2>
     {{ tips.content|safe }}
+
+    {% if perms.simplepages.edit_simplepage %}
+    <div style="float:right">
+        <a href="{% url admin:simplepages_simplepage_change tips.id %}">Edit</a>
+    </div>
+    {% endif %}
+
 </div>
 
 {% endblock %}

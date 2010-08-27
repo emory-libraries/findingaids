@@ -3,8 +3,10 @@
 {% block content-header %}
 
     {% if perms.simplepages.add_simplepage %}
-    <strong>Admin Options:</strong> <a href="{% url admin:simplepages_simplepage_change flatpage.id %}">Edit Page</a> -
-    <a href="{% url admin:simplepages_simplepage_add %}">Add Page</a>
+    <div style="float:right">
+        <strong>Admin Options:</strong> <a href="{% url admin:simplepages_simplepage_change flatpage.id %}">Edit Page</a> -
+        <a href="{% url admin:simplepages_simplepage_add %}">Add Page</a>
+    </div>
     {% endif %}
 
     {{ block.super }}

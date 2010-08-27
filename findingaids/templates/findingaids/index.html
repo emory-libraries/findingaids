@@ -8,7 +8,13 @@
 
    <div>
        <h1>{{intro.title}}</h1>
-       {{ intro.content|safe }} {# FIXME: should safe be necessary? #}
+       {{ intro.content|safe }}
+
+        {% if perms.simplepages.edit_simplepage %}
+        <div style="float:right">
+            <a href="{% url admin:simplepages_simplepage_change intro.id %}">Edit</a>
+        </div>
+        {% endif %}
    </div>
  {% comment %}
 <p>This database searches detailed descriptions of manuscript collections,
