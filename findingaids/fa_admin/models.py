@@ -32,12 +32,19 @@ class EadFile:
     @property
     def published(self):
         "Date object was modified in eXist, if published"
+        # TODO: previewed & published logic substantially the same; consolidate
         if self._published is None:
-            fa = get_findingaid(filter={'document_name': self.filename},
-                                   only=['last_modified'])
-            if fa.count():
-                self._published = fa[0].last_modified
-            else:
+            try:
+                fa = get_findingaid(filter={'document_name': self.filename},
+                                       only=['last_modified'])            
+                if fa.count():
+                    self._published = fa[0].last_modified
+            except Exception:
+                # FIXME: distinguish between not found and eXist error?
+                pass
+
+            # not found or error - store so we don't look it up again
+            if self._published is None:
                 self._published = False
         return self._published
     
@@ -46,11 +53,16 @@ class EadFile:
         """Date object was loaded to eXist preview collection, if currently
             available in preview."""
         if self._previewed is None:
-            fa = get_findingaid(filter={'document_name': self.filename},
-                                   only=['last_modified'], preview=True)
-            if fa.count():
-                self._previewed = fa[0].last_modified
-            else:
+            try:
+                fa = get_findingaid(filter={'document_name': self.filename},
+                                       only=['last_modified'], preview=True)
+                if fa.count():
+                    self._previewed = fa[0].last_modified
+            except Exception:
+                pass
+
+            # not found or error - store so we don't look up again
+            if self._published is None:
                 self._previewed = False
         return self._previewed
 
