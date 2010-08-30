@@ -83,6 +83,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.http.ConditionalGetMiddleware',
 )
 
 ROOT_URLCONF = 'findingaids.urls'
