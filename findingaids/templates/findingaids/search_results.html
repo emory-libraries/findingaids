@@ -15,7 +15,7 @@
 
 {% if keywords %}<p>Search results for : <b>{{keywords}}</b></p>{% endif %}
 
-{# FIXME: should all paginator display be common template functionality?  base / snippet? #}
+{# Pagination snippet? #}
 {% if findingaids.paginator.count %}
     <p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found,
     displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
@@ -33,6 +33,7 @@
  <div>No finding aids matched your search terms.</div>
 {% endfor %}
 
+{# Pagination snippet? #}
 {% if findingaids.paginator.count %}
     {% with findingaids as items %}
         {% include "snippets/page_navigator.html" %}
