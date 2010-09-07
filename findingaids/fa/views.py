@@ -309,8 +309,10 @@ def keyword_search(request):
         # NOTE: adding the "only" filter makes the query slower because eXist has
         # to construct return results; the more documents in a result set, the bigger
         # the cost in time - currently returning entire document plus fulltext relevance score
+        show_pages = []
         results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('-fulltext_score').only(*return_fields) #.also('fulltext_score') #.only(*return_fields)
-        result_subset, paginator = paginate_queryset(request, results)
+        result_subset, paginator = paginate_queryset(request, results, per_page=10, orphans=5)
+        show_pages = pages_to_show(paginator, result_subset.number)
 
         query_times = results.queryTime()
         # FIXME: does not currently include keyword param in generated urls
@@ -320,7 +322,8 @@ def keyword_search(request):
                 {'findingaids' : result_subset,
                  'keywords'  : search_terms,
                  'url_params' : '?' + urlencode({'keywords': search_terms}),
-                 'querytime': [query_times]},
+                 'querytime': [query_times],
+                 'show_pages' : show_pages},
                  context_instance=RequestContext(request))
     else:
         form = KeywordSearchForm()

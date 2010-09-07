@@ -3,17 +3,17 @@
 {% if items.paginator.count %}
 <div class="pagination">Pages:
 {# always link to the first page, even if it is not listed in pages to be shown #}
-{% if 1 not in show_pages %}<a href="?page=1">1</a> {% endif %}
+{% if 1 not in show_pages %}<a href="?{% if keywords %}keywords={{keywords}}&{% endif %}page=1">1</a> {% endif %}
 {% for page in show_pages %}   
     {% if forloop.first and page > 2 %} ... {% endif %} {# gap before page 1 #}
     {% ifequal page items.number %} {{ page }}
-    {% else %}<a href='?{{parameters|default:""}}page={{ page }}'>{{ page }}</a>
+    {% else %}<a href='?{% if keywords %}keywords={{keywords}}&{% endif %}{{parameters|default:""}}page={{ page }}'>{{ page }}</a>
     {% endifequal %}
     {%if forloop.last and page|add:1 < items.paginator.num_pages %} ... {% endif %} {# gap before last page #}
 {% endfor %}
 {# always link to the last page, even if it is not listed in pages to be shown #}
 {% if items.paginator.num_pages not in show_pages %}
-  <a href='?page={{ items.paginator.num_pages }}'>{{ items.paginator.num_pages }}</a>
+  <a href='?{% if keywords %}keywords={{keywords}}&{% endif %}page={{ items.paginator.num_pages }}'>{{ items.paginator.num_pages }}</a>
 {% endif %}
 </div>
 {% endif %}
