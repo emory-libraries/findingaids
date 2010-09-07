@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
+from django.core.urlresolvers import reverse
 from django.test import Client
 
 from findingaids.fa.models import FindingAid, title_letters
@@ -15,7 +16,7 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
 """
     help = __doc__
 
-    _args = ['browse'] # TODO:  search
+    _args = ['browse', 'search']
     args = ' | '.join(_args)
     option_list = BaseCommand.option_list + (
         make_option('--pages', '-p',
@@ -31,7 +32,16 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
     threshold = 5000
     "warning-level threshold, in ms (queries that take longer than this will generate warnings)"
     timedelta_threshold = timedelta(milliseconds=threshold)
-    
+
+    # sample searches to use for testing search response times
+    test_searches = (
+        'African American*',
+        '(Oral histor*) AND Atlanta',
+        'World War I',
+        '''Flannery O'Connor''',
+        'Segregat* +Georgia',
+        '"New York Times" AND journalis*',
+    )
 
     def handle(self, cmd, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
@@ -49,6 +59,7 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
             first_letters = title_letters()
 
             if not options['pages_only']:
+                # get eXist query times without page load
                 if verbosity == v_all:
                     print 'Testing response times for browse xqueries'
 
@@ -75,12 +86,11 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
                 query_times = {}
                 for letter in first_letters:
                     current_times = {}  # times for the current letter
-                    uri = "/titles/%s" % letter
+                    uri = "/titles/%s" % letter     # FIXME: use reverse here
                     if verbosity == v_all:
                         print letter
                     for page in range(1,11):
                         start_time = datetime.now()
-                        # FIXME: how to test non-first pages?
                         response = client.get(uri, {'page': page})
                         end_time = datetime.now()
                         if response.status_code == 200:
@@ -102,6 +112,67 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
                 print "\nMax/Min/Average - all letters, all pages"
                 max_min_avg(query_times.values(), zero=timedelta())
 
+        # SEARCH
+        elif cmd == 'search':
+            client = Client()
+            query_times = {}
+
+            if not options['pages_only']:
+                # get eXist query times without page load
+                if verbosity == v_all:
+                    print 'Testing response times for search xqueries'                
+                for search_terms in self.test_searches:
+                    # NOTE: search syntax duplicated from keyword_search view
+                    search_fields = fa_listfields
+                    search_fields.append('fulltext_score')
+                    fa = FindingAid.objects.filter(fulltext_terms=search_terms).or_filter(
+                        fulltext_terms=search_terms,
+                        boostfields__fulltext_terms=search_terms,
+                    ).order_by('-fulltext_score').only(*search_fields)
+
+                    time, total = fa.queryTime(), fa.count()
+                    query_times[search_terms] = time
+                    if verbosity >= v_normal:
+                        print '%s : %dms, %d records' % (search_terms, time, total)
+                    if fa.queryTime() > self.threshold:
+                        print "Warning: query for %s took %dms and returned %d records" % \
+                            (letter, time, total)
+
+                print "\nMax/Min/Average - search queries, eXist response time"
+                max_min_avg(query_times.values())
+
+            if not options['xquery_only']:
+                if verbosity == v_all:
+                    print 'Testing response times for search pages'
+
+                query_times = {}
+                for search_terms in self.test_searches:
+                    current_times = {}  # times for the current search
+                    uri = reverse('fa:keyword-search')
+                    if verbosity == v_all:
+                        print search_terms
+                    for page in range(1,11):
+                        start_time = datetime.now()
+                        response = client.get(uri, {'page': page, 'keywords': search_terms})
+                        end_time = datetime.now()
+                        if response.status_code == 200:
+                            duration = end_time - start_time
+                            current_times['%s %d' % (search_terms, page)] = duration
+                            if duration > self.timedelta_threshold:
+                                print "Warning: page load for page %d of %s (%s) took %s" % \
+                                    (page, search_terms, uri, duration)
+                            if verbosity == v_all:
+                                print "  page %d : %s" % (page, duration)
+
+
+                    # summarize times for current search
+                    print "\nMax/Min/Average for %s (all pages)" % search_terms
+                    max_min_avg(current_times.values(), zero=timedelta())
+                    # add times for current letter to all query times
+                    query_times.update(current_times)
+
+                print "\nMax/Min/Average - all letters, all pages"
+                max_min_avg(query_times.values(), zero=timedelta())
 
 def max_min_avg(times, zero=0):
     # calculate and display max/min/average
