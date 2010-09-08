@@ -26,7 +26,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # NOTE: overridding these fields from EncodedArchivalDescription to allow
     # for efficiently retrieving unittitle and abstract in the full document OR
     # in the constructed return object returned from eXist for search/browse
-    unittitle = xmlmap.NodeField('//unittitle[not(ancestor::dsc)]', xmlmap.XmlObject)
+    unittitle = xmlmap.NodeField('.//unittitle[not(ancestor::dsc)]', xmlmap.XmlObject)
     abstract = xmlmap.NodeField('//abstract[not(ancestor::dsc)]', xmlmap.XmlObject)
     physical_desc = xmlmap.StringField('//physdesc[not(ancestor::dsc)]')
 
@@ -56,6 +56,10 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         archdesc//controlaccess/corpname[@encodinganalog = "710"]', normalize=True)
     "control access fields that should be mapped to Dublin Core contributor, based on encodinganalog attribute"
 
+    # boosted fields in the index: must be searched to get proper relevance score
+    boostfields = xmlmap.StringField('.//titleproper | .//origination | \
+        .//abstract | .//bioghist | .//scopecontent | .//controlaccess')
+  
     objects = Manager('/ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving FindingAid objects

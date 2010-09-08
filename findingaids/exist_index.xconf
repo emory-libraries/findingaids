@@ -8,18 +8,9 @@
         <lucene>
             <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
             <!-- index everything for full-text keyword search at top-level  -->
-            <text qname="ead">
-                <!-- list title fields; using match because query uses full path -->
-                <text match="archdesc/did/origination/*"/>
-                <text match="archdesc/did/unittitle"/>
+            <text qname="ead" boost="0.5">
 
-                <!-- qname only of list-title fields, for query testing -->
-                <text qname="persname"/>
-                <text qname="corpname"/>
-                <text qname="famname"/>
-                <text qname="unittitle"/>
-
-                <ignore qname="filedesc"/>
+                <ignore qname="publicationstmt"/> 
                 <ignore qname="profiledesc"/>
                 <ignore qname="physdesc"/>
                 <ignore qname="langmaterial"/>
@@ -35,7 +26,7 @@
                 <ignore qname="separatedmaterial"/>
                 <ignore qname="relatedmaterial"/>
                 <ignore qname="bibliography"/>
-                <ignore qname="container"/>
+                <ignore qname="container"/>                
             </text>
 
             <!-- also retrieving at these levels with full-text highlighting -->
@@ -44,6 +35,20 @@
             <text qname="c03"/>
             <text qname="c04"/>
             <text qname="index"/>
+
+            <!-- list title fields; using match because query uses full path -->
+            <text match="archdesc/did/origination/*"/>
+            <text match="archdesc/did/unittitle"/>
+
+            <!-- boost more important fields -->
+            <text qname="origination" boost="1.5"/>
+            <text qname="titleproper" boost="2.0"/>
+            <!-- titleproper basically equivalent to archdesc/did/unittitle,
+                 but unittitle is used throughout EAD -->
+            <text qname="abstract" boost="1.5"/>
+            <text qname="bioghist" boost="1.2"/>
+            <text qname="scopecontent" boost="1.2"/>
+            <text qname="controlaccess" boost="1.7"/>
         </lucene>
     </index>
 </collection>
