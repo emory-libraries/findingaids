@@ -15,10 +15,15 @@
 
 {% if keywords %}<p>Search results for : <b>{{keywords}}</b></p>{% endif %}
 
-{# FIXME: should all paginator display be common template functionality?  base / snippet? #}
+{# Pagination snippet? #}
 {% if findingaids.paginator.count %}
     <p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found,
     displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
+    <p>
+    {% with findingaids as items %}
+        {% include "snippets/pagination.html" %}
+    {% endwith %}
+    </p>
 {% endif %}
 
 <hr/>
@@ -28,24 +33,11 @@
  <div>No finding aids matched your search terms.</div>
 {% endfor %}
 
-{# copied from django pagination documentation ... probably should be better styled  #}
+{# Pagination snippet? #}
 {% if findingaids.paginator.count %}
-<div class="pagination">
-    <span class="step-links">
-        {# FIXME: need a better way to pass url params #}
-        {% if findingaids.has_previous %}
-            <a href="?keywords={{keywords}}&page={{ findingaids.previous_page_number }}">previous</a>
-        {% endif %}
-
-        <span class="current">
-            Page {{ findingaids.number }} of {{ findingaids.paginator.num_pages }}.
-        </span>
-
-        {% if findingaids.has_next %}
-            <a href="?keywords={{keywords}}&page={{ findingaids.next_page_number }}">next</a>
-        {% endif %}
-    </span>
-</div>
+    {% with findingaids as items %}
+        {% include "snippets/pagination.html" %}
+    {% endwith %}
 {% endif %}
 
 {% endblock %}

@@ -8,7 +8,7 @@
 
 <div>{{ files.paginator.count }} files total</div>
 {% with files as items %}
-    {% include "snippets/page_navigator.html" %}
+    {% include "snippets/pagination.html" %}
 {% endwith %}
 <table>
     <tr>
@@ -46,7 +46,7 @@
 </table>
 
 {% with files as items %}
-    {% include "snippets/page_navigator.html" %}
+    {% include "snippets/pagination.html" %}
 {% endwith %}
 
 </div>

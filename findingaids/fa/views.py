@@ -3,7 +3,7 @@ import datetime
 from dateutil.tz import tzlocal
 from urllib import urlencode
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, QueryDict
 from django.conf import settings
 from django.contrib import messages
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -320,17 +320,34 @@ def keyword_search(request):
                     fulltext_terms=search_terms,
                     boostfields__fulltext_terms=search_terms,
                 ).order_by('-fulltext_score').only(*return_fields)
-            result_subset, paginator = paginate_queryset(request, results)
+            result_subset, paginator = paginate_queryset(request, results, per_page=10, orphans=5)
+            show_pages = pages_to_show(paginator, result_subset.number)
 
             query_times = results.queryTime()
             # FIXME: does not currently include keyword param in generated urls
             # create a better browse view - display search terms, etc.
+            #build query string to pass to pass additional arguments in query string (currently only keywords)
+            query_params = {
+            'keywords':search_terms,
+            }
+
+            query_string = QueryDict('')
+            query_string = query_string.copy()
+            query_string.update(query_params)
+            query_string = query_string.urlencode()
+
+            logger.info(query_string)
+
+
 
             return render_to_response('findingaids/search_results.html',
                     {'findingaids' : result_subset,
                      'keywords'  : search_terms,
+                     #TODO combine url_params and query_string
                      'url_params' : '?' + urlencode({'keywords': search_terms}),
-                     'querytime': [query_times]},
+                     'querytime': [query_times],
+                     'show_pages' : show_pages,
+                     'query_string':query_string},
                      context_instance=RequestContext(request))
         except ExistDBException, e:
             # for an invalid full-text query (e.g., missing close quote), eXist
