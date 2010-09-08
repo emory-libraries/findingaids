@@ -3,9 +3,9 @@ import datetime
 from dateutil.tz import tzlocal
 from urllib import urlencode
 
-from django.http import HttpResponse
-from django.http import Http404
+from django.http import HttpResponse, Http404
 from django.conf import settings
+from django.contrib import messages
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -13,6 +13,7 @@ from django.template import RequestContext
 from django.views.decorators.http import condition
 
 from eulcore.django.http import content_negotiation
+from eulcore.existdb.db import ExistDBException
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
 from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
@@ -299,36 +300,62 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
 
 def keyword_search(request):
     "Simple keyword search - runs exist full-text terms query on all terms included."
+    
+    tips = SimplePage.objects.get(url='/search/')   # FIXME: error handling ?
     form = KeywordSearchForm(request.GET)
+    query_error = False
+    
     if form.is_valid():
-        # not yet implemented - if no search terms, display search form
-        search_terms = request.GET.get('keywords')
+        search_terms = form.cleaned_data['keywords']
         # common ead fields for list display, plus full-text relevance score
         return_fields = fa_listfields
         return_fields.append('fulltext_score')
-        # NOTE: adding the "only" filter makes the query slower because eXist has
-        # to construct return results; the more documents in a result set, the bigger
-        # the cost in time - currently returning entire document plus fulltext relevance score
-        results = FindingAid.objects.filter(fulltext_terms=search_terms).order_by('-fulltext_score').only(*return_fields) #.also('fulltext_score') #.only(*return_fields)
-        result_subset, paginator = paginate_queryset(request, results)
+        try:
+            results = FindingAid.objects.filter(
+                    # first do a full-text search to restrict to relevant documents
+                    fulltext_terms=search_terms
+                ).or_filter(
+                    # do an OR search on boosted fields, so that relevance score
+                    # will be calculated based on boosted field values
+                    fulltext_terms=search_terms,
+                    boostfields__fulltext_terms=search_terms,
+                ).order_by('-fulltext_score').only(*return_fields)
+            result_subset, paginator = paginate_queryset(request, results)
 
-        query_times = results.queryTime()
-        # FIXME: does not currently include keyword param in generated urls
-        # create a better browse view - display search terms, etc.
+            query_times = results.queryTime()
+            # FIXME: does not currently include keyword param in generated urls
+            # create a better browse view - display search terms, etc.
 
-        return render_to_response('findingaids/search_results.html',
-                {'findingaids' : result_subset,
-                 'keywords'  : search_terms,
-                 'url_params' : '?' + urlencode({'keywords': search_terms}),
-                 'querytime': [query_times]},
-                 context_instance=RequestContext(request))
+            return render_to_response('findingaids/search_results.html',
+                    {'findingaids' : result_subset,
+                     'keywords'  : search_terms,
+                     'url_params' : '?' + urlencode({'keywords': search_terms}),
+                     'querytime': [query_times]},
+                     context_instance=RequestContext(request))
+        except ExistDBException, e:
+            # for an invalid full-text query (e.g., missing close quote), eXist
+            # error reports 'Cannot parse' and 'Lexical error'
+            # FIXME: could/should this be a custom eXist exception class?
+            query_error = True
+            if 'Cannot parse' in e.message():
+                messages.error(request,
+                    'Your search query could not be parsed.  Please revise your search and try again.')
+            else:
+                # generic error message for any other exception
+                messages.error(request, 'There was an error processing your search.')
     else:
+        # if form was not valid, re-initialize
+        # don't tell the user the field is required if they haven't submitted anything!
         form = KeywordSearchForm()
-        tips = SimplePage.objects.get(url='/search/')   # FIXME: error handling
-            
-    return render_to_response('findingaids/search_form.html',
+
+    # if form is invalid (no search terms) or there was an error, display search form
+    response = render_to_response('findingaids/search_form.html',
                     {'form' : form, 'request': request, 'tips': tips },
                     context_instance=RequestContext(request))
+    # if query could not be parsed, set a 'Bad Request' status code on the response
+    if query_error:
+        response.status_code = 400
+    return response
 
 def _series_url(eadid, series_id, *ids, **extra_opts):
     """

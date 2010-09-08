@@ -1085,6 +1085,29 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, "No finding aids matched",
             msg_prefix='search for nonexistent term should indicate no matches found')
 
+    def test_keyword_search__exact_phrase(self):
+        search_url = reverse('fa:keyword-search')
+        response = self.client.get(search_url,
+                        { 'keywords' : '"georgia'}) # missing close quote - query syntax error
+
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        # expected http status code ?
+        self.assert_("search query could not be parsed" in messages[0],
+                "query parse error message present in response context")
+        expected, got = 400, response.status_code
+        self.assertEqual(expected, got,
+                        'Expected %s but returned %s for %s with invalid exact phrase search' % \
+                        (expected, got, search_url))
+
+        # exact phrase
+        response = self.client.get(search_url,
+                        { 'keywords' : '"Abbey Theatre organized in 1904"'})
+        self.assertContains(response, 'Abbey Theatre collection',
+            msg_prefix='search results include Abbey Theatre for exact phrase from Abbey Theatre bioghist')
+        self.assertContains(response, '1 finding aid found',
+            msg_prefix='only one search result for exact phrase from Abbey Theatre bioghist')
+                
+
 
     def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting
