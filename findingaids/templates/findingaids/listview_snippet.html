@@ -5,6 +5,7 @@
     {% if fa.fulltext_score %}
       <div class="relevance">
 	<div class="score" style="width:{% widthratio fa.fulltext_score  1 100 %}px">&nbsp;</div>
+        {% if debug %}{{ fa.fulltext_score }}{% endif %}{# display numerical score in debug mode #}
       </div>	
     {% endif %}
     <p><a href="{% url fa:view-fa fa.eadid %}{{ url_params }}">{{ fa.list_title|format_ead }}</a> </p>
