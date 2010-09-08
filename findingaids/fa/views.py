@@ -44,6 +44,7 @@ def browse_titles(request):
                               {'letters': title_letters()},
                               context_instance=RequestContext(request))
 
+# TODO: code review requested
 @condition(last_modified_func=collection_lastmodified)
 def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.

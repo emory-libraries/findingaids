@@ -979,6 +979,7 @@ class UtilsTest(TestCase):
         self.assert_(24 in pages,
             "show pages includes 6 pages before last page for last page of results")
 
+# TODO: code review requested
     def test_alpha_pagelabels(self):
         # create minimal object and list of items to generate labels for
         class item:
