@@ -20,7 +20,7 @@ from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, D
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
-    collection_lastmodified, exist_datetime_with_timezone
+    collection_lastmodified, exist_datetime_with_timezone, alpha_pagelabels
 
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
@@ -163,7 +163,9 @@ class FaViewsTest(TestCase):
             msg_prefix='browse by titles for A should include Abbey finding aid abstract')
         self.assertContains(response, '2 finding aids found',
             msg_prefix='browse by titles for A should return 2 finding aids')
-        # test pagination ?
+        # test pagination ? not a lot to paginate here...
+        self.assertContains(response, 'Ab - Ad',
+            msg_prefix='browse pagination uses first letters of titles instead of numbers')
 
         # test current letter
         self.assertPattern("<a *class='current'[^>]*>A<", response.content,
@@ -976,6 +978,21 @@ class UtilsTest(TestCase):
         self.assert_(30 in pages, "show pages includes last page for last page of results")
         self.assert_(24 in pages,
             "show pages includes 6 pages before last page for last page of results")
+
+    def test_alpha_pagelabels(self):
+        # create minimal object and list of items to generate labels for
+        class item:
+            def __init__(self, title):
+                self.title = title
+        titles = ['Abigail', 'Abner', 'Adam', 'Allen', 'Amy', 'Andy', 'Annabelle', 'Anne', 'Azad']
+        items = [item(t) for t in titles]
+        paginator = Paginator(items, per_page=2)        
+        labels = alpha_pagelabels(paginator, items, label_attribute='title')
+        self.assertEqual('Abi - Abn', labels[1])
+        self.assertEqual('Ad - Al', labels[2])
+        self.assertEqual('Am - And', labels[3])
+        self.assertEqual('Anna - Anne', labels[4])
+        self.assertEqual('Az', labels[5])
 
     def test_ead_lastmodified(self):
         modified = ead_lastmodified('rqst', 'abbey244')

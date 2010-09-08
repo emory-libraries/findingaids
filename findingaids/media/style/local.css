@@ -212,3 +212,7 @@ div.removed-notice {
     color: black !important;
     background-color: #f2f3f5;
 }
+
+div.pagination a {
+    padding-right: 2px; 
+}

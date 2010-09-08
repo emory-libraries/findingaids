@@ -65,6 +65,66 @@ def pages_to_show(paginator, page, page_labels={}):
 
     return show_pages
 
+def alpha_pagelabels(paginator, objects, label_attribute):
+    """Generate abbreviated, alphabetical page labels for pagination items.
+    Label format should be something like 'Ab - Ad', 'Ard - Art'.
+
+    :param paginator: a django paginator
+    :param objects: the complete list of objects paginated by the paginator
+    :param label_attribute: attribute on the object to use to generate
+        page labels
+    :returns: dictionary appropriate for use with :meth:`pages_to_show`, keyed
+        on page numbers
+    """
+    page_labels = {}
+    labels = []
+
+    if paginator.count <= 1:
+        # if there is not enough content to paginate, bail out
+        return page_labels
+    
+    # get all labels for start and end objects on each page
+    for i in range(paginator.num_pages):
+        page = paginator.page(i+1)  # page is 1-based
+        # get objects at start & end of each page (index is also 1-based)
+        labels.append(unicode(getattr(objects[page.start_index()-1], label_attribute)))
+        # don't go beyond the end of the actual number of objects
+        end_index = min(page.end_index()-1, paginator.count)
+        # add end label only if not the same as first (e.g., page of a single item)
+        if page.start_index() - 1 != end_index:            
+            labels.append(unicode(getattr(objects[end_index], label_attribute)))
+
+    # abbreviate labels so they are as short as possible but distinct from
+    # preceding and following labels
+    abbreviated_labels = []
+    for i in range(len(labels)):
+        for j in range(1, len(labels[i])+1):
+            # start with one letter, go up to full length of the label if necessary
+            abbr = labels[i][:j]
+            next_label = labels[i+1] if i+1 < len(labels)  else ''
+            prev_label = labels[i-1] if i > 0 else ''
+            if abbr != next_label[:j] and abbr != prev_label[:j]:
+                # at current length, abbreviation is different from neighboring labels
+                abbreviated_labels.append(abbr)
+                break
+            elif labels[i] == next_label or labels[i] == prev_label:
+                # in the rare case that two labels are *exactly* the same,
+                # add the full label
+                # FIXME: is there a better way to handle this? 
+                abbreviated_labels.append(labels[i])
+                break
+
+    for i in range(0, len(abbreviated_labels), 2):
+        page_index = (i+2) / 2
+        try:
+            page_labels[page_index] = '%s - %s' % (abbreviated_labels[i].strip(),
+                                                  abbreviated_labels[i+1].strip())
+        except IndexError:
+            # paginator was not created with orphan protection,
+            # it's possible we could get a single item at the end
+            page_labels[page_index] = abbreviated_labels[i].strip()
+
+    return page_labels
 
 # functionality for switching to preview mode
 

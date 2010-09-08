@@ -1,12 +1,8 @@
 import logging
-import datetime
-from dateutil.tz import tzlocal
 from urllib import urlencode
 
 from django.http import HttpResponse, Http404, QueryDict
-from django.conf import settings
 from django.contrib import messages
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -21,7 +17,7 @@ from findingaids.fa.forms import KeywordSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
-            collection_lastmodified
+            collection_lastmodified, alpha_pagelabels
 from findingaids.simplepages.models import SimplePage
 
 import logging
@@ -34,7 +30,6 @@ fa_listfields = ['eadid', 'list_title','archdesc__did']
 # and physdesc individually because eXist can construct the return xml much more
 # efficiently; unittitle and abstract should be accessed via FindingAid.unittitle
 # and FindingAid.abstract
-# FIXME: could list title be pulled from did also?
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
@@ -54,21 +49,25 @@ def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
-    # NOTE: adding the "only" filter makes the query slower; removing it requires
-    # transferring and loading full xml for each document; currently, the view
-    # seems to load faster *with* only
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)
-    show_pages = []
-    fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
-    show_pages = pages_to_show(paginator, fa_subset.number)
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)    
+    fa_subset, paginator = paginate_queryset(request, fa, per_page=10) #, orphans=5)
+    page_labels = alpha_pagelabels(paginator, fa, label_attribute='list_title')
+    show_pages = pages_to_show(paginator, fa_subset.number, page_labels)
 
-    return render_to_response('findingaids/titles_list.html',
-        {'findingaids' : fa_subset,
+    response_context = {
+        'findingaids' : fa_subset,
          'querytime': [fa.queryTime()],
          'letters': title_letters(),
          'current_letter': letter,
-         'show_pages' : show_pages},
-         context_instance=RequestContext(request))
+         'show_pages' : show_pages,
+    }
+    if page_labels:     # if there is content and page labels to show, add to context
+         # other page labels handled by show_pages, but first & last are special
+         response_context['first_page_label'] = page_labels[1]
+         response_context['last_page_label'] = page_labels[paginator.num_pages]
+
+    return render_to_response('findingaids/titles_list.html',
+        response_context, context_instance=RequestContext(request))
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
@@ -308,7 +307,7 @@ def keyword_search(request):
     if form.is_valid():
         search_terms = form.cleaned_data['keywords']
         # common ead fields for list display, plus full-text relevance score
-        return_fields = fa_listfields
+        return_fields = fa_listfields[:]     # copy! don't modify master list
         return_fields.append('fulltext_score')
         try:
             results = FindingAid.objects.filter(
@@ -326,6 +325,7 @@ def keyword_search(request):
             query_times = results.queryTime()
             # FIXME: does not currently include keyword param in generated urls
             # create a better browse view - display search terms, etc.
+            
             #build query string to pass to pass additional arguments in query string (currently only keywords)
             query_params = {
             'keywords':search_terms,
@@ -335,10 +335,6 @@ def keyword_search(request):
             query_string = query_string.copy()
             query_string.update(query_params)
             query_string = query_string.urlencode()
-
-            logger.info(query_string)
-
-
 
             return render_to_response('findingaids/search_results.html',
                     {'findingaids' : result_subset,
