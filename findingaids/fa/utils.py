@@ -37,10 +37,17 @@ def render_to_pdf(template_src, context_dict, filename=None):
     return http.HttpResponse('Error generating PDF')
     return http.HttpResponse('Error generating PDF<pre>%s</pre>' % cgi.escape(html))
 
-def pages_to_show(paginator, page):
-    # generate a list of pages to show around the current page
-    # show 3 numbers on either side of current number, or more if close to end/beginning
-    show_pages = []
+def pages_to_show(paginator, page, page_labels={}):
+    """Generate a dictionary of pages to show around the current page. Show
+    3 numbers on either side of the specified page, or more if close to end or
+    beginning of available pages.
+
+    :param paginator: paginator object, populated with objects
+    :param page: number of the current page
+    :param page_labels: optional dictionary of page labels, keyed on page number
+    :rtype: dictionary
+    """    
+    show_pages = {}
     if page != 1:
         before = 3      # default number of pages to show before the current page
         if page >= (paginator.num_pages - 3):   # current page is within 3 of end
@@ -48,11 +55,13 @@ def pages_to_show(paginator, page):
             before += (3 - (paginator.num_pages - page))
         for i in range(before, 0, -1):    # add pages from before away up to current page
             if (page - i) >= 1:
-                show_pages.append(page - i)
+                # if there is a page label available, use that as dictionary value
+                show_pages[page - i] = page_labels[page - i ] if (page - 1) in page_labels else None
     # show up to 3 to 7 numbers after the current number, depending on how many we already have
     for i in range(7 - len(show_pages)):
         if (page + i) <= paginator.num_pages:
-            show_pages.append(page + i)
+            # if there is a page label available, use that as dictionary value
+            show_pages[page + i] = page_labels[page + i] if (page + i) in page_labels else None
 
     return show_pages
 
