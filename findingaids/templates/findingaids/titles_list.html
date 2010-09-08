@@ -16,7 +16,7 @@
 {% endif %}
 
 {% with findingaids as items %}
-    {% include "snippets/page_navigator.html" %}
+    {% include "snippets/pagination.html" %}
 {% endwith %}
 <hr/>
 
@@ -27,7 +27,7 @@
 {% endfor %}
 
 {% with findingaids as items %}
-    {% include "snippets/page_navigator.html" %}
+    {% include "snippets/pagination.html" %}
 {% endwith %}
 
 {% endblock %}

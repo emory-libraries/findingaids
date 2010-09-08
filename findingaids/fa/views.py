@@ -6,6 +6,7 @@ from urllib import urlencode
 from django.http import HttpResponse
 from django.http import Http404
 from django.conf import settings
+from django.http import QueryDict
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -314,6 +315,18 @@ def keyword_search(request):
         result_subset, paginator = paginate_queryset(request, results, per_page=10, orphans=5)
         show_pages = pages_to_show(paginator, result_subset.number)
 
+        #build query string
+        query_params = {
+        'keywords':search_terms,
+        }
+        
+        query_string = QueryDict('')
+        query_string = query_string.copy()
+        query_string.update(query_params)
+        query_string = query_string.urlencode()
+        
+        logger.info(query_string)
+
         query_times = results.queryTime()
         # FIXME: does not currently include keyword param in generated urls
         # create a better browse view - display search terms, etc.
@@ -323,7 +336,8 @@ def keyword_search(request):
                  'keywords'  : search_terms,
                  'url_params' : '?' + urlencode({'keywords': search_terms}),
                  'querytime': [query_times],
-                 'show_pages' : show_pages},
+                 'show_pages' : show_pages,
+                 'query_string':query_string},
                  context_instance=RequestContext(request))
     else:
         form = KeywordSearchForm()

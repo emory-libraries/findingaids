@@ -6,7 +6,7 @@
 <div>{{findingaids.paginator.count}} documents</div>
 
 {% with findingaids as items %}
-    {% include "snippets/page_navigator.html" %}
+    {% include "snippets/pagination.html" %}
 {% endwith %}
 
 <table>
@@ -29,7 +29,7 @@
 </table>
 
 {% with findingaids as items %}
-    {% include "snippets/page_navigator.html" %}
+    {% include "snippets/pagination.html" %}
 {% endwith %}
 {% endblock %}
 
