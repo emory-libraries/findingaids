@@ -50,7 +50,7 @@ def titles_by_letter(request, letter):
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)    
-    fa_subset, paginator = paginate_queryset(request, fa, per_page=10) #, orphans=5)
+    fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
     page_labels = alpha_pagelabels(paginator, fa, label_attribute='list_title')
     show_pages = pages_to_show(paginator, fa_subset.number, page_labels)
 
