@@ -305,6 +305,27 @@ class Index(XmlModel, EadIndex):
 ArchivalDescription._fields['index'].node_class = Index
 
 
+class FileContents(XmlModel, Component):
+    """
+    Any EAD component with a level of *file*, with item-level information (box &
+    folder contents).
+    """
+
+    ROOT_NAMESPACES = { 'exist': 'http://exist.sourceforge.net/NS/exist' }
+
+    ead = xmlmap.NodeField("ancestor::ead", FindingAid)
+    ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
+
+    series = xmlmap.NodeField("parent::node()", Series)
+    ":class:`findingaids.fa.models.Series` series this file belongs to."
+
+    objects = Manager('''(//c01|//c02|//c03|//c04)[@level="file"]''')
+    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
+        for django db objects, used for finding and retrieving c-series file objects
+        in eXist.
+
+        Configured to find any c-series (1-4) with a level of file.
+    """
 
 class Deleted(models.Model):
     """
