@@ -319,6 +319,7 @@ def keyword_search(request):
                     # will be calculated based on boosted field values
                     fulltext_terms=search_terms,
                     boostfields__fulltext_terms=search_terms,
+                    highlight=False,    # disable highlighting in search results list
                 ).order_by('-fulltext_score').only(*return_fields)
             result_subset, paginator = paginate_queryset(request, results, per_page=10, orphans=5)
             show_pages = pages_to_show(paginator, result_subset.number)
