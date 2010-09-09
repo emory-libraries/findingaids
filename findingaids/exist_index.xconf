@@ -36,9 +36,9 @@
             <text qname="c04"/>
             <text qname="index"/>
 
-            <!-- list title fields; using match because query uses full path -->
-            <text match="archdesc/did/origination/*"/>
-            <text match="archdesc/did/unittitle"/>
+            <!-- range index on list title fields -->
+            <create path="archdesc/did/unittitle" type="xs:string"/>
+            <create path="archdesc/did/origination/*" type="xs:string"/> 
 
             <!-- boost more important fields -->
             <text qname="origination" boost="1.5"/>
