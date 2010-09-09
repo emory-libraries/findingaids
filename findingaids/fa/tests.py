@@ -1125,7 +1125,15 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '1 finding aid found',
             msg_prefix='only one search result for exact phrase from Abbey Theatre bioghist')
                 
+    def test_keyword_search__wildcard(self):
+        search_url = reverse('fa:keyword-search')
+        # wildcard search
+        response = self.client.get(search_url, { 'keywords' : 'Abb?y Theat*'})
 
+        self.assertContains(response, 'Abbey Theatre collection',
+            msg_prefix='search results include Abbey Theatre for wildcard search "Abb?y Theat*"')
+
+        # don't know of any error cases that could happen with wildcards...
 
     def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting
