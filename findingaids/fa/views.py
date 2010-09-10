@@ -86,7 +86,7 @@ def xml_fa(request, id, preview=False):
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 @content_negotiation({'text/xml' : xml_fa, 'application/xml' : xml_fa})
-def view_fa(request, id, preview=False):
+def findingaid(request, id, preview=False):
     """View a single finding aid.   In preview mode, pulls the document from the
     configured eXist-db preview collection instead of the default public one.
     
@@ -103,7 +103,7 @@ def view_fa(request, id, preview=False):
     fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
-    return render_to_response('findingaids/view.html', { 'ead' : fa,
+    return render_to_response('findingaids/findingaid.html', { 'ead' : fa,
                                                          'series' : series,
                                                          'all_indexes' : fa.archdesc.index,                                                         
                                                          'preview': preview,
@@ -128,7 +128,7 @@ def full_fa(request, id, mode, preview=False):
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
 
     template = 'findingaids/full.html'
-    template_args = { 'findingaid' : fa, 'series' : series,
+    template_args = { 'ead' : fa, 'series' : series,
                     'mode' : mode, 'preview': preview, 'request' : request}
     if mode == 'html':
         return render_to_response(template, template_args)

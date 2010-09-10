@@ -4,7 +4,7 @@
 {% load ead %}
 {% load ifurl %}
 {# generate and store url for main finding aid page #}
-{% ifurl preview admin:preview:view-fa fa:view-fa ead.eadid as ead_url %}
+{% ifurl preview admin:preview:findingaid fa:findingaid ead.eadid as ead_url %}
 <div id="toc">
     <h2>Table of contents:</h2>
     <ul>

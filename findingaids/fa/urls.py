@@ -14,7 +14,7 @@ series_id = "[a-zA-Z0-9-._]+"
 
 # urls under a single document url (e.g., /documents/abbey244/ )
 findingaid_parts = patterns('findingaids.fa.views',
-    url(r'^$', 'view_fa', name='view-fa'),
+    url(r'^$', 'findingaid', name='findingaid'),
     url(r'^EAD/$', 'xml_fa', name='xml-fa'),
     url(r'^full/$', 'full_fa', {'mode': 'html'}, name='full-fa'),     # html version of pdf, for testing
     url(r'^printable/$', 'full_fa', {'mode': 'pdf'}, name='printable-fa'),

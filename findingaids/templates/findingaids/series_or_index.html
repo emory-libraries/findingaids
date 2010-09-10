@@ -15,7 +15,7 @@
 
 {% block content-title %}
 {# generate and store url for main finding aid page #}
-{% ifurl preview fa-admin:preview:view-fa fa:view-fa id=ead.eadid as ead_url %}
+{% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid as ead_url %}
   <a href="{{ ead_url }}{{ url_params }}" rel="contents">{{ ead.title }}</a>
 {% endblock %}
 

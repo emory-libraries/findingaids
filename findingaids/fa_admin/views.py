@@ -237,7 +237,7 @@ def publish(request):
             task = TaskResult(label='PDF reload', eadid=ead.eadid.value, task_id=result.task_id)
             task.save()
 
-            ead_url = reverse('fa:view-fa', kwargs={ 'id' : ead.eadid.value })
+            ead_url = reverse('fa:findingaid', kwargs={ 'id' : ead.eadid.value })
             change = "updated" if replaced else "added"
             messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
                     % (change, filename, ead_url, unicode(ead.unittitle)))
@@ -280,7 +280,7 @@ def preview(request):
             ead = load_xmlobject_from_file(fullpath, FindingAid)
             messages.success(request, 'Successfully loaded <b>%s</b> for preview.' % filename)                
             # redirect to document preview page with code 303 (See Other)
-            return HttpResponseSeeOther(reverse('fa-admin:preview:view-fa', kwargs={'id': ead.eadid }))
+            return HttpResponseSeeOther(reverse('fa-admin:preview:findingaid', kwargs={'id': ead.eadid }))
         else:
             return render_to_response('fa_admin/publish-errors.html',
                     {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e },
