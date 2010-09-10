@@ -137,42 +137,21 @@ def full_fa(request, id, mode, preview=False):
 
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def series_or_index(request, id, series_id, preview=False):
-    """View a single series (c01) or index from a finding aid.
+def series_or_index(request, id, series_id, subseries_id=None,
+                    subsubseries_id=None, preview=False):
+    """View a single series or subseries (c01, c02, or c03) or an index from a
+    finding aid.
 
     :param id: eadid for the document the series belongs to
-    :param series_id: series or index id
+    :param series_id: c01 series or index id
+    :param subseries_id: c02 subseries id (optional)
+    :param subsubseries_id: c03 sub-subseries id (optional)
     :param preview: boolean indicating preview mode, defaults to False
     """
-    return _view_series(request, id, series_id, preview=preview)
-
-@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def view_subseries(request, id, series_id, subseries_id, preview=False):
-    """View a single subseries (c02) from a finding aid.
-    
-    :param id: eadid for the document the subseries belongs to
-    :param series_id: id for the top-level series (c01) the subseries belongs to
-    :param subseries_id: id for the subseries (c02) to display
-    :param preview: boolean indicating preview mode, defaults to False
-    """
-    return _view_series(request, id, series_id, subseries_id,
-                        preview=preview)
-
-@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id, preview=False):
-    """View a single sub-subseries (c03) from a finding aid.
-    
-    :param id: eadid for the document the sub-subseries belongs to
-    :param series_id: top-level series (c01) the sub-subseries belongs to
-    :param subseries_id: subseries (c02) the sub-subseries belongs to
-    :param subsubseries_id: sub-subseries (c03) to display
-    :param preview: boolean indicating preview mode, defaults to False"
-    """
-    return _view_series(request, id, series_id, subseries_id, subsubseries_id,
-                        preview=preview)
+    return _view_series(request, id, series_id, subseries_id, subsubseries_id, preview=preview)
 
 def _view_series(request, eadid, *series_ids, **kwargs):
-    """Common logic for retrieving and displaying a series, subseries, or index.
+    """Retrieve and display a series, subseries, or index.
 
     :param eadid: eadid for the document the series or index belongs to
     :param series_ids: list of series ids - number of ids determines series level
@@ -181,6 +160,11 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     """
     if 'preview' in kwargs and kwargs['preview']:
         use_preview_collection()
+
+    # unspecified sub- and sub-sub-series come in as None; filter them out
+    series_ids = list(series_ids)
+    while None in series_ids:
+        series_ids.remove(None)
 
     #used to build initial series and index filters and field lists
     filter_list = {'ead__eadid':eadid}
