@@ -127,7 +127,7 @@ def full_fa(request, id, mode, preview=False):
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor)
 
     template = 'findingaids/full.html'
-    template_args = { 'findingaid' : fa, 'series' : series,
+    template_args = { 'ead' : fa, 'series' : series,
                     'mode' : mode, 'preview': preview, 'request' : request}
     if mode == 'html':
         return render_to_response(template, template_args)
