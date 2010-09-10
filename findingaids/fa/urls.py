@@ -21,6 +21,7 @@ def document_urls(**extra_opts):
             name='full-fa'),     # html version of pdf, for testing
         url(r'^%s/printable/$' % EADID_URL_REGEX, 'full_fa', dict({'mode': 'pdf'}, **extra_opts),
             name='printable-fa'),
+        url(r'^%s/search/$' % EADID_URL_REGEX, 'document_search', extra_opts, name='singledoc-search'),
         url(r'^%s/(?P<series_id>%s)/$' % (EADID_URL_REGEX, series_id), 'series_or_index',
             extra_opts, name='series-or-index'),
         url(r'^%s/(?P<series_id>%s)/(?P<subseries_id>%s)/$' % \

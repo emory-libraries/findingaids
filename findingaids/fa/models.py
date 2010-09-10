@@ -305,7 +305,7 @@ class Index(XmlModel, EadIndex):
 ArchivalDescription._fields['index'].node_class = Index
 
 
-class FileContents(XmlModel, Component):
+class FileComponent(XmlModel, Component):
     """
     Any EAD component with a level of *file*, with item-level information (box &
     folder contents).

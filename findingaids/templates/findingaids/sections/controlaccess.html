@@ -1,9 +1,9 @@
-{# controlled access terms - expects FindingAid object as findingaid #}
+{# controlled access terms - expects FindingAid object as ead #}
 {% load ead %}
 <div id="control_access" class="nextpage">
-    <h2><a name="control_access">{{ findingaid.archdesc.controlaccess.head }}</a></h2>
-    {{ findingaid.archdesc.controlaccess.controlaccess.head }}
-    {% for ca in findingaid.archdesc.controlaccess.controlaccess %}
+    <h2><a name="control_access">{{ ead.archdesc.controlaccess.head }}</a></h2>
+    {{ ead.archdesc.controlaccess.controlaccess.head }}
+    {% for ca in ead.archdesc.controlaccess.controlaccess %}
        <h3>{{ ca.head }}</h3>
        <ul>
        {% for term in ca.terms %}

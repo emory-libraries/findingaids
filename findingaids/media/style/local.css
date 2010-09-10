@@ -46,7 +46,7 @@ p.query-time {
 }
 
 div#toc_series {
-    clear: both;
+    clear: right;
     border: 1px solid #D9D9D9;
     background-color: #f2f3f5;
     margin: 0px 0px 30px;
@@ -102,7 +102,7 @@ div#sidebar-left-inner div {
     padding: 5px;
     margin-bottom: 10px;
 }
-div#keyword-search input {
+div.sidebar-search input {
     margin: 2px;
 }
 

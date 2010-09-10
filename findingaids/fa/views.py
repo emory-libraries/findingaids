@@ -12,8 +12,9 @@ from eulcore.django.http import content_negotiation
 from eulcore.existdb.db import ExistDBException
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
-from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, title_letters, Index
-from findingaids.fa.forms import KeywordSearchForm
+from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, \
+            FileComponent, title_letters, Index
+from findingaids.fa.forms import KeywordSearchForm, DocumentSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
@@ -102,11 +103,12 @@ def view_fa(request, id, preview=False):
     fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
-    return render_to_response('findingaids/view.html', { 'findingaid' : fa,
+    return render_to_response('findingaids/view.html', { 'ead' : fa,
                                                          'series' : series,
                                                          'all_indexes' : fa.archdesc.index,                                                         
                                                          'preview': preview,
                                                          'url_params': url_params,
+                                                         'docsearch_form': DocumentSearchForm(),
                                                          },
                                                          context_instance=RequestContext(request, current_app='preview'))
 
@@ -233,6 +235,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'next': next,
                     'url_params': url_params,
                     'canonical_url' : _series_url(eadid, *series_ids),
+                    'docsearch_form': DocumentSearchForm(),
                     }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
@@ -371,6 +374,23 @@ def keyword_search(request):
     if query_error:
         response.status_code = 400
     return response
+
+def document_search(request, id):
+    "Keyword search on file-level items in a single Finding Aid."
+
+    form = DocumentSearchForm(request.GET)
+    if form.is_valid():
+        search_terms = form.cleaned_data['keywords']
+        files = FileComponent.objects.filter(ead__eadid=id,
+            fulltext_terms=search_terms).also('series__id', 'series__did')
+
+        query_times = files.queryTime()
+
+        return render_to_response('findingaids/document_search.html', {
+                'files' : files,
+                'querytime': [query_times],
+             }, context_instance=RequestContext(request))
+    # TODO: error handling, invalid form, etc.
 
 def _series_url(eadid, series_id, *ids, **extra_opts):
     """
