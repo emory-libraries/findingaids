@@ -16,7 +16,7 @@ from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, Deleted
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
@@ -814,7 +814,7 @@ class FaViewsTest(TestCase):
 
     def test__subseries_links_c02(self):
         # subseries links when not starting at c01 level
-        series = Subseries.objects.also('ead__eadid', 'series__id').get(id='raoul548_4.1')
+        series = Series2.objects.also('ead__eadid', 'series__id').get(id='raoul548_4.1')
         links = _subseries_links(series)
 
         self.assertEqual(2, len(links))     # test doc has two c03 subseries
@@ -828,20 +828,20 @@ class FaViewsTest(TestCase):
             'series2_id': 'raoul548_4.1', 'series3_id': 'raoul548_4.1b'}) in links[1])
 
         # c02 retrieved without parent c01 id should get an exception
-        series = Subseries.objects.also('ead__eadid').get(id='raoul548_4.1')        
+        series = Series2.objects.also('ead__eadid').get(id='raoul548_4.1')
         self.assertRaises(Exception, _subseries_links, series)
 
     def test__subseries_links_c03(self):
         # c03 retrieved without parent c01 id should get an exception
-        series = Subsubseries.objects.also('ead__eadid').get(id='raoul548_4.1a')
+        series = Series3.objects.also('ead__eadid').get(id='raoul548_4.1a')
         self.assertRaises(Exception, _subseries_links, series)
 
         # c03 with series but not subseries id - still exception
-        series = Subsubseries.objects.also('ead__eadid', 'series__id').get(id='raoul548_4.1a')
+        series = Series3.objects.also('ead__eadid', 'series__id').get(id='raoul548_4.1a')
         self.assertRaises(Exception, _subseries_links, series)
 
         # all required parent ids - no exception
-        series = Subsubseries.objects.also('ead__eadid', 'series__id', 'subseries__id').get(id='raoul548_4.1a')
+        series = Series3.objects.also('ead__eadid', 'series__id', 'series2__id').get(id='raoul548_4.1a')
         self.assertEqual([], _subseries_links(series))
 
     def test__subseries_links_anchors(self):

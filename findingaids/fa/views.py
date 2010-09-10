@@ -12,7 +12,7 @@ from eulcore.django.http import content_negotiation
 from eulcore.existdb.db import ExistDBException
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
-from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, \
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
             FileComponent, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm, DocumentSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
@@ -268,11 +268,11 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
         elif len(series_ids) == 2:
             return_fields.append('series__id')
             search_fields["series__id"] = series_ids[0]
-            queryset = Subseries.objects
+            queryset = Series2.objects
         elif len(series_ids) == 3:
-            return_fields.extend(['series__id', 'subseries__id'])
-            search_fields.update({"series__id": series_ids[0], "subseries__id" : series_ids[1]})
-            queryset = Subsubseries.objects
+            return_fields.extend(['series__id', 'series2__id'])
+            search_fields.update({"series__id": series_ids[0], "series2__id" : series_ids[1]})
+            queryset = Series3.objects
         
         queryset = queryset.filter(**search_fields).also(*return_fields)
         # if there are any additional filters specified, apply before getting item
@@ -452,8 +452,8 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
 
             if series.node.tag == 'c03':
                 # if initial series passed in is c03, add c02 series id to url ids before current series id
-                if hasattr(series, 'subseries') and series.subseries:
-                    url_ids.append(series.subseries.id)
+                if hasattr(series, 'series2') and series.series2:
+                    url_ids.append(series.series2.id)
                 else:
                     raise Exception("Cannot construct subseries links without c02 subseries id for %s element %s"
                         % (series.node.tag, series.id))
