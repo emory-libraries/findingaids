@@ -66,10 +66,10 @@
     </head>
     <body>
 <div class="fa">
-<h1>{{ findingaid.title|format_ead }}</h1>
+<h1>{{ ead.title|format_ead }}</h1>
 
 <div id="publication_statement">
-    {% with findingaid.file_desc.publication as publication %}
+    {% with ead.file_desc.publication as publication %}
     <p>{{ publication.publisher }}</p>
     {% for line in publication.address.lines %}
         <p>{{ line }}</p>
@@ -83,9 +83,9 @@
 {# NOTE: contol access section is not included in the PDF #}
 
 {# container list or series/subseries listing #}
-{% if findingaid.dsc.hasSeries %}       {# list series/subseries here,   display on separate page #}
+{% if ead.dsc.hasSeries %}       {# list series/subseries here,   display on separate page #}
   <div class="nextpage">
-    <h2><a name="dsc">{{ findingaid.dsc.head }}</a></h2>
+    <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
     <ul>
        {% autoescape off %}
            {{ series|unordered_list }}
@@ -93,15 +93,15 @@
     </ul>
   </div>
 {% else %}  {# not using next page for container list - causes blank page because of long table #}
-  {% with findingaid.dsc as series %}
-    <h2><a name="dsc">{{ findingaid.dsc.head }}</a></h2>
+  {% with ead.dsc as series %}
+    <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
     {% include "findingaids/sections/containerlist.html" %}
   {% endwith %}
 {% endif %}
 
 
-{% if findingaid.dsc.hasSeries %}
-    {% for c01_series in findingaid.dsc.c %}        
+{% if ead.dsc.hasSeries %}
+    {% for c01_series in ead.dsc.c %}
         <div class="nextpage">
             {% with c01_series as series %}
                 {% include "findingaids/sections/series.html" %}
@@ -132,7 +132,7 @@
   {% include "findingaids/sections/containerlist.html" %}
 {% endif %}
 
-{% for index in findingaid.archdesc.index %}
+{% for index in ead.archdesc.index %}
     {% include "findingaids/sections/indexentry.html" %}
 {% endfor %}
 
@@ -147,8 +147,8 @@
 <div id="header">
     <table>
         <tr>
-            <td style="text-align:left">{{ findingaid.title|format_ead }}</td>
-            <td style="text-align:right">{{ findingaid.archdesc.unitid }}</td>
+            <td style="text-align:left">{{ ead.title|format_ead }}</td>
+            <td style="text-align:right">{{ ead.archdesc.unitid }}</td>
         </tr>
     </table>
 </div>
