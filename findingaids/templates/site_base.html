@@ -29,18 +29,6 @@
       </form>
   </div>
   {% endif %}
-
-  {# FIXME: should we create a finding aid-specific base that includes this? #}
-  {% if docsearch_form %} {# single document search, when available #}
-  <div id="document-search" class="sidebar-search">
-      Search within <b>{{ ead.title }}</b>
-      <form action="{% url fa:singledoc-search ead.eadid %}" method="get">
-        {{ docsearch_form.document }}
-        {{ docsearch_form.keywords }}
-        <input class="form-submit" type="submit" value="Search" />
-      </form>
-  </div>
-  {% endif %}
 {% endblock %}
 
 {% block message %}
