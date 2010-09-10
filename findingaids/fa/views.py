@@ -137,18 +137,18 @@ def full_fa(request, id, mode, preview=False):
 
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def series_or_index(request, id, series_id, subseries_id=None,
-                    subsubseries_id=None, preview=False):
+def series_or_index(request, id, series_id, series2_id=None,
+                    series3_id=None, preview=False):
     """View a single series or subseries (c01, c02, or c03) or an index from a
     finding aid.
 
     :param id: eadid for the document the series belongs to
     :param series_id: c01 series or index id
-    :param subseries_id: c02 subseries id (optional)
-    :param subsubseries_id: c03 sub-subseries id (optional)
+    :param series2_id: c02 subseries id (optional)
+    :param series3_id: c03 sub-subseries id (optional)
     :param preview: boolean indicating preview mode, defaults to False
     """
-    return _view_series(request, id, series_id, subseries_id, subsubseries_id, preview=preview)
+    return _view_series(request, id, series_id, series2_id, series3_id, preview=preview)
 
 def _view_series(request, eadid, *series_ids, **kwargs):
     """Retrieve and display a series, subseries, or index.
@@ -369,9 +369,11 @@ def document_search(request, id):
             fulltext_terms=search_terms).also('series__id', 'series__did')
 
         query_times = files.queryTime()
+        ead = get_findingaid(id, only=['eadid', 'title'])
 
         return render_to_response('findingaids/document_search.html', {
                 'files' : files,
+                'ead': ead,
                 'querytime': [query_times],
              }, context_instance=RequestContext(request))
     # TODO: error handling, invalid form, etc.
@@ -390,11 +392,11 @@ def _series_url(eadid, series_id, *ids, **extra_opts):
     if len(ids) == 0:       # no additional args
         view_name = 'series-or-index'
     if len(ids) >= 1:       # add subseries id arg if one specified (used for sub and sub-subseries)
-        args['subseries_id'] = ids[0]
-        view_name = 'view-subseries'
+        args['series2_id'] = ids[0]
+        view_name = 'series2'
     if len(ids) == 2:       # add sub-subseries id arg if specified
-        args['subsubseries_id'] = ids[1]
-        view_name = 'view-subsubseries'
+        args['series3_id'] = ids[1]
+        view_name = 'series3'
 
     if 'preview' in extra_opts and extra_opts['preview'] == True:
         view_namespace = 'fa-admin:preview'

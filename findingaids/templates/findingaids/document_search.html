@@ -21,7 +21,7 @@
    {% ifchanged %}
      <tr><th colspan="3"><a
          {% if component.series.subseries.id %}
-            href="{% url fa:view-subsubseries ead.eadid.value component.series.series.id component.series.subseries.id component.series.id  %}"
+            href="{% url fa:series3 ead.eadid.value component.series.series.id component.series.subseries.id component.series.id  %}"
          {% else %}
             href="{% url fa:series-or-index ead.eadid component.series.id %}"
          {% endif %}      

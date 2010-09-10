@@ -22,10 +22,10 @@ findingaid_parts = patterns('findingaids.fa.views',
     url(r'^(?P<series_id>%s)/$' % series_id, 'series_or_index', name='series-or-index'),
     # django can't reverse url patterns with optional parameters
     # so series, subseries, and sub-subseries urls have to be defined separately
-    url(r'^(?P<series_id>%(re)s)/(?P<subseries_id>%(re)s)/$' % {'re': series_id},
-        'series_or_index', name='view-subseries'),
-    url(r'^(?P<series_id>%(re)s)/(?P<subseries_id>%(re)s)/(?P<subsubseries_id>%(re)s)/$' \
-        % {'re': series_id}, 'series_or_index', name='view-subsubseries'),
+    url(r'^(?P<series_id>%(re)s)/(?P<series2_id>%(re)s)/$' % {'re': series_id},
+        'series_or_index', name='series2'),
+    url(r'^(?P<series_id>%(re)s)/(?P<series2_id>%(re)s)/(?P<series3_id>%(re)s)/$' \
+        % {'re': series_id}, 'series_or_index', name='series3'),
 )
 
 findingaid_urlpatterns = patterns('findingaids.fa.views',
