@@ -4,6 +4,7 @@ import re
 from time import sleep
 from types import ListType
 from lxml import etree
+from urllib import quote as urlquote
 
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -345,6 +346,20 @@ class FaViewsTest(TestCase):
                     response.content, "control access - form/genre")
         self.assertPattern('<h3>Occupation</h3>.*Educator\..*Journalist',
                     response.content, "control access - occupation")
+                    
+        # controlaccess terms link to subject search
+        search_url = reverse('fa:keyword-search')
+        self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
+                urlquote('Collins, M.D.')), msg_prefix='controlaccess person name links to subject search')
+        self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
+            urlquote('African Americans--Georgia--Eatonton.')),
+            msg_prefix='controlaccess subject links to subject search')
+        self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
+            urlquote('Augusta (Ga.).')), msg_prefix='controlaccess geogname links to subject search')
+        self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
+            urlquote('Scrapbooks.')), msg_prefix='controlaccess genreform links to subject search')
+        self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
+            urlquote('Journalist.')), msg_prefix='controlaccess occupation links to subject search')
 
         # dsc
         self.assertPattern('<h2>.*Container List.*</h2>', response.content,

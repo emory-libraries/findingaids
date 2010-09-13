@@ -108,7 +108,7 @@
             <head id="leverette135_1060">Selected Search Terms</head>
             <controlaccess id="leverette135_1068">
                 <head id="leverette135_1061">Personal Names</head>
-                <persname encodinganalog="600" id="leverette135_1062" source="lcnaf"> Collins, M.D.</persname>
+                <persname encodinganalog="600" id="leverette135_1062" source="lcnaf">Collins, M.D.</persname>
                 <persname encodinganalog="600" id="leverette135_1063" source="lcnaf"> Farley, James A. (James Aloysius), 1888-1976.</persname>
                 <famname encodinganalog="600" id="leverette135_1064" source="lcnaf"> Harris family.</famname>
                 <persname encodinganalog="600" id="leverette135_1065" source="lcnaf"> Harris, Joel Chandler,
@@ -120,8 +120,7 @@
             </controlaccess>
             <controlaccess id="leverette135_1075">
                 <head id="leverette135_1069">Topical Terms</head>
-                <subject encodinganalog="650" id="leverette135_1070" source="lcsh">
-			 African Americans--Georgia--Eatonton.</subject>
+                <subject encodinganalog="650" id="leverette135_1070" source="lcsh">African Americans--Georgia--Eatonton.</subject>
                 <subject encodinganalog="650" id="leverette135_1071" source="lcsh"> American
 			 newspapers--Sections, columns, etc.</subject>
                 <subject encodinganalog="650" id="leverette135_1072" source="lcsh">
@@ -133,7 +132,7 @@
             </controlaccess>
             <controlaccess id="leverette135_1082">
                 <head id="leverette135_1076">Geographic Names</head>
-                <geogname encodinganalog="651" id="leverette135_1077"> Augusta (Ga.).</geogname>
+                <geogname encodinganalog="651" id="leverette135_1077">Augusta (Ga.).</geogname>
                 <geogname encodinganalog="651" id="leverette135_1078"> Eatonton (Ga.)</geogname>
                 <geogname encodinganalog="651" id="leverette135_1079"> Social Circle (Ga.)</geogname>
                 <geogname encodinganalog="651" id="leverette135_1080"> Thomson (Ga.)</geogname>
@@ -148,7 +147,7 @@
             <controlaccess id="leverette135_1090">
                 <head id="leverette135_1087">Occupation</head>
                 <occupation encodinganalog="656" id="leverette135_1088" source="aat"> Educator.</occupation>
-                <occupation encodinganalog="656" id="leverette135_1089" source="aat"> Journalist.</occupation>
+                <occupation encodinganalog="656" id="leverette135_1089" source="aat">Journalist.</occupation>
             </controlaccess>
         </controlaccess>
         <dsc id="leverette135_10495" type="in-depth">
