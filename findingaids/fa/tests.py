@@ -655,6 +655,10 @@ class FaViewsTest(TestCase):
         # missing section head should not be displayed as "none"
         self.assertContains(response, "None", 0,
             msg_prefix="series with a section with no head does not display 'None' for heading")
+        self.assertContains(response, 'id="breadcrumbs"')
+        self.assertContains(response, "Miscellaneous, 1881-1982", 1, msg_prefix='should only contain 1 instance of this text and it should be in the breadcrumbs')
+        self.assertContains(response, "/documents/raoul548/raoul548_s4", 2, msg_prefix='should only contain 2 instance of this text in breadcrumbs and contents')
+#        print response
 
 
     def test_preview_mode(self):

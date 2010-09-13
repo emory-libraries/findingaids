@@ -21,7 +21,6 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             collection_lastmodified, alpha_pagelabels
 from findingaids.simplepages.models import SimplePage
 
-import logging
 logger = logging.getLogger(__name__);
 
 
@@ -210,7 +209,6 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     prev= index -1
     next = index +1
 
-    
     render_opts = { 'ead': result.ead,
                     'all_series' : all_series,
                     'all_indexes' : all_indexes,
@@ -221,6 +219,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'canonical_url' : _series_url(eadid, *series_ids),
                     'docsearch_form': DocumentSearchForm(),
                     }
+
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
@@ -229,6 +228,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     else:
         render_opts['series'] = result
         render_opts['subseries'] = _subseries_links(result, url_params=url_params)
+
 
     return render_to_response('findingaids/series_or_index.html',
                             render_opts, context_instance=RequestContext(request))
@@ -266,11 +266,11 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
             return record
         
         elif len(series_ids) == 2:
-            return_fields.append('series__id')
+            return_fields.extend(['series__id', 'series__did'])
             search_fields["series__id"] = series_ids[0]
             queryset = Series2.objects
         elif len(series_ids) == 3:
-            return_fields.extend(['series__id', 'series2__id'])
+            return_fields.extend(['series__id', 'series2__id', 'series_did', 'series2__did'])
             search_fields.update({"series__id": series_ids[0], "series2__id" : series_ids[1]})
             queryset = Series3.objects
         

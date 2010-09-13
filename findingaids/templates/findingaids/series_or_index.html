@@ -19,11 +19,20 @@
   <a href="{{ ead_url }}{{ url_params }}" rel="contents">{{ ead.title }}</a>
 {% endblock %}
 
+
 {% block content-body %}
+<div id="breadcrumbs">
+{% if series.series.id %}
+    <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid, series_id=series.series.id %}{{ url_params }}">{{series.series.did.unittitle}}</a> >
+{% endif %}
+{% if series.series2.id %}
+    <a href="{% ifurl preview fa-admin:preview:series2 fa:series2 id=ead.eadid, series_id=series.series.id, series2_id=series.series2.id %}{{ url_params }}">{{series.series2.did.unittitle}}</a> >
+{% endif %}
+{% firstof series.did.unittitle  index.head %}
+</div>
 <div id="print-links">
     <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
 </div>
-
 <div id="toc_series">
     {% include "findingaids/sections/toc.html" %}
 <div id="series">
