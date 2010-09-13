@@ -366,20 +366,49 @@ def document_search(request, id):
     "Keyword search on file-level items in a single Finding Aid."
 
     form = DocumentSearchForm(request.GET)
+    query_error = False
+    ead = get_findingaid(id, only=['eadid', 'title'])   # will 404 if not found
     if form.is_valid():
         search_terms = form.cleaned_data['keywords']
-        files = FileComponent.objects.filter(ead__eadid=id,
-            fulltext_terms=search_terms).also('series__id', 'series__did')
-
-        query_times = files.queryTime()
-        ead = get_findingaid(id, only=['eadid', 'title'])
-
-        return render_to_response('findingaids/document_search.html', {
-                'files' : files,
-                'ead': ead,
-                'querytime': [query_times],
-             }, context_instance=RequestContext(request))
-    # TODO: error handling, invalid form, etc.
+        try:
+            # do a full-text search at the file level
+            # include parent series information and enough ancestor series ids
+            # in order to generate link to containing series at any level (c01-c03)
+            files = FileComponent.objects.filter(ead__eadid=id,
+                fulltext_terms=search_terms).also('parent__id', 'parent__did',
+                    'series1__id', 'series2__id')
+            return render_to_response('findingaids/document_search.html', {
+                    'files' : files,
+                    'ead': ead,
+                    'querytime': [files.queryTime(), ead.queryTime()],
+                    'keywords': search_terms,
+                    'url_params': '?' + urlencode({'keywords': search_terms}),
+                    'docsearch_form': DocumentSearchForm(),
+                 }, context_instance=RequestContext(request))
+        except ExistDBException, e:
+            # for an invalid full-text query (e.g., missing close quote), eXist
+            # error reports 'Cannot parse' and 'Lexical error'
+            # NOTE: some duplicate logic from error handling in main keyword search
+            query_error = True
+            if 'Cannot parse' in e.message():
+                messages.error(request,
+                    'Your search query could not be parsed.  Please revise your search and try again.')
+            else:
+                # generic error message for any other exception
+                messages.error(request, 'There was an error processing your search.')
+    else:
+        # invalid form 
+        messages.error(request, 'Please enter a search term.')
+    # display empty search results
+    response = render_to_response('findingaids/document_search.html', {
+                    'files' : [],
+                    'ead': ead,
+                    'docsearch_form': DocumentSearchForm(),
+                 }, context_instance=RequestContext(request))
+     # if query could not be parsed, set a 'Bad Request' status code on the response
+    if query_error:
+        response.status_code = 400
+    return response
 
 def _series_url(eadid, series_id, *ids, **extra_opts):
     """

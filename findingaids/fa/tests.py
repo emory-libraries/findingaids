@@ -1253,6 +1253,81 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, 'Index of Selected Correspondents',
             msg_prefix="index without search terms is still returned normally")
 
+    def test_document_search(self):
+        search_url = reverse('fa:singledoc-search', kwargs={'id':'raoul548'})
+        response = self.client.get(search_url, { 'keywords' : 'correspondence'})
+
+        self.assertContains(response, "Search results for : <b>correspondence</b>",
+            msg_prefix='search results include search term')
+        self.assertContains(response, "45 matches found",
+            msg_prefix='search for "correspondence" in raoul548 matches 45 items')
+
+        # series from fixture with matches:  s1.1, 4, 4.1b
+        # - series url & label
+        series_url = reverse('fa:series-or-index',
+                            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4'})
+        self.assertContains(response, series_url,
+            count=1, msg_prefix='link to series with matches (series 4) occurs once')        
+        self.assertContains(response, 'Series 4: Miscellaneous',
+            msg_prefix='label for series with matches (4) is displayed')
+        # - subseries url & label
+        self.assertContains(response, reverse('fa:series2',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223', 'series2_id': 'raoul548_100355'}),
+            count=1, msg_prefix='link to subseries with matches (1.1) occurs once')
+        self.assertContains(response, 'Subseries 1.1: William Greene',
+            msg_prefix='label for series with matches (1.1) is displayed')
+        # - sub-subseries url & label
+        self.assertContains(response, reverse('fa:series3',
+            kwargs={'id': 'raoul548', 'series_id': 'raoul548_s4',
+                'series2_id': 'raoul548_4.1', 'series3_id': 'raoul548_4.1b'}),
+            count=1, msg_prefix='link to sub-subseries with matches (4.1b) occurs once')
+        self.assertContains(response, 'Subseries 4.1b: Genealogy part 2',
+            msg_prefix='label for subseries with matches (4.1b) is displayed')
+
+        self.assertContains(response, reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
+            msg_prefix='search within raoul48 includes link to main finding aid page')
+        
+        self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
+            msg_prefix="single-document search results page includes robots directives - noindex, nofollow")
+
+        # links to series and main finding aid should include search terms
+        # should be 7 series matches, 1 document title
+        self.assertContains(response, '?keywords=correspondence', count=9,
+            msg_prefix='links to finding aid series include search terms')
+
+        # no matches
+        response = self.client.get(search_url, { 'keywords' : 'bogus'})
+        self.assertContains(response, "No matches found",
+            msg_prefix='search for "bogus" in raoul548 displays no matches')
+
+        # bad query
+        response = self.client.get(search_url, { 'keywords' : '"incomplete phrase'})
+        # sets status code to 400 bad request
+        self.assertContains(response, "No matches found", status_code=400,
+            msg_prefix='unparse-able search in raoul548 displays no matches')
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assert_('search query could not be parsed.' in messages[0],
+            'user sees a message about error parsing query')
+        self.assertNotContains(response, '?keywords="incomplete phrase', status_code=400,
+            msg_prefix='links do not include invalid query')
+
+        # no query
+        response = self.client.get(search_url, { 'keywords' : ''})
+        self.assertContains(response, "No matches found",
+            msg_prefix='No matches found when form is submitted with no search terms')
+        messages = [ str(msg) for msg in response.context['messages'] ]
+        self.assert_('Please enter a search term' in messages[0],
+            'user sees a message requesting them to enter a search term when ' + \
+            'form is submitted with no search terms')
+
+        # invalid eadid should 404
+        search_url = reverse('fa:singledoc-search', kwargs={'id':'bogus-ead'})
+        response = self.client.get(search_url, { 'keywords' : 'nothing'})
+        expected, got = 404, response.status_code
+        self.assertEqual(expected, got,
+            "expected status code %s for %s with bogus eadid, got %s" %\
+            (expected, search_url, got))
+
 
 class FormatEadTestCase(DjangoTestCase):
 # test ead_format template tag explicitly

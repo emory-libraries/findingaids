@@ -316,8 +316,17 @@ class FileComponent(XmlModel, Component):
     ead = xmlmap.NodeField("ancestor::ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
-    series = xmlmap.NodeField("parent::node()", Series)
-    ":class:`findingaids.fa.models.Series` series this file belongs to."
+    # NOTE: mapping parent, series1, and series2 to ensure there is enough
+    # information to generate a link to the series a FileComponent belongs to
+
+    parent = xmlmap.NodeField("parent::node()", Series)
+    ":class:`findingaids.fa.models.Series` series this file belongs to (could be c01, c02, or c03)."
+
+    series1 = xmlmap.NodeField("ancestor::c01", Series)
+    ":class:`findingaids.fa.models.Series` c01 series this file belongs to."
+    
+    series2 = xmlmap.NodeField("ancestor::c02", Series)
+    ":class:`findingaids.fa.models.Series` c02 series this file belongs to, if any."
 
     objects = Manager('''(//c01|//c02|//c03|//c04)[@level="file"]''')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
