@@ -241,7 +241,7 @@ Component._fields['c'].node_class = Series
 SubordinateComponents._fields['c'].node_class = Series
 
 
-class Subseries(Series):
+class Series2(Series):
     """
       c02 level subseries
 
@@ -257,14 +257,14 @@ class Subseries(Series):
     """
 
 
-class Subsubseries(Series):
+class Series3(Series):
     """
       c03 level subseries
 
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
       :class:`Series`
     """
-    subseries = xmlmap.NodeField("parent::c02", Subseries)
+    series2 = xmlmap.NodeField("parent::c02", Series2)
     ":class:`findingaids.fa.models.Subseries` access to c02 subseries this sub-subseries belongs to"
     series = xmlmap.NodeField("ancestor::c01", Series)
     ":class:`findingaids.fa.models.Series` access to c01 series this sub-subseries belongs to"

@@ -12,7 +12,7 @@ from eulcore.django.http import content_negotiation
 from eulcore.existdb.db import ExistDBException
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
-from findingaids.fa.models import FindingAid, Series, Subseries, Subsubseries, \
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
             FileComponent, title_letters, Index
 from findingaids.fa.forms import KeywordSearchForm, DocumentSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
@@ -72,7 +72,7 @@ def titles_by_letter(request, letter):
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def xml_fa(request, id, preview=False):
+def eadxml(request, id, preview=False):
     """Display the full EAD XML content of a finding aid.
 
     :param id: eadid for the document to be displayed
@@ -84,8 +84,8 @@ def xml_fa(request, id, preview=False):
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-@content_negotiation({'text/xml' : xml_fa, 'application/xml' : xml_fa})
-def view_fa(request, id, preview=False):
+@content_negotiation({'text/xml' : eadxml, 'application/xml' : eadxml})
+def findingaid(request, id, preview=False):
     """View a single finding aid.   In preview mode, pulls the document from the
     configured eXist-db preview collection instead of the default public one.
     
@@ -102,7 +102,7 @@ def view_fa(request, id, preview=False):
     fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
-    return render_to_response('findingaids/view.html', { 'ead' : fa,
+    return render_to_response('findingaids/findingaid.html', { 'ead' : fa,
                                                          'series' : series,
                                                          'all_indexes' : fa.archdesc.index,                                                         
                                                          'preview': preview,
@@ -114,7 +114,7 @@ def view_fa(request, id, preview=False):
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def full_fa(request, id, mode, preview=False):
+def full_findingaid(request, id, mode, preview=False):
     """View the full contents of a single finding aid as PDF or plain html.
 
     :param id: eadid for the document to be displayed
@@ -136,42 +136,21 @@ def full_fa(request, id, mode, preview=False):
 
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def series_or_index(request, id, series_id, preview=False):
-    """View a single series (c01) or index from a finding aid.
+def series_or_index(request, id, series_id, series2_id=None,
+                    series3_id=None, preview=False):
+    """View a single series or subseries (c01, c02, or c03) or an index from a
+    finding aid.
 
     :param id: eadid for the document the series belongs to
-    :param series_id: series or index id
+    :param series_id: c01 series or index id
+    :param series2_id: c02 subseries id (optional)
+    :param series3_id: c03 sub-subseries id (optional)
     :param preview: boolean indicating preview mode, defaults to False
     """
-    return _view_series(request, id, series_id, preview=preview)
-
-@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def view_subseries(request, id, series_id, subseries_id, preview=False):
-    """View a single subseries (c02) from a finding aid.
-    
-    :param id: eadid for the document the subseries belongs to
-    :param series_id: id for the top-level series (c01) the subseries belongs to
-    :param subseries_id: id for the subseries (c02) to display
-    :param preview: boolean indicating preview mode, defaults to False
-    """
-    return _view_series(request, id, series_id, subseries_id,
-                        preview=preview)
-
-@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def view_subsubseries(request, id, series_id, subseries_id, subsubseries_id, preview=False):
-    """View a single sub-subseries (c03) from a finding aid.
-    
-    :param id: eadid for the document the sub-subseries belongs to
-    :param series_id: top-level series (c01) the sub-subseries belongs to
-    :param subseries_id: subseries (c02) the sub-subseries belongs to
-    :param subsubseries_id: sub-subseries (c03) to display
-    :param preview: boolean indicating preview mode, defaults to False"
-    """
-    return _view_series(request, id, series_id, subseries_id, subsubseries_id,
-                        preview=preview)
+    return _view_series(request, id, series_id, series2_id, series3_id, preview=preview)
 
 def _view_series(request, eadid, *series_ids, **kwargs):
-    """Common logic for retrieving and displaying a series, subseries, or index.
+    """Retrieve and display a series, subseries, or index.
 
     :param eadid: eadid for the document the series or index belongs to
     :param series_ids: list of series ids - number of ids determines series level
@@ -180,6 +159,11 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     """
     if 'preview' in kwargs and kwargs['preview']:
         use_preview_collection()
+
+    # unspecified sub- and sub-sub-series come in as None; filter them out
+    series_ids = list(series_ids)
+    while None in series_ids:
+        series_ids.remove(None)
 
     #used to build initial series and index filters and field lists
     filter_list = {'ead__eadid':eadid}
@@ -284,11 +268,11 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
         elif len(series_ids) == 2:
             return_fields.extend(['series__id', 'series__did'])
             search_fields["series__id"] = series_ids[0]
-            queryset = Subseries.objects
+            queryset = Series2.objects
         elif len(series_ids) == 3:
-            return_fields.extend(['series__id', 'subseries__id', 'series__did', 'subseries__did'])
-            search_fields.update({"series__id": series_ids[0], "subseries__id" : series_ids[1]})
-            queryset = Subsubseries.objects
+            return_fields.extend(['series__id', 'series2__id', 'series_did', 'series2__did'])
+            search_fields.update({"series__id": series_ids[0], "series2__id" : series_ids[1]})
+            queryset = Series3.objects
         
         queryset = queryset.filter(**search_fields).also(*return_fields)
         # if there are any additional filters specified, apply before getting item
@@ -385,9 +369,11 @@ def document_search(request, id):
             fulltext_terms=search_terms).also('series__id', 'series__did')
 
         query_times = files.queryTime()
+        ead = get_findingaid(id, only=['eadid', 'title'])
 
         return render_to_response('findingaids/document_search.html', {
                 'files' : files,
+                'ead': ead,
                 'querytime': [query_times],
              }, context_instance=RequestContext(request))
     # TODO: error handling, invalid form, etc.
@@ -406,11 +392,11 @@ def _series_url(eadid, series_id, *ids, **extra_opts):
     if len(ids) == 0:       # no additional args
         view_name = 'series-or-index'
     if len(ids) >= 1:       # add subseries id arg if one specified (used for sub and sub-subseries)
-        args['subseries_id'] = ids[0]
-        view_name = 'view-subseries'
+        args['series2_id'] = ids[0]
+        view_name = 'series2'
     if len(ids) == 2:       # add sub-subseries id arg if specified
-        args['subsubseries_id'] = ids[1]
-        view_name = 'view-subsubseries'
+        args['series3_id'] = ids[1]
+        view_name = 'series3'
 
     if 'preview' in extra_opts and extra_opts['preview'] == True:
         view_namespace = 'fa-admin:preview'
@@ -466,8 +452,8 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
 
             if series.node.tag == 'c03':
                 # if initial series passed in is c03, add c02 series id to url ids before current series id
-                if hasattr(series, 'subseries') and series.subseries:
-                    url_ids.append(series.subseries.id)
+                if hasattr(series, 'series2') and series.series2:
+                    url_ids.append(series.series2.id)
                 else:
                     raise Exception("Cannot construct subseries links without c02 subseries id for %s element %s"
                         % (series.node.tag, series.id))

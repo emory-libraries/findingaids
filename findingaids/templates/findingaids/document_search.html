@@ -1,8 +1,6 @@
 {% extends "site_base.html" %}
 {% load ead %}
-{# TODO: label page as search within doc, link to doc #}
-
-{% block page-subtitle %}: Search Results {% endblock %}
+{% block page-subtitle %}: {{ ead.title }} - Search Results {% endblock %}
 
 {% block page-head %}
   {{block.super}}  {# direct search engines not to index search pages #}
@@ -10,44 +8,50 @@
 {% endblock %}
 
 
-{% block content-title %}Search Results{% endblock %}
+{% block content-title %}<a href="{% url fa:findingaid ead.eadid %}">{{ ead.title }}</a>
+    : Search Results{% endblock %}
 
 {% block content-body %}
 
 {% if keywords %}<p>Search results for : <b>{{keywords}}</b></p>{% endif %}
-{{ files.count }} matches found {# FIXME: pluralize #}
-<hr/>
-  <table class="box-folder" repeat="1">
-    {% for component in files %}
-    {# FIXME: substantial overlap with component display in containerlist template #}
-         {% ifchanged %}
-         <tr><th colspan="3"><a href="">{{ component.series.display_label }}</a></th></tr> {# FIXME: link! #}
-          <tr>
-             <th class="bf">Box</th>
-             <th class="bf">Folder</th>
-             <th class="content">Content</th>
-           </tr>
-         {% endifchanged %}
+{{ files.count }} match{{ files|pluralize:'es' }} found
+<table class="box-folder">
+{% for component in files %}
+{# FIXME: substantial overlap with component display in containerlist template #}
+   {% ifchanged %}
+     <tr><th colspan="3"><a
+         {% if component.series.subseries.id %}
+            href="{% url fa:series3 ead.eadid.value component.series.series.id component.series.subseries.id component.series.id  %}"
+         {% else %}
+            href="{% url fa:series-or-index ead.eadid component.series.id %}"
+         {% endif %}      
+                 >{{ component.series.display_label }}</a></th></tr> {# FIXME: link! #}
+      <tr>
+         <th class="bf">Box</th>
+         <th class="bf">Folder</th>
+         <th class="content">Content</th>
+       </tr>
+    {% endifchanged %}
+    
+    <tr {% if not component.did.container %} class="section" {% endif %} >
+      {% spaceless %}
 
-        <tr {% if not component.did.container %} class="section" {% endif %} >
-          {% spaceless %}
-            
-            {% for container in component.did.container %}
-            <td class="bf">{{ container }}</td>
-            {% endfor %}
-            {# component with no container currently indicates a section heading #}
-            <td {% if not component.did.container %} colspan="3"
-                {% else %} class="content"
-                {% endif %} >
-                {{ component.did.unittitle|format_ead }}
-                {{ component.did.physdesc|default:'' }}
-                {{ component.did.abstract|format_ead|default:'' }}
-                {{ component.did.note|format_ead|default:'' }}
-            </td>
-          {% endspaceless %}
-        </tr>
-    {% endfor %}
-  </table>
+        {% for container in component.did.container %}
+        <td class="bf">{{ container }}</td>
+        {% endfor %}
+        {# component with no container currently indicates a section heading #}
+        <td {% if not component.did.container %} colspan="3"
+            {% else %} class="content"
+            {% endif %} >
+            {{ component.did.unittitle|format_ead }}
+            {{ component.did.physdesc|default:'' }}
+            {{ component.did.abstract|format_ead|default:'' }}
+            {{ component.did.note|format_ead|default:'' }}
+        </td>
+      {% endspaceless %}
+    </tr>
+{% endfor %}
+</table>
 
 {# <div>No contents matched your search terms.</div> #}
 

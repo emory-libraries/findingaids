@@ -79,6 +79,7 @@ class BaseAdminViewsTest(TestCase):
             settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
 
         # clean up temp files & dir
+        # FIXME: this does not seem to be removing the files
         rmtree(self.tmpdir)
 
         # restore existdb settings
@@ -192,7 +193,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.post(preview_url, {'filename' : filename},
                 follow=True) # follow redirect so we can inspect message on response
         (redirect_url, code) = response.redirect_chain[0]
-        preview_docurl = reverse('fa-admin:preview:view-fa', kwargs={'id': eadid})
+        preview_docurl = reverse('fa-admin:preview:findingaid', kwargs={'id': eadid})
         self.assert_(preview_docurl in redirect_url)
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
@@ -213,13 +214,13 @@ class AdminViewsTest(BaseAdminViewsTest):
                              % (expected, code, preview_url))
         self.assertContains(response, "Hartsfield, William Berry",
             msg_prefix="preview summary should list title of document loaded for preview")
-        self.assertContains(response, reverse('fa-admin:preview:view-fa', kwargs={'id': 'hartsfield558'}),
+        self.assertContains(response, reverse('fa-admin:preview:findingaid', kwargs={'id': 'hartsfield558'}),
             msg_prefix="preview summary should link to preview page for document loaded to preview")
         self.assertContains(response, 'last modified: 0 minutes ago',
             msg_prefix="preview summary listing includes modification time")
             
         # preview page should include publish form for users with permission to publish
-        preview_fa_url = reverse('fa-admin:preview:view-fa', kwargs={'id': eadid})
+        preview_fa_url = reverse('fa-admin:preview:findingaid', kwargs={'id': eadid})
         response = self.client.get(preview_fa_url)
         self.assertContains(response,
                 '<form id="preview-publish" action="%s" method="post"' % reverse('fa-admin:publish-ead'),
@@ -675,7 +676,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # last message is the publication one (preview load message still in message queue)
         self.assert_("Successfully updated" in messages[-1],
             "publication success message set in response context")        
-        self.assert_('href="%s"' % reverse('fa:view-fa', kwargs={'id': 'hartsfield558'}) in messages[-1],
+        self.assert_('href="%s"' % reverse('fa:findingaid', kwargs={'id': 'hartsfield558'}) in messages[-1],
             'success message links to published document')
         self.assert_('William Berry Hartsfield papers' in messages[-1],
             'success message includes unit title of published document')
@@ -928,7 +929,7 @@ class ReloadCachedPdfTestCase(TestCase):
         self.assert_(self.mock_httplib.connection.url.startswith(settings.SITE_BASE_URL),
             "http request url should begin with SITE_BASE_URL from settings; expected starting with %s, got %s" \
             % (settings.SITE_BASE_URL, self.mock_httplib.connection.url))
-        pdf_url = reverse('fa:printable-fa', kwargs={'id': 'eadid'})
+        pdf_url = reverse('fa:printable', kwargs={'id': 'eadid'})
         self.assert_(self.mock_httplib.connection.url.endswith(pdf_url),
             "http request url should end with PDF url; expected ending with %s, got %s" \
             % (pdf_url, self.mock_httplib.connection.url))

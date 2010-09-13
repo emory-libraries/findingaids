@@ -14,7 +14,7 @@ def reload_cached_pdf(eadid):
     if hasattr(settings, 'PROXY_HOST') and hasattr(settings, 'SITE_BASE_URL'):
         sleep(3)    # may need to sleep for a few seconds so cache will recognized as modified (?)
         connection = httplib.HTTPConnection(settings.PROXY_HOST)
-        url = "%s%s" % (settings.SITE_BASE_URL.rstrip('/'), reverse('fa:printable-fa', kwargs={'id': eadid }))
+        url = "%s%s" % (settings.SITE_BASE_URL.rstrip('/'), reverse('fa:printable', kwargs={'id': eadid }))
         logger.info("Requesting PDF for %s from configured cache at %s" % (eadid, url))
         connection.request('GET', url)      # Pragma no-cache?  seems to avoid cache entirely
         r = connection.getresponse()    # actually get the response to trigger PDF generation

@@ -15,7 +15,7 @@
 
 {% block content-title %}
 {# generate and store url for main finding aid page #}
-{% ifurl preview fa-admin:preview:view-fa fa:view-fa id=ead.eadid as ead_url %}
+{% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid as ead_url %}
   <a href="{{ ead_url }}{{ url_params }}" rel="contents">{{ ead.title }}</a>
 {% endblock %}
 
@@ -25,13 +25,13 @@
 {% if series.series.id %}
     <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid, series_id=series.series.id %}{{ url_params }}">{{series.series.did.unittitle}}</a> >
 {% endif %}
-{% if series.subseries.id %}
-    <a href="{% ifurl preview fa-admin:preview:view-subseries fa:view-subseries id=ead.eadid, series_id=series.series.id, subseries_id=series.subseries.id %}{{ url_params }}">{{series.subseries.did.unittitle}}</a> >
+{% if series.series2.id %}
+    <a href="{% ifurl preview fa-admin:preview:series2 fa:series2 id=ead.eadid, series_id=series.series.id, series2_id=series.series2.id %}{{ url_params }}">{{series.series2.did.unittitle}}</a> >
 {% endif %}
 {% firstof series.did.unittitle  index.head %}
 </div>
 <div id="print-links">
-    <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable-fa fa:printable-fa id=ead.eadid %}">PDF Version</a></p>
+    <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
 </div>
 <div id="toc_series">
     {% include "findingaids/sections/toc.html" %}

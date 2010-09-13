@@ -16,7 +16,7 @@
     </tr>
 {% for fa in findingaids.object_list %}
     <tr>
-        <td><a href ="{% url fa:view-fa fa.eadid %}">{{ fa.document_name }}</a></td>
+        <td><a href ="{% url fa:findingaid fa.eadid %}">{{ fa.document_name }}</a></td>
         <td>{% if perms.fa_admin.can_delete %}
               <a class="admin-action" href ="{% url fa-admin:delete-ead fa.eadid %}">DELETE</a>
             {% endif %}
