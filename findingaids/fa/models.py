@@ -56,6 +56,9 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         archdesc//controlaccess/corpname[@encodinganalog = "710"]', normalize=True)
     "control access fields that should be mapped to Dublin Core contributor, based on encodinganalog attribute"
 
+    # convenience mapping for searching on subject fields
+    subject = xmlmap.StringField('.//controlaccess')
+
     # boosted fields in the index: must be searched to get proper relevance score
     boostfields = xmlmap.StringField('.//titleproper | .//origination | \
         .//abstract | .//bioghist | .//scopecontent | .//controlaccess')
