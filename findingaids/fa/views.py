@@ -266,11 +266,14 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
             return record
         
         elif len(series_ids) == 2:
+            # returning a subseries (c02); include id and did from parent c01 for breadcrumbs
             return_fields.extend(['series__id', 'series__did'])
             search_fields["series__id"] = series_ids[0]
             queryset = Series2.objects
         elif len(series_ids) == 3:
-            return_fields.extend(['series__id', 'series2__id', 'series_did', 'series2__did'])
+            # returning a sub-subseries (c03); include ids and dids from c01 and c02
+            # series this c03 belogs to, for generating breadcrumbs
+            return_fields.extend(['series__id', 'series2__id', 'series__did', 'series2__did'])
             search_fields.update({"series__id": series_ids[0], "series2__id" : series_ids[1]})
             queryset = Series3.objects
         
