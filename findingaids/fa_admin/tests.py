@@ -929,7 +929,7 @@ class ReloadCachedPdfTestCase(TestCase):
         self.assert_(self.mock_httplib.connection.url.startswith(settings.SITE_BASE_URL),
             "http request url should begin with SITE_BASE_URL from settings; expected starting with %s, got %s" \
             % (settings.SITE_BASE_URL, self.mock_httplib.connection.url))
-        pdf_url = reverse('fa:printable-fa', kwargs={'id': 'eadid'})
+        pdf_url = reverse('fa:printable', kwargs={'id': 'eadid'})
         self.assert_(self.mock_httplib.connection.url.endswith(pdf_url),
             "http request url should end with PDF url; expected ending with %s, got %s" \
             % (pdf_url, self.mock_httplib.connection.url))

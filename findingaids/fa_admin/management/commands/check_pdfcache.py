@@ -83,7 +83,7 @@ In verbose mode, reports the cache age and any warnings for cached items."""
 
         for eadid in eadids:
             # ead printable url to check in the cache
-            pdf_url = reverse('fa:printable-fa', kwargs={'id': eadid })
+            pdf_url = reverse('fa:printable', kwargs={'id': eadid })
             url = "%s%s" % (base_url, pdf_url)
             # construct ICP query 
             query = icp.HEADER_LAYOUT + icp.QUERY_LAYOUT

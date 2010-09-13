@@ -8,7 +8,7 @@
    <link rel="canonical" href="{% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid %}" />
   {% endif %}
   <link rel="alternate" type="application/xml" href="{% ifurl preview fa-admin:preview:eadxml fa:eadxml id=ead.eadid %}" />
-  <link rel="alternate" media="print" type="application/pdf" href="{% ifurl preview fa-admin:preview:printable-fa fa:printable-fa id=ead.eadid %}" />
+  <link rel="alternate" media="print" type="application/pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}" />
   {# embed Dublin Core metadata for this finding aid in the html header #}
   {% with ead.dc_fields as dc_fields %}
     {% include "findingaids/sections/_dc_meta.html" %}
@@ -21,7 +21,7 @@
 {% block content-body %}
 
 <div id="print-links">
-    <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable-fa fa:printable-fa id=ead.eadid %}">PDF Version</a></p>
+    <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
 </div>
 
 {# main display page for a single finding aid; links to series & subseries, if any #}

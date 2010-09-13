@@ -115,7 +115,7 @@ def findingaid(request, id, preview=False):
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def full_fa(request, id, mode, preview=False):
+def full_findingaid(request, id, mode, preview=False):
     """View the full contents of a single finding aid as PDF or plain html.
 
     :param id: eadid for the document to be displayed

@@ -230,7 +230,7 @@ class FaViewsTest(TestCase):
                 msg_prefix="note from deleted record are displayed in response")
         
         # full_fa (single-page html version of entire Finding Aid, basis for PDF)
-        full_url = reverse('fa:full-fa', kwargs={'id': id})
+        full_url = reverse('fa:full-findingaid', kwargs={'id': id})
         response = self.client.get(full_url)
         expected, got = 410, response.status_code
         self.assertEqual(expected, got, 
@@ -240,7 +240,7 @@ class FaViewsTest(TestCase):
                 msg_prefix="title from deleted record is displayed in response")
 
         # printable_fa - single-page PDF of entire Finding Aid
-        pdf_url = reverse('fa:printable-fa', kwargs={'id': id})
+        pdf_url = reverse('fa:printable', kwargs={'id': id})
         response = self.client.get(pdf_url)
         expected, got = 410, response.status_code
         self.assertEqual(expected, got,
@@ -860,7 +860,7 @@ class FaViewsTest(TestCase):
 
     def test_printable_fa(self):
         # using 'full' html version of pdf for easier testing
-        fullfa_url = reverse('fa:full-fa', kwargs={'id': 'raoul548'})
+        fullfa_url = reverse('fa:full-findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(fullfa_url)
         expected = 200
         self.assertEqual(response.status_code, expected,
@@ -889,12 +889,12 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "Second Index")
 
         # simple finding aid with no subseries - should have container list
-        response = self.client.get(reverse('fa:full-fa', kwargs={'id': 'leverette135'}))
+        response = self.client.get(reverse('fa:full-findingaid', kwargs={'id': 'leverette135'}))
         self.assertContains(response, "Container List",
             msg_prefix="finding aid with no subseries should include container list in printable mode")
 
         # minimal testing on actual PDF
-        pdf_url = reverse('fa:printable-fa', kwargs={'id': 'raoul548'})
+        pdf_url = reverse('fa:printable', kwargs={'id': 'raoul548'})
         response = self.client.get(pdf_url)
         expected = 'application/pdf'
         self.assertEqual(response['Content-Type'], expected,
@@ -1317,7 +1317,7 @@ school desegregation case files</abstract>"""
 class IfUrlTestCase(DjangoTestCase):
 
     def test_ifurl(self):
-        template = Template("{% load ifurl %}{% ifurl preview fa:full-fa fa:findingaid id=id %}")
+        template = Template("{% load ifurl %}{% ifurl preview fa:full-findingaid fa:findingaid id=id %}")
         urlopts = {'id': 'docid'}
         context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})        
         url = template.render(context)
@@ -1326,12 +1326,12 @@ class IfUrlTestCase(DjangoTestCase):
 
         context = RequestContext(HttpRequest(), {'preview': True, 'id': 'docid'})
         url = template.render(context)
-        self.assertEqual(reverse('fa:full-fa', kwargs=urlopts), url,
+        self.assertEqual(reverse('fa:full-findingaid', kwargs=urlopts), url,
             "when condition is true, url is generated from first named url")
 
     def test_ifurl_asvar(self):
         # store ifurl output in a context variable and then render it for testing
-        template = Template("{% load ifurl %}{% ifurl preview fa:full-fa fa:findingaid id=id as myurl %}{{ myurl }}")
+        template = Template("{% load ifurl %}{% ifurl preview fa:full-findingaid fa:findingaid id=id as myurl %}{{ myurl }}")
         urlopts = {'id': 'docid'}
         context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})
         url = template.render(context)
