@@ -73,7 +73,7 @@ def titles_by_letter(request, letter):
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-def xml_fa(request, id, preview=False):
+def eadxml(request, id, preview=False):
     """Display the full EAD XML content of a finding aid.
 
     :param id: eadid for the document to be displayed
@@ -85,7 +85,7 @@ def xml_fa(request, id, preview=False):
 
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-@content_negotiation({'text/xml' : xml_fa, 'application/xml' : xml_fa})
+@content_negotiation({'text/xml' : eadxml, 'application/xml' : eadxml})
 def findingaid(request, id, preview=False):
     """View a single finding aid.   In preview mode, pulls the document from the
     configured eXist-db preview collection instead of the default public one.

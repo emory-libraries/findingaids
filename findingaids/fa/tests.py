@@ -250,7 +250,7 @@ class FaViewsTest(TestCase):
                 msg_prefix="title from deleted record is displayed in response")
 
         # xml_fa - full XML EAD content for a single finding aid
-        xml_url = reverse('fa:xml-fa', kwargs={'id': id})
+        xml_url = reverse('fa:eadxml', kwargs={'id': id})
         response = self.client.get(xml_url)
         expected, got = 410, response.status_code
         self.assertEqual(expected, got,
@@ -373,7 +373,7 @@ class FaViewsTest(TestCase):
 
         # header link to EAD xml
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890.xml'}))
-        self.assertContains(response, 'href="%s"' % reverse('fa:xml-fa', kwargs={'id': 'pomerantz890.xml'}))
+        self.assertContains(response, 'href="%s"' % reverse('fa:eadxml', kwargs={'id': 'pomerantz890.xml'}))
 
         self.assertNotContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="non-highlighted finding aid does NOT include robots directives noindex, nofollow")
@@ -671,7 +671,7 @@ class FaViewsTest(TestCase):
                         'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, fa_url))
 
-        ead_url = reverse('fa-admin:preview:xml-fa', kwargs={'id':'raoul548'})
+        ead_url = reverse('fa-admin:preview:eadxml', kwargs={'id':'raoul548'})
         self.assertContains(response, 'href="%s"' % ead_url)
 
 
@@ -905,14 +905,14 @@ class FaViewsTest(TestCase):
                         "Expected '%s' but returned '%s' for %s content-disposition" % \
                         (expected, response['Content-Disposition'], pdf_url))
 
-    def test_xml_fa(self):
-        nonexistent_ead = reverse('fa:xml-fa', kwargs={'id': 'nonexistent'})
+    def test_eadxml(self):
+        nonexistent_ead = reverse('fa:eadxml', kwargs={'id': 'nonexistent'})
         response = self.client.get(nonexistent_ead)
         expected = 404
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for nonexistent EAD at %s'
                             % (expected, response.status_code, nonexistent_ead))
-        xml_url = reverse('fa:xml-fa', kwargs={'id': 'abbey244'})
+        xml_url = reverse('fa:eadxml', kwargs={'id': 'abbey244'})
         response = self.client.get(xml_url)
         expected = 200
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s' % \

@@ -7,7 +7,7 @@
    <meta name="robots" content="noindex,nofollow" />
    <link rel="canonical" href="{% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid %}" />
   {% endif %}
-  <link rel="alternate" type="application/xml" href="{% ifurl preview fa-admin:preview:xml-fa fa:xml-fa id=ead.eadid %}" />
+  <link rel="alternate" type="application/xml" href="{% ifurl preview fa-admin:preview:eadxml fa:eadxml id=ead.eadid %}" />
   <link rel="alternate" media="print" type="application/pdf" href="{% ifurl preview fa-admin:preview:printable-fa fa:printable-fa id=ead.eadid %}" />
   {# embed Dublin Core metadata for this finding aid in the html header #}
   {% with ead.dc_fields as dc_fields %}
