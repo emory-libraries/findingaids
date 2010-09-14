@@ -1,11 +1,19 @@
 from django import forms
 
+from findingaids.fa.models import repositories
+
 class KeywordSearchForm(forms.Form):
     "Simple keyword search form"
     keywords = forms.CharField(required=False,
         help_text="one or more terms; will search anywhere in the finding aid")
     subject = forms.CharField(required=False,
         help_text="Controlled subject headings: subject, genre, geography, etc.")
+    repo_choices = [(r, r) for r in repositories()]
+    repo_choices.insert(0, ('', 'All'))     # first option should be all
+    repository = forms.ChoiceField(required=False, choices=repo_choices,
+            initial='', help_text="Filter by repository",
+            # configure select widget to be large enough to display all choices
+            widget=forms.Select(attrs={'size': len(repo_choices)}))
 
     def clean(self):
         """Custom form validation.  Keywords and subjects are both optional,
