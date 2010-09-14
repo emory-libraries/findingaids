@@ -1,21 +1,29 @@
 {% extends "site_base.html" %}
 
-{% block page-subtitle %}: Search Results {% endblock %}
+{% block page-subtitle %}: Search Results for
+    {% for type, value in search_params.iteritems %}
+        {% if type != 'keywords' %}{{type }}:{% endif %}{{ value }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+    {% if findingaids.number != 1 %}(page {{ findingaids.number }}){% endif %}
+{% endblock %}
 
 {% block page-head %}
   {{block.super}}  {# direct search engines not to index search pages #}
   <meta name="robots" content="noindex,nofollow" />
 {% endblock %}
 
-
 {% block content-title %}Search Results{% endblock %}
 
 {% block content-body %}
 
+{% if search_params %}
+<p>Search results for
+    {% for type, value in search_params.iteritems %}
+        {% if type != 'keywords' %}{{type }}:{% endif %}<b>{{ value }}</b>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+{% endif %}
 
-{% if keywords %}<p>Search results for : <b>{{keywords}}</b></p>{% endif %}
-
-{# Pagination snippet? #}
 {% if findingaids.paginator.count %}
     <p>{{ findingaids.paginator.count }} finding aid{{ findingaids.paginator.count|pluralize }} found,
     displaying {{ findingaids.start_index }} - {{ findingaids.end_index }}</p>
@@ -33,11 +41,8 @@
  <div>No finding aids matched your search terms.</div>
 {% endfor %}
 
-{# Pagination snippet? #}
-{% if findingaids.paginator.count %}
-    {% with findingaids as items %}
-        {% include "snippets/pagination.html" %}
-    {% endwith %}
-{% endif %}
+{% with findingaids as items %}
+    {% include "snippets/pagination.html" %}
+{% endwith %}
 
 {% endblock %}

@@ -296,47 +296,67 @@ def keyword_search(request):
     query_error = False
     
     if form.is_valid():
-        search_terms = form.cleaned_data['keywords']
-        # common ead fields for list display, plus full-text relevance score
-        return_fields = fa_listfields[:]     # copy! don't modify master list
-        return_fields.append('fulltext_score')
+        # FIXME: do we need custom validation?
+        # at least *one* search term shuold be specified
+        subject = form.cleaned_data['subject']
+        keywords = form.cleaned_data['keywords']       
+        
+        # initialize findingaid queryset for any search terms passed in
+        findingaids = FindingAid.objects
+
+        # local copy of return fields (fulltext-score may be added-- don't modify master copy!)
+        return_fields = fa_listfields[:]     
+
         try:
-            results = FindingAid.objects.filter(
-                    # first do a full-text search to restrict to relevant documents
-                    fulltext_terms=search_terms
-                ).or_filter(
-                    # do an OR search on boosted fields, so that relevance score
-                    # will be calculated based on boosted field values
-                    fulltext_terms=search_terms,
-                    boostfields__fulltext_terms=search_terms,
-                    highlight=False,    # disable highlighting in search results list
-                ).order_by('-fulltext_score').only(*return_fields)
-            result_subset, paginator = paginate_queryset(request, results, per_page=10, orphans=5)
-            show_pages = pages_to_show(paginator, result_subset.number)
+            if subject:
+                # if a subject was specified, filter on subject
+                findingaids = findingaids.filter(subject__fulltext_terms=subject).order_by('list_title')
+                # order by list title when searching by subject only
+                # (if keywords are specified, fulltext score ordering will override this)
+            if keywords:
+                # if keywords were specified, do a fulltext search
+                return_fields.append('fulltext_score')
+                findingaids = FindingAid.objects.filter(
+                        # first do a full-text search to restrict to relevant documents
+                        fulltext_terms=keywords
+                    ).or_filter(
+                        # do an OR search on boosted fields, so that relevance score
+                        # will be calculated based on boosted field values
+                        fulltext_terms=keywords,
+                        boostfields__fulltext_terms=keywords,
+                        highlight=False,    # disable highlighting in search results list
+                    ).order_by('-fulltext_score')
 
-            query_times = results.queryTime()
-            # FIXME: does not currently include keyword param in generated urls
-            # create a better browse view - display search terms, etc.
-            
-            #build query string to pass to pass additional arguments in query string (currently only keywords)
-            query_params = {
-            'keywords':search_terms,
+            findingaids = findingaids.only(*return_fields)
+            result_subset, paginator = paginate_queryset(request, findingaids,
+                        per_page=10, orphans=5)
+            # when searching by subject only, use alpha pagination
+            if subject and not keywords:
+                page_labels = alpha_pagelabels(paginator, findingaids,
+                                               label_attribute='list_title')
+            else:
+                page_labels = {}
+            show_pages = pages_to_show(paginator, result_subset.number, page_labels)
+            query_times = findingaids.queryTime()
+
+            # select non-empty form values for use in template
+            search_params = dict((key, value) for key, value in form.cleaned_data.iteritems()
+                                                 if value)
+            response_context = {
+                'findingaids' : result_subset,
+                 'search_params': search_params,    # actual search terms, for display
+                 'url_params' : urlencode(search_params),   # url opts for pagination/highlighting
+                 'querytime': [query_times],
+                 'show_pages' : show_pages
             }
-
-            query_string = QueryDict('')
-            query_string = query_string.copy()
-            query_string.update(query_params)
-            query_string = query_string.urlencode()
-
+            if page_labels:     # if there are page labels to show, add to context
+                 # other page labels handled by show_pages, but first & last are special
+                 response_context['first_page_label'] = page_labels[1]
+                 response_context['last_page_label'] = page_labels[paginator.num_pages]
+                 
             return render_to_response('findingaids/search_results.html',
-                    {'findingaids' : result_subset,
-                     'keywords'  : search_terms,
-                     #TODO combine url_params and query_string
-                     'url_params' : '?' + urlencode({'keywords': search_terms}),
-                     'querytime': [query_times],
-                     'show_pages' : show_pages,
-                     'query_string':query_string},
-                     context_instance=RequestContext(request))
+                    response_context, context_instance=RequestContext(request))
+
         except ExistDBException, e:
             # for an invalid full-text query (e.g., missing close quote), eXist
             # error reports 'Cannot parse' and 'Lexical error'

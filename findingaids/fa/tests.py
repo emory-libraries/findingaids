@@ -1077,7 +1077,7 @@ class FullTextFaViewsTest(TestCase):
                         'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, search_url))
 
-        self.assertPattern("<p[^>]*>Search results for : .*raoul.*</p>", response.content,
+        self.assertPattern("<p[^>]*>Search results for.*raoul.*</p>", response.content,
             msg_prefix='search results include search term')
         self.assertContains(response, "1 finding aid found",
             msg_prefix='search for "raoul" returns one finding aid')
@@ -1096,7 +1096,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, search_url))
-        self.assertPattern("<p[^>]*>Search results for : .*family papers.*</p>", response.content)
+        self.assertPattern("<p[^>]*>Search results for.*family papers.*</p>", response.content)
         self.assertContains(response, "5 finding aids found",
             msg_prefix='search for "family papers" should return 5 test finding aids')
         self.assertContains(response, "Fannie Lee Leverette scrapbooks",
