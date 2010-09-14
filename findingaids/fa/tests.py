@@ -1154,6 +1154,19 @@ class FullTextFaViewsTest(TestCase):
 
         # don't know of any error cases that could happen with wildcards...
 
+    def test_subject_search(self):
+        search_url = reverse('fa:keyword-search')
+        response = self.client.get(search_url, { 'subject' : 'Scripts.'})
+
+        self.assertPattern("<p[^>]*>Search results for.*subject:.*Scripts\..*</p>", response.content,
+            msg_prefix='search results include subject search term')
+        self.assertContains(response, "1 finding aid found",
+            msg_prefix='search for "Scripts" in subject returns one finding aid')
+        self.assertContains(response, reverse('fa:findingaid', kwargs={'id': 'abbey244'}),
+            msg_prefix='search for subject:Scripts includes link to abbey244 finding aid')
+        self.assertNotContains(response, "<div class=\"relevance\">",
+            msg_prefix='search for subject only does not include relevance indicator')
+
     def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting
         fa_url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
