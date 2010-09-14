@@ -7,7 +7,9 @@
 {% block content-body %}
 
 <form action="{% url fa:keyword-search %}" method="get">
-    {{ form.as_p }}
+    <table>
+        {{ form.as_table }}
+    </table>
     <input class="form-submit" type="submit" value="Search" />
 </form>
 

@@ -8,12 +8,19 @@ class KeywordSearchForm(forms.Form):
         help_text="one or more terms; will search anywhere in the finding aid")
     subject = forms.CharField(required=False,
         help_text="Controlled subject headings: subject, genre, geography, etc.")
-    repo_choices = [(r, r) for r in repositories()]
-    repo_choices.insert(0, ('', 'All'))     # first option should be all
-    repository = forms.ChoiceField(required=False, choices=repo_choices,
-            initial='', help_text="Filter by repository",
-            # configure select widget to be large enough to display all choices
-            widget=forms.Select(attrs={'size': len(repo_choices)}))
+    # delay initializing choices until object init, since they are dynamic
+    repository = forms.ChoiceField(required=False,
+            initial='', help_text="Filter by repository")
+            
+    def __init__(self, *args, **kwargs):
+        super(KeywordSearchForm, self).__init__(*args, **kwargs)
+        # generate a list of repository choices
+        repo_choices = [('', 'All')]    # default option - no filter / all repos
+        # distinct list of repositories from eXist db: use exact phrase match for value/search
+        repo_choices.extend([('"%s"' % r, r) for r in repositories()])
+        self.fields['repository'].choices = repo_choices
+        # configure select widget so all choices will be displayed
+        self.fields['repository'].widget.attrs['size'] = len(repo_choices)
 
     def clean(self):
         """Custom form validation.  Keywords and subjects are both optional,
@@ -23,6 +30,7 @@ class KeywordSearchForm(forms.Form):
         keywords = cleaned_data.get('keywords')
         subject = cleaned_data.get('subject')
         if not keywords and not subject:
+            # for now, repository can only be used as a filter with keywords or subjects
             raise forms.ValidationError("Please enter search terms for at least one of keywords and subject")
 
         # TODO: if we can parse out subject:term or subject:"exact phrase"

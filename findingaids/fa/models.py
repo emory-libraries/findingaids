@@ -60,8 +60,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     subject = xmlmap.StringField('.//controlaccess')
 
     # local repository *subarea* - e.g., MARBL, University Archives
-    # using normalize space because whitespace is inconsistent here
-    repository = xmlmap.StringField('normalize-space(.//subarea)')
+    repository = xmlmap.StringField('.//subarea')
 
     # boosted fields in the index: must be searched to get proper relevance score
     boostfields = xmlmap.StringField('.//titleproper | .//origination | \
@@ -181,7 +180,9 @@ def repositories():
     # FIXME: may be able to keep longer than this, as it is unlikely to change frequently...
     cache_key = 'findingaid-repositories'
     if cache.get(cache_key) is None:
-        repos = FindingAid.objects.only('repository').distinct()
+        # using normalize space because whitespace is inconsistent in this field
+        repos = FindingAid.objects.only('normalize-space(%s)' % \
+                                FindingAid.repository.field.xpath).distinct()
         cache.set(cache_key, list(repos), 30*60)  # refresh every half hour
     return cache.get(cache_key)
 

@@ -49,8 +49,9 @@ id="bailey807_1021">Bailey and Thurman families papers, <unitdate calendar="greg
 		  three generations.</abstract>
             <langmaterial encodinganalog="546" id="bailey807_1030">Materials entirely in
 		  <language id="bailey807_1029" langcode="eng">English</language>.</langmaterial>
-            <repository encodinganalog="852" id="bailey807_1032">Emory University<subarea id="bailey807_1031">Manuscript,
-		  Archives, and Rare Book Library</subarea>
+            <repository encodinganalog="852" id="bailey807_1032">Emory University
+                <!-- really owned by MARBL, but changed to test repository filter -->
+                <subarea id="bailey807_1031">University Archives</subarea>
             </repository>
         </did>
         <acqinfo encodinganalog="541" id="bailey807_1036">

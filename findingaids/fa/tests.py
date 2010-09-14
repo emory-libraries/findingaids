@@ -7,6 +7,7 @@ from lxml import etree
 from urllib import quote as urlquote
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpRequest
@@ -17,7 +18,7 @@ from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted, repositories
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
@@ -1170,6 +1171,21 @@ class FullTextFaViewsTest(TestCase):
         # keyword now optional - no search terms should be an invalid form
         response = self.client.get(search_url, { 'subject' : '', 'keywords': ''})
         self.assertContains(response, 'Please enter search terms for at least one of keywords and subject')
+
+    def test_repository_search(self):
+        search_url = reverse('fa:keyword-search')
+        response = self.client.get(search_url, { 'keywords' : 'papers',
+                            'repository': '"University Archives"'})
+
+        # one fixture has been modified to have a different repository
+        self.assertPattern("<p[^>]*>Search results for.*repository:.*University Archives.*</p>", response.content,
+            msg_prefix='search results include repository filter')
+        self.assertContains(response, "1 finding aid found",
+            msg_prefix='search for "papers" & repository "University Archives" returns one finding aid')
+        self.assertContains(response, reverse('fa:findingaid', kwargs={'id': 'bailey807'}),
+            msg_prefix='search for "papers" & repository "University Archives" includes link to bailey807 finding aid')
+        self.assertNotContains(response, reverse('fa:findingaid', kwargs={'id': 'abbey244'}),
+            msg_prefix='search for "papers" & repository "University Archives" does not include non-UA finding aid')
 
     def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting

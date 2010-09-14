@@ -298,7 +298,8 @@ def keyword_search(request):
     if form.is_valid():
         # form validation requires that at least one of subject & keyword is not empty
         subject = form.cleaned_data['subject']
-        keywords = form.cleaned_data['keywords']       
+        keywords = form.cleaned_data['keywords']
+        repository = form.cleaned_data['repository']
         
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
@@ -312,10 +313,14 @@ def keyword_search(request):
                 findingaids = findingaids.filter(subject__fulltext_terms=subject).order_by('list_title')
                 # order by list title when searching by subject only
                 # (if keywords are specified, fulltext score ordering will override this)
+            if repository:
+                # if repository is set, filter finding aids by requested repository
+                # expecting repository value to come in as exact phrase
+                findingaids = findingaids.filter(repository__fulltext_terms=repository)
             if keywords:
                 # if keywords were specified, do a fulltext search
                 return_fields.append('fulltext_score')
-                findingaids = FindingAid.objects.filter(
+                findingaids = findingaids.filter(
                         # first do a full-text search to restrict to relevant documents
                         fulltext_terms=keywords
                     ).or_filter(
@@ -325,6 +330,8 @@ def keyword_search(request):
                         boostfields__fulltext_terms=keywords,
                         highlight=False,    # disable highlighting in search results list
                     ).order_by('-fulltext_score')
+
+
 
             findingaids = findingaids.only(*return_fields)
             result_subset, paginator = paginate_queryset(request, findingaids,
