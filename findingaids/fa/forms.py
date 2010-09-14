@@ -17,6 +17,9 @@ class KeywordSearchForm(forms.Form):
         if not keywords and not subject:
             raise forms.ValidationError("Please enter search terms for at least one of keywords and subject")
 
+        # TODO: if we can parse out subject:term or subject:"exact phrase"
+        # from a keyword search, it would be nice to convert that to a subject search
+        
         return cleaned_data
         
 
