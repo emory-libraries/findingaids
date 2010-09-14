@@ -59,6 +59,10 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # convenience mapping for searching on subject fields
     subject = xmlmap.StringField('.//controlaccess')
 
+    # local repository *subarea* - e.g., MARBL, University Archives
+    # using normalize space because whitespace is inconsistent here
+    repository = xmlmap.StringField('normalize-space(.//subarea)')
+
     # boosted fields in the index: must be searched to get proper relevance score
     boostfields = xmlmap.StringField('.//titleproper | .//origination | \
         .//abstract | .//bioghist | .//scopecontent | .//controlaccess')
@@ -171,6 +175,15 @@ def title_letters():
         cache.set(cache_key, list(letters), 30*60)  # refresh every half hour
     return cache.get(cache_key)
 
+def repositories():
+    """Cached list of distinct owning repositories in all Finding Aids.
+    Cached results should be refreshed after half an hour."""
+    # FIXME: may be able to keep longer than this, as it is unlikely to change frequently...
+    cache_key = 'findingaid-repositories'
+    if cache.get(cache_key) is None:
+        repos = FindingAid.objects.only('repository').distinct()
+        cache.set(cache_key, list(repos), 30*60)  # refresh every half hour
+    return cache.get(cache_key)
 
 class Series(XmlModel, Component):
     """
