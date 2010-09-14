@@ -296,12 +296,11 @@ def keyword_search(request):
     query_error = False
     
     if form.is_valid():
-        # FIXME: do we need custom validation?
-        # at least *one* search term shuold be specified
+        # form validation requires that at least one of subject & keyword is not empty
         subject = form.cleaned_data['subject']
         keywords = form.cleaned_data['keywords']       
         
-        # initialize findingaid queryset for any search terms passed in
+        # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
 
         # local copy of return fields (fulltext-score may be added-- don't modify master copy!)
@@ -368,9 +367,9 @@ def keyword_search(request):
             else:
                 # generic error message for any other exception
                 messages.error(request, 'There was an error processing your search.')
-    else:
-        # if form was not valid, re-initialize
-        # don't tell the user the field is required if they haven't submitted anything!
+    elif 'keywords' not in request.GET and 'subject' not in request.GET:
+        # if form was not valid and nothing was submitted, re-initialize
+        # don't tell the user that fields are required if they haven't submitted anything!
         form = KeywordSearchForm()
 
     # if form is invalid (no search terms) or there was an error, display search form

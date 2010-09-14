@@ -1163,9 +1163,13 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, "1 finding aid found",
             msg_prefix='search for "Scripts" in subject returns one finding aid')
         self.assertContains(response, reverse('fa:findingaid', kwargs={'id': 'abbey244'}),
-            msg_prefix='search for subject:Scripts includes link to abbey244 finding aid')
+            msg_prefix='search for "subject:Scripts" includes link to abbey244 finding aid')
         self.assertNotContains(response, "<div class=\"relevance\">",
             msg_prefix='search for subject only does not include relevance indicator')
+
+        # keyword now optional - no search terms should be an invalid form
+        response = self.client.get(search_url, { 'subject' : '', 'keywords': ''})
+        self.assertContains(response, 'Please enter search terms for at least one of keywords and subject')
 
     def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting

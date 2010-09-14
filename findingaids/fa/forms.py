@@ -7,6 +7,19 @@ class KeywordSearchForm(forms.Form):
     subject = forms.CharField(required=False,
         help_text="Controlled subject headings: subject, genre, geography, etc.")
 
+    def clean(self):
+        """Custom form validation.  Keywords and subjects are both optional,
+        but at least one of them should contain search terms."""
+        cleaned_data = self.cleaned_data
+        
+        keywords = cleaned_data.get('keywords')
+        subject = cleaned_data.get('subject')
+        if not keywords and not subject:
+            raise forms.ValidationError("Please enter search terms for at least one of keywords and subject")
+
+        return cleaned_data
+        
+
 class DocumentSearchForm(forms.Form):
     "Search item-level content within a single Finding Aid document."
     keywords = forms.CharField(required=True,
