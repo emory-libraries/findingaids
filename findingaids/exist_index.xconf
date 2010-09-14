@@ -49,6 +49,8 @@
             <text qname="bioghist" boost="1.2"/>
             <text qname="scopecontent" boost="1.2"/>
             <text qname="controlaccess" boost="1.7"/>
+
+            <text qname="subarea" />
         </lucene>
     </index>
 </collection>
