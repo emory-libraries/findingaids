@@ -20,7 +20,7 @@ from eulcore.django.test import TestCase
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted, repositories
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
-from findingaids.fa.forms import opts_to_upper
+from findingaids.fa.forms import boolean_to_upper
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
     collection_lastmodified, exist_datetime_with_timezone, alpha_pagelabels
@@ -1431,12 +1431,12 @@ class FullTextFaViewsTest(TestCase):
             (expected, search_url, got))
 
 
-    def test_opts_to_upper(self):
+    def test_boolean_to_upper(self):
         #should capitalize and or not when they are separate words and not parts of other words
         input = "not cookies and ice cream or oreos they make anderson sick and he eats nothing except hot dogs and hamburgers"
         expected = "NOT cookies AND ice cream OR oreos they make anderson sick AND he eats nothing except hot dogs AND hamburgers"
 
-        result = opts_to_upper(input)
+        result = boolean_to_upper(input)
 
         self.assertEqual(result, expected)
 

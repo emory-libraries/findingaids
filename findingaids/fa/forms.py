@@ -1,7 +1,7 @@
 from django import forms
 import re
 
-def opts_to_upper(data):
+def boolean_to_upper(data):
     """
     Converts boolean operators to uppercase
     """
@@ -56,7 +56,7 @@ class KeywordSearchForm(forms.Form):
 
     def clean_keywords(self):
         data = self.cleaned_data['keywords']
-        data = opts_to_upper(data) #convert boolean operators to uppercase
+        data = boolean_to_upper(data) #convert boolean operators to uppercase
         return data
 
 
@@ -67,6 +67,6 @@ class DocumentSearchForm(forms.Form):
 
     def clean_keywords(self):
         data = self.cleaned_data['keywords']
-        data = opts_to_upper(data) #convert boolean operators to uppercase
+        data = boolean_to_upper(data) #convert boolean operators to uppercase
         return data
     
