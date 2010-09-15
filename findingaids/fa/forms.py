@@ -1,4 +1,19 @@
 from django import forms
+import re
+
+def opts_to_upper(data):
+    """
+    Converts boolean operators to uppercase
+    """
+    ops = ['and', 'or', 'not']
+
+    for op in ops:
+        upper_op = op.upper()
+        data = re.sub(r"\b%s\b" % (op), upper_op, data)
+        
+    return data
+
+
 
 from findingaids.fa.models import repositories
 
@@ -39,8 +54,19 @@ class KeywordSearchForm(forms.Form):
         return cleaned_data
         
 
+    def clean_keywords(self):
+        data = self.cleaned_data['keywords']
+        data = opts_to_upper(data) #convert boolean operators to uppercase
+        return data
+
+
 class DocumentSearchForm(forms.Form):
     "Search item-level content within a single Finding Aid document."
     keywords = forms.CharField(required=True,
         help_text="one or more terms; will search anywhere in the finding aid")
+
+    def clean_keywords(self):
+        data = self.cleaned_data['keywords']
+        data = opts_to_upper(data) #convert boolean operators to uppercase
+        return data
     

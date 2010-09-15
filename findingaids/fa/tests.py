@@ -20,6 +20,7 @@ from eulcore.django.test import TestCase
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted, repositories
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
+from findingaids.fa.forms import opts_to_upper
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
     collection_lastmodified, exist_datetime_with_timezone, alpha_pagelabels
@@ -1187,6 +1188,59 @@ class FullTextFaViewsTest(TestCase):
         self.assertNotContains(response, reverse('fa:findingaid', kwargs={'id': 'abbey244'}),
             msg_prefix='search for "papers" & repository "University Archives" does not include non-UA finding aid')
 
+
+    def test_keyword_search__boolean(self):
+        search_url = reverse('fa:keyword-search')
+
+        #incorrect use of boolean
+        response = self.client.get(search_url, { 'keywords' : 'AND Abbey'})
+        self.assertContains(response, "Your search query could not be parsed.  Please revise your search and try again.", status_code=400)
+
+        #OR operator
+        response = self.client.get(search_url, { 'keywords' : 'Abbey or raoul'})
+        self.assertContains(response, "<b>Abbey OR raoul</b>") # converted or to OR
+        self.assertContains(response, "Raoul family.") # Raoul record
+        self.assertContains(response, "Abbey Theatre.") # Abby record
+
+        #NOT operator
+        response = self.client.get(search_url, { 'keywords' : 'Emory'})
+        self.assertContains(response, "7 finding aids found") # not using NOT yet
+        self.assertContains(response, "Abbey Theatre.") # Theatre record
+        
+        response = self.client.get(search_url, { 'keywords' : 'Emory not Theatre'})
+        self.assertContains(response, "<b>Emory NOT Theatre</b>") # converted not to NOT
+        self.assertContains(response, "5 finding aids found") #using NOT
+        self.assertNotContains(response, "Abbey Theatre") # Theatre record not in results
+
+
+        #AND operator
+        response = self.client.get(search_url, { 'keywords' : 'Bailey and Theatre'})
+        self.assertContains(response, "<b>Bailey AND Theatre</b>") # converted and to AND
+        self.assertContains(response, "1 finding aid found") #using AND
+        self.assertContains(response, "Bailey and Thurman families papers, circa 1882-1995") # Bailey record in resulsts
+
+
+    def test_keyword_search__grouping(self):
+        search_url = reverse('fa:keyword-search')
+
+        #missing parentheses
+        response = self.client.get(search_url, { 'keywords' : '(Abbey'})
+        self.assertContains(response, "Your search query could not be parsed.  Please revise your search and try again.", status_code=400)
+
+        #missing quote
+        response = self.client.get(search_url, { 'keywords' : 'Abbey"'})
+        self.assertContains(response, "Your search query could not be parsed.  Please revise your search and try again.", status_code=400)
+
+         #using grouping and quotes
+        response = self.client.get(search_url, { 'keywords' : '"Microfilm copy"'})
+        self.assertContains(response, "2 finding aids found")
+        self.assertContains(response, "Microfilm copy of the Civil War reminiscences")
+
+        response = self.client.get(search_url, { 'keywords' : '"Microfilm copy" not ("Civil War")'})
+        self.assertContains(response, "1 finding aid found")
+        self.assertNotContains(response, "Microfilm copy of the Civil War reminiscences")
+      
+
     def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting
         fa_url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
@@ -1375,6 +1429,16 @@ class FullTextFaViewsTest(TestCase):
         self.assertEqual(expected, got,
             "expected status code %s for %s with bogus eadid, got %s" %\
             (expected, search_url, got))
+
+
+    def test_opts_to_upper(self):
+        #should capitalize and or not when they are separate words and not parts of other words
+        input = "not cookies and ice cream or oreos they make anderson sick and he eats nothing except hot dogs and hamburgers"
+        expected = "NOT cookies AND ice cream OR oreos they make anderson sick AND he eats nothing except hot dogs AND hamburgers"
+
+        result = opts_to_upper(input)
+
+        self.assertEqual(result, expected)
 
 
 class FormatEadTestCase(DjangoTestCase):
