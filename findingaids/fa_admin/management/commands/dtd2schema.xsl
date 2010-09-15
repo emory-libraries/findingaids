@@ -232,6 +232,8 @@
 	</xsl:template>
 
 	<xsl:template name="hrefHandler">
+            <!-- don't generate an empty href; only add if href or entityref is present -->
+            <xsl:if test="@entityref or @href">
 		<xsl:attribute name="xlink:href">
 			<xsl:choose>
 				<xsl:when test="@entityref and not(@href)">
@@ -252,6 +254,7 @@
 			</xsl:choose>
 			<xsl:value-of select="@xpointer"/>
 		</xsl:attribute>
+            </xsl:if>
 	</xsl:template>
 
 
