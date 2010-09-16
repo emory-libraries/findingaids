@@ -100,7 +100,8 @@
 				</ead>
 			</xsl:when>
 			<xsl:when test="$schema='W3C'">
-				<ead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+				<ead xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                     xmlns:xlink="http://www.w3.org/1999/xlink">
 					<xsl:attribute name="xsi:schemaLocation">
 						<xsl:text>urn:isbn:1-931666-22-9 </xsl:text>
 						<xsl:value-of select="$schemaPath"/>
