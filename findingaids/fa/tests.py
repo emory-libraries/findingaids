@@ -1231,14 +1231,18 @@ class FullTextFaViewsTest(TestCase):
         response = self.client.get(search_url, { 'keywords' : 'Abbey"'})
         self.assertContains(response, "Your search query could not be parsed.  Please revise your search and try again.", status_code=400)
 
-         #using grouping and quotes
-        response = self.client.get(search_url, { 'keywords' : '"Microfilm copy"'})
-        self.assertContains(response, "2 finding aids found")
-        self.assertContains(response, "Microfilm copy of the Civil War reminiscences")
+        #use grouping to narrow search results
+        response = self.client.get(search_url, { 'keywords' : 'Emory or scripts'})
+        self.assertContains(response, "<b>Emory OR scripts</b>") # converted or to OR
+        self.assertContains(response, "7 finding aids found")
+        self.assertContains(response, "Pitts v. Freeman") # Should be returned before search is narrowed
+        self.assertContains(response, "Raoul family.") # Should be returned before search is narrowed
 
-        response = self.client.get(search_url, { 'keywords' : '"Microfilm copy" not ("Civil War")'})
-        self.assertContains(response, "1 finding aid found")
-        self.assertNotContains(response, "Microfilm copy of the Civil War reminiscences")
+        response = self.client.get(search_url, { 'keywords' : '(Emory or scripts) not (files and school)'})
+        self.assertContains(response, "<b>(Emory OR scripts) NOT (files AND school)</b>") # converted or and not to OR AND NOT
+        self.assertContains(response, "5 finding aids found")
+        self.assertNotContains(response, "Pitts v. Freeman") # Should not be returned after search is narrowed
+        self.assertNotContains(response, "Raoul family.") # Should not be returned after search is narrowed
       
 
     def test_view_highlighted_fa(self):
