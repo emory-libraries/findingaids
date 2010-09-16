@@ -35,5 +35,5 @@ findingaid_urlpatterns = patterns('findingaids.fa.views',
 urlpatterns = patterns('findingaids.fa.views',
     (r'^titles/', include(title_urlpatterns)),
     (r'^documents/', include(findingaid_urlpatterns)),
-    url(r'^search/?', 'keyword_search', name='keyword-search')
+    url(r'^search/?', 'search', name='search')
 )

@@ -122,7 +122,7 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
                 if verbosity == v_all:
                     print 'Testing response times for search xqueries'                
                 for search_terms in self.test_searches:
-                    # NOTE: search syntax duplicated from keyword_search view
+                    # NOTE: search syntax duplicated from search view
                     search_fields = fa_listfields
                     search_fields.append('fulltext_score')
                     fa = FindingAid.objects.filter(fulltext_terms=search_terms).or_filter(
@@ -148,7 +148,7 @@ In browse mode, tests eXist Finding Aid browse query for all browse letters.
                 query_times = {}
                 for search_terms in self.test_searches:
                     current_times = {}  # times for the current search
-                    uri = reverse('fa:keyword-search')
+                    uri = reverse('fa:search')
                     if verbosity == v_all:
                         print search_terms
                     for page in range(1,11):

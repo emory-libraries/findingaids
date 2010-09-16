@@ -13,7 +13,7 @@
 
 {% load eulcore_tags %}
 {% block navbar-items %}
-        <li><a href="{% url fa:keyword-search %}" class="{% activebase request '^/search' %}">search</a></li>
+        <li><a href="{% url fa:search %}" class="{% activebase request '^/search' %}">search</a></li>
         <li><a>collections</a></li>
         <li><a href="/content/about">About</a></li>
 {% endblock %}
@@ -21,9 +21,9 @@
 
 {% block sidebar-left %}
   {% if kwsearch_form %}
-  <div id="keyword-search" class="sidebar-search">
+  <div id="search" class="sidebar-search">
       Search all Finding Aids
-      <form action="{% url fa:keyword-search %}" method="get">
+      <form action="{% url fa:search %}" method="get">
         {{kwsearch_form.keywords}}
         <input class="form-submit" type="submit" value="Search" />
       </form>

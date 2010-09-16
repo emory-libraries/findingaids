@@ -350,7 +350,7 @@ class FaViewsTest(TestCase):
                     response.content, "control access - occupation")
                     
         # controlaccess terms link to subject search
-        search_url = reverse('fa:keyword-search')
+        search_url = reverse('fa:search')
         self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
                 urlquote('Collins, M.D.')), msg_prefix='controlaccess person name links to subject search')
         self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
@@ -1071,8 +1071,8 @@ class FullTextFaViewsTest(TestCase):
     exist_fixtures = { 'index' : exist_index_path,
                        'directory' : exist_fixture_path }
 
-    def test_keyword_search(self):
-        search_url = reverse('fa:keyword-search')
+    def test_search(self):
+        search_url = reverse('fa:search')
         response = self.client.get(search_url, { 'keywords' : 'raoul'})
         expected = 200
         self.assertEqual(response.status_code, expected,
@@ -1124,8 +1124,8 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, "No finding aids matched",
             msg_prefix='search for nonexistent term should indicate no matches found')
 
-    def test_keyword_search__exact_phrase(self):
-        search_url = reverse('fa:keyword-search')
+    def test_search__exact_phrase(self):
+        search_url = reverse('fa:search')
         response = self.client.get(search_url,
                         { 'keywords' : '"georgia'}) # missing close quote - query syntax error
 
@@ -1146,8 +1146,8 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '1 finding aid found',
             msg_prefix='only one search result for exact phrase from Abbey Theatre bioghist')
                 
-    def test_keyword_search__wildcard(self):
-        search_url = reverse('fa:keyword-search')
+    def test_search__wildcard(self):
+        search_url = reverse('fa:search')
         # wildcard search
         response = self.client.get(search_url, { 'keywords' : 'Abb?y Theat*'})
 
@@ -1157,7 +1157,7 @@ class FullTextFaViewsTest(TestCase):
         # don't know of any error cases that could happen with wildcards...
 
     def test_subject_search(self):
-        search_url = reverse('fa:keyword-search')
+        search_url = reverse('fa:search')
         response = self.client.get(search_url, { 'subject' : 'Scripts.'})
 
         self.assertPattern("<p[^>]*>Search results for.*subject:.*Scripts\..*</p>", response.content,
@@ -1174,7 +1174,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, 'Please enter search terms for at least one of keywords and subject')
 
     def test_repository_search(self):
-        search_url = reverse('fa:keyword-search')
+        search_url = reverse('fa:search')
         response = self.client.get(search_url, { 'keywords' : 'papers',
                             'repository': '"University Archives"'})
 
@@ -1189,8 +1189,8 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search for "papers" & repository "University Archives" does not include non-UA finding aid')
 
 
-    def test_keyword_search__boolean(self):
-        search_url = reverse('fa:keyword-search')
+    def test_search__boolean(self):
+        search_url = reverse('fa:search')
 
         #incorrect use of boolean
         response = self.client.get(search_url, { 'keywords' : 'AND Abbey'})
@@ -1220,8 +1220,8 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, "Bailey and Thurman families papers, circa 1882-1995") # Bailey record in resulsts
 
 
-    def test_keyword_search__grouping(self):
-        search_url = reverse('fa:keyword-search')
+    def test_search__grouping(self):
+        search_url = reverse('fa:search')
 
         #missing parentheses
         response = self.client.get(search_url, { 'keywords' : '(Abbey'})

@@ -1,4 +1,5 @@
 from django import forms
+from findingaids.fa.models import repositories
 import re
 
 def boolean_to_upper(data):
@@ -14,11 +15,24 @@ def boolean_to_upper(data):
     return data
 
 
-
-from findingaids.fa.models import repositories
-
 class KeywordSearchForm(forms.Form):
     "Simple keyword search form"
+    keywords = forms.CharField(required=True,
+        help_text="one or more terms; will search anywhere in the finding aid")
+
+    def clean_keywords(self):
+        """
+        Performs any cleanup / validation specific to keywords field
+        """
+        data = self.cleaned_data['keywords']
+        data = boolean_to_upper(data) #convert boolean operators to uppercase
+        return data
+
+
+
+class AdvancedSearchForm(KeywordSearchForm):
+    "Search item-level content within a single Finding Aid document."
+    #redefining keywords because it is optional in the AdvancedSearchForm
     keywords = forms.CharField(required=False,
         help_text="one or more terms; will search anywhere in the finding aid")
     subject = forms.CharField(required=False,
@@ -28,7 +42,7 @@ class KeywordSearchForm(forms.Form):
             initial='', help_text="Filter by repository")
             
     def __init__(self, *args, **kwargs):
-        super(KeywordSearchForm, self).__init__(*args, **kwargs)
+        super(AdvancedSearchForm, self).__init__(*args, **kwargs)
         # generate a list of repository choices
         repo_choices = [('', 'All')]    # default option - no filter / all repos
         # distinct list of repositories from eXist db: use exact phrase match for value/search
@@ -52,21 +66,3 @@ class KeywordSearchForm(forms.Form):
         # from a keyword search, it would be nice to convert that to a subject search
         
         return cleaned_data
-        
-
-    def clean_keywords(self):
-        data = self.cleaned_data['keywords']
-        data = boolean_to_upper(data) #convert boolean operators to uppercase
-        return data
-
-
-class DocumentSearchForm(forms.Form):
-    "Search item-level content within a single Finding Aid document."
-    keywords = forms.CharField(required=True,
-        help_text="one or more terms; will search anywhere in the finding aid")
-
-    def clean_keywords(self):
-        data = self.cleaned_data['keywords']
-        data = boolean_to_upper(data) #convert boolean operators to uppercase
-        return data
-    

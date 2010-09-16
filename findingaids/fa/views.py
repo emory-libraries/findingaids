@@ -14,7 +14,7 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
             FileComponent, title_letters, Index
-from findingaids.fa.forms import KeywordSearchForm, DocumentSearchForm
+from findingaids.fa.forms import KeywordSearchForm, AdvancedSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
@@ -107,7 +107,7 @@ def findingaid(request, id, preview=False):
                                                          'all_indexes' : fa.archdesc.index,                                                         
                                                          'preview': preview,
                                                          'url_params': url_params,
-                                                         'docsearch_form': DocumentSearchForm(),
+                                                         'docsearch_form': KeywordSearchForm(),
                                                          },
                                                          context_instance=RequestContext(request, current_app='preview'))
 
@@ -217,7 +217,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'next': next,
                     'url_params': url_params,
                     'canonical_url' : _series_url(eadid, *series_ids),
-                    'docsearch_form': DocumentSearchForm(),
+                    'docsearch_form': KeywordSearchForm(),
                     }
 
     # include any keyword args in template parameters (preview mode)
@@ -288,11 +288,11 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
         raise Http404
     return record
 
-def keyword_search(request):
+def search(request):
     "Simple keyword search - runs exist full-text terms query on all terms included."
     
     tips = SimplePage.objects.get(url='/search/')   # FIXME: error handling ?
-    form = KeywordSearchForm(request.GET)
+    form = AdvancedSearchForm(request.GET)
     query_error = False
     
     if form.is_valid():
@@ -377,7 +377,7 @@ def keyword_search(request):
     elif 'keywords' not in request.GET and 'subject' not in request.GET:
         # if form was not valid and nothing was submitted, re-initialize
         # don't tell the user that fields are required if they haven't submitted anything!
-        form = KeywordSearchForm()
+        form = AdvancedSearchForm()
 
     # if form is invalid (no search terms) or there was an error, display search form
     response = render_to_response('findingaids/search_form.html',
@@ -391,7 +391,7 @@ def keyword_search(request):
 def document_search(request, id):
     "Keyword search on file-level items in a single Finding Aid."
 
-    form = DocumentSearchForm(request.GET)
+    form = KeywordSearchForm(request.GET)
     query_error = False
     ead = get_findingaid(id, only=['eadid', 'title'])   # will 404 if not found
     if form.is_valid():
@@ -409,7 +409,7 @@ def document_search(request, id):
                     'querytime': [files.queryTime(), ead.queryTime()],
                     'keywords': search_terms,
                     'url_params': '?' + urlencode({'keywords': search_terms}),
-                    'docsearch_form': DocumentSearchForm(),
+                    'docsearch_form': KeywordSearchForm(),
                  }, context_instance=RequestContext(request))
         except ExistDBException, e:
             # for an invalid full-text query (e.g., missing close quote), eXist
@@ -429,7 +429,7 @@ def document_search(request, id):
     response = render_to_response('findingaids/document_search.html', {
                     'files' : [],
                     'ead': ead,
-                    'docsearch_form': DocumentSearchForm(),
+                    'docsearch_form': KeywordSearchForm(),
                  }, context_instance=RequestContext(request))
      # if query could not be parsed, set a 'Bad Request' status code on the response
     if query_error:
