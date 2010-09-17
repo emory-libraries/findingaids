@@ -62,7 +62,6 @@ def check_ead(filename, dbpath, xml=None):
         elif fa.count() == 1:
             # some inconsistency in when /db is included on exist collection names
             path = fa[0].collection_name.replace('/db', '') + "/" + fa[0].document_name
-#            print "DEBUG: comparing path %s with dbpath %s" % (path, dbpath)
             if path != dbpath:
                 errors.append("Database contains eadid '%s' in a different document (%s)"
                     % (ead.eadid.value, fa[0].document_name))

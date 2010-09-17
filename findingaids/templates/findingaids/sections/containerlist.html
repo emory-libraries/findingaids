@@ -2,7 +2,10 @@
 {% load ead %}
 
 {% if series.c|length %}
-  <table class="box-folder" repeat="1">
+  <table class="box-folder">
+    <col width="7%" valign="top" align="left"/>    {# column width needed for XSL-FO/PDF #}
+    <col width="7%" valign="top" align="left"/>
+    <col width="86%" valign="top" align="left"/>
     {% for component in series.c %}
         {# display box/folder heading once before first item in the series #}
         {% if forloop.first  %}

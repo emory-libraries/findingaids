@@ -116,3 +116,6 @@ import logging
 LOGGING_LEVEL=logging.NOLOG
 LOGGING_FORMAT="%(asctime)s : %(name)s:  %(levelname)s : %(message)s"
 LOGGING_FILENAME="" # "" will print to stdout
+
+# full path to XSL-FO processor (currently expects Apache Fop)
+XSLFO_PROCESSOR = '/usr/bin/fop'

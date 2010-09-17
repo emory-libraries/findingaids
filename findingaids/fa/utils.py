@@ -3,6 +3,11 @@ import cStringIO as StringIO
 import cgi
 from datetime import datetime
 from functools import wraps
+import logging
+from lxml import etree
+from os import path
+import subprocess
+import tempfile
 
 from django import http
 from django.conf import settings
@@ -18,24 +23,61 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 
 from findingaids.fa.models import FindingAid, Deleted
 
-# adapted from django snippets example - http://www.djangosnippets.org/snippets/659/
+logger = logging.getLogger(__name__)
+
+# parse and load XSLT for converting html to XSL-FO at init
+xhtml_xslfo_xslt = path.join(path.dirname(path.abspath(__file__)), 'xhtml_to_xslfo.xsl')
+XHTML_TO_XSLFO = etree.XSLT(etree.parse(xhtml_xslfo_xslt))
+ 
 def render_to_pdf(template_src, context_dict, filename=None):
+    """Generate and return a PDF response.
+
+    Takes a template and template arguments; the template is rendered as html,
+    converted to XSL-FO, which is run through the configured XSL-FO processor to
+    generate a PDF.  Any template used with this function should produce
+    well-formed xhtml so it can be parsed as xml.
+
+    :param template_src: name of the template to render
+    :param context_dict: dictionary to pass to the template for rendering
+    :param filename: optional filename, to specify to the browser in the response
+    :returns: :class:`django.http.HttpResponse` with PDF content, mimetype,
+            and, if a filename was specified, a content-disposition header to
+            prompt the browser to download the response as the filename specified
+    """
+
+    xslfo = html_to_xslfo(template_src, context_dict)
+    # write xsl-fo to a temporary named file that we can pass to xsl-fo processor
+    xslfo_file = tempfile.NamedTemporaryFile(prefix='findingaids-xslfo-')
+    xslfo.write(xslfo_file.name, encoding='UTF-8', pretty_print=True, xml_declaration=True)
+    # create a temporary file where the PDF should be created
+    pdf_file = tempfile.NamedTemporaryFile(prefix='findingaids-pdf-')
+    try: 
+        rval = subprocess.call([settings.XSLFO_PROCESSOR, xslfo_file.name, pdf_file.name])
+        if rval is 0:       # success!
+            response = http.HttpResponse(pdf_file.read(), mimetype='application/pdf')
+            if filename:
+                response['Content-Disposition'] = "attachment; filename=%s" % filename
+            return response
+    except OSError, e:
+        logger.error("Apache Fop execution failed: ", e)
+ 
+    # if nothing was returned by now, there was an error generating the pdf
+    raise Exception("There was an error generating the PDF")
+
+def html_to_xslfo(template_src, context_dict):
+    """Takes a template and template arguments, renders the template to get html,
+    and then converts from html to XSL-FO.  Any template used with this function
+    should produce well-formed xhtml so it can be parsed as xml.
+
+    :param template_src: name of the template to render
+    :param context_dict: dictionary to pass to the template for rendering
+    :returns: result of generated html, converted to XSL-FO, as an instance of
+                :class:`lxml.etree.ElementTree`
+    """
     template = get_template(template_src)
-    context = Context(context_dict)
-    # set media root in context - css and images must have full file paths for PDF generation
-    context['MEDIA_ROOT'] = settings.MEDIA_ROOT
-    html  = template.render(context)
-    result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode("utf-8")), result)
-    if not pdf.err:
-        response = http.HttpResponse(result.getvalue(), mimetype='application/pdf')
-        if filename:
-            response['Content-Disposition'] = "attachment; filename=%s" % filename
-        return response
-    # FIXME: this error handling probably needs some work
-    print "ERR", pdf.err
-    return http.HttpResponse('Error generating PDF')
-    return http.HttpResponse('Error generating PDF<pre>%s</pre>' % cgi.escape(html))
+    xhtml  = etree.fromstring(template.render(Context(context_dict)))
+    return XHTML_TO_XSLFO(xhtml)
+
 
 # TODO: code review requested
 def pages_to_show(paginator, page, page_labels={}):

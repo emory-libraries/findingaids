@@ -1,7 +1,8 @@
 import logging
+from lxml import etree
 from urllib import urlencode
 
-from django.http import HttpResponse, Http404, QueryDict
+from django.http import HttpResponse, Http404
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -18,10 +19,10 @@ from findingaids.fa.forms import KeywordSearchForm, AdvancedSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
-            collection_lastmodified, alpha_pagelabels
+            collection_lastmodified, alpha_pagelabels, html_to_xslfo
 from findingaids.simplepages.models import SimplePage
 
-logger = logging.getLogger(__name__);
+logger = logging.getLogger(__name__) 
 
 
 fa_listfields = ['eadid', 'list_title','archdesc__did']
@@ -133,6 +134,9 @@ def full_findingaid(request, id, mode, preview=False):
         return render_to_response(template, template_args)
     elif mode == 'pdf':
         return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid.value)
+    elif mode == 'xsl-fo':
+        xslfo = html_to_xslfo(template, template_args)
+        return HttpResponse(etree.tostring(xslfo), mimetype='application/xml')
 
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)

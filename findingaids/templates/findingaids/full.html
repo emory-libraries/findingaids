@@ -1,72 +1,12 @@
 {% load ead %}
 <html>
     <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    {% ifequal mode 'pdf' %}  {# xhtml2pdf needs full path to files #}
-      <link rel="stylesheet" type="text/css" href="{{ MEDIA_ROOT}}/style/local.css" />
-    {% endifequal %}
-    {% ifequal mode 'html' %}
-    <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
-    {% endifequal %}
-    <style>
-        body { font-family: Times-Roman; font-size: 12pt; }
-        @page { /* first page layout (default)  */
-            size: letter;
-            margin:1in;
-            margin-bottom:1.5in;
-            @frame footer {
-                -pdf-frame-content: firstpage-footer;
-                bottom: 0.5in;
-                height: 1 in;
-                margin-left: 1in;
-                margin-right: 1in;
-            }
-        }
-        @page default { /* all subsequent pages */
-            size: letter;
-            margin:1in;
-            margin-bottom:1.5in;
-            @frame footer {
-                -pdf-frame-content: footer;
-                bottom: 0.5in;
-                height: 0.5in;
-                margin-left: 1in;
-                margin-right: 1in;
-            }
-            @frame header {
-                -pdf-frame-content: header;
-                top: 0.5in;
-                height: 0.25in;
-                margin-left: 1in;
-                margin-right: 1in;
-            }
-        }
-        a { text-decoration: none; color:black; }
-        div#footer { text-align:center; -pdf-frame-border: 1;}
-        div#firstpage-footer { font-style:italic; }
-        div#header { font-size: 9pt; }
-        div#header table { width: 100%; }
-        div#publication_statement p { font-size:14pt; line-height: 15pt; margin:0px; padding:0px; text-align: center;}
-        h1 { font-size: 18pt; margin-bottom: 30pt; text-align: center;  -pdf-outline-open: true; }
-        h2 { font-size: 14pt; -pdf-keep-with-next: true; }
-        h3 { font-size: 12pt; margin-bottom: 0px; padding-bottom: 0px; -pdf-keep-with-next: true;}
-        h2.subseries { -pdf-outline-level: 2; }
-        p { margin-top: 0px; }
-        table.box-folder th.content {
-            margin-left: 20px;
-        }
-        table.box-folder td.content {
-            margin-left: 40px;
-            text-indent: -20px;
-        }
-        table.box-folder tr.section { /*-pdf-keep-with-next: true;*/  page-break-after:avoid; }
-        .nextpage { page-break-before: always; }
-        hr { color: black; height: 15px; border-top-width:10px; border-top-color: blue;}
-    </style>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
     </head>
     <body>
 <div class="fa">
-<h1>{{ ead.title|format_ead }}</h1>
+<h1><a name="{{ ead.eadid }}">{{ ead.title|format_ead }}</a></h1>
 
 <div id="publication_statement">
     {% with ead.file_desc.publication as publication %}
@@ -76,8 +16,7 @@
     {% endfor %}
     {% endwith %}
 </div>
-<hr/>
-<pdf:nexttemplate name="default" /> {# next page should switch to main page layout #}
+<hr/> 
 {% include "findingaids/sections/description.html" %}
 
 {# NOTE: contol access section is not included in the PDF #}
@@ -109,6 +48,7 @@
         </div>
         {# container list is handled in series template; display subseries, if any #}
         {% if c01_series.hasSubseries %}
+        <div class="subseries">
             {% for c02_series in c01_series.c %}
                 <div class="nextpage">
                     {% with c02_series as series %}
@@ -116,6 +56,7 @@
                     {% endwith %}
                 </div>
                 {% if c02_series.hasSubseries %}
+                <div class="subseries">
                     {% for c03_series in c02_series.c %}
                         <div class="nextpage">
                             {% with c03_series as series %}
@@ -123,11 +64,13 @@
                             {% endwith %}
                         </div>
                     {% endfor %} {# end looping through c03s #}
-                {% endif %} {# c02 has subseries #}
+                </div>
+                {% endif %} {# c02 has subseries #}                
             {% endfor %} {# end looping through c02s #}
+        </div>
         {% endif %} {# c01 has subseries #}
     {% endfor %} {# end looping through c01s #}
- <hr/>
+ <hr/> 
 {% else %} {# simple finding aid - no series at all, just a container list #}
   {% include "findingaids/sections/containerlist.html" %}
 {% endif %}
@@ -143,9 +86,11 @@
   MARBL provides copies of its finding aids for use only in research
   and private study.  Copies supplied may not be copied for others or
   otherwise distributed without prior consent of MARBL.</div>
-<div id="footer"> <pdf:pagenumber/> </div>
+{# <div id="footer"> </div> #}
 <div id="header">
     <table>
+        <col width="65%" valign="top" align="left"/>    {# column width needed for XSL-FO/PDF #}
+        <col width="45%" valign="top" align="right"/>
         <tr>
             <td style="text-align:left">{{ ead.title|format_ead }}</td>
             <td style="text-align:right">{{ ead.archdesc.unitid }}</td>

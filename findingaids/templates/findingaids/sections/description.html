@@ -3,6 +3,8 @@
 {% load ead %}
 <h2><a name="descriptive_summary">Descriptive Summary</a></h2>
 <table id="descriptive_summary">    {#  display the following fields, in this specific order  #}
+    <col width="20%" valign="top" align="left"/>
+    <col width="80%" valign="top" align="left"/>
   {% if ead.archdesc.origination %}
       <tr><th>Creator:</th><td>{{ ead.archdesc.origination }}</td></tr>
    {% endif %}

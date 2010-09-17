@@ -62,40 +62,29 @@
         
       </fo:layout-master-set> 	
       
+      <!-- generate bookmarks -->
+      <fo:bookmark-tree>
+        <xsl:apply-templates select="//h1[a/@name]" mode="bookmark"/>
+      </fo:bookmark-tree> 
+      
       <fo:page-sequence master-reference="all-pages">
 
-        <!-- display collection name / collection # at top of all pages after the first -->
+        <!-- display div with id 'header' at top of all pages after the first -->
         <fo:static-content flow-name="header">
-          <fo:table font-family="any" left="0in" font-size="10pt" margin-left="0.25in">
-            <fo:table-column column-width="4.5in"/>
-            <fo:table-column column-width="2.5in"/>
-            <fo:table-body> 
-            <fo:table-row>
-              <fo:table-cell>
-                <fo:block text-align="start">
-                  <xsl:value-of select="//div[@id='title']"/>
-                </fo:block>
-              </fo:table-cell>
-              <fo:table-cell>
-                <fo:block text-align="end">
-                  <xsl:value-of select="//span[@id='unitid']"/>
-                </fo:block>
-              </fo:table-cell>
-            </fo:table-row>
-          </fo:table-body>
-        </fo:table>
-        
+           <fo:block font-family="any" left="0in" font-size="10pt" margin-left="0.25in">
+            <xsl:apply-templates select="//div[@id='header']" mode="header-footer"/>
+           </fo:block>
       </fo:static-content>
 
-      <!-- display MARBL disclaimer at the foot of the first page -->
+        <!-- display div with id 'firstpage-footer' at the foot of the first page -->
       <fo:static-content flow-name="firstpage-footer">
         <fo:block text-align="start" font-family="any" font-style="italic"
           font-size="10pt" margin-left="0.5in" margin-right="0.5in">
-          <xsl:value-of select="normalize-space($disclaimer)"/>
+            <xsl:apply-templates select="//div[@id='firstpage-footer']" mode="header-footer"/>
         </fo:block>
       </fo:static-content>
 
-        
+      <!-- display the page number at the bottom of all pages after the first -->
       <fo:static-content flow-name="footer">
         <fo:block text-align="center" font-family="any">
           <fo:page-number/>
@@ -116,7 +105,29 @@
 
   </xsl:template>
 
- <xsl:template match="div[@id='title']">
+ <!-- ignore 'special' (header/footer) sections during normal text output -->
+ <xsl:template match="div[@id='header'] | div[@id='footer'] | div[@id='firstpage-footer']"/>
+
+ <xsl:template match="div[@id='header'] | div[@id='footer'] | div[@id='firstpage-footer']" 
+   mode="header-footer">
+    <xsl:apply-templates/>
+ </xsl:template>
+ 
+ <xsl:template match="h1[a/@name]|h2[a/@name]" mode="bookmark">
+   <fo:bookmark>
+     <xsl:attribute name="internal-destination"><xsl:value-of select="a/@name"/></xsl:attribute>
+     <fo:bookmark-title><xsl:value-of select="normalize-space(a)"/></fo:bookmark-title>
+     <xsl:choose>
+       <xsl:when test="local-name(.) = 'h1'">
+         <!-- include top-level series -->
+         <xsl:apply-templates select="//h2[a/@name][@class='series']" mode="bookmark"/>
+       </xsl:when>
+     </xsl:choose>
+   </fo:bookmark>
+ </xsl:template>
+
+
+ <xsl:template match="div[@id='title']|h1">
    <fo:block font-size="18pt" font-family="any" text-align="center"
      space-after="30pt" font-weight="bold">
      <xsl:apply-templates/>
@@ -161,21 +172,21 @@
 
  <xsl:template match="div">
    <fo:block>
-     <xsl:if test="contains(@class, 'pagebreak')">
+     <xsl:if test="contains(@class, 'pagebreak') or contains(@class, 'nextpage')">
        <xsl:attribute name="break-before">page</xsl:attribute>
      </xsl:if>
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
 
- <xsl:template match="div[@id='publicationstmt']">
+ <xsl:template match="div[@id='publication_statement']">
    <fo:block font-size="14pt" font-family="any" text-align="center"
      space-after.optimum="20pt">
      <xsl:apply-templates/>
    </fo:block>
  </xsl:template>
 
- <xsl:template match="div[@id='publicationstmt']/h3|div[@id='publicationstmt']/h4">
+ <xsl:template match="div[@id='publication_statement']/h3|div[@id='publication_statement']/h4">
    <!-- should inhert publicationstmt formatting -->
    <fo:block space-after="0pt">
      <xsl:apply-templates/>
@@ -239,9 +250,21 @@
      </xsl:if>
      <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths --> 
      <xsl:apply-templates select="col"/>
-     <fo:table-body>
-       <xsl:apply-templates select="tr"/>
-     </fo:table-body>
+     <xsl:choose>
+     <xsl:when test="tr[th and not(td) and position() = 1]">
+       <fo:table-header>   
+         <xsl:apply-templates select="tr[th and not(td) and position() = 1]"/>
+       </fo:table-header>
+       <fo:table-body>
+         <xsl:apply-templates select="tr[position() != 1]"/>
+       </fo:table-body>
+     </xsl:when>
+     <xsl:otherwise>
+       <fo:table-body>
+         <xsl:apply-templates select="tr"/>
+       </fo:table-body>
+     </xsl:otherwise>
+     </xsl:choose>
    </fo:table>
  </xsl:template>
 
@@ -274,13 +297,13 @@
       keep-together.within-line="always" as of FOP 0.94, which keeps table contents from wrapping.
       Hopefully a keep-together strength of 5 is sufficient for our needs.  -->
  <xsl:template match="tr">
-   <fo:table-row keep-together="5">
+   <fo:table-row> <!-- keep-together="5"> -->
      <xsl:apply-templates/>
    </fo:table-row>
  </xsl:template>
 
 <xsl:template match="tr[th]">
-   <fo:table-row keep-together="5" keep-with-next="always" space-after="5pt">
+  <fo:table-row keep-together="5" keep-with-next="always"> <!-- space-after="5pt"> -->
      <xsl:apply-templates/>
    </fo:table-row>
  </xsl:template>
@@ -292,7 +315,7 @@
      </xsl:if>
      <fo:block padding-after="2pt">
        <!-- box & folder labels should be smaller -->
-       <xsl:if test="../@class = 'box-folder'">
+       <xsl:if test="../@class = 'box-folder' or @class='bf' or @class='content'">
          <xsl:attribute name="font-size">10pt</xsl:attribute>
        </xsl:if>
        <xsl:if test="name() = 'th'">
@@ -306,6 +329,7 @@
          <xsl:attribute name="margin-left">20pt</xsl:attribute>
          <xsl:attribute name="text-indent">-10pt</xsl:attribute>
        </xsl:if>
+       <xsl:apply-templates select="@align|@style"/>    <!-- handle text alignment -->
        <xsl:apply-templates/>
      </fo:block>
    </fo:table-cell>
@@ -342,5 +366,40 @@
  <xsl:template match="br">
    <fo:block/>
  </xsl:template>
+
+ <xsl:template match="a[@href]">
+   <fo:basic-link>
+     <xsl:choose>
+       <xsl:when test="starts-with(@href, '#')">
+         <xsl:attribute name="internal-destination"><xsl:value-of select="substring-after(@href, '#')"/></xsl:attribute>
+       </xsl:when>
+       <xsl:otherwise>
+         <!-- FIXME -->
+         <!--         <xsl:attribute name="external-destination"><xsl:value-of select="concat('url(\'', @href, '\')')"/></xsl:attribute> -->
+       </xsl:otherwise>
+     </xsl:choose>
+     <xsl:apply-templates/>
+   </fo:basic-link>
+ </xsl:template>
+
+<xsl:template match="@align|@style">
+  <xsl:choose>
+    <xsl:when test=".='right' or contains(., 'text-align:right')">
+      <xsl:attribute name="text-align">end</xsl:attribute>
+    </xsl:when>
+    <xsl:when test=".='left' or contains(., 'text-align:left')">
+      <xsl:attribute name="text-align">start</xsl:attribute>
+    </xsl:when>
+  </xsl:choose>
+</xsl:template>
+
+ <xsl:template match="a[@name]">
+   <fo:inline>
+     <xsl:attribute name="id"><xsl:value-of select="@name"/></xsl:attribute>
+     <xsl:apply-templates/>
+   </fo:inline>
+ </xsl:template>
+
+ <xsl:template match="style"/>
 
 </xsl:stylesheet>
