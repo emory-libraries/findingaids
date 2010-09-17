@@ -5,7 +5,7 @@ from datetime import datetime
 from functools import wraps
 import logging
 from lxml import etree
-from os import path
+import os
 import subprocess
 import tempfile
 
@@ -26,7 +26,8 @@ from findingaids.fa.models import FindingAid, Deleted
 logger = logging.getLogger(__name__)
 
 # parse and load XSLT for converting html to XSL-FO at init
-xhtml_xslfo_xslt = path.join(path.dirname(path.abspath(__file__)), 'xhtml_to_xslfo.xsl')
+xhtml_xslfo_xslt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                'xhtml_to_xslfo.xsl')
 XHTML_TO_XSLFO = etree.XSLT(etree.parse(xhtml_xslfo_xslt))
  
 def render_to_pdf(template_src, context_dict, filename=None):
@@ -46,13 +47,25 @@ def render_to_pdf(template_src, context_dict, filename=None):
     """
 
     xslfo = html_to_xslfo(template_src, context_dict)
+    tmpdir = tempfile.mkdtemp('findingaids-fop')
     # write xsl-fo to a temporary named file that we can pass to xsl-fo processor
-    xslfo_file = tempfile.NamedTemporaryFile(prefix='findingaids-xslfo-')
+    xslfo_file = tempfile.NamedTemporaryFile(prefix='findingaids-xslfo-', dir=tmpdir)
     xslfo.write(xslfo_file.name, encoding='UTF-8', pretty_print=True, xml_declaration=True)
     # create a temporary file where the PDF should be created
-    pdf_file = tempfile.NamedTemporaryFile(prefix='findingaids-pdf-')
-    try: 
-        rval = subprocess.call([settings.XSLFO_PROCESSOR, xslfo_file.name, pdf_file.name])
+    pdf_file = tempfile.NamedTemporaryFile(prefix='findingaids-pdf-', dir=tmpdir)
+    # create a log4j file so we can get fop errors
+    # FIXME: there must be a better way to dot his!
+    log4j_prop = os.path.join(tmpdir, 'log4j.properties')
+    with open(log4j_prop, 'w') as file:
+        file.write('log4j.rootLogger=%s, CONSOLE' % ('WARN' if settings.DEBUG else 'ERROR') + '''
+log4j.appender.CONSOLE=org.apache.log4j.ConsoleAppender
+log4j.appender.CONSOLE.layout=org.apache.log4j.PatternLayout
+log4j.appender.CONSOLE.layout.ConversionPattern=%-5p %3x - %m%n
+        ''')
+    try:
+        # NOTE: for now, just sending errors to stdout
+        rval = subprocess.call([settings.XSLFO_PROCESSOR, xslfo_file.name, pdf_file.name],
+                cwd=tmpdir)
         if rval is 0:       # success!
             response = http.HttpResponse(pdf_file.read(), mimetype='application/pdf')
             if filename:
@@ -60,7 +73,15 @@ def render_to_pdf(template_src, context_dict, filename=None):
             return response
     except OSError, e:
         logger.error("Apache Fop execution failed: ", e)
- 
+    finally:
+        # clean up tmp files
+        os.unlink(log4j_prop)
+        # temporary files are automatically deleted when closed
+        xslfo_file.close()
+        pdf_file.close()
+        # dir should be empty now, so we can delete it
+        os.rmdir(tmpdir)
+         
     # if nothing was returned by now, there was an error generating the pdf
     raise Exception("There was an error generating the PDF")
 

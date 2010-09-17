@@ -242,7 +242,7 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
                 msg_prefix="title from deleted record is displayed in response")
 
-        # printable_fa - single-page PDF of entire Finding Aid
+        # printable_fa - PDF of entire Finding Aid
         pdf_url = reverse('fa:printable', kwargs={'id': id})
         response = self.client.get(pdf_url)
         expected, got = 410, response.status_code
