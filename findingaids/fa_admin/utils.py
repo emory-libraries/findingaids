@@ -114,9 +114,16 @@ def check_eadxml(ead):
                         % origination_count)
 
     # container list formatting (based on encoding practice) expects only 2 containers per did
+    # - dids with more than 2 containers
     containers = ead.node.xpath('//did[count(container) > 2]')
     if len(containers):
         errors.append("Site expects maximum of 2 containers per did; found %d did(s) with more than 2" \
+                        % len(containers))
+        errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
+    # - for dids with only one container
+    containers = ead.node.xpath('//did[count(container) = 1]')
+    if len(containers):
+        errors.append("Site expects 2 containers per did; found %d did(s) with only 1" \
                         % len(containers))
         errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
 

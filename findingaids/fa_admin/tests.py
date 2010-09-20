@@ -807,6 +807,11 @@ class UtilsTest(TestCase):
         # - did with > 2 containers
         self.assert_('Site expects maximum of 2 containers per did; found 1 did(s) with more than 2'
                     in errors, 'did with more than 2 containers reported')
+
+        # - did with only 1 container
+        self.assert_('Site expects 2 containers per did; found 1 did(s) with only 1'
+                    in errors, 'did with only 1 container reported')
+
         
     def test_prep_ead(self):
         # ead with series/subseries, and index
@@ -853,8 +858,13 @@ class UtilsTest(TestCase):
                         ead.archdesc.controlaccess.controlaccess[3].subject[2].value)
         self.assertEqual(u'Motion pictures.',
                         ead.archdesc.controlaccess.controlaccess[-1].genre_form[0].value)
-        self.assertEqual(1, len(check_eadxml(ead)),
-            "only one error (duplicate origination) should be left in invalid test fixture after cleaning")
+        # remaining errors after clean-up:
+        # 1 - duplicate origination
+        # 2 - > 2 containers in a did (summary error and list of problem dids)
+        # 2 - 1 container in a did (summary error and list of problem dids)
+        # = 5
+        self.assertEqual(5, len(check_eadxml(ead)),
+            "only 3 errors (duplicate origination, 3 containers in a did, 1 container in a did) should be left in invalid test fixture after cleaning")
 
         # special case - unittitle begins with a <title>  -- should not cause errors
         eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
