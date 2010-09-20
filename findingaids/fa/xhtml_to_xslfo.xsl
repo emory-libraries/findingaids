@@ -248,6 +248,17 @@
      <xsl:if test="@id != 'descriptivesummary'">
        <xsl:attribute name="padding-before">10pt</xsl:attribute>
      </xsl:if>
+     <!-- fop complains about table-layout auto; auto is treated as fixed, width=100% -->
+     <xsl:attribute name="table-layout">fixed</xsl:attribute>
+     <!-- if table has a width, use that; otherwise, specify 100% -->
+     <xsl:choose>
+       <xsl:when test="@width">
+         <xsl:attribute name="width"><xsl:value-of select="@width"/></xsl:attribute>    
+       </xsl:when>
+       <xsl:otherwise>
+         <xsl:attribute name="width">100%</xsl:attribute>
+       </xsl:otherwise>
+     </xsl:choose>     
      <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths --> 
      <xsl:apply-templates select="col"/>
      <xsl:choose>
