@@ -6,8 +6,7 @@ Dependencies
  * django 1.2
  * eXist-db 1.4
  * dateutil
- * xhtml2pdf/Pisa for PDF generation.  Stand along python package downloadable 
-   `here <http://www.xhtml2pdf.com>`_ or available via `easy_install pisa`
+ * `Apache FOP <http://xmlgraphics.apache.org/fop/>`_ for PDF generation.
  * python-dateutil library `downloadable package
    <http://labix.org/python-dateutil>`_ or install via `easy_install
    python-dateutil`
@@ -52,14 +51,8 @@ EAD files that will be accessible for loading to eXist via the admin
 interface.
 
 
-Install `xhtml2pdf/Pisa`_ and its dependencies. On Ubuntu, the following
-should be sufficient::
-
-  $ sudo apt-get install python-reportlab python-html5lib
-  $ sudo easy_install pisa
-
-.. _xhtml2pdf/Pisa: http://www.xhtml2pdf.com/doc/pisa-en.html
-
+Install `Apache FOP <http://xmlgraphics.apache.org/fop/>`_ and configure
+the XSLFO_PROCESSOR setting to the full path to the command-line version of fop.
 
 Install `django-celery` and `rabbitmq` for asynchronous task handling.  On
 Ubuntu, this can be done as follows::
@@ -88,12 +81,8 @@ eulcore dependencies
 To install all the necessary components for a development environment
 on an Ubuntu 10.04 workstation:
 
-sudo apt-get install python-ldap python-pisa python-lxml python-ply rabbitmq-server python-dateutil
+sudo apt-get install python-ldap python-lxml python-ply rabbitmq-server python-dateutil fop
 sudo easy_install django-celery mimeparse
 
 This assumes you already have a django 1.2 installation and python bindings
 for the database platform you are using (e.g., python-mysqldb for mysql).
-
-If you are running a version of Ubuntu earlier than 10.04, the
-python-pisa package will not be available and you will have to install
-pisa as documented above.

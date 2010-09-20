@@ -24,9 +24,15 @@ Upgrade notes:
    Be reminded that any cache (e.g., Squid) should be configured so that
    cached PDFs will be  kept and not released in order to cache pages
    like these.
-3. Logging is now avaliable when running via runserver and is configured in localsettngs
+3. Logging is now available when running via runserver and is configured in
+   localsettngs
+4. On Ubuntu, install Fop via ``apt-get install fop``.  Set the full path
+   to the command-line version of fop as the XSLFO_PROCESSOR in localsettings.py
 
 
+** Features/Notes **
+
+ * Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
 
 
 0.2 Data Preparation / Admin site
