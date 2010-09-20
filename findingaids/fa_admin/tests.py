@@ -802,8 +802,11 @@ class UtilsTest(TestCase):
         self.assert_("Found leading whitespace in controlaccess term '  \t   Mines and mineral resources--Georgia.' (subject)"
                     in errors, 'controlaccess subject leading whitespace reported')
         self.assert_("Found leading whitespace in controlaccess term ' Motion pictures.' (genreform)"
-                    in errors, 'controlaccess genre leading whitespace reported')        
+                    in errors, 'controlaccess genre leading whitespace reported')
 
+        # - did with > 2 containers
+        self.assert_('Site expects maximum of 2 containers per did; found 1 did(s) with more than 2'
+                    in errors, 'did with more than 2 containers reported')
         
     def test_prep_ead(self):
         # ead with series/subseries, and index

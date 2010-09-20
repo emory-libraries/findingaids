@@ -115,8 +115,8 @@ def check_eadxml(ead):
 
     # container list formatting (based on encoding practice) expects only 2 containers per did
     containers = ead.node.xpath('//did[count(container) > 2]')
-    if len(containers)  > 1:
-        errors.append("Site expects maximum of 2 containers per did; found %d exceptions" \
+    if len(containers):
+        errors.append("Site expects maximum of 2 containers per did; found %d did(s) with more than 2" \
                         % len(containers))
         errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
 
