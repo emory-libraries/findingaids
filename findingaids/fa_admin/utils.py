@@ -1,5 +1,5 @@
 import os
-from lxml.etree import XMLSyntaxError, Resolver
+from lxml.etree import XMLSyntaxError, Resolver, tostring
 import re
 
 from django.conf import settings
@@ -112,6 +112,14 @@ def check_eadxml(ead):
     if int(origination_count)  > 1:
         errors.append("Site expects only one archdesc/did/origination; found %d" \
                         % origination_count)
+
+    # container list formatting (based on encoding practice) expects only 2 containers per did
+    containers = ead.node.xpath('//did[count(container) > 2]')
+    if len(containers)  > 1:
+        errors.append("Site expects maximum of 2 containers per did; found %d exceptions" \
+                        % len(containers))
+        errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
+
     # - no leading whitespace in list title
     title_node = ead.node.xpath("%s/text()" % ead.list_title_xpath)    
     if hasattr(title_node[0], 'text'):

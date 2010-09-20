@@ -7,9 +7,7 @@
 <p>Could not {{ mode }} <b>{{ filename }}</b> due to the following:</p>
 
 <ul>
-{% for err in errors %}
-    <li>{{ err }}</li>
-{% endfor %}
+    {{ errors|unordered_list }}
 </ul>
 
 <hr/>
