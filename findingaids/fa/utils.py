@@ -72,15 +72,20 @@ log4j.appender.CONSOLE.layout.ConversionPattern=%-5p %3x - %m%n
                 response['Content-Disposition'] = "attachment; filename=%s" % filename
             return response
     except OSError, e:
-        logger.error("Apache Fop execution failed: ", e)
+        logger.error("Apache Fop execution failed: %s" % e)
     finally:
         # clean up tmp files
         os.unlink(log4j_prop)
         # temporary files are automatically deleted when closed
         xslfo_file.close()
-        pdf_file.close()
-        # dir should be empty now, so we can delete it
-        os.rmdir(tmpdir)
+        # can get an OSError if the PDF file does not exist, e.g. if fop failed
+        try:            
+            pdf_file.close()            
+        except OSError, e:
+            logger.error("Failed to delete temporary PDF file: %s" % e)
+        finally:
+            # dir should be empty now, so we can delete it
+            os.rmdir(tmpdir)
          
     # if nothing was returned by now, there was an error generating the pdf
     raise Exception("There was an error generating the PDF")
