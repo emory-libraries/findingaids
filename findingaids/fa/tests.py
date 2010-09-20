@@ -926,6 +926,17 @@ class FaViewsTest(TestCase):
                         "Expected '%s' but returned '%s' for %s content-disposition" % \
                         (expected, response['Content-Disposition'], pdf_url))
 
+        # test the XSL-FO used to generate PDF
+        # - if a template changes in a way that breaks valid XSL-FO generation, we need to catch it
+        xslfo_url = reverse('fa:xslfo', kwargs={'id': 'raoul548'})
+        response = self.client.get(xslfo_url)
+        # if XSL-FO is not valid xml, etree will not be able to parse
+        xslfo = etree.fromstring(response.content)
+        self.assert_(isinstance(xslfo, etree._Element))
+        # NOTE: currently cannot validate XSL-FO
+        # - there is no official XSL-FO schema or DTD; available unofficial
+        # schemas do not include fo:bookmark (which is part of XSL-FO v1.1)
+
     def test_eadxml(self):
         nonexistent_ead = reverse('fa:eadxml', kwargs={'id': 'nonexistent'})
         response = self.client.get(nonexistent_ead)
