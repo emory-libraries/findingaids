@@ -8,6 +8,8 @@ from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
+from eulcore.xmlmap.eadmap import EAD_NAMESPACE
+
 __all__ = [ 'format_ead', 'format_ead_children' ]
 
 register = template.Library()
@@ -75,8 +77,8 @@ format_ead_children.needs_autoescape = True
 _RENDER_DOUBLEQUOTE = etree.XPath('@render="doublequote"')
 _RENDER_BOLD = etree.XPath('@render="bold"')
 _RENDER_ITALIC = etree.XPath('@render="italic"')
-_IS_EMPH = etree.XPath('self::emph')
-_IS_TITLE = etree.XPath('self::title')
+_IS_EMPH = etree.XPath('self::e:emph', namespaces={'e': EAD_NAMESPACE})
+_IS_TITLE = etree.XPath('self::e:title', namespaces={'e': EAD_NAMESPACE})
 # NOTE: exist:match highlighting is not technically part of EAD but result of eXist
 # it might be better to make this logic more modular, less EAD-specific
 _IS_EXIST_MATCH = etree.XPath('self::exist:match',

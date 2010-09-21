@@ -6,34 +6,32 @@ from django.db import models
 
 from eulcore import xmlmap
 from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, \
-        SubordinateComponents, Index as EadIndex, ArchivalDescription
+        SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE
 from eulcore.django.existdb.manager import Manager
 from eulcore.django.existdb.models import XmlModel
 
 
-
-
-# finding aid model
-# currently just a wrapper around ead xmlmap object,
-# with a exist queryset initialized using django-exist settings and ead model
+# finding aid models
 
 class FindingAid(XmlModel, EncodedArchivalDescription):
     """Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
 
       Additional fields and methods are used for search, browse, and display.
     """
+    ROOT_NAMESPACES = {'e': EAD_NAMESPACE }
+    # redeclaring namespace from eulcore to ensure prefix is correct for xpaths
 
     # NOTE: overridding these fields from EncodedArchivalDescription to allow
     # for efficiently retrieving unittitle and abstract in the full document OR
     # in the constructed return object returned from eXist for search/browse
-    unittitle = xmlmap.NodeField('.//unittitle[not(ancestor::dsc)]', xmlmap.XmlObject)
-    abstract = xmlmap.NodeField('//abstract[not(ancestor::dsc)]', xmlmap.XmlObject)
-    physical_desc = xmlmap.StringField('//physdesc[not(ancestor::dsc)]')
+    unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', xmlmap.XmlObject)
+    abstract = xmlmap.NodeField('.//e:abstract[not(ancestor::e:dsc)]', xmlmap.XmlObject)
+    physical_desc = xmlmap.StringField('.//e:physdesc[not(ancestor::e:dsc)]')
 
-    list_title_xpaths = ["archdesc/did/origination/corpname",
-        "archdesc/did/origination/famname",
-        "archdesc/did/origination/persname",
-        "archdesc/did[not(origination/corpname or origination/famname or origination/persname)]/unittitle"]
+    list_title_xpaths = ["e:archdesc/e:did/e:origination/e:corpname",
+        "e:archdesc/e:did/e:origination/e:famname",
+        "e:archdesc/e:did/e:origination/e:persname",
+        "e:archdesc/e:did[not(e:origination/e:corpname or e:origination/e:famname or e:origination/e:persname)]/e:unittitle"]
     list_title_xpath = "|".join("./%s" % xp for xp in list_title_xpaths)
     #./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
 
@@ -45,28 +43,28 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     first_letter = xmlmap.StringField("substring(%s,1,1)" % list_title_xpath)
     "First letter of list title"
 
-    dc_subjects = xmlmap.StringListField ('archdesc//controlaccess/subject[@encodinganalog = "650"] | \
-            archdesc//controlaccess/persname[@encodinganalog = "600"] | \
-            archdesc//controlaccess/corpname[@encodinganalog = "610"] | \
-            archdesc//controlaccess/corpname[@encodinganalog = "611"] | \
-            archdesc//controlaccess/geogname[@encodinganalog = "651"]', normalize=True)
+    dc_subjects = xmlmap.StringListField ('e:archdesc//e:controlaccess/e:subject[@encodinganalog = "650"] | \
+            e:archdesc//e:controlaccess/e:persname[@encodinganalog = "600"] | \
+            e:archdesc//e:controlaccess/e:corpname[@encodinganalog = "610"] | \
+            e:archdesc//e:controlaccess/e:corpname[@encodinganalog = "611"] | \
+            e:archdesc//e:controlaccess/e:geogname[@encodinganalog = "651"]', normalize=True)
     "control access fields that should be mapped to Dublin Core subject, based on encodinganalog attribute"
 
-    dc_contributors = xmlmap.StringListField ('archdesc//controlaccess/persname[@encodinganalog = "700"] | \
-        archdesc//controlaccess/corpname[@encodinganalog = "710"]', normalize=True)
+    dc_contributors = xmlmap.StringListField ('e:archdesc//e:controlaccess/e:persname[@encodinganalog = "700"] | \
+        e:archdesc//e:controlaccess/e:corpname[@encodinganalog = "710"]', normalize=True)
     "control access fields that should be mapped to Dublin Core contributor, based on encodinganalog attribute"
 
     # convenience mapping for searching on subject fields
-    subject = xmlmap.StringField('.//controlaccess')
+    subject = xmlmap.StringField('.//e:controlaccess')
 
     # local repository *subarea* - e.g., MARBL, University Archives
-    repository = xmlmap.StringField('.//subarea')
+    repository = xmlmap.StringField('.//e:subarea')
 
     # boosted fields in the index: must be searched to get proper relevance score
-    boostfields = xmlmap.StringField('.//titleproper | .//origination | \
-        .//abstract | .//bioghist | .//scopecontent | .//controlaccess')
-  
-    objects = Manager('/ead')
+    boostfields = xmlmap.StringField('.//e:titleproper | .//e:origination | \
+        .//e:abstract | .//e:bioghist | .//e:scopecontent | .//e:controlaccess')
+
+    objects = Manager('/e:ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving FindingAid objects
         in eXist.
@@ -156,7 +154,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
-
+    ROOT_NAMESPACES = {'e': EAD_NAMESPACE }
     xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)
     # xpath to use for alpha-browse - using list title xpaths from FindingAid
     
@@ -193,14 +191,17 @@ class Series(XmlModel, Component):
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`
     """
 
-    ROOT_NAMESPACES = { 'exist': 'http://exist.sourceforge.net/NS/exist' }
+    ROOT_NAMESPACES = {
+        'e': EAD_NAMESPACE,
+        'exist': 'http://exist.sourceforge.net/NS/exist'
+    }
 
-    ead = xmlmap.NodeField("ancestor::ead", FindingAid)
+    ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
     parent = xmlmap.NodeField("parent::node()", "self")
 
-    objects = Manager('//c01')
+    objects = Manager('//e:c01')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c01 series objects
         in eXist.
@@ -265,9 +266,9 @@ class Series2(Series):
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
       :class:`Series`
     """
-    series = xmlmap.NodeField("parent::c01", Series)
+    series = xmlmap.NodeField("parent::e:c01", Series)
     ":class:`findingaids.fa.models.Series` access to c01 series this subseries belongs to"
-    objects = Manager('//c02')
+    objects = Manager('//e:c02')
     """:class:`eulcore.django.existdb.manager.Manager`
 
         Configured to use *//c02* as base search path.
@@ -281,11 +282,11 @@ class Series3(Series):
       Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
       :class:`Series`
     """
-    series2 = xmlmap.NodeField("parent::c02", Series2)
+    series2 = xmlmap.NodeField("parent::e:c02", Series2)
     ":class:`findingaids.fa.models.Subseries` access to c02 subseries this sub-subseries belongs to"
-    series = xmlmap.NodeField("ancestor::c01", Series)
+    series = xmlmap.NodeField("ancestor::e:c01", Series)
     ":class:`findingaids.fa.models.Series` access to c01 series this sub-subseries belongs to"
-    objects = Manager('//c03')
+    objects = Manager('//e:c03')
     """:class:`eulcore.django.existdb.manager.Manager`
 
         Configured to use *//c03* as base search path.
@@ -298,15 +299,17 @@ class Index(XmlModel, EadIndex):
       Customized version of :class:`eulcore.xmlmap.eadmap.Index`
     """
 
-    ROOT_NAMESPACES = { 'exist': 'http://exist.sourceforge.net/NS/exist' }
+    ROOT_NAMESPACES = {
+        'e': EAD_NAMESPACE,
+        'exist': 'http://exist.sourceforge.net/NS/exist'
+    }
 
-
-    ead = xmlmap.NodeField("ancestor::ead", FindingAid)
+    ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
     parent = xmlmap.NodeField("parent::node()", "self")
 
-    objects = Manager('//index')
+    objects = Manager('//e:index')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving index objects
         in eXist.
@@ -328,9 +331,12 @@ class FileComponent(XmlModel, Component):
     folder contents).
     """
 
-    ROOT_NAMESPACES = { 'exist': 'http://exist.sourceforge.net/NS/exist' }
+    ROOT_NAMESPACES = {
+        'e': EAD_NAMESPACE,
+        'exist': 'http://exist.sourceforge.net/NS/exist'
+    }
 
-    ead = xmlmap.NodeField("ancestor::ead", FindingAid)
+    ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
     # NOTE: mapping parent, series1, and series2 to ensure there is enough
@@ -339,13 +345,13 @@ class FileComponent(XmlModel, Component):
     parent = xmlmap.NodeField("parent::node()", Series)
     ":class:`findingaids.fa.models.Series` series this file belongs to (could be c01, c02, or c03)."
 
-    series1 = xmlmap.NodeField("ancestor::c01", Series)
+    series1 = xmlmap.NodeField("ancestor::e:c01", Series)
     ":class:`findingaids.fa.models.Series` c01 series this file belongs to."
     
-    series2 = xmlmap.NodeField("ancestor::c02", Series)
+    series2 = xmlmap.NodeField("ancestor::e:c02", Series)
     ":class:`findingaids.fa.models.Series` c02 series this file belongs to, if any."
 
-    objects = Manager('''(//c01|//c02|//c03|//c04)[@level="file"]''')
+    objects = Manager('''(//e:c01|//e:c02|//e:c03|//e:c04)[@level="file"]''')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c-series file objects
         in eXist.

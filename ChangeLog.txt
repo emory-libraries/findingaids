@@ -25,9 +25,10 @@ Upgrade notes:
    cached PDFs will be  kept and not released in order to cache pages
    like these.
 3. Logging is now available when running via runserver and is configured in
-   localsettngs
+   localsettings
 4. On Ubuntu, install Fop via ``apt-get install fop``.  Set the full path
    to the command-line version of fop as the XSLFO_PROCESSOR in localsettings.py
+   Note that running Fop requires a valid JAVA_HOME be set in the environment.
 
 
 ** Features/Notes **

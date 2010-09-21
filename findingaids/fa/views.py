@@ -12,6 +12,7 @@ from django.views.decorators.http import condition
 from eulcore.django.http import content_negotiation
 from eulcore.existdb.db import ExistDBException
 from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
             FileComponent, title_letters, Index
@@ -51,7 +52,6 @@ def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
-
     #remove last_query from session
     if 'last_query' in request.session:
         del request.session['last_query']
@@ -113,7 +113,6 @@ def findingaid(request, id, preview=False):
     fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
-
 
     response = render_to_response('findingaids/findingaid.html', { 'ead' : fa,
                                                          'series' : series,
@@ -244,7 +243,6 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'last_query' : request.session.get('last_query'),
                     'last_browse' : request.session.get('last_browse'),
                     }
-    
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
@@ -332,14 +330,13 @@ def search(request):
         keywords = form.cleaned_data['keywords']
         repository = form.cleaned_data['repository']
         page = request.REQUEST.get('page', 1)
-
+        
         #remove last_browse from session
         if 'last_browse' in request.session:
             del request.session['last_browse']
         
         #set query and last page in session and set it to expire on browser close
         last_query = {}
-
         if subject:
             last_query['subject'] = subject
 
@@ -351,7 +348,6 @@ def search(request):
         last_query = urlencode(last_query)
         request.session["last_query"] = last_query
         request.session.set_expiry(0)
-
 
 
         # initialize findingaid queryset - filters will be added based on search terms
@@ -545,6 +541,11 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
     :param url_params: optional string to add to the end of urls (e.g., for search
             term highlighting)
     """
+    # namespaced tag names, for easy comparison of tag name to determine c-level
+    C01 = '{%s}c01' % EAD_NAMESPACE
+    C02 = '{%s}c02' % EAD_NAMESPACE
+    C03 = '{%s}c03' % EAD_NAMESPACE
+
     # construct url ids if none are passed
     if url_ids is None:
         if not (series.ead and series.ead.eadid):
@@ -552,8 +553,9 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                         % (series.node.tag, series.id))
 
         url_ids = [series.ead.eadid]
+        
         # if c02/c03, check to ensure we have enough information to generate the correct link
-        if series.node.tag in ['c02', 'c03']:
+        if series.node.tag in [C02, C03]:
             # if initial series passed in is c02 or c03, add c01 series id to url ids before current series id
             if hasattr(series, 'series') and series.series:
                 url_ids.append(series.series.id)
@@ -561,7 +563,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                 raise Exception("Cannot construct subseries links without c01 series id for %s element %s"
                         % (series.node.tag, series.id))
 
-            if series.node.tag == 'c03':
+            if series.node.tag == C03:
                 # if initial series passed in is c03, add c02 series id to url ids before current series id
                 if hasattr(series, 'series2') and series.series2:
                     url_ids.append(series.series2.id)
@@ -570,7 +572,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                         % (series.node.tag, series.id))
 
         #  current series id
-        if series.node.tag in ['c01', 'c02', 'c03']:
+        if series.node.tag in [C01, C02, C03]:
             url_ids.append(series.id)
         
     links = []
@@ -585,12 +587,12 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
 
             current_url_ids = url_ids + [component.id]
             #set c01 rel attrib to 'section' c02 and c03 to 'subsection'
-            if (component.node.tag == 'c01'):
+            if (component.node.tag == C01):
                 rel='section'
-            elif (component.node.tag in ['c02', 'c03']):
+            elif (component.node.tag in [C02, C03]):
                 rel='subsection'
             text = "<a href='%(url)s%(url_params)s' rel='%(rel)s'>%(linktext)s</a> %(match_count)s" % \
-                {'url': url_callback(*current_url_ids, preview=preview),
+                {'url': url_callback(preview=preview, *current_url_ids),
                  'url_params': url_params,
                  'rel': rel,
                  'linktext':  component.display_label(), 'match_count': match_count}

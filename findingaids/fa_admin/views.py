@@ -196,11 +196,8 @@ def publish(request):
         errors = []
         try:
             ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
-            if ok is not True and publish_mode != 'preview':
-                # FIXME: currently, doctype declaration is getting lost when we load to eXist
-                # so validation fails on pre-publication check
-                # ignoring validation errors for now, since preview files *should*
-                # already have been checked when loaded for preview...
+            if ok is not True:
+                # publication check failed - do not publish
                 return response
 
             # only load to exist if there are no errors found

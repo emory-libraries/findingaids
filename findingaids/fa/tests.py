@@ -15,6 +15,7 @@ from django.template import RequestContext, Template
 from django.test import Client, TestCase as DjangoTestCase
 
 from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
+from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
@@ -81,12 +82,6 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_(isinstance(info, ListType))
         self.assertEqual("Scope and Content Note", unicode(info[0].head))
         self.assertEqual("Arrangement Note", unicode(info[1].head))
-
-        #get number of matched keywords in series
-        self.assertEqual(self.findingaid['raoul548'].dsc.c[3].match_count,  2)
-
-        #get number of matched keywords in index
-        self.assertEqual(self.findingaid['raoul548'].archdesc.index[0].match_count,  1)
         
         # series info problem when scopecontent is missing a <head>; contains use restriction
         info = self.findingaid['raoul548'].dsc.c[-1].c[-1].series_info()
@@ -180,6 +175,7 @@ class FaViewsTest(TestCase):
             msg_prefix='browse by letter A should mark A as current letter')
 
         # format_ead
+        # NOTE: these tests are somewhat dependent on whitespace in the xml fixtures
         response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'P'}))
         # title
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+> research files''',
@@ -678,9 +674,10 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "None", 0,
             msg_prefix="series with a section with no head does not display 'None' for heading")
         self.assertContains(response, 'id="breadcrumbs"')
-        self.assertContains(response, "Miscellaneous, 1881-1982", 1, msg_prefix='should only contain 1 instance of this text and it should be in the breadcrumbs')
-        self.assertContains(response, "/documents/raoul548/raoul548_s4", 2, msg_prefix='should only contain 2 instance of this text in breadcrumbs and contents')
-#        print response
+        self.assertContains(response, "Miscellaneous, 1881-1982", 1,
+            msg_prefix='should only contain 1 instance of this text and it should be in the breadcrumbs')
+        self.assertContains(response, "/documents/raoul548/raoul548_s4", 2,
+            msg_prefix='should only contain 2 instance of this text in breadcrumbs and contents')
 
 
     def test_preview_mode(self):
@@ -805,13 +802,6 @@ class FaViewsTest(TestCase):
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 'raoul548_1003223',
             'series2_id': 'raoul548_1003222'}) in links[-1])
-
-
-         # check to make suare highlighting   info is correct
-        series = Series.objects.also('ead__eadid').get(id='raoul548_s4')
-        links = _subseries_links(series)
-        self.assertPattern("^((?!class='exist-match').)*$", links[0])       # NO matches for this link
-        self.assertPattern(".*class='exist-match'.*1 match", links[2])       # matched 1 time on this link
 
         series = Series.objects.get(id='raoul548_1003223')
         # should get exception when top-level ead id is not available
@@ -1212,7 +1202,7 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search results include Abbey Theatre for exact phrase from Abbey Theatre bioghist')
         self.assertContains(response, '1 finding aid found',
             msg_prefix='only one search result for exact phrase from Abbey Theatre bioghist')
-                
+
     def test_search__wildcard(self):
         search_url = reverse('fa:search')
         # wildcard search
@@ -1521,21 +1511,36 @@ class FullTextFaViewsTest(TestCase):
 
         self.assertEqual(result, expected)
 
+    def test_findingaid_match_count(self):
+        # finding aid match_count field can only be tested via eXist return
+        findingaid = FindingAid.objects.filter(highlight='mansion institute').get(eadid='raoul548')
+        # get number of matched keywords in series
+        self.assertEqual(3, findingaid.dsc.c[3].match_count)
+        # get number of matched keywords in index
+        self.assertEqual(2, findingaid.archdesc.index[0].match_count)
+
+        # subseries links
+        series = Series.objects.also('ead__eadid').filter(highlight='champmanoir').get(id='raoul548_s4')
+        links = _subseries_links(series)
+        self.assertPattern(".*class='exist-match'.*2 matches", links[0])  # 2 matches in series 4.1
+        self.assertPattern(".*class='exist-match'.*1 match", links[1][0]) # 1 match in series 4.1a
+        self.assertPattern("^((?!class='exist-match').)*$", links[-1])   # NO matches in last subseries
+
 
 class FormatEadTestCase(DjangoTestCase):
 # test ead_format template tag explicitly
-    ITALICS = """<titleproper><emph render="italic">Pitts v. Freeman</emph> school desegregation case files,
-1969-1993</titleproper>"""
-    BOLD = """<titleproper><emph render="bold">Pitts v. Freeman</emph> school desegregation case files,
-1969-1993</titleproper>"""
-    TITLE = """<abstract>A submission for the magazine <title>The Smart Set</title> from
-    Irish writer Oliver St. John Gogarty to author Ernest Augustus Boyd.</abstract>"""
-    TITLE_EMPH = """<bibref><emph>Biographical source:</emph> "Shaw, George Bernard."
-    <title>Contemporary Authors Online</title>, Gale, 2003</bibref>"""
-    NESTED = """<abstract>magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>"""
-    NOTRANS = """<abstract>magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>"""
-    EXIST_MATCH = """<abstract>Pitts v. <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">Freeman</exist:match>
-school desegregation case files</abstract>"""
+    ITALICS = """<titleproper xmlns="%s"><emph render="italic">Pitts v. Freeman</emph> school desegregation case files,
+1969-1993</titleproper>""" % EAD_NAMESPACE
+    BOLD = """<titleproper xmlns="%s"><emph render="bold">Pitts v. Freeman</emph> school desegregation case files,
+1969-1993</titleproper>""" % EAD_NAMESPACE
+    TITLE = """<abstract xmlns="%s">A submission for the magazine <title>The Smart Set</title> from
+    Irish writer Oliver St. John Gogarty to author Ernest Augustus Boyd.</abstract>"""  % EAD_NAMESPACE
+    TITLE_EMPH = """<bibref xmlns="%s"><emph>Biographical source:</emph> "Shaw, George Bernard."
+    <title>Contemporary Authors Online</title>, Gale, 2003</bibref>""" % EAD_NAMESPACE
+    NESTED = """<abstract xmlns="%s">magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>""" % EAD_NAMESPACE
+    NOTRANS = """<abstract xmlns="%s">magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>""" % EAD_NAMESPACE
+    EXIST_MATCH = """<abstract xmlns="%s">Pitts v. <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">Freeman</exist:match>
+school desegregation case files</abstract>""" % EAD_NAMESPACE
 
     def setUp(self):
         self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node

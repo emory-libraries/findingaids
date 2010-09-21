@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.django.test import TestCase
 from eulcore.xmlmap.core import load_xmlobject_from_file
+from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa_admin import tasks, views
 from findingaids.fa_admin.models import TaskResult
@@ -240,7 +241,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
                              % (expected, code, preview_url))
         self.assertContains(response, "Could not preview")
-        self.assertContains(response, "No declaration for attribute invalid")   # DTD validation error
+        self.assertContains(response, """The attribute &#39;invalid&#39; is not allowed""")   # schema validation error
         self.assertContains(response, "Additional Instructions",
                 msg_prefix="error page displays instructions & next steps to user")
 
@@ -352,8 +353,11 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(response['Content-Type'], expected, "Expected '%s' but returned '%s' for %s mimetype" % \
                         (expected, response['Content-Type'], prep_xml))
         self.assertEqual(response['Content-Disposition'], "attachment; filename=%s" % filename)
-        self.assertContains(response, "<!DOCTYPE ead PUBLIC",
-                    msg_prefix="response does not lose doctype declaration from original xml")
+        #print response
+        self.assertContains(response, "xsi:schemaLocation",
+                    msg_prefix="response does not lose XSD schema location from original xml")
+        self.assertContains(response, "encoding='UTF-8'",
+                    msg_prefix="response includes charater encoding declaration")
         self.assertContains(response, "encoding='UTF-8'",
                     msg_prefix="response includes charater encoding declaration")
         self.assertContains(response, 'hartsfield558</eadid>')
@@ -599,7 +603,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
                              % (expected, code, publish_url))
         self.assertContains(response, "Could not publish")
-        self.assertContains(response, "No declaration for attribute invalid")   # DTD validation error
+        self.assertContains(response, "The attribute &#39;invalid&#39; is not allowed")   # DTD validation error
         self.assertContains(response, "series c01 id attribute is not set")
         self.assertContains(response, "index id attribute is not set")
         docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield558_invalid.xml')
@@ -734,17 +738,19 @@ class UtilsTest(TestCase):
         errors = check_ead(valid_eadfile, dbpath)
         self.assertEqual(0, len(errors))
 
-        # should cause several errors - not DTD valid, eadid, series/subseries ids missing, index id missing
+        # should cause several errors - not schema valid, eadid, series/subseries ids missing, index id missing
         errors = check_ead(os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558_invalid.xml'),
                 dbpath)
         self.assertNotEqual(0, len(errors))
-        self.assert_("No declaration for attribute invalid" in str(errors[0]))   # validation error
+        self.assert_("attribute 'invalid': The attribute 'invalid' is not allowed"
+                     in errors[0])   # validation error message
+        self.assert_("Line 2" in errors[0], "validation error includes line number")   # validation error message
         self.assert_("eadid 'hartsfield558.xml' does not match expected value" in errors[1])
         self.assert_("series c01 id attribute is not set for Series 1" in errors[2])
         self.assert_("subseries c02 id attribute is not set for Subseries 6.1" in errors[3])
         self.assert_("index id attribute is not set for Index of Selected Correspondents" in errors[4])
 
-        # eadid uniqueness check in exist
+        # eadid uniqueness check in eXist
         self.db.load(open(valid_eadfile), dbpath, True)
         errors = check_ead(valid_eadfile, dbpath)
         # same eadid, but present in the file that will be updated - no errors
@@ -843,7 +849,7 @@ class UtilsTest(TestCase):
         ead = prep_ead(ead, eadfile)
         # - no leading whitespace in list title
         # ead.archdesc.origination is getting normalized, so can't be used for testing
-        origination = ead.node.xpath('//origination/persname')        
+        origination = ead.node.xpath('//e:origination/e:persname', namespaces={'e': EAD_NAMESPACE})
         self.assertEqual(u'Hartsfield, William Berry.', origination[0].text)
         # test the node text directly (does not include unitdate)
         self.assertEqual(u'William Berry Hartsfield papers, ', ead.unittitle.node.text)        

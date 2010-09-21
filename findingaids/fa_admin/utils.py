@@ -1,20 +1,23 @@
 import os
-from lxml.etree import XMLSyntaxError, Resolver, tostring
+from lxml.etree import XMLSyntaxError, XPath, tostring
 import re
 
-from django.conf import settings
 from django.http import HttpResponseRedirect
 
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
+from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 from findingaids.fa.models import FindingAid
 from findingaids.fa.urls import EADID_URL_REGEX, TITLE_LETTERS
+
+# pre-compile an xpath to easily get node names without EAD namespace
+local_name = XPath('local-name()')
 
 def check_ead(filename, dbpath, xml=None):
     """
     Sanity check an EAD file before it is loaded to the configured database.
 
     Checks the following:
-     - DTD valid (file must include doctype declaration)
+     - EAD schema valid
      - eadid matches expected pattern-- filename without .xml
      - check that eadid is unique within the database (only present once, in the file that will be updated)
      - additional checks done by :meth:`check_eadxml`
@@ -31,24 +34,21 @@ def check_ead(filename, dbpath, xml=None):
     else:
         load_xml = load_xmlobject_from_file
         content = filename
-    
+
     try:
-        ead = load_xml(content, FindingAid, validate=True, resolver=EadDTDResolver())
+        ead = load_xml(content, FindingAid)
     except XMLSyntaxError, e:
-        # NOTE: we could report all syntax/validation errors if we validate with
-        # a dtd object and access the error_log on the dtd object.
-        # It's probably sufficient to report the first error and direct the user
-        # to validate offline; possibly when we switch to an XSD schema this could
-        # be revisited - load without validation, then validate and report all errors
-        errors.append(e)       
-        # if not dtd-valid, then appempt to load without validation to do additional checking
-        try:
-            ead = load_xml(content, FindingAid, validate=False, resolver=EadDTDResolver())
-        except XMLSyntaxError, e:
-            # if this fails, document is not well-formed xml
-            # don't bother appending the syntax error, it will be the same one found above
-            # can't do any further processing, so return
-            return errors
+        # if this fails, document is not well-formed xml
+        # can't do any further processing, so return
+        errors.append(e)
+        return errors
+
+    # schema validation
+    if not ead.schema_valid():
+        # if not valid, report all schema validation errors
+        # - simplify error message: report line & columen #s, and text of the error
+        errors.extend('Line %d, column %d: %s' % (err.line, err.column, err.message)
+                        for err in ead.validation_errors())
     
     # eadid is expected to match filename without .xml extension
     expected_eadid = os.path.basename(filename).replace('.xml', '')
@@ -97,7 +97,7 @@ def check_eadxml(ead):
     for index in ead.archdesc.index:
         if not index.id:
             errors.append("%(node)s id attribute is not set for %(label)s"
-                % { 'node' : index.node.tag, 'label' : unicode(index.head) })
+                % { 'node' : local_name(index.node), 'label' : unicode(index.head) })
 
     # eadid matches appropriate site URL regex
     if not re.match('^%s$' % EADID_URL_REGEX, ead.eadid.value):   # entire eadid should match regex
@@ -106,29 +106,34 @@ def check_eadxml(ead):
 
     # multiple tests to ensure xml used for search/browse list-title matches what code expects
     # -- since list title is pulled from multiple places, give enough context so it can be found & corrected
-    list_title_path = "%s/%s" % (ead.list_title.node.getparent().tag, ead.list_title.node.tag)
+    list_title_path = "%s/%s" % (local_name(ead.list_title.node.getparent()), 
+                                 local_name(ead.list_title.node))
     # - check for at most one top-level origination
-    origination_count = ead.node.xpath('count(archdesc/did/origination)')
+    origination_count = ead.node.xpath('count(e:archdesc/e:did/e:origination)',
+                                       namespaces={'e': EAD_NAMESPACE})
     if int(origination_count)  > 1:
         errors.append("Site expects only one archdesc/did/origination; found %d" \
                         % origination_count)
 
     # container list formatting (based on encoding practice) expects only 2 containers per did
     # - dids with more than 2 containers
-    containers = ead.node.xpath('//did[count(container) > 2]')
+    containers = ead.node.xpath('//e:did[count(e:container) > 2]',
+                                namespaces={'e': EAD_NAMESPACE})
     if len(containers):
         errors.append("Site expects maximum of 2 containers per did; found %d did(s) with more than 2" \
                         % len(containers))
         errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
-    # - for dids with only one container
-    containers = ead.node.xpath('//did[count(container) = 1]')
+    # - dids with only one container
+    containers = ead.node.xpath('//e:did[count(e:container) = 1]',
+                                namespaces={'e': EAD_NAMESPACE})
     if len(containers):
         errors.append("Site expects 2 containers per did; found %d did(s) with only 1" \
                         % len(containers))
         errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
 
     # - no leading whitespace in list title
-    title_node = ead.node.xpath("%s/text()" % ead.list_title_xpath)    
+    title_node = ead.node.xpath("%s/text()" % ead.list_title_xpath,
+                                namespaces={'e': EAD_NAMESPACE})
     if hasattr(title_node[0], 'text'):
         title_text = title_node[0].text
     else:
@@ -150,7 +155,7 @@ def check_eadxml(ead):
             for term in ca.terms:
                 if re.match('\s+', term.value):
                     errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
-                                 % (term.value, term.node.tag))
+                                 % (term.value, local_name(term.node)))
     return errors
    
 def check_series_ids(series):
@@ -162,7 +167,9 @@ def check_series_ids(series):
     errors = []
     if not series.id:
         errors.append("%(level)s %(node)s id attribute is not set for %(label)s"
-                % { 'node' : series.node.tag, 'level' : series.level, 'label' : series.display_label() })
+                % { 'node' : local_name(series.node),
+                    'level' : series.level,
+                    'label' : series.display_label() })
     if series.hasSubseries():
         for c in series.c:
             errors.extend(check_series_ids(c))
@@ -196,7 +203,8 @@ def prep_ead(ead, filename):
     # NOTE: only removing *leading* whitespace because these fields
     # can contain mixed content, and trailing whitespace here may be significant
     # - list title fields - origination nodes and unittitle
-    for field in ead.node.xpath('archdesc/did/origination/node()|archdesc/did/unittitle'):
+    for field in ead.node.xpath('e:archdesc/e:did/e:origination/node()|e:archdesc/e:did/e:unittitle',
+                                namespaces={'e': EAD_NAMESPACE}):
         if hasattr(field, 'text'):
             field.text = unicode(field.text).lstrip()
     # - controlaccess fields (if any)
@@ -228,19 +236,6 @@ def set_series_ids(series, eadid, position):
     if series.hasSubseries():
         for j, c in enumerate(series.c):
             set_series_ids(c, eadid, j)
-
-
-class EadDTDResolver(Resolver):
-    """Custom :class:`lxml.etree.Resolver` that loads the **ead.dtd** from a
-    known location (packaged with the source code)."""
-    def resolve(self, url, id, context):
-        if url == 'ead.dtd' or url.split('/')[-1] == 'ead.dtd':
-            # when loading a file, the 'url' gets set to the fullpath of that file plus ead.dtd
-            # assuming that anything coming in as ead.dtd can use our local copy (no variant DTDs)
-            filepath = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'ead.dtd')
-            return self.resolve_filename(filepath, context)
-        else:
-            return super(EadDTDResolver, self).resolve(url, id, context)
 
 
 class HttpResponseSeeOther(HttpResponseRedirect):
