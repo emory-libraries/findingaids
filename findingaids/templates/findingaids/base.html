@@ -16,8 +16,14 @@
 {% endblock %}
 
 {% block sidebar-left %}
+  {% if last_query %}
+        <a href="{% url fa:search %}?{{last_query}}">return to search</a>
+  {% endif %}
+  {% if last_browse %}
+        <a href="{% url fa:titles-by-letter letter=last_browse.letter %}?page={{last_browse.page}}">return to browse</a>
+  {% endif %}
   {{ block.super }}
-  {# single document search, when available - disabled in preview mode #}
+    {# single document search, when available - disabled in preview mode #}
   {% if docsearch_form and not preview %}
   <div id="document-search" class="sidebar-search">
       Search for items in <b>{{ ead.title }}</b>

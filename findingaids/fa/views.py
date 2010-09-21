@@ -51,7 +51,17 @@ def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)    
+
+    #remove last_query from session
+    if 'last_query' in request.session:
+        del request.session['last_query']
+
+    #set last browse letter and page in session
+    page = request.REQUEST.get('page', 1)
+    last_browse  = {'letter' : letter, 'page' : page}
+    request.session['last_browse'] = last_browse
+
+    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
     page_labels = alpha_pagelabels(paginator, fa, label_attribute='list_title')
     show_pages = pages_to_show(paginator, fa_subset.number, page_labels)
@@ -103,14 +113,23 @@ def findingaid(request, id, preview=False):
     fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
-    return render_to_response('findingaids/findingaid.html', { 'ead' : fa,
+
+
+    response = render_to_response('findingaids/findingaid.html', { 'ead' : fa,
                                                          'series' : series,
                                                          'all_indexes' : fa.archdesc.index,                                                         
                                                          'preview': preview,
                                                          'url_params': url_params,
                                                          'docsearch_form': KeywordSearchForm(),
+                                                         'last_query' : request.session.get('last_query'),
+                                                         'last_browse' : request.session.get('last_browse'),
                                                          },
                                                          context_instance=RequestContext(request, current_app='preview'))
+    #Set Cache-Control to private when there is a last_query or last_browse
+    if "last_query" in request.session or "last_browse" in request.session:
+        response['Cache-Control'] = 'private'
+
+    return response
 
 
 @ead_gone_or_404
@@ -222,8 +241,10 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'url_params': url_params,
                     'canonical_url' : _series_url(eadid, *series_ids),
                     'docsearch_form': KeywordSearchForm(),
+                    'last_query' : request.session.get('last_query'),
+                    'last_browse' : request.session.get('last_browse'),
                     }
-
+    
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
@@ -233,9 +254,15 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         render_opts['series'] = result
         render_opts['subseries'] = _subseries_links(result, url_params=url_params)
 
-
-    return render_to_response('findingaids/series_or_index.html',
+    
+    response =  render_to_response('findingaids/series_or_index.html',
                             render_opts, context_instance=RequestContext(request))
+
+    #Cache-Control to private when there is a last_query or last_browse
+    if "last_query" in request.session or "last_browse" in request.session:
+        response['Cache-Control'] = 'private'
+
+    return response
 
 def _get_series_or_index(eadid, *series_ids, **kwargs):
     """Retrieve a series or index from a Finding Aid.
@@ -304,7 +331,29 @@ def search(request):
         subject = form.cleaned_data['subject']
         keywords = form.cleaned_data['keywords']
         repository = form.cleaned_data['repository']
+        page = request.REQUEST.get('page', 1)
+
+        #remove last_browse from session
+        if 'last_browse' in request.session:
+            del request.session['last_browse']
         
+        #set query and last page in session and set it to expire on browser close
+        last_query = {}
+
+        if subject:
+            last_query['subject'] = subject
+
+        if keywords:
+            last_query['keywords'] = keywords
+        if repository:
+            last_query['repository'] = repository
+        last_query['page'] = page
+        last_query = urlencode(last_query)
+        request.session["last_query"] = last_query
+        request.session.set_expiry(0)
+
+
+
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
 
