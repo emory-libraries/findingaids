@@ -1,7 +1,7 @@
 {# display common series information - expects finding aid component as series #}
 {% load ead %}
 <h2 class="{{ series.level }}">
-  <a name="{{ series.id }}">
+  <a name="{{ series.short_id }}">
       {{ series.did.unitid }} <br/>
       {{ series.did.unittitle|format_ead  }}  {{ series.did.unitdate|default:'' }} <br/>
       {{ series.did.physdesc|default:'' }}
