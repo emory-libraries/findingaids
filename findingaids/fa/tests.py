@@ -570,7 +570,7 @@ class FaViewsTest(TestCase):
 
     def test_view_subseries__raoul_series1_6(self):
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',
-            'series_id': 's1', 'series2_id': '1001928'})
+            'series_id': 's1', 'series2_id': 's1.6'})
         response = self.client.get(subseries_url)
         expected = 200
         self.assertEqual(response.status_code, expected,
@@ -591,7 +591,7 @@ class FaViewsTest(TestCase):
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's1'}),
             response.content, "series nav - series 1 link")
         self.assertPattern('<li>.*<a href="%s".*rel="next">.*Series 2:.*Photographs.*</a>.*</li>' % \
-            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': '1003649'}),
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's2'}),
             response.content, "series nav - link to series 2")
         self.assertPattern('<li>.*<a href="%s".*>.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's4'}),
@@ -650,7 +650,7 @@ class FaViewsTest(TestCase):
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's1'}),
             response.content, "series nav - series 1 link")
         self.assertPattern('<li>.*<a href="%s.* rel="next">.*Series 2:.*Photographs.*</a>.*</li>' % \
-            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': '1003649'}),
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's2'}),
             response.content, "series nav - link to series 2")
         self.assertPattern('<li>.*<a href="%s".*>.*Series 4:.*Miscellaneous.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's4'}),
@@ -705,7 +705,7 @@ class FaViewsTest(TestCase):
 
         subseries_url = reverse('fa-admin:preview:series2',
                         kwargs={'id': 'raoul548', 'series_id': 's1',
-                                'series2_id': '100355'})
+                                'series2_id': 's1.1'})
         self.assertContains(response, "href='%s'" % subseries_url,
             msg_prefix='preview version of main finding aid should link to subseries in preview mode')
 
@@ -758,7 +758,7 @@ class FaViewsTest(TestCase):
         self.assert_("Subseries 1.1: William Greene" in links[1][0])
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
-            'series2_id': '100355'})    in links[1][0])
+            'series2_id': 's1.1'})    in links[1][0])
 
         # second-to-last entry - series 4
         self.assert_("Series 4: Misc" in links[-2])
@@ -785,23 +785,23 @@ class FaViewsTest(TestCase):
         self.assertEqual(13, len(links))  # raoul series has subseries 1-13
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
-            'series2_id': '100904'}) in links[2])
+            'series2_id': 's1.3'}) in links[2])
         self.assert_('Subseries 1.1: William Greene' in links[0])
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
-            'series2_id': '100355'}) in links[0])
+            'series2_id': 's1.1'}) in links[0])
         self.assert_('Subseries 1.2: Mary Wadley' in links[1])
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
-            'series2_id': '100529'}) in links[1])
+            'series2_id': 's1.2'}) in links[1])
         self.assert_('Subseries 1.3: Sarah Lois' in links[2])
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
-            'series2_id': '100904'}) in links[2])
+            'series2_id': 's1.3'}) in links[2])
         self.assert_('Subseries 1.13: Norman Raoul' in links[-1])
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
-            'series2_id': '1003222'}) in links[-1])
+            'series2_id': 's1.13'}) in links[-1])
 
         series = Series.objects.get(id='raoul548_s1')
         # should get exception when top-level ead id is not available
@@ -869,7 +869,7 @@ class FaViewsTest(TestCase):
         self.assert_("href='#s1'" in links[0])
         self.assert_("rel='section'" in links[0])
         # subseries
-        self.assert_("href='#100355'" in links[1][0])
+        self.assert_("href='#s1.1'" in links[1][0])
         self.assert_("rel='subsection'" in links[1][0])
 
 
@@ -1327,7 +1327,7 @@ class FullTextFaViewsTest(TestCase):
                 msg_prefix="index link includes search terms")
         self.assertContains(response, '%s?keywords=raoul+georgia' \
                 %  reverse('fa:series2', kwargs={'id': 'raoul548', 'series_id': 's1',
-                        'series2_id': '100904'}),
+                        'series2_id': 's1.3'}),
                 msg_prefix="subseries link includes search terms")
 
         self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
@@ -1375,7 +1375,7 @@ class FullTextFaViewsTest(TestCase):
                 
         # series 3 - box/folder/content
         series_url = reverse('fa:series-or-index',
-                    kwargs={'id': 'raoul548', 'series_id': '1003798'})
+                    kwargs={'id': 'raoul548', 'series_id': 's3'})
         response = self.client.get(series_url, {'keywords': 'raoul georgia'})          
         self.assertContains(response, 'W. G. <span class="exist-match">Raoul</span> estate papers',
             msg_prefix="search terms in box/folder section headings are highlighted")
@@ -1384,7 +1384,7 @@ class FullTextFaViewsTest(TestCase):
 
         # search terms not in current series
         series_url = reverse('fa:series-or-index',
-                    kwargs={'id': 'raoul548', 'series_id': '1003798'})
+                    kwargs={'id': 'raoul548', 'series_id': 's3'})
         response = self.client.get(series_url, {'keywords': 'notinthistext'})
         self.assertContains(response, 'Financial and legal papers',
             msg_prefix="series without search terms is still returned normally")
@@ -1392,7 +1392,7 @@ class FullTextFaViewsTest(TestCase):
     def test_view_highlighted_subseries(self):
         # single subseries in a finding aid, with search-term highlighting
         series_url = reverse('fa:series2', kwargs={'id': 'raoul548',
-                'series_id': 's1', 'series2_id': '100355'})
+                'series_id': 's1', 'series2_id': 's1.1'})
         response = self.client.get(series_url, {'keywords': 'raoul georgia'})
         self.assertContains(response, '<link rel="canonical" href="%s"' % series_url,
             msg_prefix="highlighted finding aid subseries includes link to canonical url")
@@ -1445,7 +1445,7 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='label for series with matches (4) is displayed')
         # - subseries url & label
         self.assertContains(response, reverse('fa:series2',
-            kwargs={'id': 'raoul548', 'series_id': 's1', 'series2_id': '100355'}),
+            kwargs={'id': 'raoul548', 'series_id': 's1', 'series2_id': 's1.1'}),
             count=1, msg_prefix='link to subseries with matches (1.1) occurs once')
         self.assertContains(response, 'Subseries 1.1: William Greene',
             msg_prefix='label for series with matches (1.1) is displayed')
