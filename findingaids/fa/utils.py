@@ -105,7 +105,6 @@ def html_to_xslfo(template_src, context_dict):
     return XHTML_TO_XSLFO(xhtml)
 
 
-# TODO: code review requested
 def pages_to_show(paginator, page, page_labels={}):
     """Generate a dictionary of pages to show around the current page. Show
     3 numbers on either side of the specified page, or more if close to end or
@@ -134,7 +133,6 @@ def pages_to_show(paginator, page, page_labels={}):
 
     return show_pages
 
-# TODO: code review requested
 def alpha_pagelabels(paginator, objects, label_attribute):
     """Generate abbreviated, alphabetical page labels for pagination items.
     Label format should be something like 'Ab - Ad', 'Ard - Art'.

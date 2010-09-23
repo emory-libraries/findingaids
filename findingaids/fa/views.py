@@ -46,7 +46,6 @@ def browse_titles(request):
                               {'letters': title_letters()},
                               context_instance=RequestContext(request))
 
-# TODO: code review requested
 @condition(last_modified_func=collection_lastmodified)
 def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.
@@ -346,6 +345,7 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
         raise Http404
     return record
 
+@condition(last_modified_func=collection_lastmodified)
 def search(request):
     "Simple keyword search - runs exist full-text terms query on all terms included."
     
