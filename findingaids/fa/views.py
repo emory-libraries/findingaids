@@ -2,7 +2,7 @@ import logging
 from lxml import etree
 from urllib import urlencode
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponsePermanentRedirect
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -15,7 +15,7 @@ from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed al
 from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
-            FileComponent, title_letters, Index
+            FileComponent, title_letters, Index, shortform_id
 from findingaids.fa.forms import KeywordSearchForm, AdvancedSearchForm
 from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
@@ -183,11 +183,40 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         use_preview_collection()
 
     # unspecified sub- and sub-sub-series come in as None; filter them out
-    series_ids = list(series_ids)
-    while None in series_ids:
-        series_ids.remove(None)
+    _series_ids = list(series_ids)
+    while None in _series_ids:
+        _series_ids.remove(None)
 
-    #used to build initial series and index filters and field lists
+
+    # user-facing urls should use short-form ids (eadid not repeated)
+    # to query eXist, we need full ids with eadid
+    # check and convert them here
+    series_ids = []
+    redirect_ids = []
+    redirect = False
+    for id in _series_ids:        
+        if id.startswith('%s_' % eadid):
+            # an unshortened id was passed in - shorten and redirect to canonical url
+            redirect = True
+            redirect_ids.append(shortform_id(id, eadid))
+        else:
+            # a shortened id was passed in - generate long-form for query to exist
+            series_ids.append('%s_%s' % (eadid, id))
+            # append to redirect ids in case redirect is required for a later id
+            redirect_ids.append(id)
+
+    # if any id was passed in unshortened, return a permanent redirect to the canonical url
+    if redirect:
+        # log redirects - if any of them are coming from this application, they should be fixed
+        if 'HTTP_REFERER' in request.META:
+            referrer = 'Referrer %s' % request.META['HTTP_REFERER']
+        else:
+            referrer = ' (referrer not available)'
+        logger.info('''Redirecting from long-form series/index %s url to short-form url. %s''' \
+                    % (request.path, referrer))
+        return HttpResponsePermanentRedirect(_series_url(eadid, *redirect_ids))
+
+    # build initial series and index filters and field lists
     filter_list = {'ead__eadid':eadid}
     series_fields =['id', 'level', 'did__unitid', 'did__unittitle']
     index_fields =['id', 'head']
@@ -238,7 +267,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'prev': prev,
                     'next': next,
                     'url_params': url_params,
-                    'canonical_url' : _series_url(eadid, *series_ids),
+                    'canonical_url' : _series_url(eadid, *[shortform_id(id) for id in series_ids]),
                     'docsearch_form': KeywordSearchForm(),
                     'last_query' : request.session.get('last_query'),
                     'last_browse' : request.session.get('last_browse'),
@@ -558,7 +587,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
         if series.node.tag in [C02, C03]:
             # if initial series passed in is c02 or c03, add c01 series id to url ids before current series id
             if hasattr(series, 'series') and series.series:
-                url_ids.append(series.series.id)
+                url_ids.append(series.series.short_id)
             else:
                 raise Exception("Cannot construct subseries links without c01 series id for %s element %s"
                         % (series.node.tag, series.id))
@@ -566,14 +595,14 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
             if series.node.tag == C03:
                 # if initial series passed in is c03, add c02 series id to url ids before current series id
                 if hasattr(series, 'series2') and series.series2:
-                    url_ids.append(series.series2.id)
+                    url_ids.append(series.series2.short_id)
                 else:
                     raise Exception("Cannot construct subseries links without c02 subseries id for %s element %s"
                         % (series.node.tag, series.id))
 
         #  current series id
         if series.node.tag in [C01, C02, C03]:
-            url_ids.append(series.id)
+            url_ids.append(series.short_id)
         
     links = []
     if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
@@ -585,7 +614,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
             else:
                 match_count = ""
 
-            current_url_ids = url_ids + [component.id]
+            current_url_ids = url_ids + [component.short_id]
             #set c01 rel attrib to 'section' c02 and c03 to 'subsection'
             if (component.node.tag == C01):
                 rel='section'

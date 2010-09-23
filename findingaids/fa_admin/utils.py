@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.xmlmap.eadmap import EAD_NAMESPACE
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, ID_DELIMITER
 from findingaids.fa.urls import EADID_URL_REGEX, TITLE_LETTERS
 
 # pre-compile an xpath to easily get node names without EAD namespace
@@ -197,7 +197,7 @@ def prep_ead(ead, filename):
     # set index ids 
     for i, index in enumerate(ead.archdesc.index):
         # generate index ids based on eadid and index number (starting at 1, not 0)
-        index.id = "%s_index%s" % (ead.eadid.value, i+1)
+        index.id = "%s%sindex%s" % (ead.eadid.value, ID_DELIMITER, i+1)
 
     # remove any leading whitespace in list title fields
     # NOTE: only removing *leading* whitespace because these fields
@@ -229,10 +229,10 @@ def set_series_ids(series, eadid, position):
     :returns: list of errors, if any
     """
     if series.did.unitid:
-        series.id = "%s_%s" % (eadid, series.did.unitid.replace(' ', '').lower())
+        series.id = "%s%s%s" % (eadid, ID_DELIMITER, series.did.unitid.replace(' ', '').lower())
     else:
         # fall-back id: generate from c-level (series, subseries) and position in the series
-        series.id = "%s_%s%s" % (eadid, series.level.lower(), position + 1)
+        series.id = "%s%s%s%s" % (eadid, ID_DELIMITER, series.level.lower(), position + 1)
     if series.hasSubseries():
         for j, c in enumerate(series.c):
             set_series_ids(c, eadid, j)

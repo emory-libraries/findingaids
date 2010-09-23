@@ -19,15 +19,15 @@
      {# calculate and store url to series the item belongs to #}
      {% if component.series2.id and component.series2.id != component.parent.id %}
        {# component has a series2 and id does not match parent - must be c03/series3 #}
-       {% url fa:series3 ead.eadid component.series1.id component.series2.id component.parent.id as series_url %}
+       {% url fa:series3 ead.eadid component.series1.short_id component.series2.short_id component.parent.short_id as series_url %}
      {% endif %}
      {% if component.series2.id and component.series2.id == component.parent.id %}
         {# component has a series2 that matches parent id - c02/series2 #}
-        {% url fa:series2 ead.eadid component.series1.id component.parent.id as series_url %}
+        {% url fa:series2 ead.eadid component.series1.short_id component.parent.short_id as series_url %}
      {% endif %}
      {% if component.parent.id == component.series1.id %}
         {# component parent id matches series1 id - c01/series #}
-        {% url fa:series-or-index ead.eadid component.parent.id as series_url %}
+        {% url fa:series-or-index ead.eadid component.parent.short_id as series_url %}
      {% endif %}
      <tr>
          <th colspan="3">

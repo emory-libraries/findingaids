@@ -13,6 +13,8 @@ from eulcore.django.existdb.models import XmlModel
 
 # finding aid models
 
+ID_DELIMITER = '_'
+
 class FindingAid(XmlModel, EncodedArchivalDescription):
     """Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
 
@@ -252,12 +254,45 @@ class Series(XmlModel, Component):
         "Series display label - *unitid : unittitle* (if unitid) or *unittitle* (if no unitid)"
         return ': '.join([u for u in [self.did.unitid, unicode(self.did.unittitle)] if u])
 
+    _short_id = None
+    @property
+    def short_id(self):
+        "Short-form id (without eadid_ prefix) for use in external urls."
+        if self._short_id is None:
+            # get eadid, if available
+            if hasattr(self, 'ead') and hasattr(self.ead, 'eadid') and self.ead.eadid.value:
+                eadid = self.ead.eadid.value
+            else:
+                eadid = None
+            self._short_id = shortform_id(self.id, eadid)
+        return self._short_id
+
 # override component.c node_class
 # subcomponents need to be initialized as Series to get display_label, series list...
 # FIXME: look for a a better way to do this kind of XmlObject extension
 Component._fields['c'].node_class = Series
 SubordinateComponents._fields['c'].node_class = Series
 
+
+def shortform_id(id, eadid=None):
+    """Calculate a short-form id (without eadid_ prefix) for use in external urls.
+    Uses eadid if available; otherwise, relies on the id delimiter character.
+    :param id: id to be shortened
+    :param eadid: eadid prefix, if available
+    :returns: short-form id
+    """
+    # if eadid is available, use that (should be the most reliable way to shorten id)
+    if eadid:
+        id = id.replace('%s_' % eadid, '')
+        
+    # if eadid is not available, split on _ and return latter portion
+    elif ID_DELIMITER in id:
+        eadid, id = id.split(ID_DELIMITER)
+
+    # this shouldn't happen -  one of the above two options should work
+    else:
+        raise Exception("Cannot calculate short id for %s" % id)
+    return id
 
 class Series2(Series):
     """
@@ -319,6 +354,18 @@ class Index(XmlModel, EadIndex):
 
     match_count = xmlmap.IntegerField("count(.//exist:match)")
 
+    _short_id = None
+    @property
+    def short_id(self):
+        "Short-form id (without eadid_ prefix) for use in external urls."
+        if self._short_id is None:
+            # get eadid, if available
+            if hasattr(self, 'ead') and hasattr(self.ead, 'eadid') and self.ead.eadid.value:
+                eadid = self.ead.eadid.value
+            else:
+                eadid = None
+            self._short_id = shortform_id(self.id, eadid)
+        return self._short_id
 
 
 # FIXME: look for a a better way to do this kind of XmlObject extension

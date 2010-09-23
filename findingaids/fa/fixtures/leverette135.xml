@@ -1,101 +1,101 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<ead xmlns="urn:isbn:1-931666-22-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:isbn:1-931666-22-9 http://www.loc.gov/ead/ead.xsd" id="leverette135_10497" relatedencoding="MARC21">
-  <eadheader countryencoding="iso3166-1" dateencoding="iso8601" id="leverette135_1018" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
+<ead xmlns="urn:isbn:1-931666-22-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:isbn:1-931666-22-9 http://www.loc.gov/ead/ead.xsd" relatedencoding="MARC21">
+  <eadheader countryencoding="iso3166-1" dateencoding="iso8601" langencoding="iso639-2b" relatedencoding="Dublin Core" repositoryencoding="iso15511" scriptencoding="iso15924">
     <eadid countrycode="US" identifier="leverette135.xml" mainagencycode="geu-s">leverette135</eadid>
-    <filedesc id="leverette135_1012">
-      <titlestmt id="leverette135_103">
-        <titleproper encodinganalog="Title" id="leverette135_101">Fannie Lee Leverette scrapbooks,
+    <filedesc>
+      <titlestmt>
+        <titleproper encodinganalog="Title">Fannie Lee Leverette scrapbooks,
 			 circa 1900-1948</titleproper>
-        <author encodinganalog="Creator" id="leverette135_102">Manuscript, Archives, and Rare Book
+        <author encodinganalog="Creator">Manuscript, Archives, and Rare Book
 			 Library, Emory University</author>
       </titlestmt>
-      <publicationstmt id="leverette135_1011">
-        <publisher encodinganalog="Publisher" id="leverette135_104">Emory University</publisher>
-        <address id="leverette135_109">
-          <addressline id="leverette135_105">Manuscript, Archives, and Rare Book
+      <publicationstmt>
+        <publisher encodinganalog="Publisher">Emory University</publisher>
+        <address>
+          <addressline>Manuscript, Archives, and Rare Book
 				Library</addressline>
-          <addressline id="leverette135_106">Atlanta, GA 30322</addressline>
-          <addressline id="leverette135_107">404-727-6887</addressline>
-          <addressline id="leverette135_108">Fax: 404-727-0360</addressline>
+          <addressline>Atlanta, GA 30322</addressline>
+          <addressline>404-727-6887</addressline>
+          <addressline>Fax: 404-727-0360</addressline>
         </address>
-        <date calendar="gregorian" encodinganalog="Date" era="ce" id="leverette135_1010" normal="2007-06-27">June 27, 2007</date>
+        <date calendar="gregorian" encodinganalog="Date" era="ce" normal="2007-06-27">June 27, 2007</date>
       </publicationstmt>
     </filedesc>
-    <profiledesc id="leverette135_1017">
-      <creation id="leverette135_1014">Finding aid encoded, 
-		  <date calendar="gregorian" encodinganalog="Date" era="ce" id="leverette135_1013" normal="2007-06-27">June 27,
+    <profiledesc>
+      <creation>Finding aid encoded, 
+		  <date calendar="gregorian" encodinganalog="Date" era="ce" normal="2007-06-27">June 27,
 			 2007</date></creation>
-      <langusage id="leverette135_1016">
-        <language encodinganalog="Language" id="leverette135_1015" langcode="eng" scriptcode="Latn">English</language>
+      <langusage>
+        <language encodinganalog="Language" langcode="eng" scriptcode="Latn">English</language>
       </langusage>
     </profiledesc>
   </eadheader>
-  <archdesc id="leverette135_10496" level="collection" relatedencoding="MARC21">
-    <did id="leverette135_1031">
-      <origination id="leverette135_1020">
-        <persname encodinganalog="100" id="leverette135_1019" source="lcnaf">Leverette, Fannie Lee.</persname>
+  <archdesc level="collection" relatedencoding="MARC21">
+    <did>
+      <origination>
+        <persname encodinganalog="100" source="lcnaf">Leverette, Fannie Lee.</persname>
       </origination>
-      <unittitle encodinganalog="245$a" id="leverette135_1022">Fannie Lee Leverette scrapbooks,<unitdate calendar="gregorian" certainty="circa" encodinganalog="245$f" era="ce" id="leverette135_1021" normal="1900/1948" type="inclusive">circa 1900-1948</unitdate></unittitle>
-      <unitid countrycode="US" id="leverette135_1023" repositorycode="geu-s">Manuscript Collection
+      <unittitle encodinganalog="245$a">Fannie Lee Leverette scrapbooks,<unitdate calendar="gregorian" certainty="circa" encodinganalog="245$f" era="ce" normal="1900/1948" type="inclusive">circa 1900-1948</unitdate></unittitle>
+      <unitid countrycode="US" repositorycode="geu-s">Manuscript Collection
 		  No.135</unitid>
-      <physdesc encodinganalog="300" id="leverette135_1025">
-        <extent id="leverette135_1024">1 microfilm reel
+      <physdesc encodinganalog="300">
+        <extent>1 microfilm reel
 		  (MF)</extent>
       </physdesc>
-      <abstract id="leverette135_1026">Microfilm copy of four scrapbooks kept by Georgia public school
+      <abstract>Microfilm copy of four scrapbooks kept by Georgia public school
 		  teacher and journalist Fannie Lee Leverette which include letters, photographs,
 		  clippings, and memorabilia documenting Miss Leverette's personal life and
 		  professional career.</abstract>
-      <langmaterial encodinganalog="546" id="leverette135_1028">Materials entirely in
-		  <language id="leverette135_1027" langcode="eng">English</language>.</langmaterial>
-      <repository encodinganalog="852" id="leverette135_1030">Emory University<subarea id="leverette135_1029">Manuscript,
+      <langmaterial encodinganalog="546">Materials entirely in
+		  <language langcode="eng">English</language>.</langmaterial>
+      <repository encodinganalog="852">Emory University<subarea>Manuscript,
 		  Archives, and Rare Book Library</subarea></repository>
     </did>
-    <acqinfo encodinganalog="541" id="leverette135_1034">
-      <head id="leverette135_1032">Source</head>
-      <p id="leverette135_1033">Loaned for reproduction, 1978.</p>
+    <acqinfo encodinganalog="541">
+      <head>Source</head>
+      <p>Loaned for reproduction, 1978.</p>
     </acqinfo>
-    <accessrestrict encodinganalog="506" id="leverette135_1037">
-      <head id="leverette135_1035">Restrictions on Access</head>
-      <p id="leverette135_1036">Unrestricted access. </p>
+    <accessrestrict encodinganalog="506">
+      <head>Restrictions on Access</head>
+      <p>Unrestricted access. </p>
     </accessrestrict>
     <userestrict encodinganalog="540">
-      <head id="leverette135_1038">Terms Governing Use and Reproduction</head>
-      <p id="leverette135_1039">All requests subject to limitations noted in departmental policies on
+      <head>Terms Governing Use and Reproduction</head>
+      <p>All requests subject to limitations noted in departmental policies on
 		  reproduction.</p>
     </userestrict>
-    <prefercite encodinganalog="524" id="leverette135_1042">
-      <head id="leverette135_1040">Citation</head>
-      <p id="leverette135_1041">[after identification of item(s)], Fannie Lee Leverette scrapbooks,
+    <prefercite encodinganalog="524">
+      <head>Citation</head>
+      <p>[after identification of item(s)], Fannie Lee Leverette scrapbooks,
 		  Manuscript, Archives, and Rare Book Library, Emory University.</p>
     </prefercite>
-    <processinfo id="leverette135_1048">
-      <head id="leverette135_1043">Processing</head>
-      <note id="leverette135_1045">
-        <p id="leverette135_1044">Control level 3</p>
+    <processinfo>
+      <head>Processing</head>
+      <note>
+        <p>Control level 3</p>
       </note>
-      <note id="leverette135_1047">
-        <p id="leverette135_1046">File name: Leverette135.doc</p>
+      <note>
+        <p>File name: Leverette135.doc</p>
       </note>
     </processinfo>
-    <bioghist encodinganalog="545" id="leverette135_1056">
-      <head id="leverette135_1049">Biographical Note</head>
-      <p id="leverette135_1055">Fannie Lee Leverette (circa 1869-1956), a public school teacher and
+    <bioghist encodinganalog="545">
+      <head>Biographical Note</head>
+      <p>Fannie Lee Leverette (circa 1869-1956), a public school teacher and
 		  journalist, was born in Eatonton, Putnam County, Georgia. Leverette was the
 		  daughter of Frank Leverette and Mary Ella Wyatt Leverette. She was educated in
 		  the public schools of Eatonton and at Wesleyan College, and taught in the
 		  public schools of Eatonton (circa l904-1914), Social Circle (circa 1915-circa
 		  1924), and Thomson (circa 1925-circa 1940). She also served as assistant editor
 		  of the 
-		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="leverette135_1050" xlink:href="">Eatonton Messenger</title> and as Eatonton correspondent for the 
-		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="leverette135_1051" xlink:href="">Macon Telegraph</title>, the 
-		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="leverette135_1052" xlink:href="">Atlanta Journal</title>, the 
-		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="leverette135_1053" xlink:href="">Savannah Morning News</title>, and the 
-		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="leverette135_1054" xlink:href="">Augusta Chronicle</title>.</p>
+		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Eatonton Messenger</title> and as Eatonton correspondent for the 
+		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Macon Telegraph</title>, the 
+		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Atlanta Journal</title>, the 
+		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Savannah Morning News</title>, and the 
+		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Augusta Chronicle</title>.</p>
     </bioghist>
-    <scopecontent encodinganalog="520" id="leverette135_1059">
-      <head id="leverette135_1057">Scope and Content Note</head>
-      <p id="leverette135_1058">The collection consists of a microfilm copy of four scrapbooks kept by
+    <scopecontent encodinganalog="520">
+      <head>Scope and Content Note</head>
+      <p>The collection consists of a microfilm copy of four scrapbooks kept by
 		  Fannie Lee Leverette from 1900-1948. The scrapbooks include letters,
 		  photographs, clippings, and memorabilia documenting Miss Leverette's personal
 		  life and professional career. Major portions of the scrapbooks relate to
@@ -104,618 +104,618 @@
 		  Harris, of Eatonton houses and people, and articles by Miss Leverette about the
 		  history of Eatonton. </p>
         </scopecontent>
-        <controlaccess id="leverette135_1091">
-            <head id="leverette135_1060">Selected Search Terms</head>
-            <controlaccess id="leverette135_1068">
-                <head id="leverette135_1061">Personal Names</head>
-                <persname encodinganalog="600" id="leverette135_1062" source="lcnaf">Collins, M.D.</persname>
-                <persname encodinganalog="600" id="leverette135_1063" source="lcnaf"> Farley, James A. (James Aloysius), 1888-1976.</persname>
-                <famname encodinganalog="600" id="leverette135_1064" source="lcnaf"> Harris family.</famname>
-                <persname encodinganalog="600" id="leverette135_1065" source="lcnaf"> Harris, Joel Chandler,
+        <controlaccess>
+            <head>Selected Search Terms</head>
+            <controlaccess>
+                <head>Personal Names</head>
+                <persname encodinganalog="600" source="lcnaf">Collins, M.D.</persname>
+                <persname encodinganalog="600" source="lcnaf"> Farley, James A. (James Aloysius), 1888-1976.</persname>
+                <famname encodinganalog="600" source="lcnaf"> Harris family.</famname>
+                <persname encodinganalog="600" source="lcnaf"> Harris, Joel Chandler,
 			 1848-1908.</persname>
-        <famname encodinganalog="600" id="leverette135_1066" source="lcnaf"> Leverette
+        <famname encodinganalog="600" source="lcnaf"> Leverette
 			 family.</famname>
-        <persname encodinganalog="600" id="leverette135_1067" source="lcnaf"> Vinson, Carl,
+        <persname encodinganalog="600" source="lcnaf"> Vinson, Carl,
 			 1883-1981.</persname>
             </controlaccess>
-            <controlaccess id="leverette135_1075">
-                <head id="leverette135_1069">Topical Terms</head>
-                <subject encodinganalog="650" id="leverette135_1070" source="lcsh">African Americans--Georgia--Eatonton.</subject>
-                <subject encodinganalog="650" id="leverette135_1071" source="lcsh"> American
+            <controlaccess>
+                <head>Topical Terms</head>
+                <subject encodinganalog="650" source="lcsh">African Americans--Georgia--Eatonton.</subject>
+                <subject encodinganalog="650" source="lcsh"> American
 			 newspapers--Sections, columns, etc.</subject>
-        <subject encodinganalog="650" id="leverette135_1072" source="lcsh">
+        <subject encodinganalog="650" source="lcsh">
 			 Education--Georgia.</subject>
-        <subject encodinganalog="650" id="leverette135_1073" source="lcsh">
+        <subject encodinganalog="650" source="lcsh">
 			 Plantations--Georgia.</subject>
-        <subject encodinganalog="650" id="leverette135_1074" source="lcsh"> Women
+        <subject encodinganalog="650" source="lcsh"> Women
 			 journalists--Georgia.</subject>
             </controlaccess>
-            <controlaccess id="leverette135_1082">
-                <head id="leverette135_1076">Geographic Names</head>
-                <geogname encodinganalog="651" id="leverette135_1077">Augusta (Ga.).</geogname>
-                <geogname encodinganalog="651" id="leverette135_1078"> Eatonton (Ga.)</geogname>
-                <geogname encodinganalog="651" id="leverette135_1079"> Social Circle (Ga.)</geogname>
-                <geogname encodinganalog="651" id="leverette135_1080"> Thomson (Ga.)</geogname>
-                <geogname encodinganalog="651" id="leverette135_1081"> West (U.S.)--Description and
+            <controlaccess>
+                <head>Geographic Names</head>
+                <geogname encodinganalog="651">Augusta (Ga.).</geogname>
+                <geogname encodinganalog="651"> Eatonton (Ga.)</geogname>
+                <geogname encodinganalog="651"> Social Circle (Ga.)</geogname>
+                <geogname encodinganalog="651"> Thomson (Ga.)</geogname>
+                <geogname encodinganalog="651"> West (U.S.)--Description and
 			 travel.</geogname>
             </controlaccess>
-            <controlaccess id="leverette135_1086">
-                <head id="leverette135_1083">Form/Genre Terms</head>
-                <genreform encodinganalog="655" id="leverette135_1084" source="aat">Photographs.</genreform>
-                <genreform encodinganalog="655" id="leverette135_1085" source="aat">Scrapbooks.</genreform>
+            <controlaccess>
+                <head>Form/Genre Terms</head>
+                <genreform encodinganalog="655" source="aat">Photographs.</genreform>
+                <genreform encodinganalog="655" source="aat">Scrapbooks.</genreform>
             </controlaccess>
-            <controlaccess id="leverette135_1090">
-                <head id="leverette135_1087">Occupation</head>
-                <occupation encodinganalog="656" id="leverette135_1088" source="aat"> Educator.</occupation>
-                <occupation encodinganalog="656" id="leverette135_1089" source="aat">Journalist.</occupation>
+            <controlaccess>
+                <head>Occupation</head>
+                <occupation encodinganalog="656" source="aat"> Educator.</occupation>
+                <occupation encodinganalog="656" source="aat">Journalist.</occupation>
             </controlaccess>
         </controlaccess>
-        <dsc id="leverette135_10495" type="in-depth">
-            <head id="leverette135_1092">Container List</head>
-            <c01 id="leverette135_1095" level="file">
-                <did id="leverette135_1094">
-                    <unittitle id="leverette135_1093">Scrapbook 1</unittitle>
+        <dsc type="in-depth">
+            <head>Container List</head>
+            <c01 level="file">
+                <did>
+                    <unittitle>Scrapbook 1</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10100" level="file">
-                <did id="leverette135_1099">
-                    <container id="leverette135_1096" type="box">MF1</container>
-                    <container id="leverette135_1097" type="folder">1</container>
-                    <unittitle id="leverette135_1098">Photo and clippings re Fannie Lee Leverette (page 2)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Photo and clippings re Fannie Lee Leverette (page 2)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10105" level="file">
-                <did id="leverette135_10104">
-                    <container id="leverette135_10101" type="box">MF1</container>
-                    <container id="leverette135_10102" type="folder">1</container>
-                    <unittitle id="leverette135_10103">Photos of people and places in Eatonton (page 5)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Photos of people and places in Eatonton (page 5)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10110" level="file">
-                <did id="leverette135_10109">
-                    <container id="leverette135_10106" type="box">MF1</container>
-                    <container id="leverette135_10107" type="folder">1</container>
-                    <unittitle id="leverette135_10108">Poems, photos (page 7-8)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Poems, photos (page 7-8)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10115" level="file">
-                <did id="leverette135_10114">
-                    <container id="leverette135_10111" type="box">MF1</container>
-                    <container id="leverette135_10112" type="folder">1</container>
-                    <unittitle id="leverette135_10113">FLL's "biography" (page 10)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>FLL's "biography" (page 10)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10120" level="file">
-                <did id="leverette135_10119">
-                    <container id="leverette135_10116" type="box">MF1</container>
-                    <container id="leverette135_10117" type="folder">1</container>
-                    <unittitle id="leverette135_10118">Information about Eatonton, friends, and family (pages 11-13)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Information about Eatonton, friends, and family (pages 11-13)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10125" level="file">
-                <did id="leverette135_10124">
-                    <container id="leverette135_10121" type="box">MF1</container>
-                    <container id="leverette135_10122" type="folder">1</container>
-                    <unittitle id="leverette135_10123">Postcards and notes re Joel Chandler Harris and family (pages 15-16)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Postcards and notes re Joel Chandler Harris and family (pages 15-16)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10130" level="file">
-                <did id="leverette135_10129">
-                    <container id="leverette135_10126" type="box">MF1</container>
-                    <container id="leverette135_10127" type="folder">1</container>
-                    <unittitle id="leverette135_10128">Letters and articles re Gov. John M. Slaton (page 17)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Letters and articles re Gov. John M. Slaton (page 17)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10135" level="file">
-                <did id="leverette135_10134">
-                    <container id="leverette135_10131" type="box">MF1</container>
-                    <container id="leverette135_10132" type="folder">1</container>
-                    <unittitle id="leverette135_10133">FLL articles re Eatonton (pages 23-25)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>FLL articles re Eatonton (pages 23-25)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10140" level="file">
-                <did id="leverette135_10139">
-                    <container id="leverette135_10136" type="box">MF1</container>
-                    <container id="leverette135_10137" type="folder">1</container>
-                    <unittitle id="leverette135_10138">Articles re Eatonton (pages 27-29)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Articles re Eatonton (pages 27-29)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10145" level="file">
-                <did id="leverette135_10144">
-                    <container id="leverette135_10141" type="box">MF1</container>
-                    <container id="leverette135_10142" type="folder">1</container>
-                    <unittitle id="leverette135_10143">Eatonton (pages 31-32)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Eatonton (pages 31-32)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10150" level="file">
-                <did id="leverette135_10149">
-                    <container id="leverette135_10146" type="box">MF1</container>
-                    <container id="leverette135_10147" type="folder">1</container>
-                    <unittitle id="leverette135_10148">Western trip (pages 33-36)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Western trip (pages 33-36)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10155" level="file">
-                <did id="leverette135_10154">
-                    <container id="leverette135_10151" type="box">MF1</container>
-                    <container id="leverette135_10152" type="folder">1</container>
-                    <unittitle id="leverette135_10153">FLL newspaper articles (pages 37-38)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>FLL newspaper articles (pages 37-38)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10160" level="file">
-                <did id="leverette135_10159">
-                    <container id="leverette135_10156" type="box">MF1</container>
-                    <container id="leverette135_10157" type="folder">1</container>
-                    <unittitle id="leverette135_10158">Photos and notes re Social Circle, Ga. (page 40)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Photos and notes re Social Circle, Ga. (page 40)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10165" level="file">
-                <did id="leverette135_10164">
-                    <container id="leverette135_10161" type="box">MF1</container>
-                    <container id="leverette135_10162" type="folder">1</container>
-                    <unittitle id="leverette135_10163">Postcard views of Eatonton (page 44)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Postcard views of Eatonton (page 44)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10170" level="file">
-                <did id="leverette135_10169">
-                    <container id="leverette135_10166" type="box">MF1</container>
-                    <container id="leverette135_10167" type="folder">1</container>
-                    <unittitle id="leverette135_10168">Family photos (pages 49-53)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Family photos (pages 49-53)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10175" level="file">
-                <did id="leverette135_10174">
-                    <container id="leverette135_10171" type="box">MF1</container>
-                    <container id="leverette135_10172" type="folder">1</container>
-                    <unittitle id="leverette135_10173">Letter from Joel Chandler Harris, Jr. (December 6, 1948) (insert) (page 54)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Letter from Joel Chandler Harris, Jr. (December 6, 1948) (insert) (page 54)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10180" level="file">
-                <did id="leverette135_10179">
-                    <container id="leverette135_10176" type="box">MF1</container>
-                    <container id="leverette135_10177" type="folder">1</container>
-                    <unittitle id="leverette135_10178">Leverette article re William H. Seward's connection with Putnam County (page 56)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Leverette article re William H. Seward's connection with Putnam County (page 56)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10185" level="file">
-                <did id="leverette135_10184">
-                    <container id="leverette135_10181" type="box">MF1</container>
-                    <container id="leverette135_10182" type="folder">1</container>
-                    <unittitle id="leverette135_10183">Leverette article on Joel Chandler Harris's mother (page 60)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Leverette article on Joel Chandler Harris's mother (page 60)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10190" level="file">
-                <did id="leverette135_10189">
-                    <container id="leverette135_10186" type="box">MF1</container>
-                    <container id="leverette135_10187" type="folder">1</container>
-                    <unittitle id="leverette135_10188">Photos, etc. re Turnwold and JCH (pages 61-66)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Photos, etc. re Turnwold and JCH (pages 61-66)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10195" level="file">
-                <did id="leverette135_10194">
-                    <container id="leverette135_10191" type="box">MF1</container>
-                    <container id="leverette135_10192" type="folder">1</container>
-                    <unittitle id="leverette135_10193">Letter of JCH to FLL, April 15, 1901 (page 63)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Letter of JCH to FLL, April 15, 1901 (page 63)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10200" level="file">
-                <did id="leverette135_10199">
-                    <container id="leverette135_10196" type="box">MF1</container>
-                    <container id="leverette135_10197" type="folder">1</container>
-                    <unittitle id="leverette135_10198">Letter of "Essie" LaRose Harris, August 4, 1918 (page 64)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Letter of "Essie" LaRose Harris, August 4, 1918 (page 64)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10205" level="file">
-                <did id="leverette135_10204">
-                    <container id="leverette135_10201" type="box">MF1</container>
-                    <container id="leverette135_10202" type="folder">1</container>
-                    <unittitle id="leverette135_10203">Article and 3 letters of Esther LaRose Harris (page 65)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Article and 3 letters of Esther LaRose Harris (page 65)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10210" level="file">
-                <did id="leverette135_10209">
-                    <container id="leverette135_10206" type="box">MF1</container>
-                    <container id="leverette135_10207" type="folder">1</container>
-                    <unittitle id="leverette135_10208">Georgia's historic highways (page 71)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Georgia's historic highways (page 71)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10215" level="file">
-                <did id="leverette135_10214">
-                    <container id="leverette135_10211" type="box">MF1</container>
-                    <container id="leverette135_10212" type="folder">1</container>
-                    <unittitle id="leverette135_10213">Georgia Press trip (pages 76-79)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Georgia Press trip (pages 76-79)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10220" level="file">
-                <did id="leverette135_10219">
-                    <container id="leverette135_10216" type="box">MF1</container>
-                    <container id="leverette135_10217" type="folder">1</container>
-                    <unittitle id="leverette135_10218">Unveiling of monument to Uncle Remus in Eatonton; article of death of FLL's mother (page 81)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Unveiling of monument to Uncle Remus in Eatonton; article of death of FLL's mother (page 81)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10225" level="file">
-                <did id="leverette135_10224">
-                    <container id="leverette135_10221" type="box">MF1</container>
-                    <container id="leverette135_10222" type="folder">1</container>
-                    <unittitle id="leverette135_10223">Personal and family photos, history, and genealogy (page 83-)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">1</container>
+                    <unittitle>Personal and family photos, history, and genealogy (page 83-)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10228" level="file">
-                <did id="leverette135_10227">
-                    <unittitle id="leverette135_10226">Scrapbook 2</unittitle>
+            <c01 level="file">
+                <did>
+                    <unittitle>Scrapbook 2</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10233" level="file">
-                <did id="leverette135_10232">
-                    <container id="leverette135_10229" type="box">MF1</container>
-                    <container id="leverette135_10230" type="folder">2</container>
-                    <unittitle id="leverette135_10231">Postcards and clippings re history of Georgia and the Confederacy</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Postcards and clippings re history of Georgia and the Confederacy</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10238" level="file">
-                <did id="leverette135_10237">
-                    <container id="leverette135_10234" type="box">MF1</container>
-                    <container id="leverette135_10235" type="folder">2</container>
-                    <unittitle id="leverette135_10236">Letter, March 24, 1930, from Evelyn Harris (page 7)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Letter, March 24, 1930, from Evelyn Harris (page 7)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10243" level="file">
-                <did id="leverette135_10242">
-                    <container id="leverette135_10239" type="box">MF1</container>
-                    <container id="leverette135_10240" type="folder">2</container>
-                    <unittitle id="leverette135_10241">Two notes (1918 and 1922) from Esther LaRose Harris (pages 7-8)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Two notes (1918 and 1922) from Esther LaRose Harris (pages 7-8)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10248" level="file">
-                <did id="leverette135_10247">
-                    <container id="leverette135_10244" type="box">MF1</container>
-                    <container id="leverette135_10245" type="folder">2</container>
-                    <unittitle id="leverette135_10246">Photos and postcards from FLL's Texas trip with article by FLL on Mirabeau Lamar (page 10)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Photos and postcards from FLL's Texas trip with article by FLL on Mirabeau Lamar (page 10)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10253" level="file">
-                <did id="leverette135_10252">
-                    <container id="leverette135_10249" type="box">MF1</container>
-                    <container id="leverette135_10250" type="folder">2</container>
-                    <unittitle id="leverette135_10251">"Around and About Atlanta" by FLL (page 30)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>"Around and About Atlanta" by FLL (page 30)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10258" level="file">
-                <did id="leverette135_10257">
-                    <container id="leverette135_10254" type="box">MF1</container>
-                    <container id="leverette135_10255" type="folder">2</container>
-                    <unittitle id="leverette135_10256">"A Woman's View of the World of Politics" by FLL (page 31)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>"A Woman's View of the World of Politics" by FLL (page 31)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10263" level="file">
-                <did id="leverette135_10262">
-                    <container id="leverette135_10259" type="box">MF1</container>
-                    <container id="leverette135_10260" type="folder">2</container>
-                    <unittitle id="leverette135_10261">Article on Georgia plantation "Hilltops" by FLL (page 33)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Article on Georgia plantation "Hilltops" by FLL (page 33)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10268" level="file">
-                <did id="leverette135_10267">
-                    <container id="leverette135_10264" type="box">MF1</container>
-                    <container id="leverette135_10265" type="folder">2</container>
-                    <unittitle id="leverette135_10266">Article (by Susan Myrick) about James 0. Cooper, Conductor on the Central of Georgia Railroad between Eatonton and Macon for 45 years (page 40)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Article (by Susan Myrick) about James 0. Cooper, Conductor on the Central of Georgia Railroad between Eatonton and Macon for 45 years (page 40)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10273" level="file">
-                <did id="leverette135_10272">
-                    <container id="leverette135_10269" type="box">MF1</container>
-                    <container id="leverette135_10270" type="folder">2</container>
-                    <unittitle id="leverette135_10271">"Some Remembrances of Judge John M. Dooly, An Early Georgian," by FLL (page 46)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>"Some Remembrances of Judge John M. Dooly, An Early Georgian," by FLL (page 46)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10278" level="file">
-                <did id="leverette135_10277">
-                    <container id="leverette135_10274" type="box">MF1</container>
-                    <container id="leverette135_10275" type="folder">2</container>
-                    <unittitle id="leverette135_10276">Article on William H. Crawford, by FLL (page 48)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Article on William H. Crawford, by FLL (page 48)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10283" level="file">
-                <did id="leverette135_10282">
-                    <container id="leverette135_10279" type="box">MF1</container>
-                    <container id="leverette135_10280" type="folder">2</container>
-                    <unittitle id="leverette135_10281">Articles on Putnam County history (pages 51-57)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Articles on Putnam County history (pages 51-57)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10288" level="file">
-                <did id="leverette135_10287">
-                    <container id="leverette135_10284" type="box">MF1</container>
-                    <container id="leverette135_10285" type="folder">2</container>
-                    <unittitle id="leverette135_10286">Article on George M. Troup; note (June 22, 1914) from M. L. Brittain (page 60)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>Article on George M. Troup; note (June 22, 1914) from M. L. Brittain (page 60)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10293" level="file">
-                <did id="leverette135_10292">
-                    <container id="leverette135_10289" type="box">MF1</container>
-                    <container id="leverette135_10290" type="folder">2</container>
-                    <unittitle id="leverette135_10291">"Oldest Road in Georgia" (page 64)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">2</container>
+                    <unittitle>"Oldest Road in Georgia" (page 64)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10296" level="file">
-                <did id="leverette135_10295">
-                    <unittitle id="leverette135_10294">Scrapbook 3 (Pages not numbered; mainly FLL's teaching career in Thomson, Ga.)</unittitle>
+            <c01 level="file">
+                <did>
+                    <unittitle>Scrapbook 3 (Pages not numbered; mainly FLL's teaching career in Thomson, Ga.)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10301" level="file">
-                <did id="leverette135_10300">
-                    <container id="leverette135_10297" type="box">MF1</container>
-                    <container id="leverette135_10298" type="folder">3</container>
-                    <unittitle id="leverette135_10299">Family photographs, poems </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Family photographs, poems </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10306" level="file">
-                <did id="leverette135_10305">
-                    <container id="leverette135_10302" type="box">MF1</container>
-                    <container id="leverette135_10303" type="folder">3</container>
-                    <unittitle id="leverette135_10304">Two letters of M. D. Collins, State superintendent of schools, July 8 and September 9, 1940 </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Two letters of M. D. Collins, State superintendent of schools, July 8 and September 9, 1940 </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10311" level="file">
-                <did id="leverette135_10310">
-                    <container id="leverette135_10307" type="box">MF1</container>
-                    <container id="leverette135_10308" type="folder">3</container>
-                    <unittitle id="leverette135_10309">Clippings about and letter (May 22, 1940) from Congressman Cal Vinson </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Clippings about and letter (May 22, 1940) from Congressman Cal Vinson </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10316" level="file">
-                <did id="leverette135_10315">
-                    <container id="leverette135_10312" type="box">MF1</container>
-                    <container id="leverette135_10313" type="folder">3</container>
-                    <unittitle id="leverette135_10314">Letter from James A. Farley, November 23, 1940 </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Letter from James A. Farley, November 23, 1940 </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10321" level="file">
-                <did id="leverette135_10320">
-                    <container id="leverette135_10317" type="box">MF1</container>
-                    <container id="leverette135_10318" type="folder">3</container>
-                    <unittitle id="leverette135_10319">Letter from Lucien Harris, December 1, 1948 </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Letter from Lucien Harris, December 1, 1948 </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10326" level="file">
-                <did id="leverette135_10325">
-                    <container id="leverette135_10322" type="box">MF1</container>
-                    <container id="leverette135_10323" type="folder">3</container>
-                    <unittitle id="leverette135_10324">Letter from James A. Farley, December 27, 1940, and autographed photo</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Letter from James A. Farley, December 27, 1940, and autographed photo</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10331" level="file">
-                <did id="leverette135_10330">
-                    <container id="leverette135_10327" type="box">MF1</container>
-                    <container id="leverette135_10328" type="folder">3</container>
-                    <unittitle id="leverette135_10329">Letter from Julian LaRose Harris, December 6, 1948 </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Letter from Julian LaRose Harris, December 6, 1948 </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10336" level="file">
-                <did id="leverette135_10335">
-                    <container id="leverette135_10332" type="box">MF1</container>
-                    <container id="leverette135_10333" type="folder">3</container>
-                    <unittitle id="leverette135_10334">Photograph of Captain John S. Reid of Eatonton </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photograph of Captain John S. Reid of Eatonton </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10341" level="file">
-                <did id="leverette135_10340">
-                    <container id="leverette135_10337" type="box">MF1</container>
-                    <container id="leverette135_10338" type="folder">3</container>
-                    <unittitle id="leverette135_10339">Letter from James M. Cox, January 20, 1941 </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Letter from James M. Cox, January 20, 1941 </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10346" level="file">
-                <did id="leverette135_10345">
-                    <container id="leverette135_10342" type="box">MF1</container>
-                    <container id="leverette135_10343" type="folder">3</container>
-                    <unittitle id="leverette135_10344">Family and personal photographs </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Family and personal photographs </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10351" level="file">
-                <did id="leverette135_10350">
-                    <container id="leverette135_10347" type="box">MF1</container>
-                    <container id="leverette135_10348" type="folder">3</container>
-                    <unittitle id="leverette135_10349">Photographs of students from Thomson </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photographs of students from Thomson </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10356" level="file">
-                <did id="leverette135_10355">
-                    <container id="leverette135_10352" type="box">MF1</container>
-                    <container id="leverette135_10353" type="folder">3</container>
-                    <unittitle id="leverette135_10354">Photographs of black servants </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photographs of black servants </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10361" level="file">
-                <did id="leverette135_10360">
-                    <container id="leverette135_10357" type="box">MF1</container>
-                    <container id="leverette135_10358" type="folder">3</container>
-                    <unittitle id="leverette135_10359">Photographs of Thomson, Ga. </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photographs of Thomson, Ga. </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10366" level="file">
-                <did id="leverette135_10365">
-                    <container id="leverette135_10362" type="box">MF1</container>
-                    <container id="leverette135_10363" type="folder">3</container>
-                    <unittitle id="leverette135_10364">Photograph and story re Leverette home in Eatonton</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photograph and story re Leverette home in Eatonton</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10371" level="file">
-                <did id="leverette135_10370">
-                    <container id="leverette135_10367" type="box">MF1</container>
-                    <container id="leverette135_10368" type="folder">3</container>
-                    <unittitle id="leverette135_10369">Reminiscences of "Grandma Mary" Harris </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Reminiscences of "Grandma Mary" Harris </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10376" level="file">
-                <did id="leverette135_10375">
-                    <container id="leverette135_10372" type="box">MF1</container>
-                    <container id="leverette135_10373" type="folder">3</container>
-                    <unittitle id="leverette135_10374">"Mental Album" of FLL</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>"Mental Album" of FLL</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10381" level="file">
-                <did id="leverette135_10380">
-                    <container id="leverette135_10377" type="box">MF1</container>
-                    <container id="leverette135_10378" type="folder">3</container>
-                    <unittitle id="leverette135_10379">FLL's genealogy </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>FLL's genealogy </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10386" level="file">
-                <did id="leverette135_10385">
-                    <container id="leverette135_10382" type="box">MF1</container>
-                    <container id="leverette135_10383" type="folder">3</container>
-                    <unittitle id="leverette135_10384">Record of "family tragedies", including deaths of several family members at hands of their servants </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Record of "family tragedies", including deaths of several family members at hands of their servants </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10391" level="file">
-                <did id="leverette135_10390">
-                    <container id="leverette135_10387" type="box">MF1</container>
-                    <container id="leverette135_10388" type="folder">3</container>
-                    <unittitle id="leverette135_10389">Photographs of Eatonton and Thomson</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photographs of Eatonton and Thomson</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10396" level="file">
-                <did id="leverette135_10395">
-                    <container id="leverette135_10392" type="box">MF1</container>
-                    <container id="leverette135_10393" type="folder">3</container>
-                    <unittitle id="leverette135_10394">Photographs re Thomas E. Watson </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photographs re Thomas E. Watson </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10401" level="file">
-                <did id="leverette135_10400">
-                    <container id="leverette135_10397" type="box">MF1</container>
-                    <container id="leverette135_10398" type="folder">3</container>
-                    <unittitle id="leverette135_10399">Photos re T. C. Martie of Thomson</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photos re T. C. Martie of Thomson</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10406" level="file">
-                <did id="leverette135_10405">
-                    <container id="leverette135_10402" type="box">MF1</container>
-                    <container id="leverette135_10403" type="folder">3</container>
-                    <unittitle id="leverette135_10404">Photos of Augusta</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">3</container>
+                    <unittitle>Photos of Augusta</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10409" level="file">
-                <did id="leverette135_10408">
-                    <unittitle id="leverette135_10407">Scrapbook 4 (Pages not numbered)</unittitle>
+            <c01 level="file">
+                <did>
+                    <unittitle>Scrapbook 4 (Pages not numbered)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10414" level="file">
-                <did id="leverette135_10413">
-                    <container id="leverette135_10410" type="box">MF1</container>
-                    <container id="leverette135_10411" type="folder">4</container>
-                    <unittitle id="leverette135_10412">Clippings by and about FLL</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Clippings by and about FLL</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10419" level="file">
-                <did id="leverette135_10418">
-                    <container id="leverette135_10415" type="box">MF1</container>
-                    <container id="leverette135_10416" type="folder">4</container>
-                    <unittitle id="leverette135_10417">Christmas and greeting cards</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Christmas and greeting cards</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10424" level="file">
-                <did id="leverette135_10423">
-                    <container id="leverette135_10420" type="box">MF1</container>
-                    <container id="leverette135_10421" type="folder">4</container>
-                    <unittitle id="leverette135_10422">Photos of Maggie Adam Harvey, mother of Leland Harvey, photo and article re Margery Harris Leonard Barber; </unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of Maggie Adam Harvey, mother of Leland Harvey, photo and article re Margery Harris Leonard Barber; </unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10429" level="file">
-                <did id="leverette135_10428">
-                    <container id="leverette135_10425" type="box">MF1</container>
-                    <container id="leverette135_10426" type="folder">4</container>
-                    <unittitle id="leverette135_10427">Letters from President Woodrow Wilson (November 14, 1912), Governor John M. Slaton (September 15, 1913), Sarah Grant Slaton, (February 6, 1914), and Esther LaRose Harris (July 27, 1889)</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Letters from President Woodrow Wilson (November 14, 1912), Governor John M. Slaton (September 15, 1913), Sarah Grant Slaton, (February 6, 1914), and Esther LaRose Harris (July 27, 1889)</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10434" level="file">
-                <did id="leverette135_10433">
-                    <container id="leverette135_10430" type="box">MF1</container>
-                    <container id="leverette135_10431" type="folder">4</container>
-                    <unittitle id="leverette135_10432">Photos of Rock Eagle Park near Eatonton</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of Rock Eagle Park near Eatonton</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10439" level="file">
-                <did id="leverette135_10438">
-                    <container id="leverette135_10435" type="box">MF1</container>
-                    <container id="leverette135_10436" type="folder">4</container>
-                    <unittitle id="leverette135_10437">Photos of parents and home in Eatonton, and letter (November 20, 1935) from Martha Berry</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of parents and home in Eatonton, and letter (November 20, 1935) from Martha Berry</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10444" level="file">
-                <did id="leverette135_10443">
-                    <container id="leverette135_10440" type="box">MF1</container>
-                    <container id="leverette135_10441" type="folder">4</container>
-                    <unittitle id="leverette135_10442">Photos of students, Cousin Frances Hearn, and servant, and letter from W. P. Collins</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of students, Cousin Frances Hearn, and servant, and letter from W. P. Collins</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10449" level="file">
-                <did id="leverette135_10448">
-                    <container id="leverette135_10445" type="box">MF1</container>
-                    <container id="leverette135_10446" type="folder">4</container>
-                    <unittitle id="leverette135_10447">Testimonials re teaching of Fannie Lee Leverette</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Testimonials re teaching of Fannie Lee Leverette</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10454" level="file">
-                <did id="leverette135_10453">
-                    <container id="leverette135_10450" type="box">MF1</container>
-                    <container id="leverette135_10451" type="folder">4</container>
-                    <unittitle id="leverette135_10452">Photos and cards from her students, photos of Thomson schools</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos and cards from her students, photos of Thomson schools</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10459" level="file">
-                <did id="leverette135_10458">
-                    <container id="leverette135_10455" type="box">MF1</container>
-                    <container id="leverette135_10456" type="folder">4</container>
-                    <unittitle id="leverette135_10457">Family and personal photos</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Family and personal photos</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10464" level="file">
-                <did id="leverette135_10463">
-                    <container id="leverette135_10460" type="box">MF1</container>
-                    <container id="leverette135_10461" type="folder">4</container>
-                    <unittitle id="leverette135_10462">Photos of Eatonton and Thomson and Social Circle</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of Eatonton and Thomson and Social Circle</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10469" level="file">
-                <did id="leverette135_10468">
-                    <container id="leverette135_10465" type="box">MF1</container>
-                    <container id="leverette135_10466" type="folder">4</container>
-                    <unittitle id="leverette135_10467">Photos of the Knox Hotel in Thomson</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of the Knox Hotel in Thomson</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10474" level="file">
-                <did id="leverette135_10473">
-                    <container id="leverette135_10470" type="box">MF1</container>
-                    <container id="leverette135_10471" type="folder">4</container>
-                    <unittitle id="leverette135_10472">Photos of Eatonton, family, friends, black servants</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of Eatonton, family, friends, black servants</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10479" level="file">
-                <did id="leverette135_10478">
-                    <container id="leverette135_10475" type="box">MF1</container>
-                    <container id="leverette135_10476" type="folder">4</container>
-                    <unittitle id="leverette135_10477">Photo of Eatonton group with airplane, "The Butterfly," in 1911</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photo of Eatonton group with airplane, "The Butterfly," in 1911</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10484" level="file">
-                <did id="leverette135_10483">
-                    <container id="leverette135_10480" type="box">MF1</container>
-                    <container id="leverette135_10481" type="folder">4</container>
-                    <unittitle id="leverette135_10482">Photos of Thomson</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of Thomson</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10489" level="file">
-                <did id="leverette135_10488">
-                    <container id="leverette135_10485" type="box">MF1</container>
-                    <container id="leverette135_10486" type="folder">4</container>
-                    <unittitle id="leverette135_10487">Photos of "Hickory Hill"</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Photos of "Hickory Hill"</unittitle>
                 </did>
             </c01>
-            <c01 id="leverette135_10494" level="file">
-                <did id="leverette135_10493">
-                    <container id="leverette135_10490" type="box">MF1</container>
-                    <container id="leverette135_10491" type="folder">4</container>
-                    <unittitle id="leverette135_10492">Letters from Carl Vinson</unittitle>
+            <c01 level="file">
+                <did>
+                    <container type="box">MF1</container>
+                    <container type="folder">4</container>
+                    <unittitle>Letters from Carl Vinson</unittitle>
                 </did>
             </c01>
         </dsc>
