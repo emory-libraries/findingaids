@@ -186,33 +186,37 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     _series_ids = list(series_ids)
     while None in _series_ids:
         _series_ids.remove(None)
-        
+
+
+    # user-facing urls should use short-form ids (eadid not repeated)
+    # to query eXist, we need full ids with eadid
+    # check and convert them here
     series_ids = []
     redirect_ids = []
     redirect = False
     for id in _series_ids:        
         if id.startswith('%s_' % eadid):
-            # an unshortened id was passed in - redirect!
+            # an unshortened id was passed in - shorten and redirect to canonical url
             redirect = True
             redirect_ids.append(shortform_id(id, eadid))
         else:
-            # shortened id was passed in - generate long-form for query to exist
+            # a shortened id was passed in - generate long-form for query to exist
             series_ids.append('%s_%s' % (eadid, id))
             # append to redirect ids in case redirect is required for a later id
             redirect_ids.append(id)
 
+    # if any id was passed in unshortened, return a permanent redirect to the canonical url
     if redirect:
         # log redirects - if any of them are coming from this application, they should be fixed
         if 'HTTP_REFERER' in request.META:
             referrer = 'Referrer %s' % request.META['HTTP_REFERER']
         else:
-            referrer = ''
+            referrer = ' (referrer not available)'
         logger.info('''Redirecting from long-form series/index %s url to short-form url. %s''' \
                     % (request.path, referrer))
         return HttpResponsePermanentRedirect(_series_url(eadid, *redirect_ids))
 
-
-    #used to build initial series and index filters and field lists
+    # build initial series and index filters and field lists
     filter_list = {'ead__eadid':eadid}
     series_fields =['id', 'level', 'did__unitid', 'did__unittitle']
     index_fields =['id', 'head']

@@ -873,7 +873,6 @@ class FaViewsTest(TestCase):
         self.assert_("rel='subsection'" in links[1][0])
 
 
-
     def test_printable_fa(self):
         # using 'full' html version of pdf for easier testing
         fullfa_url = reverse('fa:full-findingaid', kwargs={'id': 'raoul548'})
@@ -1018,6 +1017,61 @@ class FaViewsTest(TestCase):
         self.assertTrue(response['Cache-Control'])
         self.assertEqual(response['Cache-Control'], "private")
         self.assertContains(response, '<a href="/titles/R?page=1">return to browse</a>')
+
+    def test_short_ids(self):
+        # urls for series/index should use short-form ids (tested above, throughout)
+        # request on url with long-form ids should get a permanent redirect to short-form
+
+        # - series
+        long_id_url = reverse('fa:series-or-index',  kwargs={'id': 'raoul548',
+                                  'series_id': 'raoul548_s4'})
+        short_id_url = reverse('fa:series-or-index',  kwargs={'id': 'raoul548',
+                                   'series_id': 's4'})
+        response = self.client.get(long_id_url)
+        self.assertRedirects(response, short_id_url, status_code=301)
+
+        # - series2
+        long_id_url = reverse('fa:series2', kwargs={'id': 'raoul548',
+                           'series_id': 'raoul548_s1', 'series2_id': 'raoul548_s1.3'})
+        short_id_url = reverse('fa:series2', kwargs={'id': 'raoul548',
+                           'series_id': 's1', 'series2_id': 's1.3'})
+        response = self.client.get(long_id_url)
+        self.assertRedirects(response, short_id_url, status_code=301)
+
+        # - series3
+        long_id_url = reverse('fa:series3', kwargs={'id': 'raoul548',
+                'series_id': 'raoul548_s4', 'series2_id': 'raoul548_4.1',
+                'series3_id': 'raoul548_4.1b'})
+        short_id_url = reverse('fa:series3', kwargs={'id': 'raoul548',
+                'series_id': 's4', 'series2_id': '4.1', 'series3_id': '4.1b'})
+        response = self.client.get(long_id_url)
+        self.assertRedirects(response, short_id_url, status_code=301)
+
+        # index
+        long_id_url = reverse('fa:series-or-index',  kwargs={'id': 'raoul548',
+                                  'series_id': 'raoul548_index1'})
+        short_id_url = reverse('fa:series-or-index',  kwargs={'id': 'raoul548',
+                                   'series_id': 'index1'})
+        response = self.client.get(long_id_url)
+        self.assertRedirects(response, short_id_url, status_code=301)
+
+        # mixed long and short ids, series3
+        long_id_url = reverse('fa:series3', kwargs={'id': 'raoul548',
+                'series_id': 's4', 'series2_id': 'raoul548_4.1',
+                'series3_id': '4.1b'})
+        short_id_url = reverse('fa:series3', kwargs={'id': 'raoul548',
+                'series_id': 's4', 'series2_id': '4.1', 'series3_id': '4.1b'})
+        response = self.client.get(long_id_url)
+        self.assertRedirects(response, short_id_url, status_code=301)
+
+        # invalid id should not redirect
+        invalid_id_url = reverse('fa:series-or-index',  kwargs={'id': 'raoul548',
+                                  'series_id': 'bogusid_s4'})
+        response = self.client.get(invalid_id_url)
+        expected, got = 404, response.status_code
+        self.assertEqual(expected, got, 'Expected %s but returned %s for %s' % \
+                        (expected, got, invalid_id_url))
+
         
 class UtilsTest(TestCase):
     exist_fixtures = {'files': [
