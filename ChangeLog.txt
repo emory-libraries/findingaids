@@ -13,28 +13,82 @@ notes.
 
 Upgrade notes:
 
-1. Run ``python manage.py ead_to_xsd`` to convert all the EAD
-   documents in the configured EAD source directory from DTD to new
-   XSD Schema EAD format. Note that this will **modify** the EAD
-   files; running the script should be coordinated with anyone who
-   might be editing those files.
-2. Browse pages now include a last-modified header to enable caching.
-   Pages are indicated via query string, e.g., titles/B?page=2  
-   Some configuration may be required to enable caching on these pages.
-   Be reminded that any cache (e.g., Squid) should be configured so that
-   cached PDFs will be  kept and not released in order to cache pages
-   like these.
-3. Logging is now available when running via runserver and is configured in
-   localsettings
-4. On Ubuntu, install Fop via ``apt-get install fop``.  Set the full path
+1. Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
+   On Ubuntu, install Fop via ``apt-get install fop``.  Set the full path
    to the command-line version of fop as the XSLFO_PROCESSOR in localsettings.py
+   (see localsettings-sample.py for an example)
    Note that running Fop requires a valid JAVA_HOME be set in the environment.
+   Pisa and ReportLab are no longer in use and can be uninstalled.
+2. Search and browse pages now include a last-modified header to enable caching.
+   Browse and Search page urls are indicated via query string, e.g.,
+        titles/B?page=2
+        search?keywords=ciaran+carson
+   Some configuration may be required to enable caching on these pages.
+   Any cache (e.g., Squid) should be configured so that cached PDFs will be
+   kept in preference to search and browse pages.
+3. Logging is now available when running via runserver; it is currently NOT
+   enabled when running through mod wsgi (but could be enabled).  Any logging
+   settings should be configured in localsettings.py
+4. To get the latest database changes and fixtures, run ``python manage.py syncdb``
+5. Reload the exist index configuration: ``python manage.py existdb_index load``
+   (reindexing is not necessary at this point because we will be reloading data)
+6. Migrate EAD documents from DTD-format to EAD Schema: 
+   ``python manage.py ead_to_xsd``  
+   (requires write access-- this will *modify* EAD files in the source directory
+    that is configured in localsettings.py)
+7. Reload converted EAD documents to eXist database:
+   ``python manage.py load_ead``
+8. OPTIONAL: To meet the response-time requirements, a response_time management
+   command was written.  To test response times in the deployed environment:
+    ``python manage.py response_times browse``
+    ``python manage.py response_times search``
+   (Tip: for minimal output with summary information only, use ``-v 0``)
 
 
-** Features/Notes **
+** New Features **
+
+ * When viewing a finding aid after a search, a researcher can easily find search
+   terms and exact phrases because they are highlighted.
+ * When viewing a finding aid after a search, a researcher sees an indicator of
+   which sections of the finding aid include their search terms.
+ * A system administrator can run a script to migrate EAD files in the
+   configured source directory from EAD DTD format to EAD XSD schema.
+ * When an admin cleans, publishes, or previews an schema-based EAD document,
+   the application validates against the XSD schema.
+ * Researchers can retrieve an alphabetical browse list in less than 5 seconds,
+   based on the first letter of a stakeholder specified field.
+ * Researchers receive their search results in less than 5 seconds.
+ * Researchers can see how many pages of search results there are, and jump to
+   any section of search results from any page in the search results.
+ * When viewing a finding aid with series or sub-series, a researcher can use
+   breadcrumbs to navigate within the hierarchy of the document.
+ * Researchers can search for an exact phrase in all indexed fields in the full
+   text of the finding aid, to allow targeted discovery.
+ * Researchers can search using wildcards to match partial or variant words.
+ * Researchers can use grouping and boolean operators in the main search input,
+   to generate very precise, relevant search results.
+ * Researchers find finding aids with matches in stake-holder specified fields
+   at the top of search results.
+ * When viewing a finding aid, a researcher can search within that one document,
+   to find relevant folder contents in a large finding aid.
+ * Researchers can click on a subject heading (any of the controlaccess terms)
+   in a single finding aid to discover other finding aids with the same subject headings.
+ * When browsing finding aids by any first letter, a researcher can jump to
+   alphabetical groupings within that letter, to enable identifying and accessing
+   a particular portion of that browse listing (e.g., A-Ar, As-Ax, etc.).
+ * When viewing a finding aid found via search, a researcher can get back to the
+   last page of search results they were on.
+ * Researchers can filter their search by repository (MARBL, Pitts, University
+   Archives, etc.), to find resources available at a specific location.
+ * Users interact with a site that has a consistent look and feel across
+   Emory Libraries websites.
+
+** Minor changes **
 
  * Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
-
+ * Logging now available in runserver
+ * Clean urls for series/subseries/index (without redundant eadid)
+ * Includes a prototype version simplepages for editable site content
 
 0.2 Data Preparation / Admin site
 ---------------------------------
