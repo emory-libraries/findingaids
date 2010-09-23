@@ -605,7 +605,7 @@
     </separatedmaterial>
     <dsc id="raoul548_1003977" type="combined">
       <head id="raoul548_100186">Description of Series</head>
-      <c01 id="raoul548_1003223" level="series">
+      <c01 id="raoul548_s1" level="series">
         <did id="raoul548_100191">
           <unitid id="raoul548_100187">Series 1</unitid>
           <unittitle encodinganalog="245$a" id="raoul548_100189">Letters and personal papers, <unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="raoul548_100188" normal="1865/1982" type="inclusive">1865-1982</unitdate></unittitle>
@@ -7082,44 +7082,44 @@
           </c03>
         </c02>
         <!-- problem series from rushdie: missing scopecontent head breaks series_info ? -->
-        <c02 id="rushdie1000_subseries2.1" level="subseries">
-          <did id="rushdie1000_10600">
-            <unitid id="rushdie1000_10596">Subseries 2.1</unitid>
-            <unittitle id="rushdie1000_10598" type="245$a">Fiction,
+        <c02 id="raoul548_subseries2.1" level="subseries">
+          <did>
+            <unitid>Subseries 2.1</unitid>
+            <unittitle type="245$a">Fiction,
 				  <unitdate calendar="gregorian" encodinganalog="245$f" era="ce" id="rushdie1000_10597" normal="1973/2006" type="inclusive">1973-2006</unitdate></unittitle>
-            <physdesc encodinganalog="300" id="rushdie1000_10599">Boxes 15-45; OP1-5</physdesc>
+            <physdesc encodinganalog="300">Boxes 15-45; OP1-5</physdesc>
           </did>
-          <scopecontent id="rushdie1000_10620">
-            <p id="rushdie1000_10615">This subseries contains all materials related to the writing and preparation for publication of each of Rushdie's novels or short stories, from 1973-2006.  All of his published works, including <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10601" xlink:href="">Grimus</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10602" xlink:href="">Midnight's Children</title>,<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10603" xlink:href=""> Shame</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10604" xlink:href="">The Satanic Verses</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10605" xlink:href="">Haroun and the Sea of Stories</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10606" xlink:href="">East West</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10607" xlink:href="">The Moor's Last Sigh</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10608" xlink:href="">The Ground Beneath Her Feet</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10609" xlink:href="">Fury</title>, and <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10610" xlink:href="">Shalimar the Clown</title> are represented.  Frequently, the subseries frequently contains multiple typescript versions of a novel, many of which are heavily annotated and corrected in Rushdie's hand. At times, typescript versions differ significantly from the published text, with characters and scenes that are excised from the final version; often, Rushdie's drafts contain many versions of a single page, giving the researcher significant insight into his creative process that is supplemented by the large body of manuscript and typescript notes related to the composition of each work.  Additionally, the series contains unpublished fiction, including <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10611" xlink:href="">The Antagonist</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10612" xlink:href="">The Avatar</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10613" xlink:href="">Madame Rama</title>, and <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10614" xlink:href="">The Book of the Peer</title>, as well as fragments of additional novels or stories or the title pages for planned novels.  The arrangement of the material within each work roughly follows the creative process from early manuscript or typescript drafts through to galley and page proofs.  </p>
-            <p id="rushdie1000_10619">Additional drafts and notes for<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10616" xlink:href=""> East, West</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10617" xlink:href="">The Moor's Last Sigh</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10618" xlink:href="">The Ground Beneath Her Feet</title>, and various short stories can be found in the digital files.  A detailed list of the files is available by accessing the searchable database and emulated environment on the researcher workstation in the Manuscript, Archives, and Rare Book Library (MARBL) reading room.
+          <scopecontent>
+            <p>This subseries contains all materials related to the writing and preparation for publication of each of Rushdie's novels or short stories, from 1973-2006.  All of his published works, including <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10601" xlink:href="">Grimus</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10602" xlink:href="">Midnight's Children</title>,<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10603" xlink:href=""> Shame</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10604" xlink:href="">The Satanic Verses</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10605" xlink:href="">Haroun and the Sea of Stories</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10606" xlink:href="">East West</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10607" xlink:href="">The Moor's Last Sigh</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10608" xlink:href="">The Ground Beneath Her Feet</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10609" xlink:href="">Fury</title>, and <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10610" xlink:href="">Shalimar the Clown</title> are represented.  Frequently, the subseries frequently contains multiple typescript versions of a novel, many of which are heavily annotated and corrected in Rushdie's hand. At times, typescript versions differ significantly from the published text, with characters and scenes that are excised from the final version; often, Rushdie's drafts contain many versions of a single page, giving the researcher significant insight into his creative process that is supplemented by the large body of manuscript and typescript notes related to the composition of each work.  Additionally, the series contains unpublished fiction, including <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10611" xlink:href="">The Antagonist</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10612" xlink:href="">The Avatar</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10613" xlink:href="">Madame Rama</title>, and <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10614" xlink:href="">The Book of the Peer</title>, as well as fragments of additional novels or stories or the title pages for planned novels.  The arrangement of the material within each work roughly follows the creative process from early manuscript or typescript drafts through to galley and page proofs.  </p>
+            <p>Additional drafts and notes for<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10616" xlink:href=""> East, West</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10617" xlink:href="">The Moor's Last Sigh</title>, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10618" xlink:href="">The Ground Beneath Her Feet</title>, and various short stories can be found in the digital files.  A detailed list of the files is available by accessing the searchable database and emulated environment on the researcher workstation in the Manuscript, Archives, and Rare Book Library (MARBL) reading room.
                  <!-- <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">MATCHED TEXT</exist:match> --></p>
           </scopecontent>
-          <arrangement encodinganalog="351" id="rushdie1000_10623">
-            <head id="rushdie1000_10621">Arrangement Note</head>
-            <p id="rushdie1000_10622">Novels are arranged in chronological order by date of publication, followed by short stories and unpublished works arranged alphabetically.</p>
+          <arrangement encodinganalog="351">
+            <head>Arrangement Note</head>
+            <p>Novels are arranged in chronological order by date of publication, followed by short stories and unpublished works arranged alphabetically.</p>
           </arrangement>
-          <accessrestrict encodinganalog="506" id="rushdie1000_10626">
-            <head id="rushdie1000_10624">Restrictions on Access</head>
-            <p id="rushdie1000_10625">Selected notes and unpublished writings are restricted.  Access to digital files is only available in the Manuscript, Archives, and Rare Book Library (MARBL).  </p>
+          <accessrestrict encodinganalog="506">
+            <head>Restrictions on Access</head>
+            <p>Selected notes and unpublished writings are restricted.  Access to digital files is only available in the Manuscript, Archives, and Rare Book Library (MARBL).  </p>
           </accessrestrict>
           <userestrict encodinganalog="540">
-            <head id="rushdie1000_10627">Terms Governing Use and Reproduction</head>
-            <p id="rushdie1000_10628">The use of personal cameras is not allowed.  Researchers are not permitted to copy or download any digital files or applications from the emulated environment or the searchable database on the computer workstation.   </p>
+            <head>Terms Governing Use and Reproduction</head>
+            <p>The use of personal cameras is not allowed.  Researchers are not permitted to copy or download any digital files or applications from the emulated environment or the searchable database on the computer workstation.   </p>
           </userestrict>
           <c03 id="rushdie1000_10631" level="file">
-            <did id="rushdie1000_10630">
-              <unittitle id="rushdie1000_10629">Published Works</unittitle>
+            <did>
+              <unittitle>Published Works</unittitle>
             </did>
           </c03>
           <c03 id="rushdie1000_10635" level="file">
-            <did id="rushdie1000_10634">
-              <unittitle id="rushdie1000_10633"><title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10632" xlink:href="">Grimus</title> (1975)</unittitle>
+            <did>
+              <unittitle><title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" id="rushdie1000_10632" xlink:href="">Grimus</title> (1975)</unittitle>
             </did>
           </c03>
         </c02>
       </c01>
     </dsc>
-    <index id="index1">
+    <index id="raoul548_index1">
       <head id="raoul548_1003978">Index of Selected Correspondents</head>
       <note id="raoul548_1003982">
         <p id="raoul548_1003979">Names of prominent local citizens, Georgia business and political
@@ -7523,7 +7523,7 @@
         </ptrgrp>
       </indexentry>
     </index>
-    <index id="index2">
+    <index id="raoul548_index2">
       <head>Second Index</head>
       <indexentry>
         <persname>Guy, Some Other</persname>

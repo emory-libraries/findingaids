@@ -120,13 +120,13 @@ def findingaid(request, id, preview=False):
                                                          'preview': preview,
                                                          'url_params': url_params,
                                                          'docsearch_form': KeywordSearchForm(),
-                                                         #'last_query' : request.session.get('last_query'),
-                                                         #'last_browse' : request.session.get('last_browse'),
+                                                         'last_query' : request.session.get('last_query'),
+                                                         'last_browse' : request.session.get('last_browse'),
                                                          },
                                                          context_instance=RequestContext(request, current_app='preview'))
     #Set Cache-Control to private when there is a last_query or last_browse
-    #if "last_query" in request.session or "last_browse" in request.session:
-    #    response['Cache-Control'] = 'private'
+    if "last_query" in request.session or "last_browse" in request.session:
+        response['Cache-Control'] = 'private'
 
     return response
 
@@ -263,7 +263,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'prev': prev,
                     'next': next,
                     'url_params': url_params,
-                    'canonical_url' : _series_url(eadid, *series_ids),
+                    'canonical_url' : _series_url(eadid, *[shortform_id(id) for id in series_ids]),
                     'docsearch_form': KeywordSearchForm(),
                     'last_query' : request.session.get('last_query'),
                     'last_browse' : request.session.get('last_browse'),
