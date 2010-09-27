@@ -31,7 +31,7 @@ class KeywordSearchForm(forms.Form):
 
 
 class AdvancedSearchForm(KeywordSearchForm):
-    "Search item-level content within a single Finding Aid document."
+    "Advanced search form for keyword, subject and repository"
     #redefining keywords because it is optional in the AdvancedSearchForm
     keywords = forms.CharField(required=False,
         help_text="one or more terms; will search anywhere in the finding aid")

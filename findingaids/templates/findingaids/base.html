@@ -16,13 +16,10 @@
 {% endblock %}
 
 {% block sidebar-left %}
-  {% if last_query %}
-        <a href="{% url fa:search %}?{{last_query}}">return to search</a>
+  {% if last_search %}
+        <a href="{{last_search.url}}">{{last_search.txt}}</a>
   {% endif %}
-  {% if last_browse %}
-        <a href="{% url fa:titles-by-letter letter=last_browse.letter %}?page={{last_browse.page}}">return to browse</a>
-  {% endif %}
-  {{ block.super }}
+    {{ block.super }}
     {# single document search, when available - disabled in preview mode #}
   {% if docsearch_form and not preview %}
   <div id="document-search" class="sidebar-search">

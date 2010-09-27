@@ -51,14 +51,12 @@ def titles_by_letter(request, letter):
     """Paginated list of finding aids by first letter in list title.
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
-    #remove last_query from session
-    if 'last_query' in request.session:
-        del request.session['last_query']
 
     #set last browse letter and page in session
     page = request.REQUEST.get('page', 1)
-    last_browse  = {'letter' : letter, 'page' : page}
-    request.session['last_browse'] = last_browse
+    last_search  = "%s?page=%s" % (reverse("fa:titles-by-letter", kwargs={'letter': letter}), page)
+    last_search = {"url" : last_search, "txt" : "return to browse" }
+    request.session['last_search'] = last_search
 
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
@@ -119,12 +117,11 @@ def findingaid(request, id, preview=False):
                                                          'preview': preview,
                                                          'url_params': url_params,
                                                          'docsearch_form': KeywordSearchForm(),
-                                                         'last_query' : request.session.get('last_query'),
-                                                         'last_browse' : request.session.get('last_browse'),
+                                                         'last_search' : request.session.get('last_search', None),
                                                          },
                                                          context_instance=RequestContext(request, current_app='preview'))
     #Set Cache-Control to private when there is a last_query or last_browse
-    if "last_query" in request.session or "last_browse" in request.session:
+    if "last_search" in request.session:
         response['Cache-Control'] = 'private'
 
     return response
@@ -268,8 +265,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'url_params': url_params,
                     'canonical_url' : _series_url(eadid, *[shortform_id(id) for id in series_ids]),
                     'docsearch_form': KeywordSearchForm(),
-                    'last_query' : request.session.get('last_query'),
-                    'last_browse' : request.session.get('last_browse'),
+                    'last_search' : request.session.get('last_search', None),
                     }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
@@ -285,7 +281,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                             render_opts, context_instance=RequestContext(request))
 
     #Cache-Control to private when there is a last_query or last_browse
-    if "last_query" in request.session or "last_browse" in request.session:
+    if "last_search" in request.session:
         response['Cache-Control'] = 'private'
 
     return response
@@ -360,25 +356,7 @@ def search(request):
         repository = form.cleaned_data['repository']
         page = request.REQUEST.get('page', 1)
         
-        #remove last_browse from session
-        if 'last_browse' in request.session:
-            del request.session['last_browse']
-        
-        #set query and last page in session and set it to expire on browser close
-        last_query = {}
-        if subject:
-            last_query['subject'] = subject
-
-        if keywords:
-            last_query['keywords'] = keywords
-        if repository:
-            last_query['repository'] = repository
-        last_query['page'] = page
-        last_query = urlencode(last_query)
-        request.session["last_query"] = last_query
-        request.session.set_expiry(0)
-
-
+              
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
 
@@ -426,6 +404,16 @@ def search(request):
             # select non-empty form values for use in template
             search_params = dict((key, value) for key, value in form.cleaned_data.iteritems()
                                                  if value)
+
+            #set query and last page in session and set it to expire on browser close
+            last_search = search_params
+            last_search['page'] = page
+            last_search = urlencode(last_search)
+            last_search = "%s?%s" % (reverse("fa:search"), last_search)
+            last_search = {"url" : last_search, "txt" : "return to search"}
+            request.session["last_search"] = last_search
+            request.session.set_expiry(0) #set to expire when browser closes
+
             response_context = {
                 'findingaids' : result_subset,
                  'search_params': search_params,    # actual search terms, for display

@@ -153,10 +153,11 @@ class FaViewsTest(TestCase):
         response = self.client.get(a_titles)
         session = self.client.session
         expected = 200
-        last_browse = self.client.session.get("last_browse", None) # browse query info stored in the session
-        self.assertTrue(last_browse)
-        self.assertEqual(last_browse["letter"], "A")
-        self.assertEqual(last_browse["page"], 1)
+        last_search = session.get("last_search", None) # browse query info stored in the session
+        self.assertTrue(last_search)
+        self.assertEqual("%s?page=1" % (reverse('fa:titles-by-letter', kwargs={'letter':'A'})), last_search['url'], "session url should match title-by-letter with page number")
+        
+
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
                              % (expected, response.status_code, a_titles))
         self.assertContains(response, 'href="%s' % \
@@ -971,52 +972,49 @@ class FaViewsTest(TestCase):
         self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
 
     def test_cache_control(self):
-        #No session varialbes set so not Cache-Control should be set
+        #No session varialbes set so not Cache-Control should not be set
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(url)
         session = self.client.session
-        last_query = session.get("last_query", None)
-        last_browse = session.get("last_browse", None)
-        self.assertFalse(last_query)
-        self.assertFalse(last_browse)
-        self.assertFalse(response.get('Cache-Control', None))
-        self.assertNotContains(response, 'return to browse')
-        self.assertNotContains(response, 'return to browse')
+        last_search = session.get("last_search", None)
+        self.assertFalse(last_search)
+        self.assertFalse(response.get('Cache-Control', None), "Cache-Control should not be set since there are no session variables set")
+        self.assertNotContains(response, 'return to browse', msg_prefix="No return to browse link should apear since there are no session variables set")
         
 
-        #With last_query set NOTE: having to set session in the view - setting the session in the test does not work like the docs says
+        #With last_search set in search
+        #Calling search view first to set session info to simulate a user searching
         search_url = reverse('fa:search')
         response = self.client.get(search_url, { 'keywords' : 'raoul'})
 
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(url)
         session = self.client.session
-        last_query = session.get("last_query", None)
-        last_browse = session.get("last_browse", None)
-        self.assertTrue(last_query)
-        self.assertFalse(last_browse)
-
-        self.assertTrue(response['Cache-Control'])
-        self.assertEqual(response['Cache-Control'], "private")
-        self.assertContains(response, '<a href="/search?keywords=raoul&amp;page=1">return to search</a>')
-                
+        last_search = session.get("last_search", None)
+        self.assertTrue(last_search)
+        self.assertEqual(last_search['txt'], "return to search", 'test to make sure the search view set the session')
         
-        #With last_browse set
-        #NOTE: having to set session in the view - setting the session in the test does not work like the docs says
-        browse_url = reverse('fa:titles-by-letter', kwargs={'letter':'R'})
+        self.assertTrue(response['Cache-Control'], "Cache-Control should be set since there are session variables set")
+        self.assertEqual(response['Cache-Control'], "private", "value should be private")
+        self.assertContains(response, '<a href="%s?keywords=raoul&amp;page=1">return to search</a>' %(reverse('fa:search')), msg_prefix="retun to search link should exist")
+                
+
+        #With last_search set in browse
+        #Calling title-by-letter view first to set session info to simulate a user
+        letter = "R"
+        browse_url = reverse('fa:titles-by-letter', kwargs={'letter':letter})
         response = self.client.get(browse_url)
 
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(url)
         session = self.client.session
-        last_query = session.get("last_query", None)
-        last_browse = session.get("last_browse", None)
-        self.assertFalse(last_query)
-        self.assertTrue(last_browse)
-
-        self.assertTrue(response['Cache-Control'])
-        self.assertEqual(response['Cache-Control'], "private")
-        self.assertContains(response, '<a href="/titles/R?page=1">return to browse</a>')
+        last_search = session.get("last_search", None)
+        self.assertTrue(last_search)
+        self.assertEqual(last_search['txt'], "return to browse", 'test to make sure the browse view set the session')
+        
+        self.assertTrue(response['Cache-Control'], "Cache-Control should be set since there are session variables set")
+        self.assertEqual(response['Cache-Control'], "private", "value should be private")
+        self.assertContains(response, '<a href="%s?page=1">return to browse</a>' % (reverse('fa:titles-by-letter', kwargs={'letter':letter})), msg_prefix="retun to browse link should exist")
 
     def test_short_ids(self):
         # urls for series/index should use short-form ids (tested above, throughout)
@@ -1185,9 +1183,9 @@ class FullTextFaViewsTest(TestCase):
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, search_url))
-        last_query = session.get("last_query", None)
-        self.assertTrue(last_query)
-        self.assertEqual("keywords=raoul&page=1", last_query)
+        last_search = session.get("last_search", None)
+        self.assertTrue(last_search)
+        self.assertEqual("%s?keywords=raoul&page=1" % (search_url), last_search['url'])
 
         self.assertPattern("<p[^>]*>Search results for.*raoul.*</p>", response.content,
             msg_prefix='search results include search term')
@@ -1271,9 +1269,9 @@ class FullTextFaViewsTest(TestCase):
         response = self.client.get(search_url, { 'subject' : 'Scripts.'})
         session = self.client.session
 
-        last_query = session.get("last_query", None)
-        self.assertTrue(last_query)
-        self.assertEqual("page=1&subject=Scripts.", last_query)
+        last_search = session.get("last_search", None)
+        self.assertTrue(last_search)
+        self.assertEqual("%s?page=1&subject=Scripts." % (search_url), last_search['url'])
 
         self.assertPattern("<p[^>]*>Search results for.*subject:.*Scripts\..*</p>", response.content,
             msg_prefix='search results include subject search term')
@@ -1294,9 +1292,9 @@ class FullTextFaViewsTest(TestCase):
                             'repository': '"University Archives"'})
         session = self.client.session
 
-        last_query = session.get("last_query", None)
-        self.assertTrue(last_query)
-        self.assertEqual("keywords=papers&page=1&repository=%22University+Archives%22", last_query)
+        last_search = session.get("last_search", None)
+        self.assertTrue(last_search)
+        self.assertEqual(search_url + "?keywords=papers&page=1&repository=%22University+Archives%22", last_search['url'])
 
         # one fixture has been modified to have a different repository
         self.assertPattern("<p[^>]*>Search results for.*repository:.*University Archives.*</p>", response.content,
