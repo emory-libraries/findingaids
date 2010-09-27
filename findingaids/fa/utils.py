@@ -116,7 +116,7 @@ def pages_to_show(paginator, page, page_labels={}):
     :rtype: dictionary
     """    
     show_pages = {}
-    if page is not 1:
+    if page != 1:
         before = 3      # default number of pages to show before the current page
         if page >= (paginator.num_pages - 3):   # current page is within 3 of end
             # increase number to show before current page based on distance to end
