@@ -236,13 +236,3 @@ def set_series_ids(series, eadid, position):
     if series.hasSubseries():
         for j, c in enumerate(series.c):
             set_series_ids(c, eadid, j)
-
-
-class HttpResponseSeeOther(HttpResponseRedirect):
-    """Variant of Django's :class:`django.http.HttpResponseRedirect`.  Used to
-    simplify redirecting with status code 303, since this type of redirect is
-    used frequently in fa_admin.
-
-    303 See Other - not a replacement for the requested content, but a different resource
-    """
-    status_code = 303   # See Other - not a replacement for the requested content, but a different resource

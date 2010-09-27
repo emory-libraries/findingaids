@@ -20,6 +20,7 @@ from django.views.decorators.cache import cache_page
 
 from eulcore.django.auth import permission_required_with_403
 from eulcore.django.existdb.db import ExistDB, ExistDBException
+from eulcore.django.http import HttpResponseSeeOtherRedirect
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.existdb.exceptions import DoesNotExist
 
@@ -28,7 +29,7 @@ from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryse
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
 from findingaids.fa_admin.models import TaskResult, EadFile
 from findingaids.fa_admin.tasks import reload_cached_pdf
-from findingaids.fa_admin.utils import check_ead, check_eadxml, prep_ead, HttpResponseSeeOther
+from findingaids.fa_admin.utils import check_ead, check_eadxml, prep_ead
 
 @login_required
 def main(request):
@@ -189,7 +190,7 @@ def publish(request):
 
             if ead is None:
                 # if ead could not be retrieved from preview mode, skip processing
-                return HttpResponseSeeOther(reverse('fa-admin:index'))
+                return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
             xml = ead.serialize()
 
@@ -240,7 +241,7 @@ def publish(request):
                     % (change, filename, ead_url, unicode(ead.unittitle)))
 
             # redirect to main admin page and display messages
-            return HttpResponseSeeOther(reverse('fa-admin:index'))
+            return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
         else:
             return render_to_response('fa_admin/publish-errors.html',
                 {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e },
@@ -277,7 +278,7 @@ def preview(request):
             ead = load_xmlobject_from_file(fullpath, FindingAid)
             messages.success(request, 'Successfully loaded <b>%s</b> for preview.' % filename)                
             # redirect to document preview page with code 303 (See Other)
-            return HttpResponseSeeOther(reverse('fa-admin:preview:findingaid', kwargs={'id': ead.eadid }))
+            return HttpResponseSeeOtherRedirect(reverse('fa-admin:preview:findingaid', kwargs={'id': ead.eadid }))
         else:
             return render_to_response('fa_admin/publish-errors.html',
                     {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e },
@@ -358,7 +359,7 @@ def prepared_ead(request, filename, mode):
             if not changes:
                 messages.info(request, 'No changes made to <b>%s</b>; EAD is already prepared.' % filename)
                 # redirect to main admin page with code 303 (See Other)
-                return HttpResponseSeeOther(reverse('fa-admin:index'))
+                return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
     elif prep_ead.status_code == 500:
         # something went wrong with generating prep xml - most likely, non-well-formed xml
         errors = [prep_ead.content]
@@ -450,4 +451,4 @@ def delete_ead(request, id):
 
     # if we get to this point, either there was an error or the document was 
     # successfully deleted - in any of those cases, redirect to publish list
-    return HttpResponseSeeOther(reverse('fa-admin:list-published'))
+    return HttpResponseSeeOtherRedirect(reverse('fa-admin:list-published'))
