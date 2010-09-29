@@ -1169,7 +1169,24 @@ class UtilsTest(TestCase):
         #NOTE: THIS TEST DEPENDS ON THE LOCAL MACHINE TIME BEING SET CORRECTLY
         self.assertEqual(exist_datetime_with_timezone(record.date), modified,
             'collection last modified should be datetime of most recently deleted document in collection')
-        
+
+        # last-modified should not cause an error when there are no documents in eXist
+        # - temporarily change collection so no documents will be found
+        real_collection = settings.EXISTDB_ROOT_COLLECTION
+        settings.EXISTDB_ROOT_COLLECTION = '/db/missing'
+        # no exist data, but deleted record - should not cause any errors
+        modified = collection_lastmodified('rqst')
+        self.assertEqual(exist_datetime_with_timezone(record.date), modified,
+            'collection last-modified should return most recently deleted document when no data is in eXist')
+        # no exist data, no deleted records
+        record = Deleted.objects.get(eadid='eadid')     # retrieve datetime from DB
+        record.delete()
+        modified = collection_lastmodified('rqst')
+        self.assertEqual(None, modified,
+            'collection last-modified should return None when no data is in eXist or deleted')
+
+        settings.EXISTDB_ROOT_COLLECTION = real_collection
+
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index
     exist_fixtures = { 'index' : exist_index_path,

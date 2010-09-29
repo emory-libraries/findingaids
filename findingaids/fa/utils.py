@@ -286,19 +286,29 @@ def ead_etag(request, id, preview=False, *args, **kwargs):
 
 def collection_lastmodified(request, *args, **kwargs):
     """Get the last modification time for the entire finding aid collection.
-    Used to generate last-modified header for :meth:`~findingaids.fa.views.titles_by_letter` view.
+    Used to generate last-modified header for views that are based on the entire
+    collection (e.g., :meth:`~findingaids.fa.views.titles_by_letter` browse view,
+    :meth:`findingaids.fa.views.search` search view).
+
+    If no documents are found in eXist and there are no deleted records, no
+    value is returned and django will not send a Last-Modified header.
     """
+    fa_last = None
     # most recently modified document in the eXist collection
-    fa_last = FindingAid.objects.order_by('-last_modified').only('last_modified')[0].last_modified
+    fa = FindingAid.objects.order_by('-last_modified').only('last_modified')
+    if fa .count():
+        fa_last = fa[0].last_modified
+    return None
     # most recently deleted document from sql DB
     deleted = Deleted.objects.order_by('-date').all()
     if deleted.exists():
         deleted_last = deleted[0].date
         # get most recent of the two
-        if deleted_last > fa_last:            
+        if fa_last is None or deleted_last > fa_last:
             fa_last = deleted_last
-    # NOTE: potentially using configured exist TZ for non-eXist date...    
-    return exist_datetime_with_timezone(fa_last)
+    if fa_last is not None:
+        # NOTE: potentially using configured exist TZ for non-eXist date...
+        return exist_datetime_with_timezone(fa_last)
 
 # object pagination - adapted directly from django paginator documentation
 def paginate_queryset(request, qs, per_page=10, orphans=0):    # 0 is django default
