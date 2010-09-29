@@ -298,7 +298,6 @@ def collection_lastmodified(request, *args, **kwargs):
     fa = FindingAid.objects.order_by('-last_modified').only('last_modified')
     if fa .count():
         fa_last = fa[0].last_modified
-    return None
     # most recently deleted document from sql DB
     deleted = Deleted.objects.order_by('-date').all()
     if deleted.exists():
