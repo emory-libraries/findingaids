@@ -17,7 +17,9 @@
 
 {% block sidebar-left %}
   {% if last_search %}
+    <div class="sidebar-search">
         <a href="{{last_search.url}}">{{last_search.txt}}</a>
+    </div>
   {% endif %}
     {{ block.super }}
     {# single document search, when available - disabled in preview mode #}

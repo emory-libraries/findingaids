@@ -992,11 +992,11 @@ class FaViewsTest(TestCase):
         session = self.client.session
         last_search = session.get("last_search", None)
         self.assertTrue(last_search)
-        self.assertEqual(last_search['txt'], "return to search", 'test to make sure the search view set the session')
+        self.assertEqual(last_search['txt'], "Return to Search Results", 'test to make sure the search view set the session')
         
         self.assertTrue(response['Cache-Control'], "Cache-Control should be set since there are session variables set")
         self.assertEqual(response['Cache-Control'], "private", "value should be private")
-        self.assertContains(response, '<a href="%s?keywords=raoul&amp;page=1">return to search</a>' %(reverse('fa:search')), msg_prefix="retun to search link should exist")
+        self.assertContains(response, '<a href="%s?keywords=raoul&amp;page=1">Return to Search Results</a>' %(reverse('fa:search')), msg_prefix="retun to search link should exist")
                 
 
         #With last_search set in browse
@@ -1010,11 +1010,11 @@ class FaViewsTest(TestCase):
         session = self.client.session
         last_search = session.get("last_search", None)
         self.assertTrue(last_search)
-        self.assertEqual(last_search['txt'], "return to browse", 'test to make sure the browse view set the session')
+        self.assertEqual(last_search['txt'], "Return to Browse Results", 'test to make sure the browse view set the session')
         
         self.assertTrue(response['Cache-Control'], "Cache-Control should be set since there are session variables set")
         self.assertEqual(response['Cache-Control'], "private", "value should be private")
-        self.assertContains(response, '<a href="%s?page=1">return to browse</a>' % (reverse('fa:titles-by-letter', kwargs={'letter':letter})), msg_prefix="retun to browse link should exist")
+        self.assertContains(response, '<a href="%s?page=1">Return to Browse Results</a>' % (reverse('fa:titles-by-letter', kwargs={'letter':letter})), msg_prefix="retun to browse link should exist")
 
     def test_short_ids(self):
         # urls for series/index should use short-form ids (tested above, throughout)
