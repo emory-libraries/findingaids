@@ -57,6 +57,7 @@ def titles_by_letter(request, letter):
     last_search  = "%s?page=%s" % (reverse("fa:titles-by-letter", kwargs={'letter': letter}), page)
     last_search = {"url" : last_search, "txt" : "Return to Browse Results" }
     request.session['last_search'] = last_search
+    request.session.set_expiry(0) #set to expire when browser closes
 
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('list_title').only(*fa_listfields)
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
@@ -120,7 +121,7 @@ def findingaid(request, id, preview=False):
                                                          'last_search' : request.session.get('last_search', None),
                                                          },
                                                          context_instance=RequestContext(request, current_app='preview'))
-    #Set Cache-Control to private when there is a last_query or last_browse
+    #Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
 
@@ -280,7 +281,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     response =  render_to_response('findingaids/series_or_index.html',
                             render_opts, context_instance=RequestContext(request))
 
-    #Cache-Control to private when there is a last_query or last_browse
+    #Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
 
@@ -407,6 +408,7 @@ def search(request):
 
             #set query and last page in session and set it to expire on browser close
             last_search = search_params
+            last_search = search_params.copy()
             last_search['page'] = page
             last_search = urlencode(last_search)
             last_search = "%s?%s" % (reverse("fa:search"), last_search)
