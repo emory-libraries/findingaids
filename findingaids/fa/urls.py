@@ -21,7 +21,7 @@ findingaid_parts = patterns('findingaids.fa.views',
     # view access to XSL-FO used to generate pdf (for testing)
     url(r'^xsl-fo/$', 'full_findingaid', {'mode': 'xsl-fo'}, name='xslfo'),
     url(r'^printable/$', 'full_findingaid', {'mode': 'pdf'}, name='printable'),
-    url(r'^search/$', 'document_search', name='singledoc-search'),
+    url(r'^items/$', 'document_search', name='singledoc-search'),
     url(r'^(?P<series_id>%s)/$' % series_id, 'series_or_index', name='series-or-index'),
     # NOTE: django can't reverse url patterns with optional parameters
     # so series, subseries, and sub-subseries urls have to be defined separately
