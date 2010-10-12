@@ -70,6 +70,8 @@ def titles_by_letter(request, letter):
          'letters': title_letters(),
          'current_letter': letter,
          'show_pages' : show_pages,
+         # This is displayted in the title bar of the browser to indicate which page you are on
+         #example: (Cua - Cut)
          'title_range' : show_pages[fa_subset.number]
     }
     if page_labels:     # if there is content and page labels to show, add to context
