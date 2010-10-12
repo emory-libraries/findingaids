@@ -96,6 +96,12 @@ table.box-folder .bf {
 table.box-folder .section {
   font-weight: bold;
 }
+
+table.box-folder tr.series-link th {
+    font-size: 1.3em !important;
+    line-height: 1.3em !important;
+}
+
 div#sidebar-left-inner div {
     border: 1px solid #D9D9D9;
     background-color: #f2f3f5;

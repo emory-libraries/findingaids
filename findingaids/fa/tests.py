@@ -1512,7 +1512,8 @@ class FullTextFaViewsTest(TestCase):
         series_url = reverse('fa:series-or-index',
                             kwargs={'id': 'raoul548', 'series_id': 's4'})
         self.assertContains(response, series_url,
-            count=1, msg_prefix='link to series with matches (series 4) occurs once')        
+            msg_prefix='link to series with matches (series 4) is in response')
+            # should be displayed once for every subseries with a match
         self.assertContains(response, 'Series 4: Miscellaneous',
             msg_prefix='label for series with matches (4) is displayed')
         # - subseries url & label
@@ -1521,6 +1522,14 @@ class FullTextFaViewsTest(TestCase):
             count=1, msg_prefix='link to subseries with matches (1.1) occurs once')
         self.assertContains(response, 'Subseries 1.1: William Greene',
             msg_prefix='label for series with matches (1.1) is displayed')
+        # - label for subseries items includes series
+        series_url = reverse('fa:series-or-index',
+                            kwargs={'id': 'raoul548', 'series_id': 's1'})
+        self.assertContains(response, series_url,
+            msg_prefix='link to series (1) with subseries matches (1.1) is in response')
+        self.assertContains(response, 'Series 1: Letters and personal papers',
+            msg_prefix='label for series (1) with subseries matches (1.1) is in response')
+
         # - sub-subseries url & label
         self.assertContains(response, reverse('fa:series3',
             kwargs={'id': 'raoul548', 'series_id': 's4',
@@ -1528,6 +1537,12 @@ class FullTextFaViewsTest(TestCase):
             count=1, msg_prefix='link to sub-subseries with matches (4.1b) occurs once')
         self.assertContains(response, 'Subseries 4.1b: Genealogy part 2',
             msg_prefix='label for subseries with matches (4.1b) is displayed')
+        # - label for sub-subseries includes subseries
+        self.assertContains(response, reverse('fa:series2',
+            kwargs={'id': 'raoul548', 'series_id': 's4', 'series2_id': '4.1'}),
+            msg_prefix='matches in sub-subseries links to subseries')
+        self.assertContains(response, 'Subseries 4.1: Miscellaneous,',
+            msg_prefix='label for subseries with matches (4.1) is displayed')
 
         self.assertContains(response, reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             msg_prefix='search within raoul48 includes link to main finding aid page')
@@ -1536,8 +1551,8 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix="single-document search results page includes robots directives - noindex, nofollow")
 
         # links to series and main finding aid should include search terms
-        # should be 7 series matches, 1 document title
-        self.assertContains(response, '?keywords=correspondence', count=9,
+        # should be 16 series/subseries/subsubseries matches, 1 document title
+        self.assertContains(response, '?keywords=correspondence', count=17,
             msg_prefix='links to finding aid series include search terms')
 
         # no matches
