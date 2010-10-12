@@ -7,7 +7,6 @@ from lxml import etree
 from urllib import quote as urlquote
 
 from django.conf import settings
-from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpRequest
@@ -19,7 +18,7 @@ from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted, repositories
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.forms import boolean_to_upper
 from findingaids.fa.templatetags.ead import format_ead
@@ -1502,6 +1501,11 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search results include search term')
         self.assertContains(response, "45 matches found",
             msg_prefix='search for "correspondence" in raoul548 matches 45 items')
+        # box/folder/contents headings should only display once
+        self.assertContains(response, "Box", 1,
+            msg_prefix='"Box" heading only appears once in search results')
+        self.assertContains(response, "Folder", 1,
+            msg_prefix='"Folder" heading only appears once in search results')
 
         # series from fixture with matches:  s1.1, 4, 4.1b
         # - series url & label
