@@ -70,6 +70,7 @@ def titles_by_letter(request, letter):
          'letters': title_letters(),
          'current_letter': letter,
          'show_pages' : show_pages,
+         'title_range' : show_pages[fa_subset.number]
     }
     if page_labels:     # if there is content and page labels to show, add to context
          # other page labels handled by show_pages, but first & last are special
