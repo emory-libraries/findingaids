@@ -16,25 +16,23 @@
            </tr>
          {% endif %}
 
+       {% spaceless %}
         <tr {% if not component.did.container %} class="section" {% endif %} >
-          {% spaceless %}
             {% for container in component.did.container %}
             {# formatting assumes 2 containers; if only one, add a column span #}
             <td class="bf" {% if component.did.container|length = 1 %}colspan="2"{% endif%}>
                 {{ container }}
             </td>
-            {% endfor %}
+            {% endfor %}       
             {# component with no container currently indicates a section heading #}
-            <td {% if not component.did.container %} colspan="3"
-                {% else %} class="content"
-                {% endif %} >
+        {% endspaceless %} {# NOTE: no spaceless for content: loses spaces between highlighted words #}
+            <td {% if not component.did.container %}colspan="3"{% else %}class="content"{% endif %}>
                 {{ component.did.unittitle|format_ead }}
                 {{ component.did.physdesc|default:'' }}
                 {{ component.did.abstract|format_ead|default:'' }}
                 {{ component.did.note|format_ead|default:'' }}
             </td>
-          {% endspaceless %}
-        </tr>        
+        </tr>
     {% endfor %}
   </table>
 {% endif %}
