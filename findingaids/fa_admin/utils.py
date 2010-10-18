@@ -205,7 +205,11 @@ def prep_ead(ead, filename):
     # - list title fields - origination nodes and unittitle
     for field in ead.node.xpath('e:archdesc/e:did/e:origination/node()|e:archdesc/e:did/e:unittitle',
                                 namespaces={'e': EAD_NAMESPACE}):
-        if hasattr(field, 'text'):
+        # the text of an lxml node is the text content *before* any child elements
+        # in some finding aids, this could be blank, e.g.
+        # <unittitle><title>Pitts v. Freeman</title> case files</unittitle>
+        # note that this clean does NOT handle leading whitespace in a leading child element.
+        if hasattr(field, 'text') and field.text is not None:
             field.text = unicode(field.text).lstrip()
     # - controlaccess fields (if any)
     if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:

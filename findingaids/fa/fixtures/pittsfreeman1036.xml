@@ -31,7 +31,7 @@
   </eadheader>
   <archdesc level="collection" relatedencoding="MARC21">
     <did>
-      <unittitle encodinganalog="245$a"><title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Pitts v. Freeman</title> school desegregation case files,<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" normal="1969/1993" type="inclusive">1969-1993</unitdate></unittitle>
+      <unittitle encodinganalog="245$a"><title>Pitts v. Freeman</title> school desegregation case files,<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" normal="1969/1993" type="inclusive">1969-1993</unitdate></unittitle>
       <unitid countrycode="US" repositorycode="geu-s">Manuscript Collection No.
 		  1036</unitid>
       <physdesc encodinganalog="300">
@@ -39,7 +39,7 @@
         <extent>(12
 		  boxes)</extent>
       </physdesc>
-      <abstract><title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Pitts v. Freeman</title> school desegregation case files, consisting of material from the plaintiffs’ legal team, including legal memos, newspaper clippings, transcripts, expert reports, and other materials related to the case.  The case concerned school desegration in the DeKalb County (Georgia) School System.  </abstract>
+      <abstract><title>Pitts v. Freeman</title> school desegregation case files, consisting of material from the plaintiffs’ legal team, including legal memos, newspaper clippings, transcripts, expert reports, and other materials related to the case.  The case concerned school desegration in the DeKalb County (Georgia) School System.  </abstract>
       <langmaterial encodinganalog="546">Materials entirely in
 		  <language langcode="eng">English</language>.</langmaterial>
       <repository encodinganalog="852">Emory University<subarea>Manuscript,

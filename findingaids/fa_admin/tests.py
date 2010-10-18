@@ -872,10 +872,12 @@ class UtilsTest(TestCase):
         self.assertEqual(5, len(check_eadxml(ead)),
             "only 3 errors (duplicate origination, 3 containers in a did, 1 container in a did) should be left in invalid test fixture after cleaning")
 
-        # special case - unittitle begins with a <title>  -- should not cause errors
+        # special case - unittitle begins with a <title>
         eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = prep_ead(ead, eadfile)
+        self.assertFalse(unicode(ead.list_title).startswith('None'),
+            'cleaned unittitle with leading <title> should not start with "None"')
 
 
 ### unit tests for findingaids.fa_admin.tasks
