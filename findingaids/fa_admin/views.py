@@ -1,7 +1,6 @@
 import os
 import glob
 
-from datetime import datetime
 import difflib
 from lxml.etree import XMLSyntaxError
 
