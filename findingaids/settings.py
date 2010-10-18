@@ -1,6 +1,10 @@
 # Django settings for findingaids project.
 from os import path
 
+import os
+os.environ['CELERY_LOADER'] = 'django'
+
+
 #Logger Setup
 #Add custom logging level to allow us to tun off logging via tha config file
 import logging
