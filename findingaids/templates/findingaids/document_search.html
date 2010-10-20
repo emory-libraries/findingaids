@@ -35,16 +35,14 @@
            {% endif %}
          </th>
      </tr>
-     {# NOTE: substantial overlap with component display in containerlist template #}
-    {% endifchanged %}
-    {% if forloop.first %}  {# only display box/folder headings once #}
+     {# display box/folder headings once for each series/section #}
       <tr>
          <th class="bf">Box</th>
          <th class="bf">Folder</th>
          <th class="content">Content</th>
        </tr>
-    {% endif %}
-    
+    {% endifchanged %}
+    {# NOTE: substantial overlap with component display in containerlist template #}
     <tr{% if not component.did.container %} class="section" {% endif %}>
       {% spaceless %}
         {% for container in component.did.container %}

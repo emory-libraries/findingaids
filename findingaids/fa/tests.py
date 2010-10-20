@@ -1501,11 +1501,11 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search results include search term')
         self.assertContains(response, "45 matches found",
             msg_prefix='search for "correspondence" in raoul548 matches 45 items')
-        # box/folder/contents headings should only display once
-        self.assertContains(response, "Box", 1,
-            msg_prefix='"Box" heading only appears once in search results')
-        self.assertContains(response, "Folder", 1,
-            msg_prefix='"Folder" heading only appears once in search results')
+        # box/folder/contents headings should display once for each series
+        self.assertContains(response, "Box", 8,
+            msg_prefix='"Box" heading appears once for each series match')
+        self.assertContains(response, "Folder", 8,
+            msg_prefix='"Folder" heading appears once for each series match')
 
         # series from fixture with matches:  s1.1, 4, 4.1b
         # - series url & label
