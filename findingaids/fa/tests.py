@@ -148,14 +148,20 @@ class FaViewsTest(TestCase):
                 msg_prefix='browse titles should not link to titles starting with Z')
 
     def test_titles_by_letter(self):
+        # load a modified copy of abbey244 to test case-insensitive sorting (for this test only)
+        alphatest_dbpath = settings.EXISTDB_ROOT_COLLECTION + '/alpha-test.xml'
+        ead = load_xmlobject_from_file(path.join(exist_fixture_path, 'abbey244.xml'), FindingAid)
+        ead.list_title.node.text = 'ABC alpha-test'
+        self.db.load(ead.serialize(), alphatest_dbpath, overwrite=True)
+
         a_titles = reverse('fa:titles-by-letter', kwargs={'letter':'A'})
         response = self.client.get(a_titles)
         session = self.client.session
         expected = 200
         last_search = session.get("last_search", None) # browse query info stored in the session
         self.assertTrue(last_search)
-        self.assertEqual("%s?page=1" % (reverse('fa:titles-by-letter', kwargs={'letter':'A'})), last_search['url'], "session url should match title-by-letter with page number")
-        
+        self.assertEqual("%s?page=1" % (reverse('fa:titles-by-letter', kwargs={'letter':'A'})),
+            last_search['url'], "session url should match title-by-letter with page number")
 
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
                              % (expected, response.status_code, a_titles))
@@ -164,9 +170,12 @@ class FaViewsTest(TestCase):
             msg_prefix='browse by titles for A should link to Abbey finding aid')
         self.assertContains(response, '<p class="abstract">Collection of play scripts',
             msg_prefix='browse by titles for A should include Abbey finding aid abstract')
-        self.assertContains(response, '2 finding aids found',
-            msg_prefix='browse by titles for A should return 2 finding aids')
-        # test pagination ? not a lot to paginate here...
+        self.assertContains(response, '3 finding aids found',
+            msg_prefix='browse by titles for A should return 3 finding aids')
+        # test case-insensitive sorting
+        self.assertPattern('Abbey.*ABC', response.content,
+            msg_prefix='Abbey Theater should be listed before ABC (case-insensitive sort)')
+        # test pagination
         self.assertContains(response, 'Ab - Ad',
             msg_prefix='browse pagination uses first letters of titles instead of numbers')
 
@@ -202,7 +211,9 @@ class FaViewsTest(TestCase):
         #title within unittitle
         self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content,
             msg_prefix='title within unittitle should be formatted on list view')
-    
+
+        # clean up alpha-test doc
+        self.db.removeDocument(alphatest_dbpath)
 
 # view finding aid main page
 
