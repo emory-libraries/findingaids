@@ -1,11 +1,9 @@
-import ho.pisa as pisa
-import cStringIO as StringIO
-import cgi
 from datetime import datetime
 from functools import wraps
 import logging
 from lxml import etree
 import os
+import re
 import subprocess
 import tempfile
 
@@ -176,10 +174,12 @@ def alpha_pagelabels(paginator, objects, label_attribute):
                 abbreviated_labels.append(abbr)
                 break
             elif labels[i] == next_label or labels[i] == prev_label:
-                # in the rare case that two labels are *exactly* the same,
-                # add the full label
-                # FIXME: is there a better way to handle this? 
-                abbreviated_labels.append(labels[i])
+                # In the rare case that two labels are *exactly* the same,
+                # add the full label.
+                # In finding aids, this is most likely to happen with origination name;
+                # remove trailing dates in these formats: , NNNN-NNN. , NNNN. , NNNN-
+                label = re.sub(r', \d{4}-?(\d{4})?.?$', '', labels[i])
+                abbreviated_labels.append(label)
                 break
 
     for i in range(0, len(abbreviated_labels), 2):
