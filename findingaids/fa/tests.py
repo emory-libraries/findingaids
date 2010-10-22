@@ -1414,11 +1414,25 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix="highlighted finding aid includes link to canonical finding aid url")
 
         # highlighting
-        #print response
         self.assertContains(response, '<span class="exist-match">Raoul</span>',
                 msg_prefix="search terms are highlighted on main finding aid page")
         self.assertContains(response, '<span class="exist-match">Raoul</span>, Eleanore',
                 msg_prefix="search terms in control access terms are highlighted")
+
+        # match count in table of contents
+        self.assertPattern(r'<li>.*Descriptive Summary.*4 matches.*</li>', response.content,
+                msg_prefix="descriptive summary has match count in ToC")
+        self.assertPattern(r'<li>.*Collection Description.*51 matches.*</li>', response.content,
+                msg_prefix="collection description has match count in ToC")
+        self.assertPattern(r'<li>.*Selected Search Terms.*30 matches.*</li>', response.content,
+                msg_prefix="selected search terms has match count in ToC")
+
+        # match count for non-series document
+        fa_url = reverse('fa:findingaid', kwargs={'id': 'leverette135'})
+        response = self.client.get(fa_url, {'keywords': '"hickory hill"'})
+        self.assertPattern(r'<li>.*Container List.*1 match.*</li>', response.content,
+                msg_prefix="container list has match count in ToC")
+
 
     def test_view_highlighted_series(self):
         # single series in a finding aid, with search-term highlighting
@@ -1450,6 +1464,14 @@ class FullTextFaViewsTest(TestCase):
                 msg_prefix="search terms are highlighted on series page")
         self.assertContains(response, 'genealogy, the <span class="exist-match">Raoul</span> mansion',
                 msg_prefix="search terms in scope/content note are highlighted")
+
+        # match count in table of contents
+        self.assertPattern(r'<li>.*Descriptive Summary.*4 matches.*</li>', response.content,
+                msg_prefix="descriptive summary has match count in ToC")
+        self.assertPattern(r'<li>.*Collection Description.*51 matches.*</li>', response.content,
+                msg_prefix="collection description has match count in ToC")
+        self.assertPattern(r'<li>.*Selected Search Terms.*30 matches.*</li>', response.content,
+                msg_prefix="selected search terms has match count in ToC")
                 
         # series 3 - box/folder/content
         series_url = reverse('fa:series-or-index',

@@ -20,7 +20,11 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 
       Additional fields and methods are used for search, browse, and display.
     """
-    ROOT_NAMESPACES = {'e': EAD_NAMESPACE }
+    ROOT_NAMESPACES = {
+        'e': EAD_NAMESPACE,
+        'exist': 'http://exist.sourceforge.net/NS/exist',
+        'util': 'http://exist-db.org/xquery/util',
+    }
     # redeclaring namespace from eulcore to ensure prefix is correct for xpaths
 
     # NOTE: overridding these fields from EncodedArchivalDescription to allow
@@ -65,6 +69,27 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # boosted fields in the index: must be searched to get proper relevance score
     boostfields = xmlmap.StringField('.//e:titleproper | .//e:origination | \
         .//e:abstract | .//e:bioghist | .//e:scopecontent | .//e:controlaccess')
+
+    # match-count on special groups of data for table of contents listing
+    # - administrative info fields
+    _admin_info = ['userestrict', 'altformavail', 'relatedmaterial', 'separatedmaterial',
+        'acqinfo', 'custodhist', 'prefercite']
+    # -- map as regular xmlmap field, for use when entire object is returned
+    admin_info_matches = xmlmap.IntegerField('count(./e:archdesc/*[' + 
+        '|'.join(['self::e:%s' % field for field in _admin_info]) + ']//exist:match)')
+    # -- eXist-specific xpath for returning count without entire document
+    admin_info_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' + \
+        '|'.join(['e:%s' % field for field in _admin_info]) + '))//exist:match)'
+    # - collection description fields
+    _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'otherfindaid']
+    # -- map as regular xmlmap field, for use when entire object is returned
+    coll_desc_matches =  xmlmap.IntegerField('count(' +
+        '|'.join('./e:archdesc/e:%s//exist:match' % field for field in _coll_desc) + ')')
+    # -- eXist-specific xpath for returning count without entire document
+    coll_desc_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' +  \
+        '|'.join('e:%s' % field for field in _coll_desc) + '))//exist:match)'
+    # - controlaccess match-count
+    controlaccess_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/e:controlaccess)//exist:match)'
 
     objects = Manager('/e:ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager

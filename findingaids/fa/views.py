@@ -237,11 +237,29 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         all_indexes = all_indexes.filter(**filter)
         series_fields.append('match_count')
         index_fields.append('match_count')
+
     else:
         url_params = ''
         filter = {}
     # get the item to be displayed (series, subseries, index)
     result = _get_series_or_index(eadid, *series_ids, filter=filter)
+
+    if 'keywords' in request.GET:
+        # when full-text highlighting is enabled, ead must be retrieved separately
+        # in order to retrieve match counts for main page ToC items
+
+        # fields needed for top-level display (some redundancy with list in _get_series_or_index)
+        return_fields = ['eadid', 'title', 'archdesc__controlaccess__head',
+                         'dsc__head', 'archdesc__did']
+        fa = FindingAid.objects.filter(eadid=eadid).filter(**filter)
+        # using raw xpaths for exist-specific logic to expand and count matches
+        ead = fa.only(*return_fields).only_raw(coll_desc_matches=FindingAid.coll_desc_matches_xpath,
+            admin_info_matches=FindingAid.admin_info_matches_xpath,
+            archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath,
+            ).get()
+    else:
+        # when no highlighting, use partial ead retrieved with main item
+        ead = result.ead
 
     # info needed to construct navigation links within this ead
     # - summary info for all top-level series in this finding aid
@@ -261,10 +279,14 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     prev= index -1
     next = index +1
 
-    render_opts = { 'ead': result.ead,
+    query_times = [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()]
+    if hasattr(ead, 'queryTime'):
+        query_times.append(ead.queryTime())
+
+    render_opts = { 'ead': ead,
                     'all_series' : all_series,
                     'all_indexes' : all_indexes,
-                    "querytime" : [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()],
+                    "querytime" : query_times,
                     'prev': prev,
                     'next': next,
                     'url_params': url_params,
