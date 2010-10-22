@@ -145,7 +145,8 @@
 	<!-- arc-type elements-->
 	<xsl:template match="arc">
 		<xsl:element name="{name()}">
-			<xsl:attribute name="xlink:type">arc</xsl:attribute>
+            <!-- suppress automatic xlink attribute addition
+			<xsl:attribute name="xlink:type">arc</xsl:attribute> -->
 			<xsl:call-template name="xlink_attrs"/>
 		</xsl:element>
 	</xsl:template>
@@ -153,7 +154,8 @@
 	<!-- extended-type elements-->
 	<xsl:template match="daogrp | linkgrp">
 		<xsl:element name="{name()}">
-			<xsl:attribute name="xlink:type">extended</xsl:attribute>
+            <!-- suppress automatic xlink attribute addition
+			<xsl:attribute name="xlink:type">extended</xsl:attribute> -->
 			<xsl:call-template name="xlink_attrs"/>
 			<xsl:apply-templates/>
 		</xsl:element>
@@ -162,7 +164,8 @@
 	<!-- locator-type elements-->
 	<xsl:template match="daoloc | extptrloc | extrefloc | ptrloc | refloc">
 		<xsl:element name="{name()}">
-			<xsl:attribute name="xlink:type">locator</xsl:attribute>
+            <!-- suppress automatic xlink attribute addition
+			<xsl:attribute name="xlink:type">locator</xsl:attribute> -->
 			<xsl:call-template name="xlink_attrs"/>
 			<xsl:call-template name="hrefHandler"/>
 		</xsl:element>
@@ -171,7 +174,8 @@
 	<!-- resource-type elements-->
 	<xsl:template match="resource">
 		<xsl:element name="{name()}">
-			<xsl:attribute name="xlink:type">resource</xsl:attribute>
+            <!-- suppress automatic xlink attribute addition
+			<xsl:attribute name="xlink:type">resource</xsl:attribute> -->
 			<xsl:call-template name="xlink_attrs"/>
 		</xsl:element>
 	</xsl:template>
@@ -180,7 +184,8 @@
 	<xsl:template
 		match="archref | bibref | dao | extptr | extref | ptr | ref | title">
 		<xsl:element name="{name()}">
-			<xsl:attribute name="xlink:type">simple</xsl:attribute>
+            <!-- suppress automatic xlink attribute addition
+			<xsl:attribute name="xlink:type">simple</xsl:attribute> -->
 			<xsl:call-template name="xlink_attrs"/>
 			<xsl:call-template name="hrefHandler"/>
 			<xsl:apply-templates/>
