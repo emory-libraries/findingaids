@@ -228,12 +228,12 @@ class Series(XmlModel, Component):
 
     parent = xmlmap.NodeField("parent::node()", "self")
 
-    objects = Manager('//e:c01')
+    objects = Manager('//e:c01[@level="series"]')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c01 series objects
         in eXist.
 
-        Configured to use *//c01* as base search path.
+        Configured to use *//c01[@level='series']* as base search path.
     """
 
     match_count = xmlmap.IntegerField("count(.//exist:match)")

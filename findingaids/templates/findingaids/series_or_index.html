@@ -28,34 +28,37 @@
 {% if series.series2.id %}
     <a href="{% ifurl preview fa-admin:preview:series2 fa:series2 id=ead.eadid, series_id=series.series.short_id, series2_id=series.series2.short_id %}{{ url_params }}">{{series.series2.did.unittitle}}</a> >
 {% endif %}
-{% firstof series.did.unittitle  index.head %}
+{% firstof series.did.unittitle  index.head %}  {# series or index title #}
 </div>
 <div id="print-links">
     <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
 </div>
 <div id="toc_series">
     {% include "findingaids/sections/toc.html" %}
-<div id="series">
-  <h2><a href="{{ ead_url }}{{ url_params }}#dsc">{{ ead.dsc.head }}</a></h2>
-<ul>
-  {% for component in all_series %}
-    <li>
-        {#  currently selected page #}
-        {% ifequal series.id component.id %}
-           {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
-            {{ component.did.unittitle|format_ead }}
-        {# all other links that are not currently selected page #}
-        {# next prev and start rel attributes are calculated in the view #}
-        {% else %}
-           <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=component.short_id %}{{ url_params }}"
-           {% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% if forloop.first %}rel="start"{% endif %}>
-            {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
-                {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count|floatformat }} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
-        {% endifequal %}
-     </li>
-  {% endfor %}
-</ul>
-</div>
+
+{% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
+    <div id="series">
+      <h2><a href="{{ ead_url }}{{ url_params }}#dsc">{{ ead.dsc.head }}</a></h2>
+        <ul>
+          {% for component in all_series %}
+            <li>
+                {#  currently selected page #}
+                {% ifequal series.id component.id %}
+                   {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+                    {{ component.did.unittitle|format_ead }}
+                {# all other links that are not currently selected page #}
+                {# next prev and start rel attributes are calculated in the view #}
+                {% else %}
+                   <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=component.short_id %}{{ url_params }}"
+                   {% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% if forloop.first %}rel="start"{% endif %}>
+                    {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+                        {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count|floatformat }} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
+                {% endifequal %}
+             </li>
+          {% endfor %}
+        </ul>
+    </div>
+{% endif %}
 <br class="clear"/>
 </div>
 

@@ -384,6 +384,9 @@ class FaViewsTest(TestCase):
             response.content, "photo clippings in container list")
         self.assertPattern('MF1.*4.*Family and personal photos|', response.content,
             "family photos in container list")
+        # container list included in top-level contents
+        self.assertPattern('<li>.*Container List.*</li>', response.content,
+            'container list included in top-level table of contents')
 
         # title with formatting
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890.xml'}))
@@ -432,6 +435,9 @@ class FaViewsTest(TestCase):
             "series 2 link")
         self.assertPattern('|<a href.*>Series 3: Other material, 1935-1941.*</a>',
             response.content, "series 3 link")
+        # dsc head when series: series ToC at top, full series ToC at bottom, but not top-level ToC
+        self.assertContains(response, 'Description of Series', 2,
+            msg_prefix="'Description of Series' should only occur twice on main finding aid page")
 
     def test_view__fa_with_subseries(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
@@ -567,6 +573,10 @@ class FaViewsTest(TestCase):
         self.assertPattern('<li>.*<a href="%s".*>.*Series 9:.*Audiovisual material.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'bailey807', 'series_id': 'series9'}),
             response.content, "series nav - link to series 9")
+        # dsc label when series: series ToC but not top-level ToC
+        self.assertContains(response, 'Description of Series', 1,
+            msg_prefix="'Description of Series' should only occur once on main finding aid page")
+
 
         # series contents
         self.assertPattern('1.*1.*I\. G\. Bailey, 1882-1901', response.content,
