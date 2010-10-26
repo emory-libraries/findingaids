@@ -55,6 +55,11 @@ AUTH_LDAP_SEARCH_FILTER = '' # i.e. '(uid=%s)'
 AUTH_LDAP_CHECK_SERVER_CERT = False # ALWAYS SET True in production.
 AUTH_LDAP_CA_CERT_PATH = '' # absolute path of cert
 
+# PID manager settings
+PIDMAN_HOST = '' # base url for PID manager - use SSL if possible, e.g. https://pid.emory.edu/
+PIDMAN_USER = '' # Username for authentication to the pidman app.
+PIDMAN_PASSWORD = '' # Pasword for username above.
+PIDMAN_DOMAIN = ''      # PID manager domain, in this format: https://pid.emory.edu/domains/1/
 
 # local, full-path location for finding aids to be loaded to eXist via admin interface
 FINDINGAID_EAD_SOURCE= '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'

@@ -6,6 +6,44 @@ Aids application.  New features in each version should be listed, with
 any necessary information about installation, upgrade, or deployment
 notes.
 
+0.4 Persistent IDs
+------------------
+
+Upgrade notes
+^^^^^^^^^^^^^
+
+1. Finding Aids now relies on the PID manager for generating ARKs.
+   (Requires at least 0.9.x, with REST API).  The following settings
+   should be configured in localsettings.py (see
+   localsettings-sample.py for more details)
+
+   - PIDMAN_HOST
+   - PIDMAN_USER
+   - PIDMAN_PASSWORD
+   - PIDMAN_DOMAIN
+
+2. step two...
+
+
+
+New Features
+^^^^^^^^^^^^
+* A system administrator can run a command that will generate ARKs for
+  all existing EAD documents that do not already have ARKs to update the
+  documents and store the ARK in the appropriate eadid attribute.
+* When an archivist runs the 'prep' step in the Finding Aid admin
+  site, an ARK will be generated and added to the 'prepared' EAD. 
+* When an archivist runs the 'prep' step on a Finding Aid with no ARK
+  stored in the EADID, but for which an ARK has already been generated,
+  the existing ARK will be used and the archivist will see an
+  explanatory message. 
+* When an archivist attempts to publish a Finding Aid without an ARK
+  stored in the EADID, the document will not be published and the
+  archivist will see an explanatory message. 
+* A researcher or search engine accessing a Finding Aid document has
+  access to view and bookmark the permanent url for that document. 
+* When researchers try to use the Emory Finding Aids Database and it
+  is down, they will see a message about the problem and who to contact. 
 
 
 0.3 Enhanced Search
