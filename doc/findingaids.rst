@@ -29,10 +29,10 @@ Series and other Finding Aid sections
    :members:
    :inherited-members:
 
-.. autoclass:: findingaids.fa.models.Subseries
+.. autoclass:: findingaids.fa.models.Series2
    :members:
 
-.. autoclass:: findingaids.fa.models.Subsubseries
+.. autoclass:: findingaids.fa.models.Series3
    :members:
 
 .. autoclass:: findingaids.fa.models.Index
@@ -91,8 +91,8 @@ built-in django verbosity options.
  * **check_ead**
     .. autoclass:: findingaids.fa.management.commands.check_ead.Command
        :members:
- * **clean_ead**
-    .. autoclass:: findingaids.fa_admin.management.commands.clean_ead.Command
+ * **prep_ead**
+    .. autoclass:: findingaids.fa_admin.management.commands.prep_ead.Command
        :members:
  * **load_ead**
     .. autoclass:: findingaids.fa_admin.management.commands.load_ead.Command
@@ -101,8 +101,8 @@ built-in django verbosity options.
     .. autoclass:: findingaids.fa.management.commands.response_times.Command
        :members:
 * **check_pdfcache**
-    .. autoclass:: findingaids.fa.management.commands.check_pdfcache.Command
+    .. autoclass:: findingaids.fa_admin.management.commands.check_pdfcache.Command
        :members:
 * **ead_to_xsd**
-    .. autoclass:: findingaids.fa.management.commands.ead_to_xsd.Command
+    .. autoclass:: findingaids.fa_admin.management.commands.ead_to_xsd.Command
        :members:

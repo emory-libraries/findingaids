@@ -16,9 +16,10 @@ from eulcore.django.existdb.models import XmlModel
 ID_DELIMITER = '_'
 
 class FindingAid(XmlModel, EncodedArchivalDescription):
-    """Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
+    """
+    Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
 
-      Additional fields and methods are used for search, browse, and display.
+    Additional fields and methods are used for search, browse, and display.
     """
     ROOT_NAMESPACES = {
         'e': EAD_NAMESPACE,
@@ -282,7 +283,7 @@ class Series(XmlModel, Component):
     _short_id = None
     @property
     def short_id(self):
-        "Short-form id (without eadid_ prefix) for use in external urls."
+        "Short-form id (without eadid prefix) for use in external urls."
         if self._short_id is None:
             # get eadid, if available
             if hasattr(self, 'ead') and hasattr(self.ead, 'eadid') and self.ead.eadid.value:
@@ -300,7 +301,7 @@ SubordinateComponents._fields['c'].node_class = Series
 
 
 def shortform_id(id, eadid=None):
-    """Calculate a short-form id (without eadid_ prefix) for use in external urls.
+    """Calculate a short-form id (without eadid prefix) for use in external urls.
     Uses eadid if available; otherwise, relies on the id delimiter character.
     :param id: id to be shortened
     :param eadid: eadid prefix, if available
@@ -382,7 +383,7 @@ class Index(XmlModel, EadIndex):
     _short_id = None
     @property
     def short_id(self):
-        "Short-form id (without eadid_ prefix) for use in external urls."
+        "Short-form id (without eadid prefix) for use in external urls."
         if self._short_id is None:
             # get eadid, if available
             if hasattr(self, 'ead') and hasattr(self.ead, 'eadid') and self.ead.eadid.value:

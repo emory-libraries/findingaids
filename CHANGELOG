@@ -11,7 +11,8 @@ notes.
 0.3 Enhanced Search
 -------------------
 
-Upgrade notes:
+Upgrade notes
+^^^^^^^^^^^^^
 
 1. Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
    On Ubuntu, install Fop via ``apt-get install fop``.  Set the full path
@@ -20,9 +21,11 @@ Upgrade notes:
    Note that running Fop requires a valid JAVA_HOME be set in the environment.
    Pisa and ReportLab are no longer in use and can be uninstalled.
 2. Search and browse pages now include a last-modified header to enable caching.
-   Browse and Search page urls are indicated via query string, e.g.,
+   Browse and Search page urls are indicated via query string, e.g.::
+
         titles/B?page=2
         search?keywords=ciaran+carson
+
    Some configuration may be required to enable caching on these pages.
    Any cache (e.g., Squid) should be configured so that cached PDFs will be
    kept in preference to search and browse pages.
@@ -30,22 +33,32 @@ Upgrade notes:
    enabled when running through mod wsgi (but could be enabled).  Any logging
    settings should be configured in localsettings.py
 4. To get the latest database changes and fixtures, run ``python manage.py syncdb``
-5. Reload the exist index configuration: ``python manage.py existdb_index load``
+5. Reload the exist index configuration::
+
+	python manage.py existdb_index load
+
    (reindexing is not necessary at this point because we will be reloading data)
-6. Migrate EAD documents from DTD-format to EAD Schema: 
-   ``python manage.py ead_to_xsd``  
+6. Migrate EAD documents from DTD-format to EAD Schema::
+
+	python manage.py ead_to_xsd
+
    (requires write access-- this will *modify* EAD files in the source directory
     that is configured in localsettings.py)
-7. Reload converted EAD documents to eXist database:
-   ``python manage.py load_ead``
+7. Reload converted EAD documents to eXist database::
+
+   	python manage.py load_ead
+
 8. OPTIONAL: To meet the response-time requirements, a response_time management
-   command was written.  To test response times in the deployed environment:
-    ``python manage.py response_times browse``
-    ``python manage.py response_times search``
+   command was written.  To test response times in the deployed environment::
+
+	python manage.py response_times browse
+	python manage.py response_times search
+
    (Tip: for minimal output with summary information only, use ``-v 0``)
 
 
-** New Features **
+New Features
+^^^^^^^^^^^^
 
  * When viewing a finding aid after a search, a researcher can easily find search
    terms and exact phrases because they are highlighted.
@@ -83,7 +96,7 @@ Upgrade notes:
  * Users interact with a site that has a consistent look and feel across
    Emory Libraries websites.
 
-** Minor changes **
+**Minor changes**
 
  * Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
  * Logging now available in runserver
@@ -100,56 +113,61 @@ To upgrade from the previous version:
 
 1. There are a few new external dependencies; please see the README
    for installation instructions.
+
 2. The application now requires that the celery daemon be running;
    consult the README for more details.
-3. Update localsettings.py with configuration settings that
-   have been added since the last version: (examples in
-   localsettings-sample.py)
 
-  * EXISTDB_SERVER_TIMEZONE and EXISTDB_PREVIEW_COLLECTION
+3. Update localsettings.py with configuration settings that have been
+   added since the last version: (examples in localsettings-sample.py)
 
-    * You should make sure that EXISTDB_PREVIEW_COLLECTION is present
-      in eXist, and that the configured eXist user has permission to
-      write to that collection.
-
-  * FINDINGAID_EAD_SOURCE 
-  * Proxy/cache settings: PROXY_HOST & SITE_BASE_URL
-  * RabbitMQ settings (BROKER_*)
+   - EXISTDB_SERVER_TIMEZONE and EXISTDB_PREVIEW_COLLECTION
+   - You should make sure that EXISTDB_PREVIEW_COLLECTION is present in
+     eXist, and that the configured eXist user has permission to write to 
+     that collection.
+   - FINDINGAID_EAD_SOURCE 
+   - Proxy/cache settings: PROXY_HOST & SITE_BASE_URL
+   - RabbitMQ settings (BROKER_*)
 
 4. The Finding Aids site now requires a sql database (for user
-   management and tracking deleted finding aids).  You should set up
-   a database, configure it in localsettings.pi, and run ``python
-   manage.py syncdb``.
-5. Run ``python manage.py prep_ead`` to prepare all the EAD documents in
-   the configured EAD source directory.  Note that this will **modify**
-   the EAD files; running the script should be coordinated with anyone
-   who might be editing those files.
+   management and tracking deleted finding aids).  You should set up a
+   database, configure it in localsettings.pi, and run ``python manage.py
+   syncdb``.
+
+5. Run ``python manage.py prep_ead`` to prepare all the EAD documents
+   in the configured EAD source directory.  Note that this will
+   **modify** the EAD files; running the script should be coordinated
+   with anyone who might be editing those files.
+
 6. Run ``python manage.py load_ead`` to load all EAD documents in the
-   configured EAD source directory to the configured collection in
-   eXist.  If you are loading to a new collection, it is recommend that
-   you use the existdb index manage scripts to load the index
-   configuration before loading data.  Because the load_ead script
-   triggers celery tasks to reload PDFs in the cache and waits until
-   all celery tasks have completed, loading all the Finding Aids may
-   take a long time.
+   configured EAD source directory to the configured collection in eXist.
+   If you are loading to a new collection, it is recommend that you use
+   the existdb index manage scripts to load the index configuration
+   before loading data.  Because the load_ead script triggers celery
+   tasks to reload PDFs in the cache and waits until all celery tasks
+   have completed, loading all the Finding Aids may take a long time.
+
 7. After loading the data, you may wish check the data using the
    ``python manage.py check_ead`` command.
+
 8. The admin section of the site is at /admin/ (under your site url).
-   This uses Emory LDAP for login, so should be configured to run
-   under SSL. 
+   This uses Emory LDAP for login, so should be configured to run under
+   SSL.
+
 9. eXist query response times are reported on templates in Debug mode
-   only.  To view them, set DEBUG = True in the settings, and add any
-   IP addresses that need access to the INTERNAL_IPS.  In staging and
-   production, DEBUG should be set to False. 
-10.To check the status of PDFs in the cache, use ``python manage.py
-   check_pdfcache``.  This uses Internat Cache Protocal (ICP) to query
-   the configured cache, and requires that PROXY_ICP_PORT be
-   configured in local settings, and that the cache is configured to
-   allow ICP access.  For Squid, you should check the icp_port and
-   icp_access settings.
+   only.  To view them, set DEBUG = True in the settings, and add any IP
+   addresses that need access to the INTERNAL_IPS.  In staging and
+   production, DEBUG should be set to False.
+
+10. To check the status of PDFs in the cache, use 
+    ``python manage.py check_pdfcache``.  This uses Internat Cache 
+    Protocol (ICP) to query the configured cache, and requires that 
+    PROXY_ICP_PORT be configured in local settings, and that the 
+    cache is configured to allow ICP access.  For Squid, you should 
+    check the icp_port and icp_access settings.
 
 
-**Features**
+Features
+^^^^^^^^
 
 * An authorized archivist can log in to an admin section of the
   finding aids site inaccessible to other users.
@@ -197,7 +215,8 @@ To upgrade from the previous version:
 Reimplementation of the functionality of the existing PHP Finding Aids
 site in django and eXist 1.4.
 
-**Features**
+Features
+^^^^^^^^
 
 * Researchers can browse finding aids alphabetically by first letter
   of title.

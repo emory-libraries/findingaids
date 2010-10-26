@@ -9,11 +9,13 @@ from findingaids.fa.models import FindingAid, title_letters
 from findingaids.fa.views import fa_listfields
 
 class Command(BaseCommand):
-    """Benchmark response times for running queries against the configured eXist
-database, and warn if any take longer than the current threshold of 5 seconds.
+    """
+    Benchmark response times for running queries against the configured eXist
+    database, and warn if any take longer than the current threshold of 5 seconds.
 
-In browse mode, tests eXist Finding Aid browse query for all browse letters.
-"""
+    In browse mode, tests eXist Finding Aid browse query for all browse letters.
+    
+    """
     help = __doc__
 
     _args = ['browse', 'search']
