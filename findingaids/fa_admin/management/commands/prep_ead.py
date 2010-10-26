@@ -66,9 +66,14 @@ directory will be prepared."""
                     errored += 1
                     print "Prepared EAD for %s does not pass sanity checks, not saving." % file
                     if verbosity >= v_normal:
-                        print "  Errors found:"
+                        print "Errors found:"
                         for err in errors:
-                            print "    %s" % err
+                            # some errors include a list of error instances - display nicely
+                            if isinstance(err, list):
+                                for suberr in err:
+                                    print "    %s" % suberr
+                            else:
+                                print "  %s" % err
                 elif orig_xml == ead.serializeDocument(pretty=True):
                     if verbosity >= v_normal:
                         print "No changes made to %s" % file
