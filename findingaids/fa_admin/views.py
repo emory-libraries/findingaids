@@ -314,8 +314,8 @@ def prepared_eadxml(request, filename):
     try:
         ead = prep_ead(ead, filename)
     except Exception as e:
-        # FIXME: custom exception type?
-        return HttpResponseServerError('There was an error prepping the ead: ' + str(e))
+        # any exception on prep is most likely ark generation
+        return HttpResponseServerError('Failed to prep the document: ' + str(e))
 
     prepped_xml = ead.serializeDocument()
 
@@ -365,7 +365,9 @@ def prepared_ead(request, filename, mode):
                 # redirect to main admin page with code 303 (See Other)
                 return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
     elif prep_ead.status_code == 500:
-        # something went wrong with generating prep xml - most likely, non-well-formed xml
+        # something went wrong with generating prep xml; could be one of:
+        # - non-well-formed xml (failed to load original document at all)
+        # - error generating an ARK for the document
         errors = [prep_ead.content]
     else:
         # this shouldn't happen; not 200 or 500 == something went dreadfully wrong

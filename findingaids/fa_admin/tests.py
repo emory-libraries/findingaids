@@ -70,6 +70,14 @@ class BaseAdminViewsTest(TestCase):
         self.preview_collection = settings.EXISTDB_PREVIEW_COLLECTION
         self.real_exist_url = settings.EXISTDB_SERVER_URL
 
+        # save pid config settings to restore in teardown
+        self._pid_config = {
+            'PIDMAN_HOST': settings.PIDMAN_HOST,
+            'PIDMAN_USER': settings.PIDMAN_USER,
+            'PIDMAN_PASSWORD': settings.PIDMAN_PASSWORD,
+            'PIDMAN_DOMAIN' : settings.PIDMAN_DOMAIN
+            }
+
     def tearDown(self):
         if hasattr(self, '_stored_ead_src'):
             settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
@@ -81,6 +89,10 @@ class BaseAdminViewsTest(TestCase):
         settings.EXISTDB_ROOT_COLLECTION = self.real_collection
         settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection
         settings.EXISTDB_SERVER_URL = self.real_exist_url
+
+            # restore pid config settings
+        for key, val in self._pid_config.iteritems():
+            setattr(settings, key, val)
 
 class AdminViewsTest(BaseAdminViewsTest):
 
@@ -347,7 +359,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(response['Content-Type'], expected, "Expected '%s' but returned '%s' for %s mimetype" % \
                         (expected, response['Content-Type'], prep_xml))
         self.assertEqual(response['Content-Disposition'], "attachment; filename=%s" % filename)
-        #print response
         self.assertContains(response, "xsi:schemaLocation",
                     msg_prefix="response does not lose XSD schema location from original xml")
         self.assertContains(response, "encoding='UTF-8'",
@@ -367,7 +378,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.get(prep_summary, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (following redirects, clean EAD)'
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (following redirects, prep EAD)'
                              % (expected, code, prep_summary))
         (redirect_url, code) = response.redirect_chain[0]
         self.assert_(reverse('fa-admin:index') in redirect_url)
@@ -376,6 +387,28 @@ class AdminViewsTest(BaseAdminViewsTest):
                              % (expected, code, prep_summary))
         self.assertContains(response, "No changes made to <b>%s</b>" % filename)
 
+        # prep an ead that needs an ARK, force ark generation error
+        settings.PIDMAN_PASSWORD = 'totally bogus password'
+        filename = 'bailey807.xml'
+
+        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
+        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
+        response = self.client.get(prep_summary, follow=True)
+        # summary should be 200, display prep error
+        code = response.status_code
+        expected = 200  # final code, after following redirects
+        self.assertEqual(code, expected,
+            'Expected %s but returned %s for %s (following redirects, prep EAD)' \
+             % (expected, code, prep_summary))
+        self.assertContains(response, 'Failed to prep the document')
+        self.assertContains(response, 'There was an error preparing the file')
+
+        response = self.client.get(prep_xml)
+        expected = 500
+        self.assertEqual(response.status_code, expected,
+            'Expected %s but returned %s for %s (prep ead, ARK generation error)' % \
+            (expected, response.status_code, prep_xml))
+        
     def test_prep_badlyformedxml(self):
         # use fixture directory to test publication
         filename = 'badlyformed.xml'

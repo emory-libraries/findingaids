@@ -5,14 +5,13 @@
 {% block content-body %}
 
 {% if errors %}
-<p>Prepared file does not pass checks required for publication!</p>
-<ul>
-{% for err in errors %}
-    <li>{{err}}</li>
-{% empty %}
-    <li>Sanity-check found no errors</li>
-{% endfor %}
-</ul>
+    <p>There was an error preparing the file: either the prep step failed,
+    or the prepared document did not pass publication checks.</p>
+    <ul>
+    {% for err in errors %}
+        <li>{{err}}</li>
+    {% endfor %}
+    </ul>
 {% endif %}
 
 {% if xml_status == 200 %} {# only display diffs / download if prep xml can be generated #}
@@ -32,9 +31,11 @@
 
 {% else %}
 
-<p>There was an error loading the file you selected for preparing; most likely,
-this indicates that the document contains invalid XML.  Please check the file in
-an XML editor and try again.</p>
+<p>There was an error preparing the file you selected.  This means that either
+the original file contains invalid XML, or there was an error generating the ARK
+for this document.  In the case of invalid XML, please check the file in an XML
+editor and try again.   If the error message indicates a connection error
+or an error generating an ARK, please report it.</p>
 
 {% endif %}
 
