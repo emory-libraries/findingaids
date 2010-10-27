@@ -89,7 +89,6 @@ directory will be prepared."""
                 print "Error: failed to load %s (document not well-formed XML?)" \
                             % file
                 errored += 1
-            # FIXME: should we catch UnicodeEncodeError ?
             except Exception, e:
                 # catch any other exceptions
                 print "Error: failed to prep %s : %s" % (file, e)

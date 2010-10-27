@@ -1,5 +1,8 @@
+import cStringIO
 import os
-from shutil import rmtree
+import re
+from shutil import rmtree, copyfile
+import sys
 import tempfile
 from time import sleep
 from urllib2 import HTTPError
@@ -7,6 +10,7 @@ from urllib2 import HTTPError
 from django.test import Client, TestCase
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError
 from django.core.urlresolvers import reverse
 
 from eulcore.django.existdb.db import ExistDB, ExistDBException
@@ -17,6 +21,7 @@ from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 from findingaids.fa_admin import tasks, views, utils
 from findingaids.fa_admin.models import TaskResult
 from findingaids.fa_admin.views import _get_recent_xml_files
+from findingaids.fa_admin.management.commands import prep_ead
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.urls import TITLE_LETTERS
 
@@ -37,16 +42,6 @@ class BaseAdminViewsTest(TestCase):
             os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
     ]}
  
-    # create temporary dirctory with files for testing
-    # (unchanged by tests, so only doing once here instead of in setup)
-    tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
-    tmpfiles = []
-    for num in ['first', 'second', 'third']:
-        tmpfiles.append(tempfile.NamedTemporaryFile(suffix='.xml', prefix=num+'_', dir=tmpdir))
-        sleep(1)        # ensure modification times are different
-    # add a non-xml file
-    nonxml_tmpfile = tempfile.NamedTemporaryFile(suffix='.txt', prefix='nonxml', dir=tmpdir)
-
     db = ExistDB()
 
     def setUp(self):
@@ -80,7 +75,6 @@ class BaseAdminViewsTest(TestCase):
             settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
 
         # clean up temp files & dir
-        # FIXME: this does not seem to be removing the files
         rmtree(self.tmpdir)
 
         # restore existdb settings
@@ -1082,3 +1076,121 @@ class ReloadCachedPdfTestCase(TestCase):
         self.assertRaises(Exception, result.get,
             "when required settings are missing, task raises an Exception")
         
+
+### unit tests for django-admin manage commands
+
+class TestCommand(BaseCommand):
+    # test command class to simplify calling a command as if running from the commandline
+    # base command will set up default args before calling handle method
+    def run_command(self, *args):
+        '''Run the command as if calling from command line by giving a list
+        of command-line arguments, e.g.::
+
+            command.run_command('-n', '-v', '2')
+
+        :param args: list of command-line arguments
+        '''
+        # run from argv expects command, subcommand, then any arguments
+        run_args = ['manage.py', 'command-name']
+        run_args.extend(args)
+        return self.run_from_argv(run_args)
+
+class PrepEadTestCommand(prep_ead.Command, TestCommand):
+    pass
+
+class PrepEadCommandTest(TestCase):
+    def setUp(self):
+        self.command = PrepEadTestCommand()
+        # store settings that may be changed/removed by tests
+        self._ead_src = settings.FINDINGAID_EAD_SOURCE
+        self._existdb_root = settings.EXISTDB_ROOT_COLLECTION
+        self._pidman_pwd = settings.PIDMAN_PASSWORD
+        
+        self.tmpdir = tempfile.mkdtemp(prefix='findingaids-prep_ead-test')
+        settings.FINDINGAID_EAD_SOURCE = self.tmpdir
+
+        settings.PIDMAN_PASSWORD = 'this-better-not-be-a-real-password'
+
+        self.files = {}
+        self.file_sizes = {}    # store file sizes to check modification
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        for file in ['hartsfield558.xml', 'hartsfield558_invalid.xml', 'badlyformed.xml']:
+            # store full path to tmp copy of file
+            self.files[file] = os.path.join(self.tmpdir, file)
+            copyfile(os.path.join(fixture_dir, file), self.files[file])
+            self.file_sizes[file] = os.path.getsize(self.files[file])
+
+    def tearDown(self):
+        # remove any files created in temporary test staging dir
+        rmtree(self.tmpdir)
+        ##for file in os.listdir(self.tmpdir):
+        #    os.unlink(os.path.join(self.tmpdir, file))
+        # remove temporary test staging dir
+        #os.rmdir(self.tmpdir)
+        # restore real settings
+        settings.FINDINGAID_EAD_SOURCE = self._ead_src
+        settings.EXISTDB_ROOT_COLLECTION = self._existdb_root
+        settings.PIDMAN_PASSWORD = self._pidman_pwd
+
+    def test_missing_ead_source_setting(self):
+        del(settings.FINDINGAID_EAD_SOURCE)
+        self.assertRaises(CommandError, self.command.handle, verbosity=0)
+
+    def test_missing_existdb_setting(self):
+        del(settings.EXISTDB_ROOT_COLLECTION)
+        self.assertRaises(CommandError, self.command.handle, verbosity=0)
+
+    def test_prep_all(self):        
+        # capture command output in a stream
+        buffer = cStringIO.StringIO()
+        sys.stdout = buffer
+        # with no filenames - should process all files
+        self.command.run_command('-v', '2')
+        sys.stdout = sys.__stdout__         # restore real stdout
+        output = buffer.getvalue()
+        buffer.close()
+        
+        # badly-formed xml - should be reported
+        self.assert_(re.search(r'^Error.*badlyformed.xml.*not well-formed.*$', output, re.MULTILINE),
+            'prep_ead reports error for non well-formed xml')
+        # invalid - should result in error on attempted ark generation
+        self.assert_(re.search(r'Error: failed to prep .*hartsfield558_invalid.xml', output),
+            'prep_ead reports prep/ark generation error')
+        self.assert_(re.search(r'Updated .*hartsfield558.xml', output),
+            'in verbose mode, prep_ead reports updated document')
+
+        # files with errors should not be modified
+        self.assertEqual(self.file_sizes['hartsfield558_invalid.xml'],
+                        os.path.getsize(self.files['hartsfield558_invalid.xml']),
+                    'in single-file mode, non-specified file not modified by prep_ead script')
+        self.assertEqual(self.file_sizes['badlyformed.xml'],
+                        os.path.getsize(self.files['badlyformed.xml']),
+                    'in single-file mode, non-specified file not modified by prep_ead script')
+
+    def test_prep_single(self):
+        # copy valid file so there are two files that could be changed
+        hfield_copy = os.path.join(self.tmpdir, 'hartsfield558-2.xml')
+        copyfile(os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
+                 hfield_copy)
+        self.file_sizes['hartsfield558-2.xml'] = os.path.getsize(hfield_copy)
+                 
+        # capture output 
+        buffer = cStringIO.StringIO()
+        sys.stdout = buffer
+        # with no filenames - should process all files
+        self.command.run_command('hartsfield558.xml')
+        sys.stdout = sys.__stdout__         # restore real stdout
+        output = buffer.getvalue()
+        buffer.close()
+
+        self.assert_('1 document updated' in output)
+        self.assert_('0 documents unchanged' in output)
+        self.assert_('0 documents with errors' in output)
+
+        # using file-size as a convenient way to check which files were modified
+        self.assertNotEqual(self.file_sizes['hartsfield558.xml'],
+                            os.path.getsize(self.files['hartsfield558.xml']),
+                            'specified file was modified by prep_ead script')
+        self.assertEqual(self.file_sizes['hartsfield558-2.xml'],
+                        os.path.getsize(hfield_copy),
+                    'in single-file mode, non-specified file not modified by prep_ead script')
