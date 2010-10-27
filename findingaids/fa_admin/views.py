@@ -311,7 +311,12 @@ def prepared_eadxml(request, filename):
         # xml is not well-formed : return 500 with error message
         return HttpResponseServerError("Could not load document: %s" % e)
 
-    ead = prep_ead(ead, filename)
+    try:
+        ead = prep_ead(ead, filename)
+    except Exception as e:
+        # FIXME: custom exception type?
+        return HttpResponseServerError(str(e))
+
     prepped_xml = ead.serializeDocument()
 
     response = HttpResponse(prepped_xml, mimetype='application/xml')

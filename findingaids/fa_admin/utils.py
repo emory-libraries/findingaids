@@ -1,11 +1,16 @@
 import os
 from lxml.etree import XMLSyntaxError, XPath, tostring
 import re
+from urllib2 import HTTPError
 
-from django.http import HttpResponseRedirect
+from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.xmlmap.eadmap import EAD_NAMESPACE
+from pidservices.djangowrapper.shortcuts import DjangoPidmanRestClient
+from pidservices.clients import is_ark, parse_ark
+
 from findingaids.fa.models import FindingAid, ID_DELIMITER
 from findingaids.fa.urls import EADID_URL_REGEX, TITLE_LETTERS
 
@@ -217,7 +222,45 @@ def prep_ead(ead, filename):
             for term in ca.terms:
                 term.value = term.value.lstrip()            
 
+    # check that ARK is set correctly (both long and short-form)
+    # - if eadid url is not set or is not an ark, generate an ark
+    if ead.eadid.url is None or not is_ark(ead.eadid.url):
+        ead.eadid.url = generate_ark(ead)
+    # - if eadid identifier is not set or not an ark, calculate short-form ark from eadid url
+    if ead.eadid.identifier is None or not is_ark(ead.eadid.identifier):
+        ark_parts = parse_ark(ead.eadid.url)
+        ead.eadid.identifier = 'ark:/%(naan)s/%(noid)s' % ark_parts
     return ead
+
+def generate_ark(ead):
+    '''Generate an ARK for the specified EAD document.  ARK will be created
+    with a default target of the url for the main page of the specified EAD
+    document in this site.
+
+    :param ead: :class:`findingaids.fa.models.FindingAid` instance
+    :returns: resolvable URL for generated ARK on success
+    '''
+    # catch init error and report simplified error to user
+    try:
+        pidclient = DjangoPidmanRestClient()
+    except RuntimeError:
+        raise Exception("Error initializing PID Manager client; please check site configuration.")
+
+    # check that domain is set
+    if not hasattr(settings, 'PIDMAN_DOMAIN'):
+        raise Exception("Unable to generate ARK: PID manager domain is not configured.")
+
+    ead_url = settings.SITE_BASE_URL.rstrip('/') + reverse('fa:findingaid',
+                                               kwargs={'id' : ead.eadid.value })
+
+    # any error in the pidclient is raised as an HTTPError
+    try:
+        return pidclient.create_ark(settings.PIDMAN_DOMAIN, ead_url,
+                                   name=unicode(ead.unittitle))
+    except HTTPError as err:
+        raise Exception('Error generating ARK: %s' % err)
+
+
 
 def set_series_ids(series, eadid, position):
     """Recursive function to set series and subseries ids.  Series id will be set
