@@ -315,7 +315,7 @@ def prepared_eadxml(request, filename):
         ead = prep_ead(ead, filename)
     except Exception as e:
         # FIXME: custom exception type?
-        return HttpResponseServerError(str(e))
+        return HttpResponseServerError('There was an error prepping the ead: ' + str(e))
 
     prepped_xml = ead.serializeDocument()
 

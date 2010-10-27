@@ -881,6 +881,9 @@ class UtilsTest(TestCase):
         
     def test_prep_ead(self):
         # valid fixtures is an ead with series/subseries, and index
+        # - clear out fixture ark url to trigger generating a new one (simulated)
+        del(self.valid_ead.eadid.url)
+        del(self.valid_ead.eadid.identifier)
         ead = utils.prep_ead(self.valid_ead, self.valid_eadfile)
         self.assert_(isinstance(ead, FindingAid), "prep_ead should return an instance of FindingAid")
         self.assertEqual(u'hartsfield558', ead.eadid.value)
@@ -889,6 +892,8 @@ class UtilsTest(TestCase):
         self.assertEqual(u'hartsfield558_index1', ead.archdesc.index[0].id)
         # ark should be generated and stored in eadid url
         self.assertEqual(MockDjangoPidmanClient.test_ark, ead.eadid.url)
+        # short-form ark should be stored in identifier attribute
+        self.assert_(MockDjangoPidmanClient.test_ark.endswith(ead.eadid.identifier))
 
         # ead with no series
         eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
