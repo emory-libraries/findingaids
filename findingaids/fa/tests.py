@@ -968,7 +968,7 @@ class FaViewsTest(TestCase):
         self.assertEqual(response['Content-Type'], expected,
                         "Expected '%s' but returned '%s' for %s mimetype" % \
                         (expected, response['Content-Type'], xml_url))
-        self.assertContains(response, 'identifier="abbey244.xml')
+        self.assertContains(response, 'identifier="ark:/25593/1fx')
 
         # load httpresponse body into an XmlObject to compare with findingaid doc
         ead = load_xmlobject_from_string(response.content)
