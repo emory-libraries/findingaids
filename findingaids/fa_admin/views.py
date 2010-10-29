@@ -1,13 +1,12 @@
 import os
 import glob
-
 import difflib
+import logging
 from lxml.etree import XMLSyntaxError
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
 from django.conf import settings
 from django.contrib import messages
-#from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth.models import User
@@ -20,6 +19,7 @@ from django.views.decorators.cache import cache_page
 from eulcore.django.auth import permission_required_with_403
 from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.django.http import HttpResponseSeeOtherRedirect
+from eulcore.django.log import message_logging
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.existdb.exceptions import DoesNotExist
 
@@ -28,7 +28,7 @@ from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryse
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
 from findingaids.fa_admin.models import TaskResult, EadFile
 from findingaids.fa_admin.tasks import reload_cached_pdf
-from findingaids.fa_admin.utils import check_ead, check_eadxml, prep_ead
+from findingaids.fa_admin import utils
 
 @login_required
 def main(request):
@@ -118,8 +118,8 @@ def _prepublication_check(request, filename, mode='publish', xml=None):
     Pre-publication check logic common to :meth:`publish` and :meth:`preview`.
 
     Generates a full path to the file in the configured EAD source directory,
-    and the expected published location in eXist, and then runs :meth:`check_ead`
-    to check the xml for errors.
+    and the expected published location in eXist, and then runs
+    :meth:`~findingaids.fa_admin.utils.check_ead` to check the xml for errors.
 
     If there are errors, will generate an error response that can be displayed.
 
@@ -138,7 +138,7 @@ def _prepublication_check(request, filename, mode='publish', xml=None):
     fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
     # full path in exist db collection
     dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
-    errors = check_ead(fullpath, dbpath, xml)
+    errors = utils.check_ead(fullpath, dbpath, xml)
     if errors:
         ok = False
         response = render_to_response('fa_admin/publish-errors.html',
@@ -311,11 +311,12 @@ def prepared_eadxml(request, filename):
         # xml is not well-formed : return 500 with error message
         return HttpResponseServerError("Could not load document: %s" % e)
 
-    try:
-        ead = prep_ead(ead, filename)
-    except Exception as e:
-        # any exception on prep is most likely ark generation
-        return HttpResponseServerError('Failed to prep the document: ' + str(e))
+    with message_logging(request, 'findingaids.fa_admin.utils', logging.INFO):
+        try:
+            ead = utils.prep_ead(ead, filename)
+        except Exception as e:
+            # any exception on prep is most likely ark generation
+            return HttpResponseServerError('Failed to prep the document: ' + str(e))
 
     prepped_xml = ead.serializeDocument()
 
@@ -358,7 +359,7 @@ def prepared_ead(request, filename, mode):
             return HttpResponse(changes)
         elif mode == 'summary':
             # prepared EAD should pass sanity checks required for publication
-            errors = check_eadxml(ead)
+            errors = utils.check_eadxml(ead)
             changes = list(difflib.unified_diff(original_xml.split('\n'), prep_xml.split('\n')))
             if not changes:
                 messages.info(request, 'No changes made to <b>%s</b>; EAD is already prepared.' % filename)
