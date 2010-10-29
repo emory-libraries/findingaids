@@ -1,4 +1,5 @@
 import os
+import logging
 from lxml.etree import XMLSyntaxError, XPath, tostring
 import re
 from urllib2 import HTTPError
@@ -16,6 +17,9 @@ from findingaids.fa.urls import EADID_URL_REGEX, TITLE_LETTERS
 
 # pre-compile an xpath to easily get node names without EAD namespace
 local_name = XPath('local-name()')
+
+# init logger for this module
+logger = logging.getLogger(__name__)
 
 def check_ead(filename, dbpath, xml=None):
     """
@@ -250,13 +254,39 @@ def generate_ark(ead):
     if not hasattr(settings, 'PIDMAN_DOMAIN'):
         raise Exception("Unable to generate ARK: PID manager domain is not configured.")
 
+    # generate absolute url for ARK target
     ead_url = settings.SITE_BASE_URL.rstrip('/') + reverse('fa:findingaid',
                                                kwargs={'id' : ead.eadid.value })
 
-    # any error in the pidclient is raised as an HTTPError
     try:
+        # search for an existing ARK first, in case one was already created for this ead
+        # limit search by the configured domain; look for an ARK with the expected target url
+        found = pidclient.search_pids(type='ark', target=ead_url,
+                                            domain_uri=settings.PIDMAN_DOMAIN)
+        # at least one match
+        if found and found['results_count']:
+            if found['results_count'] > 1:
+                # uh-oh - this shouldn't happen; warn the user
+                logger.warning("Found %d ARKs when searching for an existing ARK for %s" \
+                    % (found['results_count'], ead.eadid.value))
+
+            # use existing pid
+            pid = found['results'][0]
+            # find the unqualified target and get the access uri - primary resolvable ark url
+            for t in pid['targets']:
+                if 'qualifier' not in t or not t['qualifier']:
+                    ark_url = t['access_uri']
+
+            logger.info("Using existing ARK %s for %s" % (ark_url, ead.eadid.value))
+
+            # what if no default target is not found? (unlikely but possible...)
+            return ark_url
+
+        # if no matches found, create a new ark
         return pidclient.create_ark(settings.PIDMAN_DOMAIN, ead_url,
                                    name=unicode(ead.unittitle))
+
+    # any error in the pidclient is raised as an HTTPError
     except HTTPError as err:
         raise Exception('Error generating ARK: %s' % err)
 
