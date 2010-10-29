@@ -26,7 +26,7 @@ from findingaids.fa.urls import TITLE_LETTERS
 from findingaids.fa_admin import tasks, views, utils
 from findingaids.fa_admin.models import TaskResult
 from findingaids.fa_admin.views import _get_recent_xml_files
-from findingaids.fa_admin.management.commands import prep_ead
+from findingaids.fa_admin.management.commands import prep_ead as prep_ead_cmd
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient, MockHttplib
 
 ### unit tests for findingaids.fa_admin.views
@@ -1186,7 +1186,7 @@ class TestCommand(BaseCommand):
         run_args.extend(args)
         return self.run_from_argv(run_args)
 
-class PrepEadTestCommand(prep_ead.Command, TestCommand):
+class PrepEadTestCommand(prep_ead_cmd.Command, TestCommand):
     pass
 
 class PrepEadCommandTest(TestCase):
@@ -1202,6 +1202,10 @@ class PrepEadCommandTest(TestCase):
 
         settings.PIDMAN_PASSWORD = 'this-better-not-be-a-real-password'
 
+        # temporarily replace pid client with mock for testing
+        self._django_pid_client = prep_ead_cmd.utils.DjangoPidmanRestClient
+        prep_ead_cmd.utils.DjangoPidmanRestClient = MockDjangoPidmanClient
+
         self.files = {}
         self.file_sizes = {}    # store file sizes to check modification
         fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
@@ -1214,14 +1218,13 @@ class PrepEadCommandTest(TestCase):
     def tearDown(self):
         # remove any files created in temporary test staging dir
         rmtree(self.tmpdir)
-        ##for file in os.listdir(self.tmpdir):
-        #    os.unlink(os.path.join(self.tmpdir, file))
-        # remove temporary test staging dir
-        #os.rmdir(self.tmpdir)
         # restore real settings
         settings.FINDINGAID_EAD_SOURCE = self._ead_src
         settings.EXISTDB_ROOT_COLLECTION = self._existdb_root
         settings.PIDMAN_PASSWORD = self._pidman_pwd
+
+        MockDjangoPidmanClient.search_result = MockDjangoPidmanClient.search_result_nomatches
+        prep_ead_cmd.utils.DjangoPidmanRestClient = self._django_pid_client
 
     def test_missing_ead_source_setting(self):
         del(settings.FINDINGAID_EAD_SOURCE)
@@ -1231,15 +1234,21 @@ class PrepEadCommandTest(TestCase):
         del(settings.EXISTDB_ROOT_COLLECTION)
         self.assertRaises(CommandError, self.command.handle, verbosity=0)
 
-    def test_prep_all(self):        
+    def test_prep_all(self):
+        # force ark generation error
+        MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
+        
         # capture command output in a stream
         buffer = cStringIO.StringIO()
         sys.stdout = buffer
-        # with no filenames - should process all files
-        self.command.run_command('-v', '2')
-        sys.stdout = sys.__stdout__         # restore real stdout
+        sys.stderr = buffer
+        try:
+            # with no filenames - should process all files
+            self.command.run_command('-v', '2')
+        finally:
+            sys.stdout = sys.__stdout__         # restore real stdout
+            sys.stderr = sys.__stderr__   
         output = buffer.getvalue()
-        buffer.close()
         
         # badly-formed xml - should be reported
         self.assert_(re.search(r'^Error.*badlyformed.xml.*not well-formed.*$', output, re.MULTILINE),
@@ -1268,13 +1277,14 @@ class PrepEadCommandTest(TestCase):
         # capture output 
         buffer = cStringIO.StringIO()
         sys.stdout = buffer
+        sys.stderr = buffer
         try:
-            # with no filenames - should process all files
+            # process all files
             self.command.run_command('hartsfield558.xml')
         finally:
             sys.stdout = sys.__stdout__         # restore real stdout
+            sys.stderr = sys.__stderr__
         output = buffer.getvalue()
-        buffer.close()
 
         self.assert_('1 document updated' in output)
         self.assert_('0 documents unchanged' in output)
@@ -1287,3 +1297,31 @@ class PrepEadCommandTest(TestCase):
         self.assertEqual(self.file_sizes['hartsfield558-2.xml'],
                         os.path.getsize(hfield_copy),
                     'in single-file mode, non-specified file not modified by prep_ead script')
+
+    def test_prep_ark_messages(self):
+        MockDjangoPidmanClient.search_result = {
+            'results_count': 2,
+            'results': [
+                {
+                    'pid': '16x3n',
+                    'targets': [{'access_uri': 'http://pid/ark:/123/34c'}, ]
+                },
+            ]
+        }
+
+        # run on a single file where ark generation will be attempted
+        buffer = cStringIO.StringIO()
+        sys.stdout = buffer
+        sys.stderr = buffer
+        try:
+            self.command.run_command('hartsfield558_invalid.xml')
+        finally:
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
+
+        output = buffer.getvalue()
+
+        #print '** DEBUG output is ', output
+        self.assert_('WARNING: Found 2 ARKs'  in output)
+        self.assert_('INFO: Using existing ARK' in output)
+

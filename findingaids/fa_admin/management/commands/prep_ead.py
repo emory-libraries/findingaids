@@ -1,4 +1,5 @@
 import glob
+import logging
 from lxml.etree import XMLSyntaxError
 import os
 
@@ -9,7 +10,7 @@ from eulcore.django.existdb import ExistDB
 from eulcore.xmlmap.core import load_xmlobject_from_file
 
 from findingaids.fa.models import FindingAid
-from findingaids.fa_admin.utils import prep_ead, check_ead
+from findingaids.fa_admin import utils
 
 class Command(BaseCommand):
     """Prepare all or specified EAD xml files in the configured source directory.
@@ -26,11 +27,15 @@ directory will be prepared."""
 
     args = '[<filename filename ... >]'
     
+    # django default verbosity level options --  1 = normal, 0 = minimal, 2 = all
+    v_normal = 1
+    v_all = 2
+
     def handle(self, *args, **options):
-        verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
-        v_normal = 1
-        v_all = 2
-        
+        verbosity = int(options['verbosity'])        
+
+        self._setup_logging(verbosity)
+       
         # check for required settings
         if not hasattr(settings, 'EXISTDB_ROOT_COLLECTION') or not settings.EXISTDB_ROOT_COLLECTION:
             raise CommandError("EXISTDB_ROOT_COLLECTION setting is missing")
@@ -39,7 +44,7 @@ directory will be prepared."""
             raise CommandError("FINDINGAID_EAD_SOURCE setting is missing")
             return
 
-        if verbosity == v_all:
+        if verbosity == self.v_all:
             print "Preparing documents from configured EAD source directory: %s" \
                     % settings.FINDINGAID_EAD_SOURCE
 
@@ -58,14 +63,14 @@ directory will be prepared."""
             try:
                 ead = load_xmlobject_from_file(file, FindingAid)
                 orig_xml = ead.serializeDocument(pretty=True)
-                ead = prep_ead(ead, file)
+                ead = utils.prep_ead(ead, file)
                 # sanity check before saving
                 dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + os.path.basename(file)
-                errors = check_ead(file, dbpath, xml=ead.serializeDocument())
+                errors = utils.check_ead(file, dbpath, xml=ead.serializeDocument())
                 if errors:
                     errored += 1
                     print "Prepared EAD for %s does not pass sanity checks, not saving." % file
-                    if verbosity >= v_normal:
+                    if verbosity >= self.v_normal:
                         print "Errors found:"
                         for err in errors:
                             # some errors include a list of error instances - display nicely
@@ -75,13 +80,13 @@ directory will be prepared."""
                             else:
                                 print "  %s" % err
                 elif orig_xml == ead.serializeDocument(pretty=True):
-                    if verbosity >= v_normal:
+                    if verbosity >= self.v_normal:
                         print "No changes made to %s" % file
                     unchanged += 1
                 else:
                     with open(file, 'w') as f:
                         ead.serializeDocument(f, pretty=True)
-                    if verbosity >= v_normal:
+                    if verbosity >= self.v_normal:
                         print "Updated %s" % file
                     updated += 1
             except XMLSyntaxError, e:
@@ -98,4 +103,23 @@ directory will be prepared."""
         print "%d document%s updated" % (updated, 's' if updated != 1 else '')
         print "%d document%s unchanged" % (unchanged, 's' if unchanged != 1 else '')
         print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
+
+        # remove the local log handler
+        self.logger.removeHandler(self._sh)
             
+
+    def _setup_logging(self, verbosity):
+        # generate ark method logs warnings & info if existing ARKs are found
+        # make sure they are displayed, as appropriate to verbosity setting
+
+        # If default logger is configured to output to console and level is info
+        # or warning, these may be double-logged...
+        # not aware of any good solution to that problem
+        self.logger = logging.getLogger('findingaids.fa_admin.utils')
+        self._sh = logging.StreamHandler()
+        self._sh.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+        if verbosity >= self.v_normal:
+            self._sh.setLevel(logging.INFO)
+        else:
+            self._sh.setLevel(logging.WARNING)
+        self.logger.addHandler(self._sh)
