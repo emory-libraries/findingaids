@@ -83,11 +83,6 @@ class BaseAdminViewsTest(TestCase):
         self._django_pid_client = views.utils.DjangoPidmanRestClient
         views.utils.DjangoPidmanRestClient = MockDjangoPidmanClient
 
-         # set root logger so warnings/info messages will display
-        self.root_logger = logging.getLogger()
-        self._log_level = self.root_logger.getEffectiveLevel()
-        self.root_logger.setLevel(logging.INFO)
-
     def tearDown(self):
         if hasattr(self, '_stored_ead_src'):
             settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
@@ -106,9 +101,6 @@ class BaseAdminViewsTest(TestCase):
 
         MockDjangoPidmanClient.search_result = MockDjangoPidmanClient.search_result_nomatches
         views.utils.DjangoPidmanRestClient = self._django_pid_client
-
-        # restore configured log level
-        self.root_logger.setLevel(self._log_level)
 
 class AdminViewsTest(BaseAdminViewsTest):
 
@@ -825,11 +817,6 @@ class UtilsTest(TestCase):
             'fixtures', 'hartsfield558_invalid.xml')
         self.invalid_ead = load_xmlobject_from_file(self.invalid_eadfile, FindingAid)
 
-        # set root logger so warnings/info messages will display
-        self.root_logger = logging.getLogger()
-        self._log_level = self.root_logger.getEffectiveLevel()
-        self.root_logger.setLevel(logging.INFO)
-
     def tearDown(self):
         # ensure test file gets removed even if tests fail
         try:
@@ -844,9 +831,6 @@ class UtilsTest(TestCase):
         # restore pid config settings
         for key, val in self._pid_config.iteritems():
             setattr(settings, key, val)
-
-         # restore configured log level
-        self.root_logger.setLevel(self._log_level)
 
     def test_check_ead(self):
         # check valid EAD - no errors  -- good fixture, should pass all tests
@@ -1231,11 +1215,6 @@ class PrepEadCommandTest(TestCase):
             copyfile(os.path.join(fixture_dir, file), self.files[file])
             self.file_sizes[file] = os.path.getsize(self.files[file])
 
-        # set root logger so warnings/info messages will display
-        self.root_logger = logging.getLogger()
-        self._log_level = self.root_logger.getEffectiveLevel()
-        self.root_logger.setLevel(logging.INFO)
-
     def tearDown(self):
         # remove any files created in temporary test staging dir
         rmtree(self.tmpdir)
@@ -1246,9 +1225,6 @@ class PrepEadCommandTest(TestCase):
 
         MockDjangoPidmanClient.search_result = MockDjangoPidmanClient.search_result_nomatches
         prep_ead_cmd.utils.DjangoPidmanRestClient = self._django_pid_client
-
-        # restore configured log level
-        self.root_logger.setLevel(self._log_level)
 
     def test_missing_ead_source_setting(self):
         del(settings.FINDINGAID_EAD_SOURCE)

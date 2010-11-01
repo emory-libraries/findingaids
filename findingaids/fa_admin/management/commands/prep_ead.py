@@ -119,7 +119,7 @@ directory will be prepared."""
         self._sh = logging.StreamHandler()
         self._sh.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
         if verbosity >= self.v_normal:
-            self._sh.setLevel(logging.INFO)
+            self.logger.setLevel(logging.INFO)
         else:
-            self._sh.setLevel(logging.WARNING)
+            self.logger.setLevel(logging.WARNING)
         self.logger.addHandler(self._sh)
