@@ -175,8 +175,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         fields["language"] = set(self.profiledesc.language_codes)
         fields["subject"] = set(self.dc_subjects)
         fields["contributor"] = set(self.dc_contributors)
-        # TODO: use ARKs for dc:identifier when we have them
-        #fields["identifier"] = set([self.eadid])
+        fields["identifier"] = set([self.eadid.url])
         
         return fields
 
