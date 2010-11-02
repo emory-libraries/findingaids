@@ -108,8 +108,7 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_("Irish drama--20th century." in fields["subject"])
         self.assert_("Theater--Ireland--20th century." in fields["subject"])
         self.assert_("Dublin (Ireland)" in fields["subject"])
-        # TODO: dc:identifier will be ARK, once we add them
-        #self.assert_("abbey244" in fields["identifier"])
+        self.assert_("http://pidtest.library.emory.edu/ark:/25593/1fx" in fields["identifier"])
 
         fields = self.findingaid['bailey807'].dc_fields()
         self.assert_("Bailey, I. G. (Issac George), 1847-1914." in fields["contributor"])
@@ -291,8 +290,14 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<meta name="DC.subject" content="Irish drama--20th century." />')
         self.assertContains(response, '<meta name="DC.subject" content="Theater--Ireland--20th century." />')
         self.assertContains(response, '<meta name="DC.subject" content="Dublin (Ireland)" />')
-        #identifier - TODO (use ARK)
-        #self.assertContains(response, '<meta name="DC.identifier" content="abbey244" />')
+        #DC.identifer
+        self.assertContains(response, '<meta name="DC.identifier" content="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
+
+        #Peralink with bookmark rel and ARK
+        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">Peralink</a>')
+
+        #link in header with bookmark rel and ARK
+        self.assertContains(response, '<link rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
 
         response = self.client.get(reverse('fa:findingaid', kwargs = {'id': 'bailey807'}))
         #title
