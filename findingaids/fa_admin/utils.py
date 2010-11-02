@@ -165,6 +165,18 @@ def check_eadxml(ead):
                 if re.match('\s+', term.value):
                     errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
                                  % (term.value, local_name(term.node)))
+    #Check for ARK in eadid.url
+    if ead.eadid.url is None or not is_ark(ead.eadid.url):
+        errors.append("eadid '%s' ARK not found in eadid.url" % ead.eadid.value)
+
+    #Check for ARK in identifer
+    if ead.eadid.identifier is None or not is_ark(ead.eadid.identifier):
+        errors.append("eadid '%s' ARK not found in eadid.identifier" % ead.eadid.value)
+
+    if ead.eadid.url is not None and ead.eadid.identifier is not None and not ead.eadid.url.endswith(ead.eadid.identifier):
+        errors.append("eadid '%s' eadid.url does not contain eadid.identifie" % ead.eadid.value)
+
+
     return errors
    
 def check_series_ids(series):

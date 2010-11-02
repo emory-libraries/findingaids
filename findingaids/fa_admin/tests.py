@@ -892,6 +892,12 @@ class UtilsTest(TestCase):
         self.assert_("eadid '%s' does not match site URL regular expression" % ead.eadid.value
                     in errors, 'eadid regex error reported')
 
+        #ARK values
+        self.assert_("eadid '%s' ARK not found in eadid.url" % ead.eadid.value
+                    in errors, 'eadid ark not in url')
+        self.assert_("eadid '%s' ARK not found in eadid.identifier" % ead.eadid.value
+                    in errors, 'eadid ark not in identifier')
+
         # - list title first letter regex
         # simulate non-whitespace, non-alpha first letter in list title
         ead.list_title.node.text = "1234" # list title is not normally settable; overriding for test
