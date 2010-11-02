@@ -22,7 +22,9 @@ Upgrade notes
    - PIDMAN_PASSWORD
    - PIDMAN_DOMAIN
 
-2. step two...
+2. Run the following manage commands from the findingaids/findingaids directory:
+   - python ./manage.py prep_ead
+   - python ./manage.py load_ead
 
 
 
