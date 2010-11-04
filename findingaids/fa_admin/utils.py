@@ -165,16 +165,20 @@ def check_eadxml(ead):
                 if re.match('\s+', term.value):
                     errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
                                  % (term.value, local_name(term.node)))
-    #Check for ARK in eadid.url
+
+    # eadid url should contain resolvable ARK
     if ead.eadid.url is None or not is_ark(ead.eadid.url):
-        errors.append("eadid '%s' ARK not found in eadid.url" % ead.eadid.value)
+        errors.append("eadid url is either not set or not an ARK")
 
-    #Check for ARK in identifer
+    # eadid identifier should contain short-form ARK
     if ead.eadid.identifier is None or not is_ark(ead.eadid.identifier):
-        errors.append("eadid '%s' ARK not found in eadid.identifier" % ead.eadid.value)
+        errors.append("eadid identifier is either not set or not an ARK")
 
-    if ead.eadid.url is not None and ead.eadid.identifier is not None and not ead.eadid.url.endswith(ead.eadid.identifier):
-        errors.append("eadid '%s' eadid.url does not contain eadid.identifie" % ead.eadid.value)
+    # short- and long-form ARKs should match each other
+    if ead.eadid.url is not None and ead.eadid.identifier is not None and \
+        not ead.eadid.url.endswith(ead.eadid.identifier):
+        errors.append("eadid url and identifier do not match: url '%s' should end with identifier '%s'" \
+                     % (ead.eadid.url, ead.eadid.identifier))
 
 
     return errors
