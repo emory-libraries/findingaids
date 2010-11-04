@@ -61,6 +61,10 @@ PIDMAN_USER = '' # Username for authentication to the pidman app.
 PIDMAN_PASSWORD = '' # Pasword for username above.
 PIDMAN_DOMAIN = ''      # PID manager domain, in this format: https://pid.emory.edu/domains/1/
 
+# configure an HTTP PROXY to enable lxml to cache XML Schemas (e.g., EAD XSD)
+import os
+os.putenv('HTTP_PROXY', 'http://localhost:3128/')  # local squid proxy on default port
+
 # local, full-path location for finding aids to be loaded to eXist via admin interface
 FINDINGAID_EAD_SOURCE= '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'
 
