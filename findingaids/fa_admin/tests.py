@@ -892,11 +892,35 @@ class UtilsTest(TestCase):
         self.assert_("eadid '%s' does not match site URL regular expression" % ead.eadid.value
                     in errors, 'eadid regex error reported')
 
-        #ARK values
-        self.assert_("eadid '%s' ARK not found in eadid.url" % ead.eadid.value
+        #ARK in url and identifier not set or invalid
+        self.assert_("eadid url is either not set or not an ARK"
                     in errors, 'eadid ark not in url')
-        self.assert_("eadid '%s' ARK not found in eadid.identifier" % ead.eadid.value
+        self.assert_("eadid identifier is either not set or not an ARK"
                     in errors, 'eadid ark not in identifier')
+
+        #valid ARKs in url and identifier but do not match
+        ark1 = "http://testpid.library.emory.edu/ark:/25593/1234"
+        ark1_short = "ark:/25593/1234"
+        ark2_short = "ark:/25593/567"
+        ead.eadid.url = ark1
+        ead.eadid.identifier =  ark2_short
+        errors = utils.check_eadxml(ead)
+        
+        self.assert_("eadid url is either not set or not an ARK"
+                    not in errors, 'valid eadid ark set in url')
+        self.assert_("eadid identifier is either not set or not an ARK"
+                    not in errors, 'valid eadid ark set in identifier')
+
+        self.assert_("eadid url and identifier do not match: url '%s' should end with identifier '%s'" % (ark1, ark2_short)
+                    in errors, 'eadid url and  identifier do not march')
+
+        #Change url  and identifier to match
+        ead.eadid.url = ark1
+        ead.eadid.identifier =  ark1_short
+        errors = utils.check_eadxml(ead)
+
+        self.assert_("eadid url and identifier do not match: url '%s' should end with identifier '%s'" % (ark1, ark1_short)
+                    not in errors, 'eadid url and  identifier march')
 
         # - list title first letter regex
         # simulate non-whitespace, non-alpha first letter in list title
