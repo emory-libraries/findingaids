@@ -293,8 +293,8 @@ class FaViewsTest(TestCase):
         #DC.identifer
         self.assertContains(response, '<meta name="DC.identifier" content="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
 
-        #Peralink with bookmark rel and ARK
-        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">Peralink</a>')
+        #Permalink with bookmark rel and ARK
+        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">Permalink</a>')
 
         #link in header with bookmark rel and ARK
         self.assertContains(response, '<link rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
