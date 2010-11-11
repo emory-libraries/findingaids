@@ -4,7 +4,7 @@ TITLE_LETTERS = '[a-zA-Z]'
 
 title_urlpatterns = patterns('findingaids.fa.views',
     url('^$', 'browse_titles', name='browse-titles'),
-    url(r'^(?P<letter>%s)$' % TITLE_LETTERS, 'titles_by_letter', name='titles-by-letter')
+    url(r'^(?P<letter>%s)/$' % TITLE_LETTERS, 'titles_by_letter', name='titles-by-letter')
 )
 
 # patterns for ead document id and series id
