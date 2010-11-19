@@ -168,11 +168,13 @@ def check_eadxml(ead):
 
     # eadid url should contain resolvable ARK
     if ead.eadid.url is None or not is_ark(ead.eadid.url):
-        errors.append("eadid url is either not set or not an ARK")
+        errors.append("eadid url is either not set or not an ARK. " +
+            "To correct, run the prep process again.")
 
     # eadid identifier should contain short-form ARK
     if ead.eadid.identifier is None or not is_ark(ead.eadid.identifier):
-        errors.append("eadid identifier is either not set or not an ARK")
+        errors.append("eadid identifier is either not set or not an ARK" +
+            "To correct, run the prep process again.")
 
     # short- and long-form ARKs should match each other
     if ead.eadid.url is not None and ead.eadid.identifier is not None and \

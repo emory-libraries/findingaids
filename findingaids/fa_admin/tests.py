@@ -893,9 +893,11 @@ class UtilsTest(TestCase):
                     in errors, 'eadid regex error reported')
 
         #ARK in url and identifier not set or invalid
-        self.assert_("eadid url is either not set or not an ARK"
+        self.assert_("eadid url is either not set or not an ARK. " +
+            "To correct, run the prep process again."
                     in errors, 'eadid ark not in url')
-        self.assert_("eadid identifier is either not set or not an ARK"
+        self.assert_("eadid identifier is either not set or not an ARK" +
+            "To correct, run the prep process again."
                     in errors, 'eadid ark not in identifier')
 
         #valid ARKs in url and identifier but do not match
@@ -906,9 +908,11 @@ class UtilsTest(TestCase):
         ead.eadid.identifier =  ark2_short
         errors = utils.check_eadxml(ead)
         
-        self.assert_("eadid url is either not set or not an ARK"
+        self.assert_("eadid url is either not set or not an ARK. " +
+            "To correct, run the prep process again."
                     not in errors, 'valid eadid ark set in url')
-        self.assert_("eadid identifier is either not set or not an ARK"
+        self.assert_("eadid identifier is either not set or not an ARK" +
+            "To correct, run the prep process again."
                     not in errors, 'valid eadid ark set in identifier')
 
         self.assert_("eadid url and identifier do not match: url '%s' should end with identifier '%s'" % (ark1, ark2_short)
