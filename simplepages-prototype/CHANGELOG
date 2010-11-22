@@ -6,6 +6,17 @@ Aids application.  New features in each version should be listed, with
 any necessary information about installation, upgrade, or deployment
 notes.
 
+0.5b - Simplepages Prototype
+----------------------------
+
+Deploy Notes
+^^^^^^^^^^^^
+
+1. Run ``python manage.py syncdb`` to ensure all simple-pages
+default content pages are created.
+
+
+
 0.4 Persistent IDs
 ------------------
 

@@ -13,9 +13,11 @@
 
 {% load eulcore_tags %}
 {% block navbar-items %}
-        <li><a href="{% url fa:search %}" class="{% activebase request '^/search' %}">search</a></li>
-        <li><a>collections</a></li>
-        <li><a href="/content/about">About</a></li>
+        <li><a href="{% url fa:search %}" class="{% activebase request '^/search' %}">Search</a></li>
+        <li><a href="{% url simplepage:viewpage 'request-materials/' %}">Request Materials</a></li>
+        <li><a href="{% url simplepage:viewpage 'collection-news/' %}">Collection News</a></li>
+        <li><a href="{% url simplepage:viewpage 'visit/' %}">Visit</a></li>
+        <li><a href="{% url simplepage:viewpage 'help/' %}">Help</a></li>
 {% endblock %}
 {% block admin-url %}{% url fa-admin:index %}{% endblock %}
 
