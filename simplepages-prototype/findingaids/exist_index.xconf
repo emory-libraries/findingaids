@@ -1,0 +1,54 @@
+<collection xmlns="http://exist-db.org/collection-config/1.0">
+    <validation mode="yes" />  <!-- configure exist to validate at load time -->
+    <index xmlns:ead="urn:isbn:1-931666-22-9">
+	    <!-- Disable the standard full text index -->
+        <fulltext default="none" attributes="false"/>
+	    <!-- configure Lucene index -->
+        <lucene>
+            <analyzer class="org.apache.lucene.analysis.standard.StandardAnalyzer"/>
+            <!-- index everything for full-text keyword search at top-level  -->
+            <text qname="ead:ead" boost="0.5">
+                <ignore qname="ead:publicationstmt"/>
+                <ignore qname="ead:profiledesc"/>
+                <ignore qname="ead:physdesc"/>
+                <ignore qname="ead:langmaterial"/>
+                <ignore qname="ead:repository"/>
+                <ignore qname="ead:acqinfo"/>
+                <ignore qname="ead:accessrestrict"/>
+                <ignore qname="ead:userestrict"/>
+                <ignore qname="ead:prefercite"/>
+                <ignore qname="ead:altformavail"/>
+                <ignore qname="ead:processinfo"/>
+                <ignore qname="ead:arrangement"/>
+                <ignore qname="ead:otherfindaid"/>
+                <ignore qname="ead:separatedmaterial"/>
+                <ignore qname="ead:relatedmaterial"/>
+                <ignore qname="ead:bibliography"/>
+                <ignore qname="ead:container"/>                
+            </text>
+
+            <!-- also retrieving at these levels with full-text highlighting -->
+            <text qname="ead:c01"/>
+            <text qname="ead:c02"/>
+            <text qname="ead:c03"/>
+            <text qname="ead:c04"/>
+            <text qname="ead:index"/>
+
+            <!-- range index on list title fields -->
+            <create path="ead:archdesc/ead:did/ead:unittitle" type="xs:string"/>
+            <create path="ead:archdesc/ead:did/ead:origination/*" type="xs:string"/>
+
+            <!-- boost more important fields -->
+            <text qname="ead:origination" boost="1.5"/>
+            <text qname="ead:titleproper" boost="2.0"/>
+            <!-- titleproper basically equivalent to archdesc/did/unittitle,
+                 but unittitle is used throughout EAD -->
+            <text qname="ead:abstract" boost="1.5"/>
+            <text qname="ead:bioghist" boost="1.2"/>
+            <text qname="ead:scopecontent" boost="1.2"/>
+            <text qname="ead:controlaccess" boost="1.7"/>
+
+            <text qname="ead:subarea" />
+        </lucene>
+    </index>
+</collection>

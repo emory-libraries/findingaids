@@ -1,0 +1,42 @@
+{% extends "fa_admin/base.html" %}
+{% block page-subtitle %}: Prepared EAD for {{ filename }}{% endblock %}
+{% block content-title %}Prepared EAD for {{ filename }}{% endblock %}
+
+{% block content-body %}
+
+{% if errors %}
+    <p>There was an error preparing the file: either the prep step failed,
+    or the prepared document did not pass publication checks.</p>
+    <ul>
+    {% for err in errors %}
+        <li>{{err}}</li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+{% if xml_status == 200 %} {# only display diffs / download if prep xml can be generated #}
+<p><a href="{% url fa-admin:prep-ead-diff filename %}" target="_blank">View file differences line by line.</a></p>
+
+<div class="diff">
+{% for c in changes %}        
+  <p {% if c|first == "-" %}class="removed"{% endif %}{% if c|first == "+" %}class="added"{% endif %}>{{ c }}</p>  
+{% endfor %}
+</div>
+
+<hr/> {# provide a link to prep xml after differences have been reviewed #}
+<p><a href="{% url fa-admin:prep-ead filename %}" class="admin-action">DOWNLOAD</a></p>
+
+<p>Download and save the the prepared version of {{ filename }}.<br/>
+    <i>Recommended:</i> right-click and choose <i>Save link as...</i>.</p>
+
+{% else %}
+
+<p>There was an error preparing the file you selected.  This means that either
+the original file contains invalid XML, or there was an error generating the ARK
+for this document.  In the case of invalid XML, please check the file in an XML
+editor and try again.   If the error message indicates a connection error
+or an error generating an ARK, please report it.</p>
+
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,38 @@
+{# expects FindingAid component as series #}
+{% load ead %}
+
+{% if series.c|length %}
+  <table class="box-folder">
+    <col width="7%" valign="top" align="left"/>    {# column width needed for XSL-FO/PDF #}
+    <col width="7%" valign="top" align="left"/>
+    <col width="86%" valign="top" align="left"/>
+    {% for component in series.c %}
+        {# display box/folder heading once before first item in the series #}
+        {% if forloop.first  %}
+          <tr>
+            <th class="bf">Box</th>
+             <th class="bf">Folder</th>
+             <th class="content">Content</th>          
+           </tr>
+         {% endif %}
+
+       {% spaceless %}
+        <tr {% if not component.did.container %} class="section" {% endif %} >
+            {% for container in component.did.container %}
+            {# formatting assumes 2 containers; if only one, add a column span #}
+            <td class="bf" {% if component.did.container|length = 1 %}colspan="2"{% endif%}>
+                {{ container }}
+            </td>
+            {% endfor %}       
+            {# component with no container currently indicates a section heading #}
+        {% endspaceless %} {# NOTE: no spaceless for content: loses spaces between highlighted words #}
+            <td {% if not component.did.container %}colspan="3"{% else %}class="content"{% endif %}>
+                {{ component.did.unittitle|format_ead }}
+                {{ component.did.physdesc|default:'' }}
+                {{ component.did.abstract|format_ead|default:'' }}
+                {{ component.did.note|format_ead|default:'' }}
+            </td>
+        </tr>
+    {% endfor %}
+  </table>
+{% endif %}

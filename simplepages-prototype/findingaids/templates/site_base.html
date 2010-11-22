@@ -1,0 +1,52 @@
+{% extends "genlib_templates/bluegray_site_base.xhtml" %}
+
+{% block page-title %}Finding Aids {% block page-subtitle %}: Home{% endblock %}{% endblock %}
+
+{% block style %}
+    {{ block.super }}
+    {% comment %}Place Local changes, modifications and overrisdes in your local.css file.{% endcomment %}
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}/style/local.css" />
+{% endblock %}
+
+{% block site-name %}Finding Aids{% endblock %}
+{% block site-slogan %}Find Manuscripts &amp; Archives{% endblock %}
+
+{% load eulcore_tags %}
+{% block navbar-items %}
+        <li><a href="{% url fa:search %}" class="{% activebase request '^/search' %}">search</a></li>
+        <li><a>collections</a></li>
+        <li><a href="/content/about">About</a></li>
+{% endblock %}
+{% block admin-url %}{% url fa-admin:index %}{% endblock %}
+
+{% block sidebar-left %}
+  {% if kwsearch_form %}
+  <div id="search" class="sidebar-search">
+      Search all Finding Aids
+      <form action="{% url fa:search %}" method="get">
+        {{kwsearch_form.keywords}}
+        <input class="form-submit" type="submit" value="Search" />
+      </form>
+  </div>
+  {% endif %}
+{% endblock %}
+
+{% block message %}
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}
+
+{% block content-outer-bottom %}
+  {% if SW_VERSION %}
+    <div class="sw-version dev-note">v{{ SW_VERSION }}</div>
+  {% endif %}
+  {% if querytime and debug %}{# display eXist query times in debug mode only #}
+    <div class="query-time dev-note">quer{{ querytime|pluralize:"y,ies" }} took
+      {{ querytime|join:", " }} ms</div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends "site_base.html" %}
+
+{% block page-subtitle %}: Search {% endblock %}
+
+{% block content-title %}Search {% endblock %}
+
+{% block content-body %}
+
+<form action="{% url fa:search %}" method="get">
+    <table>
+        {{ form.as_table }}
+    </table>
+    <input class="form-submit" type="submit" value="Search" />
+</form>
+
+<hr/>
+<div>    
+    <h2>{{ tips.title }}</h2>
+    {{ tips.content|safe }}
+
+    {% if perms.simplepages.edit_simplepage %}
+    <div style="float:right">
+        <a href="{% url admin:simplepages_simplepage_change tips.id %}">Edit</a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,47 @@
+{# top-level table of contents for a finding aid (used by main finding aid and series/index views) #}
+{# expects finding aid object as ead, list of any indexes as all_indexes #}
+
+{% load ead %}
+{% load ifurl %}
+{# generate and store url for main finding aid page #}
+{% ifurl preview admin:preview:findingaid fa:findingaid ead.eadid as ead_url %}
+<div id="toc">
+    <h2>Table of contents:</h2>
+    <ul>
+         <li>
+             <a href="{{ ead_url }}{{ url_params }}#descriptive_summary">Descriptive Summary</a>
+             {% with ead.archdesc.did.match_count as count %}{% include "findingaids/sections/_matches.html" %}{% endwith %}
+         </li>
+         <li>
+             <a href="{{ ead_url }}{{ url_params }}#administrative_information">Administrative Information</a>
+             {% with ead.admin_info_matches as count %}{% include "findingaids/sections/_matches.html" %}{% endwith %}
+         </li>
+         <li>
+             <a href="{{ ead_url }}{{ url_params }}#collection_description">Collection Description</a>
+             {% with ead.coll_desc_matches as count %}{% include "findingaids/sections/_matches.html" %}{% endwith %}
+         </li>
+         {% if ead.archdesc.controlaccess.head %}
+           <li>
+                <a href="{{ ead_url }}{{ url_params }}#control_access">{{ ead.archdesc.controlaccess.head }}</a>
+                {% with ead.archdesc.controlaccess.match_count as count %}{% include "findingaids/sections/_matches.html" %}{% endwith %}
+           </li>
+         {% endif %}
+         {# if no series, include container list label in main table of contents #}
+         {% if not ead.dsc.hasSeries and not ead.dsc.head|cut:' ' = 'DescriptionofSeries' %}
+            <li> {# on series/index page, hasSeries cannot correctly detect series; using series label as fallback #}
+                <a href="{{ ead_url }}{{ url_params }}#dsc">{{ ead.dsc.head }}</a>
+                {% with ead.dsc.match_count as count %}{% include "findingaids/sections/_matches.html" %}{% endwith %}
+            </li>
+         {% endif %}
+         {% if all_indexes %}
+             {% for toc_index in all_indexes %}
+                {% ifequal index.id toc_index.id %}<li>{{ toc_index.head|format_ead }}</li>
+                {% else %} {# if on index page, don't link currently displayed index #}
+                    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=toc_index.short_id %}{{ url_params }}">
+                            {{ toc_index.head|format_ead }}</a>{% if toc_index.match_count > 0 %} <span class="exist-match">{{toc_index.match_count|floatformat }} match{{toc_index.match_count|pluralize:'es'}}</span>{% endif %}</li>
+                {% endifequal %}
+             {% endfor %}
+         {% endif %}
+
+    </ul>
+</div>

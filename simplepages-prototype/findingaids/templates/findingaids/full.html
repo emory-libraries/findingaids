@@ -1,0 +1,102 @@
+{% load ead %}
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
+    </head>
+    <body>
+<div class="fa">
+<h1><a name="{{ ead.eadid }}">{{ ead.title|format_ead }}</a></h1>
+
+<div id="publication_statement">
+    {% with ead.file_desc.publication as publication %}
+    <p>{{ publication.publisher }}</p>
+    {% for line in publication.address.lines %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    {% endwith %}
+</div>
+<hr/> 
+{% include "findingaids/sections/description.html" %}
+
+{# NOTE: contol access section is not included in the PDF #}
+
+{# container list or series/subseries listing #}
+{% if ead.dsc.hasSeries %}       {# list series/subseries here,   display on separate page #}
+  <div class="nextpage">
+    <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
+    <ul>
+       {% autoescape off %}
+           {{ series|unordered_list }}
+       {% endautoescape %}
+    </ul>
+  </div>
+{% else %}  {# not using next page for container list - causes blank page because of long table #}
+  {% with ead.dsc as series %}
+    <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
+    {% include "findingaids/sections/containerlist.html" %}
+  {% endwith %}
+{% endif %}
+
+
+{% if ead.dsc.hasSeries %}
+    {% for c01_series in ead.dsc.c %}
+        <div class="nextpage">
+            {% with c01_series as series %}
+                {% include "findingaids/sections/series.html" %}
+            {% endwith %}
+        </div>
+        {# container list is handled in series template; display subseries, if any #}
+        {% if c01_series.hasSubseries %}
+        <div class="subseries">
+            {% for c02_series in c01_series.c %}
+                <div class="nextpage">
+                    {% with c02_series as series %}
+                        {% include "findingaids/sections/series.html" %}
+                    {% endwith %}
+                </div>
+                {% if c02_series.hasSubseries %}
+                <div class="subseries">
+                    {% for c03_series in c02_series.c %}
+                        <div class="nextpage">
+                            {% with c03_series as series %}
+                                {% include "findingaids/sections/series.html" %}
+                            {% endwith %}
+                        </div>
+                    {% endfor %} {# end looping through c03s #}
+                </div>
+                {% endif %} {# c02 has subseries #}                
+            {% endfor %} {# end looping through c02s #}
+        </div>
+        {% endif %} {# c01 has subseries #}
+    {% endfor %} {# end looping through c01s #}
+ <hr/> 
+{% else %} {# simple finding aid - no series at all, just a container list #}
+  {% include "findingaids/sections/containerlist.html" %}
+{% endif %}
+
+{% for index in ead.archdesc.index %}
+    {% include "findingaids/sections/indexentry.html" %}
+{% endfor %}
+
+</div> {# end div.fa #}
+
+{# header and footer contents #}
+<div id="firstpage-footer">
+  MARBL provides copies of its finding aids for use only in research
+  and private study.  Copies supplied may not be copied for others or
+  otherwise distributed without prior consent of MARBL.</div>
+{# <div id="footer"> </div> #}
+<div id="header">
+    <table>
+        <col width="65%" valign="top" align="left"/>    {# column width needed for XSL-FO/PDF #}
+        <col width="45%" valign="top" align="right"/>
+        <tr>
+            <td style="text-align:left">{{ ead.title|format_ead }}</td>
+            <td style="text-align:right">{{ ead.archdesc.unitid }}</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

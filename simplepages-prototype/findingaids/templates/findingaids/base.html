@@ -1,0 +1,35 @@
+{% extends "site_base.html" %}
+{# base template for single-finding aid content pages - handles preview logic if preview is set to True #}
+
+{% block page-title %}Finding Aids {% if preview %} : PREVIEW {% endif %}{% block page-subtitle %}: Home{% endblock %}
+{% endblock %}
+
+{% block body-class %}{% if preview %}preview{% endif %}{% endblock %}
+
+{% block content-header  %}
+    {% if preview and perms.fa_admin.can_publish %}
+        <form id="preview-publish" action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
+            <button class="admin-action" type="submit" name="preview_id" value="{% firstof findingaid.eadid ead.eadid %}">PUBLISH</button>
+        </form>
+    {% endif %} 
+    <h1 class="title">{% if preview %}<span class="preview-label">PREVIEW:</span> {% endif %}{% block content-title %}{% endblock %}</h1>
+{% endblock %}
+
+{% block sidebar-left %}
+  {% if last_search %}
+    <div class="sidebar-search">
+        <a href="{{last_search.url}}">{{last_search.txt}}</a>
+    </div>
+  {% endif %}
+    {{ block.super }}
+    {# single document search, when available - disabled in preview mode #}
+  {% if docsearch_form and not preview %}
+  <div id="document-search" class="sidebar-search">
+      Search for items in the container list of <b>{{ ead.title }}</b>
+      <form action="{% url fa:singledoc-search ead.eadid %}" method="get">
+        {{ docsearch_form.keywords }}
+        <input class="form-submit" type="submit" value="Search this document" />
+      </form>
+  </div>
+  {% endif %}
+{% endblock %}

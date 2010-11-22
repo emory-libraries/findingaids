@@ -1,0 +1,28 @@
+{% extends "fa_admin/base.html" %}
+{% block page-subtitle %}: {{ mode|title }} Errors {% endblock %}
+{% block content-title %}{{ mode|title }}{% endblock %}
+
+{% block content-body %}
+
+<p>Could not {{ mode }} <b>{{ filename }}</b> due to the following:</p>
+
+<ul>
+    {{ errors|unordered_list }}
+</ul>
+
+<hr/>
+{% if exception %}{# eXist save error- most likely NOT the document at fault #}
+    <h2>eXist Database Error</h2>
+        <p>There was a problem loading your document to eXist, which could
+        indicate an issue with the eXist database.  Please try again;
+        if the problem persists, please report it with any error messages listed
+        above.</p>
+{% else %}  {# no exception: most likely a document-specific issue #}
+    <h2>Additional Instructions</h2>
+    <ul>
+        <li>If the document is not well-formed XML, nothing else can be checked.  Please
+        fix the file in your XML editor and try loading it again.</li>
+    </ul>
+{% endif %}
+
+{% endblock %}
