@@ -324,7 +324,7 @@ def set_series_ids(series, eadid, position):
     :returns: list of errors, if any
     """
     if series.did.unitid:
-        series.id = "%s%s%s" % (eadid, ID_DELIMITER, series.did.unitid.replace(' ', '').lower())
+        series.id = "%s%s%s" % (eadid, ID_DELIMITER, series.did.unitid.value.replace(' ', '').lower())
     else:
         # fall-back id: generate from c-level (series, subseries) and position in the series
         series.id = "%s%s%s%s" % (eadid, ID_DELIMITER, series.level.lower(), position + 1)

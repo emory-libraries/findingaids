@@ -27,6 +27,7 @@ from findingaids.fa_admin import tasks, views, utils
 from findingaids.fa_admin.models import TaskResult
 from findingaids.fa_admin.views import _get_recent_xml_files
 from findingaids.fa_admin.management.commands import prep_ead as prep_ead_cmd
+from findingaids.fa_admin.management.commands import unitid_identifier 
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient, MockHttplib
 
 ### unit tests for findingaids.fa_admin.views
@@ -1205,6 +1206,7 @@ class ReloadCachedPdfTestCase(TestCase):
 ### unit tests for django-admin manage commands
 
 class TestCommand(BaseCommand):
+    output = ''
     # test command class to simplify calling a command as if running from the commandline
     # base command will set up default args before calling handle method
     def run_command(self, *args):
@@ -1215,10 +1217,23 @@ class TestCommand(BaseCommand):
 
         :param args: list of command-line arguments
         '''
-        # run from argv expects command, subcommand, then any arguments
-        run_args = ['manage.py', 'command-name']
-        run_args.extend(args)
-        return self.run_from_argv(run_args)
+        # capture stdout & stderr for testing output results
+        buffer = cStringIO.StringIO()
+        sys.stdout = buffer
+        sys.stderr = buffer
+        try:
+            # run from argv expects command, subcommand, then any arguments
+            run_args = ['manage.py', 'command-name']
+            run_args.extend(args)
+            result = self.run_from_argv(run_args)
+        finally:
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
+
+        self.output = buffer.getvalue()
+
+        return result
+
 
 class PrepEadTestCommand(prep_ead_cmd.Command, TestCommand):
     pass
@@ -1272,17 +1287,9 @@ class PrepEadCommandTest(TestCase):
         # force ark generation error
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
         
-        # capture command output in a stream
-        buffer = cStringIO.StringIO()
-        sys.stdout = buffer
-        sys.stderr = buffer
-        try:
-            # with no filenames - should process all files
-            self.command.run_command('-v', '2')
-        finally:
-            sys.stdout = sys.__stdout__         # restore real stdout
-            sys.stderr = sys.__stderr__   
-        output = buffer.getvalue()
+        # with no filenames - should process all files
+        self.command.run_command('-v', '2')
+        output = self.command.output
         
         # badly-formed xml - should be reported
         self.assert_(re.search(r'^Error.*badlyformed.xml.*not well-formed.*$', output, re.MULTILINE),
@@ -1296,10 +1303,10 @@ class PrepEadCommandTest(TestCase):
         # files with errors should not be modified
         self.assertEqual(self.file_sizes['hartsfield558_invalid.xml'],
                         os.path.getsize(self.files['hartsfield558_invalid.xml']),
-                    'in single-file mode, non-specified file not modified by prep_ead script')
+                    'file with errors not modified by prep_ead script when updating all documents')
         self.assertEqual(self.file_sizes['badlyformed.xml'],
                         os.path.getsize(self.files['badlyformed.xml']),
-                    'in single-file mode, non-specified file not modified by prep_ead script')
+                    'file with errors not modified by prep_ead script when updating all documents')
 
     def test_prep_single(self):
         # copy valid file so there are two files that could be changed
@@ -1308,17 +1315,10 @@ class PrepEadCommandTest(TestCase):
                  hfield_copy)
         self.file_sizes['hartsfield558-2.xml'] = os.path.getsize(hfield_copy)
                  
-        # capture output 
-        buffer = cStringIO.StringIO()
-        sys.stdout = buffer
-        sys.stderr = buffer
-        try:
-            # process all files
-            self.command.run_command('hartsfield558.xml')
-        finally:
-            sys.stdout = sys.__stdout__         # restore real stdout
-            sys.stderr = sys.__stderr__
-        output = buffer.getvalue()
+       
+        # process a single file
+        self.command.run_command('hartsfield558.xml')
+        output = self.command.output
 
         self.assert_('1 document updated' in output)
         self.assert_('0 documents unchanged' in output)
@@ -1344,17 +1344,59 @@ class PrepEadCommandTest(TestCase):
         }
 
         # run on a single file where ark generation will be attempted
-        buffer = cStringIO.StringIO()
-        sys.stdout = buffer
-        sys.stderr = buffer
-        try:
-            self.command.run_command('hartsfield558_invalid.xml')
-        finally:
-            sys.stdout = sys.__stdout__
-            sys.stderr = sys.__stderr__
-
-        output = buffer.getvalue()
+        self.command.run_command('hartsfield558_invalid.xml')
+        output = self.command.output
 
         self.assert_('WARNING: Found 2 ARKs'  in output)
         self.assert_('INFO: Using existing ARK' in output)
+
+
+
+class UnitidIdentifierTestCommand(unitid_identifier.Command, TestCommand):
+    pass
+
+class UnitidIdentifierCommandTest(TestCase):
+    def setUp(self):
+        self.command = UnitidIdentifierTestCommand()
+        # store settings that may be changed/removed by tests
+        self._ead_src = settings.FINDINGAID_EAD_SOURCE
+
+        self.tmpdir = tempfile.mkdtemp(prefix='findingaids-unitid_identifier-test')
+        settings.FINDINGAID_EAD_SOURCE = self.tmpdir
+
+        self.files = {}
+        self.file_sizes = {}    # store file sizes to check modification
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        for file in ['hartsfield558.xml', 'hartsfield558_invalid.xml', 'badlyformed.xml']:
+            # store full path to tmp copy of file
+            self.files[file] = os.path.join(self.tmpdir, file)
+            copyfile(os.path.join(fixture_dir, file), self.files[file])
+            self.file_sizes[file] = os.path.getsize(self.files[file])
+
+    def tearDown(self):
+        # remove any files created in temporary test staging dir
+        rmtree(self.tmpdir)
+        # restore real settings
+        settings.FINDINGAID_EAD_SOURCE = self._ead_src
+
+    def test_run(self):
+        # process all files
+        self.command.run_command('-v', '2')
+        output = self.command.output
+
+        # check that correct unitid identifier was set
+        ead = load_xmlobject_from_file(self.files['hartsfield558.xml'], FindingAid)
+        self.assertEqual(558, ead.archdesc.unitid.identifier)
+        self.assert_('2 documents updated' in output)
+        self.assert_('1 document with errors' in output)
+
+        # badly-formed xml - should be reported
+        self.assert_(re.search(r'^Error.*badlyformed.xml.*not well-formed.*$', output, re.MULTILINE),
+            'unitid_identifier reports error for non well-formed xml')
+
+        # files with errors should not be modified
+        self.assertEqual(self.file_sizes['badlyformed.xml'],
+                        os.path.getsize(self.files['badlyformed.xml']),
+                    'file with errors not modified by unitid_identifier script')
+
 

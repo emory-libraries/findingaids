@@ -6,6 +6,22 @@ Aids application.  New features in each version should be listed, with
 any necessary information about installation, upgrade, or deployment
 notes.
 
+0.4.1 - unitid identifiers
+--------------------------
+
+ * Custom manage command to add machine-readable identifiers to the top-level
+   unitid tag.
+
+Deploy Notes
+^^^^^^^^^^^^
+
+Run the new manage command::
+  ``python manage.py unitid_identifiers``
+
+This command requires write access to the EAD source documents in the directory
+configured in localsettings.py.
+
+
 0.4 Persistent IDs
 ------------------
 
