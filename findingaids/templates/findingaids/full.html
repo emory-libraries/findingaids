@@ -12,7 +12,7 @@
     {% with ead.file_desc.publication as publication %}
     <p>{{ publication.publisher }}</p>
     {% for line in publication.address.lines %}
-        <p>{{ line }}</p>
+        {{ line }} <br />
     {% endfor %}
     {% endwith %}
 </div>
@@ -33,8 +33,12 @@
   </div>
 {% else %}  {# not using next page for container list - causes blank page because of long table #}
   {% with ead.dsc as series %}
+
+  <div class="nextpage">
+  <hr/>
     <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
     {% include "findingaids/sections/containerlist.html" %}
+  </div>
   {% endwith %}
 {% endif %}
 
@@ -72,7 +76,8 @@
     {% endfor %} {# end looping through c01s #}
  <hr/> 
 {% else %} {# simple finding aid - no series at all, just a container list #}
-  {% include "findingaids/sections/containerlist.html" %}
+<hr/>
+{% include "findingaids/sections/containerlist.html" %}
 {% endif %}
 
 {% for index in ead.archdesc.index %}
@@ -83,9 +88,9 @@
 
 {# header and footer contents #}
 <div id="firstpage-footer">
-  MARBL provides copies of its finding aids for use only in research
+  Emory Libraries provides copies of its finding aids for use only in research
   and private study.  Copies supplied may not be copied for others or
-  otherwise distributed without prior consent of MARBL.</div>
+  otherwise distributed without prior consent of the holding institution.</div>
 {# <div id="footer"> </div> #}
 <div id="header">
     <table>
