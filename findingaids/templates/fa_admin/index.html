@@ -52,7 +52,7 @@ give your account the appropriate permissions.</p>
 {% endif %}
 
 {% if perms.fa_admin.can_publish or perms.fa_admin.can_preview %}
-  {% include "fa_admin/_list_files.html" %}
+  {% include "fa_admin/snippets/list_files.html" %}
 {% endif %}
 
 {% endblock %}
