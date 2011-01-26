@@ -190,7 +190,10 @@ class FaViewsTest(TestCase):
             response.content, msg_prefix='title with formatting should be formatted in list view')
         # abstract
         self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''',
-            response.content, msg_prefix='abstract with formatting should be formatted in list view') 
+            response.content, msg_prefix='abstract with formatting should be formatted in list view')
+        # repository subarea
+        self.assertPattern(r'''Repository: Manuscript,\s+Archives,\s+and\s+Rare\s+Book\s+Library''',
+            response.content, msg_prefix='short-record view should include holding repository')
 
         # no finding aids
         response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'Z'}))
@@ -210,6 +213,7 @@ class FaViewsTest(TestCase):
         #title within unittitle
         self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content,
             msg_prefix='title within unittitle should be formatted on list view')
+
 
         # clean up alpha-test doc
         self.db.removeDocument(alphatest_dbpath)
