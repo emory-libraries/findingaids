@@ -34,7 +34,7 @@
     <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
 </div>
 <div id="toc_series">
-    {% include "findingaids/sections/toc.html" %}
+    {% include "findingaids/snippets/toc.html" %}
 
 {% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
     <div id="series">
@@ -62,7 +62,7 @@
 <br class="clear"/>
 </div>
 
-{% if series %} {% include "findingaids/sections/series.html" %} {% endif %}
-{% if index %} {% include "findingaids/sections/indexentry.html" %} {% endif %}
+{% if series %} {% include "findingaids/snippets/series.html" %} {% endif %}
+{% if index %} {% include "findingaids/snippets/indexentry.html" %} {% endif %}
 
 {% endblock %}

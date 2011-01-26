@@ -21,7 +21,7 @@
 <hr/>
 
 {% for fa in findingaids.object_list %}
-    {% include "findingaids/listview_snippet.html" %}
+    {% include "findingaids/snippets/listview.html" %}
 {% empty %}
  <div>No finding aids found for <b>{{current_letter}}</b>.</div>
 {% endfor %}

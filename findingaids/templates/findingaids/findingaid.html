@@ -12,7 +12,7 @@
   {% if ead.eadid.url %}<link rel="bookmark" href="{{ ead.eadid.url }}" /> {% endif %}
   {# embed Dublin Core metadata for this finding aid in the html header #}
   {% with ead.dc_fields as dc_fields %}
-    {% include "findingaids/sections/_dc_meta.html" %}
+    {% include "findingaids/snippets/dc_meta.html" %}
   {% endwith %}
 {% endblock %}
 
@@ -28,7 +28,7 @@
 
 {# main display page for a single finding aid; links to series & subseries, if any #}
 <div id="toc_series">
-    {% include "findingaids/sections/toc.html" %}
+    {% include "findingaids/snippets/toc.html" %}
     
 {% if ead.dsc.hasSeries %} {# top-level series list #}
 <div id="series">
@@ -48,9 +48,9 @@
 
 <div class="fa">
 <hr/>
-{% include "findingaids/sections/description.html" %}
+{% include "findingaids/snippets/description.html" %}
 <hr/>
-{% include "findingaids/sections/controlaccess.html" %}
+{% include "findingaids/snippets/controlaccess.html" %}
 <hr/>
 
 {# container list or series/subseries listing #}
@@ -63,7 +63,7 @@
     </ul>
 {% else %}
   {% with ead.dsc as series %}
-    {% include "findingaids/sections/containerlist.html" %}
+    {% include "findingaids/snippets/containerlist.html" %}
   {% endwith %}
 {% endif %}
 
