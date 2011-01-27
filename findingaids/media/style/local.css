@@ -1,3 +1,6 @@
+a:hover, a:active {
+    color: #f19b62;
+}
 div#alphalist {
   width: 350px;
   height: 75px;
@@ -25,22 +28,24 @@ div#alphalist a {
   display:block;
   text-decoration:none;
   line-height:22px;
-  background-color: #02266d; /*#3a3a3a; */ /* FIXME: was using small gradient bg image */
+  background-color:  #3a3a3a; /* FIXME: was using small gradient bg image */
 }
 
 div#alphalist a:hover, div#alphalist a.current {
-  background-color: #b98b02; /*#f19b62;*/
+  background-color: #f19b62; /*#f19b62;*/
 }
 
 div.record_list {
-   border-bottom: 2px dashed gray;
+   border-bottom: 1px dashed #cccccc;
    padding-bottom: 10px;
    margin-bottom: 10px;
 }
 div.record_list p {
     margin: 0px;
 }
-
+div.record_list a:link {
+    color: #3e80b2;
+}
 p.query-time {
     font-style:italic;
 }
@@ -284,4 +289,9 @@ div.pagination a {
 
 a.pdf {
     line-height: 20px; 
+}
+
+hr {
+    background-color: #f19b62;
+    border: 1px solid #f19b62;
 }
