@@ -322,7 +322,8 @@ class FaViewsTest(TestCase):
 
         # title
         self.assertPattern('<h1[^>]*>.*Fannie Lee Leverette scrapbooks', response.content)
-        self.assertContains(response, 'circa 1900-1948</h1>')
+        self.assertNotContains(response, 'circa 1900-1948</h1>',
+            msg_prefix='finding aid title should be unittitle without unitdate')
 
         # descriptive summary content
         self.assertPattern('Creator:.*Leverette, Fannie Lee', response.content,
@@ -562,7 +563,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Series 1.*Correspondence,.*1855-1995.*</h2>',
             response.content, "series title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s" rel=\"contents\">Bailey and Thurman.+families papers' % fa_url,
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel=\"contents\">\s*Bailey and Thurman.+families papers' % fa_url,
             response.content, "finding aid title displayed, links to main record page")
         # ead toc
         self.assertPattern('<a href="%s#descriptive_summary">Descriptive Summary</a>' % fa_url,
@@ -612,7 +613,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 1\.6.*Gaston C\. Raoul papers,.*1882-1959.*</h2>',
             response.content, "subseries title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">Raoul family papers,.*1865-1985' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*Raoul family.*Raoul family papers' % \
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
             
@@ -671,7 +672,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
             response.content, "sub-subseries title displayed, no physdesc")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">Raoul family papers,.*1865-1985' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*Raoul family.*Raoul family papers' % \
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
 
@@ -697,17 +698,15 @@ class FaViewsTest(TestCase):
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',
             'series_id': 's4', 'series2_id': 'subseries2.1'})
         response = self.client.get(subseries_url)
-        #print response
         self.assertContains(response, "Subseries 2.1")
         self.assertContains(response, "Additional drafts and notes")
         # missing section head should not be displayed as "none"
         self.assertContains(response, "None", 0,
             msg_prefix="series with a section with no head does not display 'None' for heading")
-        self.assertContains(response, 'id="breadcrumbs"')
-        self.assertContains(response, "Miscellaneous, 1881-1982", 1,
-            msg_prefix='should only contain 1 instance of this text and it should be in the breadcrumbs')
-        self.assertContains(response, reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's4'}),
-            2, msg_prefix='should only contain 2 instance of this text in breadcrumbs and contents')
+        # breadcrumb link
+        self.assertContains(response, '<a href="%s">Miscellaneous' % \
+            reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's4'}),
+            1, msg_prefix='should only contain 1 instance of series linked title(breadcrumb)')
 
 
     def test_preview_mode(self):

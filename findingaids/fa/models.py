@@ -6,7 +6,8 @@ from django.db import models
 
 from eulcore import xmlmap
 from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, \
-        SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE
+        SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
+        UnitTitle
 from eulcore.django.existdb.manager import Manager
 from eulcore.django.existdb.models import XmlModel
 
@@ -31,7 +32,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # NOTE: overridding these fields from EncodedArchivalDescription to allow
     # for efficiently retrieving unittitle and abstract in the full document OR
     # in the constructed return object returned from eXist for search/browse
-    unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', xmlmap.XmlObject)
+    unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', UnitTitle)
     abstract = xmlmap.NodeField('.//e:abstract[not(ancestor::e:dsc)]', xmlmap.XmlObject)
     physical_desc = xmlmap.StringField('.//e:physdesc[not(ancestor::e:dsc)]')
 

@@ -44,13 +44,27 @@ div.record_list p {
 p.query-time {
     font-style:italic;
 }
-
+.fa-title {
+    text-transform: uppercase;
+}
+.fa-title a {
+ text-decoration: none;
+}
+div#publication-address {
+    margin: 0px auto 10px;
+    text-align: center;
+    font-size:115%;
+}
+div#publication-address p {
+    margin:0px;
+}
 div#toc_series {
     clear: right;
     border: 1px solid #D9D9D9;
     background-color: #f2f3f5;
-    margin: 0px 0px 30px;
+    margin: 0px 0px 10px;
     padding: 20px;
+    padding-bottom: 0px;
 }
 
 div#toc {
@@ -61,6 +75,24 @@ div#toc {
 div#series {
     float:left;
     width:400px;
+}
+div.hover-menu h2 {
+    background-image: url("../images/icon_arrow-blue-down.gif");
+    background-position: 0px 22px;
+    background-repeat: no-repeat;
+    padding-left: 15px;
+}
+div.hover-menu.collapsed h2 {
+    background-image: url("../genlib_media/style/images/icon_arrow-blue-right.gif");
+    background-position: 0px 20px;
+}
+div.hover-menu.collapsed ul {
+    display:none;
+}
+div.hover-menu ul {
+    position:absolute;
+    background-color: #f2f3f5;
+    padding-right: 15px;
 }
 
 .clear {
@@ -79,6 +111,13 @@ div.fa li {
    list-style-type:none;
    background: none !important;
 }
+.fa h3, .fa th {    /* within finding aid, use normal text size */
+    font-size:100%;
+}
+.fa table, table#descriptive_summary td {
+    border: none;
+    margin: 0px;
+}
 
 div#control_access ul, div#control_access li, div#index ul, div#index li { 
     margin: 0px;
@@ -93,8 +132,25 @@ table.box-folder .bf {
     width: 50px;
 }
 
+table.box-folder th {
+    font-size: 90%;
+}
+
 table.box-folder .section {
   font-weight: bold;
+}
+/* description of series; !important required to override settings in libraryglobal.css */
+ul.series-list > li {
+    padding-left: 0px !important;   /* no indent on top-level series */
+}
+/* remove top-padding on subseries lists so list-item spacing will be consistently */
+ul.series-list ul {                 
+    padding-top: 0px !important;
+}
+/* shift padding to the top so nested list items will be consistently spaced */
+ul.series-list  li {
+    padding-bottom: 0px !important;
+    padding-top: 10px !important;
 }
 
 table.box-folder tr.series-link th {
@@ -112,12 +168,15 @@ div.sidebar-search input {
     margin: 2px;
 }
 
-div#print-links {
-    float:right;
+div.doc-links {
+    border: none !important;
+    background-color: #ffffff !important;
 }
-
-div#print-links a {
+div.doc-links a {
     text-decoration: none;
+}
+div.doc-links p {
+    margin:0px;
 }
 
 a#no-decoration {
@@ -221,4 +280,8 @@ div.removed-notice {
 
 div.pagination a {
     padding-right: 2px; 
+}
+
+a.pdf {
+    line-height: 20px; 
 }

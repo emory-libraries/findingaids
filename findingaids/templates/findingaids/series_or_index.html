@@ -14,32 +14,41 @@
 {% endblock %}
 
 {% block content-title %}
-{# generate and store url for main finding aid page #}
-{% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid as ead_url %}
-  <a href="{{ ead_url }}{{ url_params }}" rel="contents">{{ ead.title }}</a>
+<span class="fa-title">
+    {# generate and store url for main finding aid page #}
+    {% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid as ead_url %}
+    <a href="{{ ead_url }}{{ url_params }}" rel="contents">
+        {% if ead.archdesc.origination %}{{ ead.archdesc.origination|format_ead }}<br/>{% endif %}
+        {{ ead.unittitle.short|format_ead|cut:',' }}
+    </a> >
+{# breadcrumb trail to current series/subseries/index #}
+{% if series.series.id %}
+  <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid, series_id=series.series.short_id %}{{ url_params }}">{{series.series.did.unittitle.short|cut:','}}</a> >
+{% endif %}
+{% if series.series2.id %}
+   <a href="{% ifurl preview fa-admin:preview:series2 fa:series2 id=ead.eadid, series_id=series.series.short_id, series2_id=series.series2.short_id %}{{ url_params }}">{{series.series2.did.unittitle.short|cut:','}}</a> >
+{% endif %}
+{# current series or index title #}
+{{ series.did.unittitle.short|cut:',' }} {{ index.head|format_ead }}
+</span>
+{% endblock %}
+
+{% block sidebar-left %}
+  {{ block.super }}
+  <div class="doc-links">
+     <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
+  </div>
 {% endblock %}
 
 
 {% block content-body %}
-<div id="breadcrumbs">
-{% if series.series.id %}
-    <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid, series_id=series.series.short_id %}{{ url_params }}">{{series.series.did.unittitle}}</a> >
-{% endif %}
-{% if series.series2.id %}
-    <a href="{% ifurl preview fa-admin:preview:series2 fa:series2 id=ead.eadid, series_id=series.series.short_id, series2_id=series.series2.short_id %}{{ url_params }}">{{series.series2.did.unittitle}}</a> >
-{% endif %}
-{% firstof series.did.unittitle  index.head %}  {# series or index title #}
-</div>
-<div id="print-links">
-    <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
-</div>
 <div id="toc_series">
-    {% include "findingaids/snippets/toc.html" %}
+  {% include "findingaids/snippets/toc.html" %}
 
 {% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
-    <div id="series">
+    <div id="series" class="hover-menu collapsed">
       <h2><a href="{{ ead_url }}{{ url_params }}#dsc">{{ ead.dsc.head }}</a></h2>
-        <ul>
+      <ul>
           {% for component in all_series %}
             <li>
                 {#  currently selected page #}
@@ -59,10 +68,28 @@
         </ul>
     </div>
 {% endif %}
-<br class="clear"/>
+<br class="clear"/> 
 </div>
 
 {% if series %} {% include "findingaids/snippets/series.html" %} {% endif %}
 {% if index %} {% include "findingaids/snippets/indexentry.html" %} {% endif %}
 
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.hover-menu').hover(
+            function () {
+                $(this).removeClass('collapsed');
+                $(this).find('ul').slideDown(100);
+            },
+            function () {
+                $(this).addClass('collapsed');
+                $(this).find('ul').slideUp(100);
+            }
+        );
+    });
+</script>
 {% endblock %}
