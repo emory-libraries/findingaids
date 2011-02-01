@@ -13,6 +13,7 @@ Dependencies
  * `RabbitMQ <http://www.rabbitmq.com/>`__
  * `zc.icp <http://pypi.python.org/pypi/zc.icp>`_ for querying cache status
  * django-celery installed via `easy_install django-celery`
+ * feedparser -  `easy_install feedparser` or `pip install feedparser`
  * eulcore (currently included as a subversion external); see
    :ref:`eulcore dependencies <eulcore-deps>` for per-module
    dependencies. eulcore modules currently in use:
