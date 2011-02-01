@@ -21,7 +21,6 @@ from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
             restore_publish_collection, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified, alpha_pagelabels, html_to_xslfo
-from findingaids.simplepages.models import SimplePage
 
 logger = logging.getLogger(__name__) 
 
@@ -34,10 +33,8 @@ fa_listfields = ['eadid', 'list_title','archdesc__did']
 # and FindingAid.abstract
 
 def site_index(request):
-    "Site home page.  Currently includes browse letter links."
-    intro = SimplePage.objects.get(url='/intro/')   # FIXME: error handling
-    return render_to_response('findingaids/index.html', {'letters': title_letters(),
-                                                         'intro': intro},
+    "Site home page.  Currently includes browse letter links."    
+    return render_to_response('findingaids/index.html', {'letters': title_letters()},
                                                           context_instance=RequestContext(request)
                                                           )
 def browse_titles(request):
@@ -373,7 +370,6 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
 def search(request):
     "Simple keyword search - runs exist full-text terms query on all terms included."
     
-    tips = SimplePage.objects.get(url='/search/')   # FIXME: error handling ?
     form = AdvancedSearchForm(request.GET)
     query_error = False
     
@@ -476,7 +472,7 @@ def search(request):
 
     # if form is invalid (no search terms) or there was an error, display search form
     response = render_to_response('findingaids/search_form.html',
-                    {'form' : form, 'request': request, 'tips': tips },
+                    {'form' : form, 'request': request },
                     context_instance=RequestContext(request))
     # if query could not be parsed, set a 'Bad Request' status code on the response
     if query_error:

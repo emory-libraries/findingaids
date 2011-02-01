@@ -6,17 +6,6 @@
 
    {% include "findingaids/browse_letters.html" %}
 
-   <div>
-       <h1>{{intro.title}}</h1>
-       {{ intro.content|safe }}
-
-        {% if perms.simplepages.edit_simplepage %}
-        <div style="float:right">
-            <a href="{% url admin:simplepages_simplepage_change intro.id %}">Edit</a>
-        </div>
-        {% endif %}
-   </div>
- {% comment %}
 <p>This database searches detailed descriptions of manuscript collections,
 which are called finding aids. Finding aids generally include:</p>
 <ul>
@@ -26,6 +15,5 @@ which are called finding aids. Finding aids generally include:</p>
 </ul>
 
 <p><i>Please note: this site includes finding aids for unprocessed collections.</i></p>
-{% endcomment %}
 
 {% endblock %}
