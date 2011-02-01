@@ -119,6 +119,12 @@ BROKER_USER = 'guest'
 BROKER_PASSWORD = 'guest'
 
 
+CONTENT_RSS_FEEDS = {
+    'banner': '',
+    'announcements': '',
+    'content': '',
+}
+
 #Logger Settings
 import logging
 #logging levels: NOLOG, CRITICAL, ERROR, WARNING, INFO, DEBUG

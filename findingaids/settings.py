@@ -1,4 +1,3 @@
-# Django settings for findingaids project.
 from os import path
 
 import os
@@ -141,6 +140,7 @@ INSTALLED_APPS = (
     'eulcore.django.util',
     'findingaids.fa',
     'findingaids.fa_admin',
+    'findingaids.content',
 )
 
 EXTENSION_DIRS = (

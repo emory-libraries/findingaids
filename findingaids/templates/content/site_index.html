@@ -3,8 +3,13 @@
 {% block content-title %}Browse Finding Aids{% endblock %}
 
  {% block content-body %}
+ <div id="banner">
+ {% if banner|length %} {# display random banner if entries are returned (FIXME: fallback?) #}
+    {% with banner|random as banner %}{{ banner.summary|safe }}{% endwith %}
+ {% endif %}
+ </div>
 
-   {% include "findingaids/browse_letters.html" %}
+ {% include "findingaids/browse_letters.html" %}
 
 <p>This database searches detailed descriptions of manuscript collections,
 which are called finding aids. Finding aids generally include:</p>
