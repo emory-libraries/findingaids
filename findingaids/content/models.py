@@ -81,3 +81,23 @@ class NewsFeed(CachedFeed):
     'Feed object to access configured RSS feed for home page announcements'
     id = 'news'
     url = settings.CONTENT_RSS_FEEDS[id]
+
+class ContentFeed(CachedFeed):
+    'Feed object to access configured RSS feed for drupal-managed site content pages'
+    id = 'content'
+    url = settings.CONTENT_RSS_FEEDS[id]
+    separator = '-'
+
+    def get_entry(self, id):
+        '''Get a single entry in the feed by a page identifier.  The identifier
+        should match the portion of the item link after the first delimeter
+        character (-).  For example, to match `findingaids-about`, you would
+        search for `about`.
+
+        Returns the feed entry if there is a match, or None if no match.
+        '''
+        for entry in self.items:
+            prefix, sep, remainder = entry.link.partition(self.separator)
+            if remainder == id:
+                return entry
+        

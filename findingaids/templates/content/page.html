@@ -1,0 +1,7 @@
+{% extends "site_base.html" %}
+{% block page-subtitle %}: {{ page.title }}{% endblock %}
+{% block content-title %}{{ page.title }}{% endblock %}
+
+{% block content-body %}
+{{ page.summary|safe }}
+{% endblock %}
