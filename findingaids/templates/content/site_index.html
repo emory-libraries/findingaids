@@ -1,24 +1,51 @@
-{% extends "findingaids/base.html" %}
+{% extends "site_base.html" %}
 
-{% block content-title %}Browse Finding Aids{% endblock %}
+{% block style %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" media="all" href="{{ MEDIA_URL }}/style/homepage.css" />
+{% endblock %}
+
+{% block content-title %}{% endblock %}
+{% block sidebar-left %}{% endblock %} {# suppress sidebar #}
 
  {% block content-body %}
- <div id="banner">
- {% if banner|length %} {# display random banner if entries are returned (FIXME: fallback?) #}
-    {% with banner|random as banner %}{{ banner.summary|safe }}{% endwith %}
- {% endif %}
+ <div class="top-half">
+     <div id="about" class="right-col">
+         <h2>About/welcome</h2>
+         <p>This database searches detailed descriptions of manuscript collections,
+        which are called finding aids. Finding aids generally include:</p>
+        <ul>
+           <li>A description of the collection's creator</li>
+           <li>A description of the contents</li>
+           <li>A list of boxes and folders in which materials are stored</li>
+        </ul>
+
+        <p><i>Please note: this site includes finding aids for unprocessed collections.</i></p>
+     </div>
+
+     <div id="banner" class="left-col">
+     {% if banner|length %} {# display random banner if entries are returned (FIXME: fallback?) #}
+        {% with banner|random as banner %}{{ banner.summary|safe }}{% endwith %}
+     {% endif %}
+     </div>
  </div>
+ <div class="bottom-half">
+        <div id="search" class="left-col">
+             <h2>Search Finding Aids</h2>
+              <form action="{% url fa:search %}" method="get">
+                {{kwsearch_form.keywords}}
+                <input class="form-submit" type="submit" value="Search" />
+              </form>
+             <p><a href="{% url fa:search %}">Advanced Search</a></p>
+         </div>
 
- {% include "findingaids/browse_letters.html" %}
+         <div id="browse" class="right-col">
+             <h2>Browse Finding Aids</h2>
+             {% include "findingaids/browse_letters.html" %}
+         </div>
 
-<p>This database searches detailed descriptions of manuscript collections,
-which are called finding aids. Finding aids generally include:</p>
-<ul>
-   <li>A description of the collection's creator</li>
-   <li>A description of the contents</li>
-   <li>A list of boxes and folders in which materials are stored</li>
-</ul>
 
-<p><i>Please note: this site includes finding aids for unprocessed collections.</i></p>
-
+  </div>
+ 
+ <div class="clear"/>
 {% endblock %}

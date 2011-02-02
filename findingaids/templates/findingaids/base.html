@@ -1,8 +1,7 @@
 {% extends "site_base.html" %}
 {# base template for single-finding aid content pages - handles preview logic if preview is set to True #}
 
-{% block page-title %}Finding Aids {% if preview %} : PREVIEW {% endif %}{% block page-subtitle %}: Home{% endblock %}
-{% endblock %}
+{% block page-subtitle %}{% if preview %} : PREVIEW{% endif %} : Home{% endblock %}
 
 {% block body-class %}{% if preview %}preview{% endif %}{% endblock %}
 

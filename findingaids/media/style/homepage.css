@@ -1,0 +1,52 @@
+/* CSS for site home page - different layout than the rest of the site */
+
+/* TODO: possibly move home-page CSS to a separate file? not used elsewhere */
+div#content {
+    margin-left:15px; /* undo normal content margin for sidebar */
+}
+.top-half > div {
+    margin-top: 0px;
+    margin-bottom: 35px;
+    padding: 10px;
+}
+.left-col {
+    float:left;
+}
+.right-col {
+    float:right;
+}
+#about {
+    width: 350px;
+}
+#banner {
+    width: 540px;
+    height: 250px;
+}
+.bottom-half {
+    clear: both;    /* clear top-half floating columns */
+}
+.bottom-half > div {
+    width: 48%;
+    padding: 5px;
+}
+h2 {
+    background-color: gray;
+    color: white;
+    padding: 3px;
+    padding-left: 15px;
+    margin-bottom: 5px;
+}
+
+input {
+    margin: 5px;
+}
+input[type="text"] {
+    width: 225px;
+    font-size: 110%;
+}
+#search form, #search p {
+    margin-left: 25px;
+}
+#browse ul {
+    margin: 5px 35px;
+}
