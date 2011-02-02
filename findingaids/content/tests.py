@@ -18,8 +18,8 @@ class MockFeedParser:
         return feed
     
 class CachedFeedTest(TestCase):
-    id = 'testfeed'
-    cache_key = 'rss-data-%s' % id
+    testid = 'testfeed'
+    cache_key = 'rss-data-%s' % testid
     url = 'http://'
     
     def setUp(self):
@@ -35,21 +35,21 @@ class CachedFeedTest(TestCase):
         cache.set(self.cache_key, None)
 
     def test_init_nocache(self):
-        cf = models.CachedFeed(self.id, self.url)
+        cf = models.CachedFeed(self.testid, self.url)
         self.assertEqual(None, cf._feed,
             'initial feed data should not be set on init when feed is not previously cached')
 
     def test_init_with_cache(self):
         # pre-populate the cache with test feed result
         cache.set(self.cache_key, self.mockfeedparser.parse(self.url))
-        cf = models.CachedFeed(self.id, self.url)
+        cf = models.CachedFeed(self.testid, self.url)
         self.assertNotEqual(None, cf._feed,
             'initial feed data should be set on init when feed is cached')
 
     def test_load_feed(self):
         data = ['a', 'b']
         self.mockfeedparser.entries = data
-        cf = models.CachedFeed(self.id, self.url)
+        cf = models.CachedFeed(self.testid, self.url)
         self.assert_(isinstance(cf.feed, feedparser.FeedParserDict),
             'feed property should be set from feedparse result')
         self.assert_(isinstance(cache.get(self.cache_key), feedparser.FeedParserDict),
@@ -58,7 +58,7 @@ class CachedFeedTest(TestCase):
     def test_load_ifmodified(self):
         initial = ['a', 'b']
         self.mockfeedparser.entries = initial
-        cf = models.CachedFeed(self.id, self.url)
+        cf = models.CachedFeed(self.testid, self.url)
         cf.feed # access feed to load initial feed
         # change the data for comparison
         mod = ['z', 'y']
@@ -76,14 +76,14 @@ class CachedFeedTest(TestCase):
         myitems = ['news', 'update']
         self.mockfeedparser.entries = myitems
 
-        cf = models.CachedFeed(self.id, self.url)
+        cf = models.CachedFeed(self.testid, self.url)
         self.assertEqual(myitems, cf.items,
             'items property should be returned from feed entries')
 
     def test_clear_cache(self):
         # populate the cache with test feed result
         cache.set(self.cache_key, self.mockfeedparser.parse(self.url))
-        cf = models.CachedFeed(self.id, self.url)
+        cf = models.CachedFeed(self.testid, self.url)
         cf.clear_cache()
         self.assertEqual(None, cache.get(self.cache_key),
             'cached data should be None after calling clear_cache()')      
