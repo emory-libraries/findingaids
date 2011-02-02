@@ -43,7 +43,10 @@
                 {{kwsearch_form.keywords}}
                 <input class="form-submit" type="submit" value="Search" />
               </form>
-             <p><a href="{% url fa:search %}">Advanced Search</a></p>
+             <p>
+                <a class="form-submit" href="{% url fa:search %}">Advanced Search</a>
+                <a class="form-submit" href="{% url content:page 'search-tips' %}">Search Tips</a>
+             </p>
          </div>
 
          <div id="browse" class="right-col">

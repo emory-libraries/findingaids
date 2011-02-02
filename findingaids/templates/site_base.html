@@ -13,10 +13,15 @@
 {% endblock %}
 
 {% load eulcore_tags %}
-{% block navbar-items %}
-        <li><a href="{% url fa:search %}" class="{% activebase request '^/search' %}">search</a></li>
-        <li><a>collections</a></li>
-        <li><a href="/content/about">About</a></li>
+{% block navbar %}   {# override the whole block - no 'HOME' #}
+<ul>
+    <li><a href="{% url fa:search %}">Advanced Search</a></li>
+    <li><a href="">Requesting Materials</a></li>
+    <li><a href="{% url content:page 'institutions' %}">Participating Institutions</a></li>
+    <li><a href="{% url content:page 'search-tips' %}">Search Tips</a></li>
+    <li><a href="{% url content:page 'faq' %}">{# FindingAid #}FAQ</a></li>
+    <li><a href="{% url content:page 'about-database' %}">About the Database</a></li>
+</ul>
 {% endblock %}
 {% block admin-url %}{% url fa-admin:index %}{% endblock %}
 
