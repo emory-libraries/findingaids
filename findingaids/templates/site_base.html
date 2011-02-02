@@ -8,8 +8,9 @@
     <link rel="stylesheet" type="text/css" media="all" href="{{ MEDIA_URL }}/style/local.css" />
 {% endblock %}
 
-{% block site-name %}EmoryFindingAids{% endblock %}
-{% block site-slogan %}Find Manuscripts &amp; Archives{% endblock %}
+{% block site-name %}
+<img src="{{ MEDIA_URL}}/images/EmoryFindingAids-logo.png" alt="EmoryFindingAids"/>
+{% endblock %}
 
 {% load eulcore_tags %}
 {% block navbar-items %}
