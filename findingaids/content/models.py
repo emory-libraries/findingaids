@@ -73,6 +73,11 @@ class CachedFeed(object):
         cache.set(self._cache_key, None)
 
 class BannerFeed(CachedFeed):
+    'Feed object to access configured RSS feed for home page banner images'
     id = 'banner'
     url = settings.CONTENT_RSS_FEEDS[id]
-    
+
+class NewsFeed(CachedFeed):
+    'Feed object to access configured RSS feed for home page announcements'
+    id = 'news'
+    url = settings.CONTENT_RSS_FEEDS[id]

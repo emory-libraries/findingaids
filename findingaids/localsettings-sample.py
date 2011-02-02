@@ -121,7 +121,7 @@ BROKER_PASSWORD = 'guest'
 
 CONTENT_RSS_FEEDS = {
     'banner': '',
-    'announcements': '',
+    'news': '',
     'content': '',
 }
 

@@ -36,7 +36,6 @@ h2 {
     padding-left: 15px;
     margin-bottom: 5px;
 }
-
 input {
     margin: 5px;
 }
@@ -49,4 +48,16 @@ input[type="text"] {
 }
 #browse ul {
     margin: 5px 35px;
+}
+
+.announcement {
+    padding: 10px;
+}
+.announcement h2 {
+    background-color: white;
+    color: black;
+    display:inline;
+}
+.announcement p {
+    display:inline;
 }

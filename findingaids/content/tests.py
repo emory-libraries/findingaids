@@ -90,7 +90,7 @@ class CachedFeedTest(TestCase):
 
 
 class ContentViewsTest(TestCase):
-    feed_entries = ['banner', 'news']
+    feed_entries = ['news', 'banner']
 
     def setUp(self):
         self.client = Client()
@@ -105,13 +105,32 @@ class ContentViewsTest(TestCase):
         models.feedparser = self._feedparser
         # clear any feed data cached by tests
         models.BannerFeed().clear_cache()
+        models.NewsFeed().clear_cache()
 
-
-    def test_site_index(self):
+    def test_site_index_banner(self):
         index_url = reverse('site-index')
         response = self.client.get(index_url)
         expected = 200
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
                              % (expected, response.status_code, index_url))
         self.assertEqual(self.feed_entries, response.context['banner'],
-            'feed entries should be set in template as "banner"')
+            'feed entries should be set in template context as "banner"')
+
+    def test_site_index_news(self):
+        index_url = reverse('site-index')
+        response = self.client.get(index_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
+                             % (expected, response.status_code, index_url))
+        self.assertEqual(self.feed_entries[0], response.context['news'],
+            'first news feed entry should be set in template context as "news"')
+
+    def test_site_index_no_news(self):
+        self.mockfeedparser.entries = []        # simulate no entries in feed
+        index_url = reverse('site-index')
+        response = self.client.get(index_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
+                             % (expected, response.status_code, index_url))
+        self.assertEqual(None, response.context['news'],
+            'news item should be None in template context when news feed has no items')
