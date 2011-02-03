@@ -1,0 +1,56 @@
+{% extends "site_base.html" %}
+{% block page-subtitle %}: Feedback{% endblock %}
+{% block content-title %}Feedback{% endblock %}
+
+{% block content-body %}
+{% if form %}
+<p>Send us your feedback.</p>
+<p>Please let us know if you have technical problems, questions, factual or
+    typographical corrections, or general comments about EmoryFindingAids.</p>
+
+<form id="feedback" action="{% url content:feedback %}" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% with ' <span class="required" title="required">*</span>' as req %}
+    <table>
+        <tr>
+            <td>{{ form.name.label_tag }}{% if form.name.field.required %}{{ req }}{% endif %}</td>
+            <td>{{ form.email.label_tag }}{% if form.email.field.required %}{{ req }}{% endif %}</td>
+        </tr>
+        <tr>
+            <td>{{ form.name }}</td>
+            <td>{{ form.email }}</td>
+        </tr>
+        {% if form.name.errors or form.email.errors %}
+            <tr>
+                <td>{{ form.name.errors }}</td>
+                <td>{{ form.email.errors }}</td>
+            </tr>
+        {% endif %}
+    </table>
+
+    <div id="message" class="">
+        <p>{{ form.message.label_tag }} 
+            {% if form.message.field.required %}{{ req }}{% endif %}
+        </p>
+        {{ form.message }}
+        {{ form.message.errors }}
+    </div>
+    {% endwith %}
+    
+    <input class="form-submit" type="submit" value="Send"/>
+</form>
+{% else %}
+
+{# if form not included, display email success/error #}
+    {% if email_sent %}
+        <p>Your feedback has been sent.  Thank you!</p>
+    {% else %}
+        <p>There was an error sending your message.  Please try again later.</p>        
+        {% if debug %}
+            Exception generated when sending email: {{ err }}
+        {% endif %}
+    {% endif %}
+    
+{% endif %}
+
+{% endblock %}

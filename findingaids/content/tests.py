@@ -1,12 +1,13 @@
 import feedparser
 
-from django.test import Client, TestCase 
+from django.test import Client, TestCase
+from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
 from eulcore.django.test import TestCase as EulDjangoTestCase
 
-from findingaids.content import models
+from findingaids.content import models, forms
 
 class MockFeedParser:
     entries = []
@@ -104,7 +105,6 @@ class ContentFeedTest(TestCase):
         self._feedparser = models.feedparser
         models.feedparser = self.mockfeedparser
 
-
     def tearDown(self):
         # restore the real feedparser
         models.feedparser = self._feedparser
@@ -120,7 +120,116 @@ class ContentFeedTest(TestCase):
         self.assertEqual(None, content.get_entry('bogus'))
 
 
-class ContentViewsTest(EulDjangoTestCase):
+class EmailTestCase(TestCase):
+    # common test class with logic to mock sending mail for tests
+    server_email = 'admin@findingaids.library.emory.edu'
+    email_prefix = '[FA] '
+    feedback_email = ('fa-admin@emory.edu',)
+    _sent_mail = {}
+    _mail_exception = None
+
+    @property
+    def sent_mail(self):
+        'Access parameters passed to last send_mail call'
+        return EmailTestCase._sent_mail
+
+    def simulate_email_exception(self):
+        'Simulate an exception on the next send_mail call via mock send_mail'
+        EmailTestCase._mail_exception = Exception
+
+    @staticmethod
+    def _mock_send_mail(subject, message, from_email, recipient_list, **kwargs):
+        if EmailTestCase._mail_exception is not None:
+            ex = EmailTestCase._mail_exception
+            EmailTestCase._mail_exception = None
+            raise ex
+
+        # store values for tests to inspect
+        EmailTestCase._sent_mail = {'subject': subject, 'message': message,
+            'from': from_email, 'recipients': recipient_list}
+        EmailTestCase._sent_mail.update(**kwargs)
+        return 1    # simulate success (django send_mail returns 1)
+
+
+    def setUp(self):
+        # swap out send_mail with mock function for testing
+        self._send_mail = forms.send_mail
+        forms.send_mail = self._mock_send_mail
+        # set required config settings here too
+        self._server_email = getattr(settings, 'SERVER_EMAIL', None)
+        self._email_prefix = getattr(settings, 'EMAIL_SUBJECT_PREFIX', None)
+        self._feedback_email = getattr(settings, 'FEEDBACK_EMAIL', None)
+        settings.SERVER_EMAIL = self.server_email
+        settings.EMAIL_SUBJECT_PREFIX = self.email_prefix
+        settings.FEEDBACK_EMAIL = self.feedback_email
+
+    def tearDown(self):
+        # restore real send_mail
+        forms.send_mail = self._send_mail
+        if self._server_email is None:
+            delattr(settings, 'SERVER_EMAIL')
+        else:
+            settings.SERVER_EMAIL = self._server_email
+        if self._email_prefix is None:
+            delattr(settings.EMAIL_SUBJECT_PREFIX)
+        else:
+            settings.EMAIL_SUBJECT_PREFIX = self._email_prefix
+        if self._feedback_email is None:
+            delattr(settings.feedback_email)
+        else:
+            settings.FEEDBACK_EMAIL = self._feedback_email
+
+
+class FeedbackFormTest(EmailTestCase):
+
+    def setUp(self):
+        super(FeedbackFormTest, self).setUp()
+
+    def tearDown(self):
+        super(FeedbackFormTest, self).tearDown()
+
+    def test_send_email(self):
+        # form data with message only
+        txt = 'here is my 2 cents'
+        data = {'message': 'here is my 2 cents'}
+        feedback = forms.FeedbackForm(data)
+        # confirm form is valid, propagate cleaned data
+        self.assertTrue(feedback.is_valid())
+        # simulate sending an email
+        self.assertTrue(feedback.send_email())
+        self.assert_(txt in self.sent_mail['message'],
+            'form message value should be included in email text body')
+        self.assert_(self.sent_mail['subject'].startswith(self.email_prefix),
+            'email subject should start with configured email prefix')
+        self.assertEqual(self.server_email, self.sent_mail['from'],
+            'when email is not specified on form, email should come from configured email address')
+        self.assertEqual(self.feedback_email, self.sent_mail['recipients'],
+            'feedback email should be sent to configured email recipients')
+        
+        # message + email address
+        user_email = 'me@my.domain.com'
+        data.update({'email': user_email})
+        feedback = forms.FeedbackForm(data)
+        # confirm form is valid, propagate cleaned data
+        self.assertTrue(feedback.is_valid())
+        # simulate sending an email
+        self.assertTrue(feedback.send_email())
+        self.assertEqual(user_email, self.sent_mail['from'],
+            'when email is specified on form, email should come user-entered from email address')
+
+        # message + email address + name
+        user_name = 'Me Myself'
+        data.update({'name': user_name})
+        feedback = forms.FeedbackForm(data)
+        # confirm form is valid, propagate cleaned data
+        self.assertTrue(feedback.is_valid())
+        # simulate sending an email
+        self.assertTrue(feedback.send_email())
+        self.assertEqual('"%s" <%s>' % (user_name, user_email), self.sent_mail['from'],
+            'when email & name are specified on form, email should come user-entered from email address with name')
+
+
+class ContentViewsTest(EulDjangoTestCase, EmailTestCase):
     feed_entries = ['news', 'banner']
 
     def setUp(self):
@@ -130,6 +239,7 @@ class ContentViewsTest(EulDjangoTestCase):
         self.mockfeedparser.entries = self.feed_entries
         self._feedparser = models.feedparser
         models.feedparser = self.mockfeedparser
+        super(ContentViewsTest, self).setUp()
 
     def tearDown(self):
         # restore the real feedparser
@@ -138,6 +248,7 @@ class ContentViewsTest(EulDjangoTestCase):
         models.BannerFeed().clear_cache()
         models.NewsFeed().clear_cache()
         models.ContentFeed().clear_cache()
+        super(ContentViewsTest, self).tearDown()
 
     def test_site_index_banner(self):
         index_url = reverse('site-index')
@@ -198,4 +309,33 @@ class ContentViewsTest(EulDjangoTestCase):
             'Expected %s but returned %s for %s (non-existent page)'
              % (expected, response.status_code, content_url))
 
+    def test_feedback_form(self):
+        # GET - display the form
+        feedback_url = reverse('content:feedback')
+        response = self.client.get(feedback_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+            'Expected %s but returned %s for GET on %s'
+             % (expected, response.status_code, feedback_url))
+        self.assert_(isinstance(response.context['form'], forms.FeedbackForm),
+            'feedback form should be set in template context for GET on %s' % feedback_url)
 
+        # POST - send an email
+        response = self.client.post(feedback_url, {'message': 'more please'})
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+            'Expected %s but returned %s for POST on %s'
+             % (expected, response.status_code, feedback_url))
+        self.assertContains(response, 'feedback has been sent',
+            msg_prefix='Thank you message should be displayed on result page after sending feedback')
+
+        # POST - simulate error sending email
+        self.simulate_email_exception()
+        response = self.client.post(feedback_url, {'message': 'more please'})
+        expected = 500
+        self.assertEqual(expected, response.status_code, 
+            'Expected %s but returned %s for POST on %s'
+             % (expected, response.status_code, feedback_url))
+        self.assertContains(response, 'here was an error sending your message',
+            msg_prefix='response should display error message when sending email triggers an exception',
+            status_code=500)

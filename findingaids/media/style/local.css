@@ -295,3 +295,33 @@ hr {
     background-color: #f19b62;
     border: 1px solid #f19b62;
 }
+
+
+/* feedback form */
+#feedback #message {
+    margin-bottom: 10px;
+}
+#feedback #message p {
+    margin: 0px;
+}
+#feedback table {
+    width: 75%;
+}
+#feedback table, #feedback td {
+    padding: 0px; 
+    border: 0px !important;
+    margin: 0px;
+}
+#feedback table input {
+    width: 95%;
+}
+#feedback textarea {
+ width: 75%;
+}
+.required {
+    color: red;
+    font-weight: bold;
+}
+#feedback ul, #feedback li {
+    padding: 0px !important;
+}
