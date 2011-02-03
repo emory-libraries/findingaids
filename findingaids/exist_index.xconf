@@ -10,12 +10,9 @@
             <text qname="ead:ead" boost="0.5">
                 <ignore qname="ead:publicationstmt"/>
                 <ignore qname="ead:profiledesc"/>
-                <ignore qname="ead:physdesc"/>
                 <ignore qname="ead:langmaterial"/>
                 <ignore qname="ead:repository"/>
                 <ignore qname="ead:acqinfo"/>
-                <ignore qname="ead:accessrestrict"/>
-                <ignore qname="ead:userestrict"/>
                 <ignore qname="ead:prefercite"/>
                 <ignore qname="ead:altformavail"/>
                 <ignore qname="ead:processinfo"/>
