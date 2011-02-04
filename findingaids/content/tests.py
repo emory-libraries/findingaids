@@ -188,6 +188,7 @@ class EmailTestCase(TestCase):
         self._captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
         settings.RECAPTCHA_PRIVATE_KEY = 'mine & mine alone'
         settings.RECAPTCHA_PUBLIC_KEY = 'anyone can see this'
+        settings.RECAPTCHA_THEME = ''
 
     def tearDown(self):
         # restore real send_mail
@@ -202,7 +203,7 @@ class EmailTestCase(TestCase):
         else:
             settings.EMAIL_SUBJECT_PREFIX = self._email_prefix
         if self._feedback_email is None:
-            delattr(settings.feedback_email)
+            delattr(settings, 'FEEDBACK_EMAIL')
         else:
             settings.FEEDBACK_EMAIL = self._feedback_email
 
