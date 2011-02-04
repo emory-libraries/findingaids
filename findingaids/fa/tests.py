@@ -20,7 +20,7 @@ from eulcore.django.test import TestCase
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
-from findingaids.fa.forms import boolean_to_upper
+from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
     collection_lastmodified, exist_datetime_with_timezone, alpha_pagelabels
@@ -1329,7 +1329,8 @@ class FullTextFaViewsTest(TestCase):
 
         # keyword now optional - no search terms should be an invalid form
         response = self.client.get(search_url, { 'subject' : '', 'keywords': ''})
-        self.assertContains(response, 'Please enter search terms for at least one of keywords and subject')
+        self.assertContains(response, 'Please enter search terms for at least one of keywords and subject ' +
+            'or select a repository')
 
     def test_repository_search(self):
         search_url = reverse('fa:search')
@@ -1351,7 +1352,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertNotContains(response, reverse('fa:findingaid', kwargs={'id': 'abbey244'}),
             msg_prefix='search for "papers" & repository "University Archives" does not include non-UA finding aid')
 
-
+        
     def test_search__boolean(self):
         search_url = reverse('fa:search')
 
@@ -1639,16 +1640,6 @@ class FullTextFaViewsTest(TestCase):
             "expected status code %s for %s with bogus eadid, got %s" %\
             (expected, search_url, got))
 
-
-    def test_boolean_to_upper(self):
-        #should capitalize and or not when they are separate words and not parts of other words
-        input = "not cookies and ice cream or oreos they make anderson sick and he eats nothing except hot dogs and hamburgers"
-        expected = "NOT cookies AND ice cream OR oreos they make anderson sick AND he eats nothing except hot dogs AND hamburgers"
-
-        result = boolean_to_upper(input)
-
-        self.assertEqual(result, expected)
-
     def test_findingaid_match_count(self):
         # finding aid match_count field can only be tested via eXist return
         findingaid = FindingAid.objects.filter(highlight='mansion institute').get(eadid='raoul548')
@@ -1752,3 +1743,36 @@ class IfUrlTestCase(DjangoTestCase):
         url = template.render(context)
         self.assertEqual(reverse('fa:findingaid', kwargs=urlopts), url,
             "ifurl correctly stores resulting url in context when 'as' is specified")
+
+
+class BooleanToUpperTest(TestCase):
+    def test_boolean_to_upper(self):
+        #should capitalize and or not when they are separate words and not parts of other words
+        input = "not cookies and ice cream or oreos they make anderson sick and he eats nothing except hot dogs and hamburgers"
+        expected = "NOT cookies AND ice cream OR oreos they make anderson sick AND he eats nothing except hot dogs AND hamburgers"
+
+        result = boolean_to_upper(input)
+        self.assertEqual(result, expected)
+
+class AdvancedSearchFormTest(TestCase):
+    # load fixtures so we have repo choices
+    exist_fixtures = {'directory' : exist_fixture_path }
+
+    def test_validation(self):
+        # no data - not valid
+        form = AdvancedSearchForm(data={})
+        self.assertFalse(form.is_valid(),
+            'advanced search form is not valid when no fields are specified')
+        self.assertTrue(form.non_field_errors(),
+            'a non-field error is displayed when no search terms are entered')
+        # any one field - valid
+        form = AdvancedSearchForm(data={'keywords': 'foo'})
+        self.assertTrue(form.is_valid(),
+            'advanced search form is valid when only keywords are specified')
+        form = AdvancedSearchForm(data={'subject': 'bar'})
+        self.assertTrue(form.is_valid(),
+            'advanced search form is valid when only subject is specified')
+        form = AdvancedSearchForm(data={'repository': '"University Archives"'})
+        self.assertTrue(form.is_valid(),
+            'advanced search form is valid when only repository is specified')
+
