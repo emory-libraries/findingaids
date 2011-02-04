@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -37,7 +38,7 @@ def feedback(request):
     '''Feedback form. On GET, displays the form; on POST, processes the submitted
     form and sends an email (if all required fields are present).'''
     if request.method == 'POST':
-        form = FeedbackForm(request.POST)
+        form = FeedbackForm(request.POST, remote_ip=request.META['REMOTE_ADDR'])
         if form.is_valid():
             err = None
             try:
@@ -47,7 +48,7 @@ def feedback(request):
                 err = ex
                 email_ok = False
             # display a success/thank you page
-            response = render_to_response('content/feedback.html', {
+            response = render_to_response ('content/feedback.html', {
                     'email_sent': email_ok,
                     'err': err,
                 }, context_instance=RequestContext(request))
@@ -56,9 +57,12 @@ def feedback(request):
                 response.status_code = 500
             return response
     else:
-        form = FeedbackForm()
+        form = FeedbackForm() 
+
+    captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
 
     return render_to_response('content/feedback.html', {
                 'form': form,
+                'captcha_theme': captcha_theme,
             }, context_instance=RequestContext(request))
 

@@ -2,13 +2,22 @@
 {% block page-subtitle %}: Feedback{% endblock %}
 {% block content-title %}Feedback{% endblock %}
 
+{% block scripts %}
+    {{ block.super }}
+    {% if captcha_theme %} {# set captcha theme option if specified #}
+        <script type="text/javascript">
+             var RecaptchaOptions = { theme : '{{ captcha_theme }}' };
+         </script>
+    {% endif %}
+{% endblock %}
+
 {% block content-body %}
 {% if form %}
 <p>Send us your feedback.</p>
 <p>Please let us know if you have technical problems, questions, factual or
     typographical corrections, or general comments about EmoryFindingAids.</p>
 
-<form id="feedback" action="{% url content:feedback %}" method="post">{% csrf_token %}
+ <form id="feedback" action="{% url content:feedback %}" method="post">{% csrf_token %}
     {{ form.non_field_errors }}
     {% with ' <span class="required" title="required">*</span>' as req %}
     <table>
@@ -36,7 +45,11 @@
         {{ form.message.errors }}
     </div>
     {% endwith %}
-    
+
+    <p>To help us combat form spam, please verify the word below before
+        submitting your feedback.</p>
+    {{ form.captcha_challenge}}
+
     <input class="form-submit" type="submit" value="Send"/>
 </form>
 {% else %}

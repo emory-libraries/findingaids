@@ -14,6 +14,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+SERVER_EMAIL = ''       # email where default messages come from; django default is root@localhost
+EMAIL_SUBJECT_PREFIX = '[EmoryFindingAids] ' # prefix for email subjects
+FEEDBACK_EMAIL = []     # list of email addresses to receive site feedback
+
 # RDB used for user account management.
 DATABASES = {
     'default': {
@@ -124,6 +128,11 @@ CONTENT_RSS_FEEDS = {
     'news': '',
     'content': '',
 }
+
+# recaptcha keys for your server or domain from https://www.google.com/recaptcha/
+RECAPTCHA_PUBLIC_KEY = ''
+RECAPTCHA_PRIVATE_KEY = ''
+RECAPTCHA_THEME = ''      # optional; one of red, white, blackglass, and clean
 
 #Logger Settings
 import logging
