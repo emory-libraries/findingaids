@@ -297,31 +297,21 @@ hr {
 }
 
 
-/* feedback form */
-#feedback #message {
-    margin-bottom: 10px;
-}
-#feedback #message p {
-    margin: 0px;
-}
-#feedback table {
-    width: 75%;
-}
-#feedback table, #feedback td {
-    padding: 0px; 
-    border: 0px !important;
-    margin: 0px;
-}
-#feedback table input {
-    width: 95%;
-}
-#feedback textarea {
- width: 75%;
-}
-.required {
+/* feedback & request materials forms */
+.email-form  .required {
     color: red;
     font-weight: bold;
 }
-#feedback ul, #feedback li {
+.email-form ul, .email-form li {
     padding: 0px !important;
+}
+
+.email-form label {
+    display: block;
+}
+.email-form input[type='text'], .email-form textarea {
+    width: 85%;
+}
+.email-form li {
+    background: none !important;
 }

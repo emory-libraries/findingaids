@@ -11,6 +11,9 @@ from eulcore.django.test import TestCase as EulDjangoTestCase
 
 from findingaids.content import models, forms
 
+# re-using finding aid fixtures from main fa app
+exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..', 'fa', 'fixtures')
+
 class MockFeedParser:
     entries = []
     status = 200
@@ -121,20 +124,8 @@ class ContentFeedTest(TestCase):
         # non-existent
         self.assertEqual(None, content.get_entry('bogus'))
 
+from eulcore.django.forms.tests import MockCaptcha
 
-class MockCaptcha:
-    'Mock captcha client to allow testing without querying captcha servers'
-    response = captcha.RecaptchaResponse(True)
-    submit_args = {}
-    display_arg = None
-
-    def displayhtml(self, pubkey):
-        self.display_arg = pubkey
-
-    def submit(self, challenge, response, private_key, remote_ip):
-        self.submit_args = {'challenge': challenge, 'response': response,
-            'private_key': private_key, 'remote_ip': remote_ip}
-        return self.response
 
 
 class EmailTestCase(EulDjangoTestCase):
@@ -182,15 +173,13 @@ class EmailTestCase(EulDjangoTestCase):
         settings.FEEDBACK_EMAIL = self.feedback_email
         
         # swap out captcha with mock
-        self._captcha = forms.captcha
-        forms.captcha = MockCaptcha()
+        self._captcha = forms.captchafield.captcha
+        forms.captchafield.captcha = MockCaptcha()
         # set required captcha configs
         self._captcha_private_key = getattr(settings, 'RECAPTCHA_PRIVATE_KEY', None)
         self._captcha_public_key = getattr(settings, 'RECAPTCHA_PUBLIC_KEY', None)
-        self._captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
         settings.RECAPTCHA_PRIVATE_KEY = 'mine & mine alone'
         settings.RECAPTCHA_PUBLIC_KEY = 'anyone can see this'
-        settings.RECAPTCHA_THEME = ''
 
     def tearDown(self):
         # restore real send_mail
@@ -210,7 +199,7 @@ class EmailTestCase(EulDjangoTestCase):
             settings.FEEDBACK_EMAIL = self._feedback_email
 
         # restore real captcha
-        forms.captcha = self._captcha
+        forms.captchafield.captcha = self._captcha
         # restore captcha settings
         if self._captcha_private_key is None:
             delattr(settings, 'RECAPTCHA_PRIVATE_KEY')
@@ -220,16 +209,10 @@ class EmailTestCase(EulDjangoTestCase):
             delattr(settings, 'RECAPTCHA_PUBLIC_KEY')
         else:
             settings.RECAPTCHA_PUBLIC_KEY = self._captcha_public_key
-        if self._captcha_theme is None:
-            delattr(settings, 'RECAPTCHA_THEME')
-        else:
-            settings.RECAPTCHA_THEME = self._captcha_theme
-
+       
 class FeedbackFormTest(EmailTestCase):
     
-    exist_fixtures = {'files' : [
-        path.join(path.dirname(path.abspath(__file__)), '..', 'fa', 'fixtures', 'abbey244.xml'),
-    ]}
+    exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
 
     def setUp(self):
         super(FeedbackFormTest, self).setUp()
@@ -247,7 +230,6 @@ class FeedbackFormTest(EmailTestCase):
             }
         feedback = forms.FeedbackForm(data, remote_ip='0.0.0.0')
         # confirm form is valid, propagate cleaned data
-        feedback.is_valid()
         self.assertTrue(feedback.is_valid())
         # simulate sending an email
         self.assertTrue(feedback.send_email())
@@ -302,53 +284,53 @@ class FeedbackFormTest(EmailTestCase):
         self.assert_(ead_url in self.sent_mail['message'],
             'when url is specified on form, it should be included in message text')
         
+class RequestMaterialsFormTest(EmailTestCase):
 
-    def test_captcha_challenge(self):
-        feedback = forms.FeedbackForm()
-        feedback.captcha_challenge()
-        self.assertEqual(settings.RECAPTCHA_PUBLIC_KEY, forms.captcha.display_arg,
-            'captcha challenge should be generated with public key from settings')
+    def setUp(self):
+        super(RequestMaterialsFormTest, self).setUp()
+
+    def tearDown(self):
+        super(RequestMaterialsFormTest, self).tearDown()
         
-    def test_captcha_validation(self):
+
+    def test_send_email(self):
         # form data with message only
-        data = {'message': 'something there',
+        data = {
+            'repo': [settings.REQUEST_MATERIALS_CONTACTS[0][0]],
+            'name': 'A. Scholar',
+            'date': 'tomorrow',
+            'email': 'a.scholar@gmail.com',
+            'phone': '7-1234',
+            'request': 'MSS644 Ted Hughes Box 1 Box 5 OP12',
             # captcha fields now required for form to be valid
             'recaptcha_challenge_field': 'boo',
             'recaptcha_response_field': 'hiss',
-            }
-        user_ip = '10.0.0.1'
-        feedback = forms.FeedbackForm(data, remote_ip=user_ip)
-        # validate
+            'remote_ip': '0.0.0.0',
+        }
+
+        feedback = forms.RequestMaterialsForm(data)
+        # confirm form is valid, propagate cleaned data
         self.assertTrue(feedback.is_valid())
-        # check that captcha was submitted correctly
-        self.assertEqual(data['recaptcha_challenge_field'],
-            forms.captcha.submit_args['challenge'])
-        self.assertEqual(data['recaptcha_response_field'],
-            forms.captcha.submit_args['response'])
-        self.assertEqual(settings.RECAPTCHA_PRIVATE_KEY,
-            forms.captcha.submit_args['private_key'])
-        self.assertEqual(user_ip, forms.captcha.submit_args['remote_ip'])
 
-        # simulate invalid captcha response
-        forms.captcha.response.is_valid = False
-        forms.captcha.response.err_code = 'incorrect-captcha-sol'
-        feedback = forms.FeedbackForm(data, remote_ip=user_ip)
-        # validate
-        self.assertFalse(feedback.is_valid(),
-            'form should not be valid when captcha response is not valid')
-        self.assert_('CAPTCHA response incorrect' in feedback.non_field_errors(),
-            'captcha error should be included in non-field errors')
-
-        # restore success response
-        forms.captcha.response.is_valid = True
-        forms.captcha.response.err_code = None
+        # simulate sending an email
+        self.assertTrue(feedback.send_email())
+        self.assertPattern('Name:\s+%s' % data['name'], self.sent_mail['message'],
+            'name submitted on form should be included in email text')
+        self.assertPattern('Date of Visit:\s+%s' % data['date'], self.sent_mail['message'],
+            'date of visit submitted on form should be included in email text')
+        self.assertPattern('Phone Number:\s+%s' % data['phone'], self.sent_mail['message'],
+            'phone number submitted on form should be included in email text')
+        self.assert_(data['request'] in self.sent_mail['message'],
+            'text of materials requested on form should be included in email text')
+        self.assert_(data['email'] in self.sent_mail['from'],
+            'material request email should come from user-entered from email address')
+        self.assert_(data['name'] in self.sent_mail['from'],
+            'material request email should come from user-entered from name')
 
 
 class ContentViewsTest(EmailTestCase):
     feed_entries = ['news', 'banner']
-    exist_fixtures = {'files' : [
-        path.join(path.dirname(path.abspath(__file__)), '..', 'fa', 'fixtures', 'abbey244.xml'),
-    ]}
+    exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
 
     def setUp(self):
         self.client = Client()
@@ -438,18 +420,6 @@ class ContentViewsTest(EmailTestCase):
         self.assert_(isinstance(response.context['form'], forms.FeedbackForm),
             'feedback form should be set in template context for GET on %s' % feedback_url)
 
-        # test captcha theme setting
-        settings.RECAPTCHA_THEME = None
-        response = self.client.get(feedback_url)
-        self.assertNotContains(response, 'var RecaptchaOptions',
-            msg_prefix='feedback page should not contain Recaptcha Options when RECAPTCHA_THEME is not configured');
-        settings.RECAPTCHA_THEME = 'white'
-        response = self.client.get(feedback_url)
-        self.assertContains(response, 'var RecaptchaOptions',
-            msg_prefix='feedback page should contain Recaptcha Options when RECAPTCHA_THEME is configured');
-        self.assertContains(response, "theme : 'white'",
-            msg_prefix='feedback page should set configured RECAPTCHA_THEME in recaptcha theme option');
-
         # GET with an eadid
         response = self.client.get(feedback_url, {'eadid': 'abbey244'})
         self.assertPattern('Sending feedback about.*Abbey\s+Theatre\s+collection,\s+1921-1995',
@@ -478,6 +448,39 @@ class ContentViewsTest(EmailTestCase):
         self.assertEqual(expected, response.status_code, 
             'Expected %s but returned %s for POST on %s'
              % (expected, response.status_code, feedback_url))
-        self.assertContains(response, 'here was an error sending your message',
+        self.assertContains(response, 'here was an error sending your feedback',
             msg_prefix='response should display error message when sending email triggers an exception',
             status_code=500)
+
+
+    def test_request_materials(self):
+        # GET - display the form
+        rqst_materials_url = reverse('content:request-materials')
+        response = self.client.get(rqst_materials_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+            'Expected %s but returned %s for GET on %s'
+             % (expected, response.status_code, rqst_materials_url))
+        self.assert_(isinstance(response.context['form'], forms.RequestMaterialsForm),
+            'request materials form should be set in template context for GET on %s' % rqst_materials_url)
+
+        # POST - send an email
+        data = {
+            'repo': [settings.REQUEST_MATERIALS_CONTACTS[0][0]],
+            'name': 'A. Scholar',
+            'date': 'tomorrow',
+            'email': 'a.scholar@gmail.com',
+            'phone': '7-1234',
+            'request': 'MSS644 Ted Hughes Box 1 Box 5 OP12',
+            # captcha fields required for form to be valid
+            'recaptcha_challenge_field': 'boo',
+            'recaptcha_response_field': 'hiss',
+            'remote_ip': '0.0.0.0',
+        }
+        response = self.client.post(rqst_materials_url, data)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+            'Expected %s but returned %s for POST on %s'
+             % (expected, response.status_code, rqst_materials_url))
+        self.assertContains(response, 'request for materials has been sent',
+            msg_prefix='success message should be displayed on result page after sending feedback')

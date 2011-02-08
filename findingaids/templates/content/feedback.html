@@ -2,15 +2,6 @@
 {% block page-subtitle %}: Feedback{% endblock %}
 {% block content-title %}Feedback{% endblock %}
 
-{% block scripts %}
-    {{ block.super }}
-    {% if captcha_theme %} {# set captcha theme option if specified #}
-        <script type="text/javascript">
-             var RecaptchaOptions = { theme : '{{ captcha_theme }}' };
-         </script>
-    {% endif %}
-{% endblock %}
-
 {% block content-body %}
 {% if form %}
 <p>Send us your feedback.</p>
@@ -22,54 +13,25 @@
   <p>Sending feedback about <b>{{ findingaid.title|format_ead }}</b>.</p>
 {% endif %}
 
- <form id="feedback" action="{% url content:feedback %}" method="post">{% csrf_token %}
-    {{ form.non_field_errors }}
-    {# hidden fields #}
-    {{ form.eadid }} {{ form.url }}
+ <form class="email-form" action="{% url content:feedback %}" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}    
     {% with ' <span class="required" title="required">*</span>' as req %}
-    <table>
-        <tr>
-            <td>{{ form.name.label_tag }}{% if form.name.field.required %}{{ req }}{% endif %}</td>
-            <td>{{ form.email.label_tag }}{% if form.email.field.required %}{{ req }}{% endif %}</td>
-        </tr>
-        <tr>
-            <td>{{ form.name }}</td>
-            <td>{{ form.email }}</td>
-        </tr>
-        {% if form.name.errors or form.email.errors %}
-            <tr>
-                <td>{{ form.name.errors }}</td>
-                <td>{{ form.email.errors }}</td>
-            </tr>
-        {% endif %}
-    </table>
-
-    <div id="message" class="">
-        <p>{{ form.message.label_tag }} 
-            {% if form.message.field.required %}{{ req }}{% endif %}
-        </p>
-        {{ form.message }}
-        {{ form.message.errors }}
-    </div>
+        {% for field in form.visible_fields %}
+            {% include 'content/snippets/form_field.html' %}
+        {% endfor %}
     {% endwith %}
-
-    <p>To help us combat form spam, please verify the word below before
-        submitting your feedback.</p>
-     {{ form.captcha_challenge}} 
-
+    {# display all hidden fields *except* captcha #}
+    {% for field in form.hidden_fields %}
+      {% if field.name != 'captcha' %} {{ field }} {% endif %}
+    {% endfor %}
+    {% include 'content/snippets/captcha.html' %}    
     <input class="form-submit" type="submit" value="Send"/>
 </form>
 {% else %}
-
-{# if form not included, display email success/error #}
-    {% if email_sent %}
-        <p>Your feedback has been sent.  Thank you!</p>
-    {% else %}
-        <p>There was an error sending your message.  Please try again later.</p>        
-        {% if debug %}
-            Exception generated when sending email: {{ err }}
-        {% endif %}
-    {% endif %}
+    {# if form not included, display email success/error #}
+    {% with 'feedback' as  message_type %}
+        {% include 'content/snippets/email_sent.html' %}
+    {% endwith %}
     
 {% endif %}
 

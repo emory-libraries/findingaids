@@ -18,6 +18,11 @@ SERVER_EMAIL = ''       # email where default messages come from; django default
 EMAIL_SUBJECT_PREFIX = '[EmoryFindingAids] ' # prefix for email subjects
 FEEDBACK_EMAIL = []     # list of email addresses to receive site feedback
 
+# email addresses & archives repositories for the request materials form
+REQUEST_MATERIALS_CONTACTS = (
+    # ('email address', 'name'),
+)
+
 # RDB used for user account management.
 DATABASES = {
     'default': {
@@ -132,7 +137,7 @@ CONTENT_RSS_FEEDS = {
 # recaptcha keys for your server or domain from https://www.google.com/recaptcha/
 RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''
-RECAPTCHA_THEME = ''      # optional; one of red, white, blackglass, and clean
+RECAPTCHA_OPTIONS = {}   # optional; e.g., {'theme': 'white'}
 
 #Logger Settings
 import logging

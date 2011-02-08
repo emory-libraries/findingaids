@@ -16,7 +16,7 @@
 {% block navbar %}   {# override the whole block - no 'HOME' #}
 <ul>
     <li><a href="{% url fa:search %}">Advanced Search</a></li>
-    <li><a href="">Requesting Materials</a></li>
+    <li><a href="{% url content:request-materials %}">Request Materials</a></li>
     <li><a href="{% url content:page 'institutions' %}">Participating Institutions</a></li>
     <li><a href="{% url content:page 'search-tips' %}">Search Tips</a></li>
     <li><a href="{% url content:page 'faq' %}">{# FindingAid #}FAQ</a></li>
