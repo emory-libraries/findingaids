@@ -449,6 +449,12 @@ class FaViewsTest(TestCase):
         self.assertContains(response, 'Description of Series', 2,
             msg_prefix="'Description of Series' should only occur twice on main finding aid page")
 
+        # link to single-finding aid feedback form
+        self.assertTrue(response.context['feedback_opts'],
+            'single finding aid feedback options should be set in response context')
+        self.assertContains(response, reverse('content:feedback'),
+            msg_prefix='url to feedback form should be included in response')
+
     def test_view__fa_with_subseries(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(fa_url)
@@ -530,6 +536,11 @@ class FaViewsTest(TestCase):
         response = self.client.get(index2_url)
         self.assertContains(response, 'Second Index')
 
+        # link to single-finding aid feedback form
+        self.assertTrue(response.context['feedback_opts'],
+            'single finding aid feedback options should be set in response context')
+        self.assertContains(response, reverse('content:feedback'),
+            msg_prefix='url to feedback form should be included in response')
 
     def test_view_nodsc(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'adams465'})
@@ -598,6 +609,13 @@ class FaViewsTest(TestCase):
 
         self.assertNotContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="non-highlighted series does NOT include robots directives noindex, nofollow")
+
+        # link to single-finding aid feedback form
+        self.assertTrue(response.context['feedback_opts'],
+            'single finding aid feedback options should be set in response context')
+        self.assertContains(response, reverse('content:feedback'),
+            msg_prefix='url to feedback form should be included in response')
+
 
     def test_view_subseries__raoul_series1_6(self):
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',

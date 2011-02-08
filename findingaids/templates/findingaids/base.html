@@ -31,4 +31,10 @@
       </form>
   </div>
   {% endif %}
+  {% if feedback_opts %}
+  <p>Do you have a factual or typographical correction for this Finding Aid?
+    <a href="{% url content:feedback %}?{{feedback_opts}}">Send us your feedback.</a>
+  </p>
+  {% endif %}
+
 {% endblock %}

@@ -113,15 +113,16 @@ def findingaid(request, id, preview=False):
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
 
-    response = render_to_response('findingaids/findingaid.html', { 'ead' : fa,
-                                                         'series' : series,
-                                                         'all_indexes' : fa.archdesc.index,                                                         
-                                                         'preview': preview,
-                                                         'url_params': url_params,
-                                                         'docsearch_form': KeywordSearchForm(),
-                                                         'last_search' : request.session.get('last_search', None),
-                                                         },
-                                                         context_instance=RequestContext(request, current_app='preview'))
+    response = render_to_response('findingaids/findingaid.html', {
+        'ead' : fa,
+        'series' : series,
+        'all_indexes' : fa.archdesc.index,
+        'preview': preview,
+        'url_params': url_params,
+        'docsearch_form': KeywordSearchForm(),
+        'last_search' : request.session.get('last_search', None),
+        'feedback_opts': _get_feedback_options(request, id),
+     },  context_instance=RequestContext(request, current_app='preview'))
     #Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
@@ -291,6 +292,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                     'canonical_url' : _series_url(eadid, *[shortform_id(id) for id in series_ids]),
                     'docsearch_form': KeywordSearchForm(),
                     'last_search' : request.session.get('last_search', None),
+                    'feedback_opts': _get_feedback_options(request, eadid),
                     }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
@@ -365,6 +367,10 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
     except DoesNotExist:
         raise Http404
     return record
+
+def _get_feedback_options(request, id):
+    'Generate single-finding aid feedback options as a url parameter.'
+    return urlencode({'eadid': id, 'url': request.build_absolute_uri()})
 
 @condition(last_modified_func=collection_lastmodified)
 def search(request):
