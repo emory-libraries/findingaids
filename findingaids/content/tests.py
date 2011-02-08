@@ -1,5 +1,6 @@
 import feedparser
 from recaptcha.client import captcha
+from os import path
 
 from django.test import Client, TestCase
 from django.conf import settings
@@ -136,9 +137,10 @@ class MockCaptcha:
         return self.response
 
 
-class EmailTestCase(TestCase):
-    # common test class with logic to mock sending mail and mock captcha submission
-    # to test functionality without actual sending email or querying captcha servers
+class EmailTestCase(EulDjangoTestCase):
+    # Common test class with logic to mock sending mail and mock captcha submission
+    # to test functionality without actual sending email or querying captcha servers.
+    # Extending EulDjangoTestCase to allow use of eXist fixtures
     server_email = 'admin@findingaids.library.emory.edu'
     email_prefix = '[FA] '
     feedback_email = ('fa-admin@emory.edu',)
@@ -224,6 +226,10 @@ class EmailTestCase(TestCase):
             settings.RECAPTCHA_THEME = self._captcha_theme
 
 class FeedbackFormTest(EmailTestCase):
+    
+    exist_fixtures = {'files' : [
+        path.join(path.dirname(path.abspath(__file__)), '..', 'fa', 'fixtures', 'abbey244.xml'),
+    ]}
 
     def setUp(self):
         super(FeedbackFormTest, self).setUp()
@@ -263,7 +269,9 @@ class FeedbackFormTest(EmailTestCase):
         # simulate sending an email
         self.assertTrue(feedback.send_email())
         self.assertEqual(user_email, self.sent_mail['from'],
-            'when email is specified on form, email should come user-entered from email address')
+            'when email is specified on form, email should come from user-entered from email address')
+        self.assert_(user_email in self.sent_mail['message'],
+            'when email is specified on form, it should be included in message text')
 
         # message + email address + name
         user_name = 'Me Myself'
@@ -274,7 +282,26 @@ class FeedbackFormTest(EmailTestCase):
         # simulate sending an email
         self.assertTrue(feedback.send_email())
         self.assertEqual('"%s" <%s>' % (user_name, user_email), self.sent_mail['from'],
-            'when email & name are specified on form, email should come user-entered from email address with name')
+            'when email & name are specified on form, email should come from user-entered from email address with name')
+        self.assert_(user_name in self.sent_mail['message'],
+            'when name is specified on form, it should be included in message text')
+
+        # send message with optional eadid & url
+        eadid = 'abbey244'
+        ead_url = reverse('fa:findingaid', args=[eadid])
+        data.update({'eadid': eadid, 'url': ead_url})
+        feedback = forms.FeedbackForm(data)
+        # confirm form is valid, propagate cleaned data
+        self.assertTrue(feedback.is_valid())
+        # simulate sending an email
+        self.assertTrue(feedback.send_email())
+        self.assert_(eadid in self.sent_mail['message'],
+            'when eadid is specified in form data, it should be included in message text')
+        self.assert_('Abbey Theatre collection, 1921-1995' in self.sent_mail['message'],
+            'when eadid is specified on form, ead title should be included in message text')
+        self.assert_(ead_url in self.sent_mail['message'],
+            'when url is specified on form, it should be included in message text')
+        
 
     def test_captcha_challenge(self):
         feedback = forms.FeedbackForm()
@@ -317,8 +344,11 @@ class FeedbackFormTest(EmailTestCase):
         forms.captcha.response.err_code = None
 
 
-class ContentViewsTest(EulDjangoTestCase, EmailTestCase):
+class ContentViewsTest(EmailTestCase):
     feed_entries = ['news', 'banner']
+    exist_fixtures = {'files' : [
+        path.join(path.dirname(path.abspath(__file__)), '..', 'fa', 'fixtures', 'abbey244.xml'),
+    ]}
 
     def setUp(self):
         self.client = Client()
@@ -419,6 +449,12 @@ class ContentViewsTest(EulDjangoTestCase, EmailTestCase):
             msg_prefix='feedback page should contain Recaptcha Options when RECAPTCHA_THEME is configured');
         self.assertContains(response, "theme : 'white'",
             msg_prefix='feedback page should set configured RECAPTCHA_THEME in recaptcha theme option');
+
+        # GET with an eadid
+        response = self.client.get(feedback_url, {'eadid': 'abbey244'})
+        self.assertPattern('Sending feedback about.*Abbey\s+Theatre\s+collection,\s+1921-1995',
+            response.content,
+            msg_prefix='feedback page should include title when sending feedback about a single ead');
 
         # POST - send an email
         feedback_data = {

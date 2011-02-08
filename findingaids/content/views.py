@@ -6,6 +6,7 @@ from django.template import RequestContext
 from findingaids.content.models import BannerFeed, NewsFeed, ContentFeed
 from findingaids.content.forms import FeedbackForm
 from findingaids.fa.models import title_letters
+from findingaids.fa.utils import get_findingaid
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
@@ -37,6 +38,7 @@ def content_page(request, page):
 def feedback(request):
     '''Feedback form. On GET, displays the form; on POST, processes the submitted
     form and sends an email (if all required fields are present).'''
+    ead = None
     if request.method == 'POST':
         form = FeedbackForm(request.POST, remote_ip=request.META['REMOTE_ADDR'])
         if form.is_valid():
@@ -57,12 +59,20 @@ def feedback(request):
                 response.status_code = 500
             return response
     else:
-        form = FeedbackForm() 
+        if 'eadid' in request.GET:
+            # retrieve minimal ead info to display ead title to user on the form
+            ead = get_findingaid(eadid=request.GET['eadid'], only=['title'])
+        else:
+            ead = None
+
+        # GET may include eadid & url; use as initial data to populate those fields
+        form = FeedbackForm(initial=request.GET)
 
     captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
 
     return render_to_response('content/feedback.html', {
                 'form': form,
+                'findingaid': ead,
                 'captcha_theme': captcha_theme,
             }, context_instance=RequestContext(request))
 

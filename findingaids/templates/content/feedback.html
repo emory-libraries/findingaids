@@ -17,8 +17,15 @@
 <p>Please let us know if you have technical problems, questions, factual or
     typographical corrections, or general comments about EmoryFindingAids.</p>
 
+{% if findingaid %} {# feedback about a particular finding aid #}
+  {% load ead %}
+  <p>Sending feedback about <b>{{ findingaid.title|format_ead }}</b>.</p>
+{% endif %}
+
  <form id="feedback" action="{% url content:feedback %}" method="post">{% csrf_token %}
     {{ form.non_field_errors }}
+    {# hidden fields #}
+    {{ form.eadid }} {{ form.url }}
     {% with ' <span class="required" title="required">*</span>' as req %}
     <table>
         <tr>
@@ -48,7 +55,7 @@
 
     <p>To help us combat form spam, please verify the word below before
         submitting your feedback.</p>
-    {{ form.captcha_challenge}}
+     {{ form.captcha_challenge}} 
 
     <input class="form-submit" type="submit" value="Send"/>
 </form>
