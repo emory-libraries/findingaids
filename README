@@ -1,89 +1,57 @@
 README
 ======
 
-Dependencies
-------------
- * django 1.2
- * eXist-db 1.4
- * dateutil
- * `Apache FOP <http://xmlgraphics.apache.org/fop/>`_ for PDF generation.
- * python-dateutil library `downloadable package
-   <http://labix.org/python-dateutil>`_ or install via `easy_install
-   python-dateutil`
- * `RabbitMQ <http://www.rabbitmq.com/>`__
- * `zc.icp <http://pypi.python.org/pypi/zc.icp>`_ for querying cache status
- * django-celery installed via `easy_install django-celery`
- * feedparser -  `easy_install feedparser` or `pip install feedparser`
- * eulcore (currently included as a subversion external); see
-   :ref:`eulcore dependencies <eulcore-deps>` for per-module
-   dependencies. eulcore modules currently in use:
+Overview
+--------
 
-   * eulcore.xmlmap
-   * eulcore.existdb and eulcore.django.existdb
-   * eulcore.django.ldap
-   * eulcore.django.testsetup
-   * eulcore.django.http
+This project is a Django web application for providing access to and limited
+administration for Archival Finding Aid XML documents in the Encoded Archival
+Description format (`EAD <http://www.loc.gov/ead/>`_ ).
 
-Installation
-------------
+Components
+----------
 
-Install and configure like other django applications. 
+fa
+~~
+Functionality for searching, browsing, and displaying Finding Aid objects.
+Includes PDF version of Finding Aid and mulitple views for complex, multi-part
+Finding Aids with series, subseries, and indexes.  Also includes a 'preview' mode
+for use with the :mod:`~findingaids.fa_admin` component, so that unpublished
+documents can be previewed exactly as they will appear when published.
 
-Copy ``localsettings-sample.py`` to ``localsettings.py`` and customize the settings.
+fa_admin
+~~~~~~~~
+This is a custom administration component for managing Finding Aid documents
+and the Finding Aids site.  Includes some user account management, but the bulk
+of the functionality revolves around preparing EAD files for publication on the
+main site, via the 'prep', 'preview', and 'publish' functions.
 
-The configured eXist-db user should be in the DBA group if you plan to
-use the app to manage the eXist index configuration. For more
-information on existdb index commands::
+content
+~~~~~~~
+Functionality for displaying the few non-EAD-based pages that are part of the
+Finding Aids website.  Includes the site home page, content pages that are
+populated via RSS feeds to allow leveraging existing content management tools,
+and some simple email forms.
 
-     $ ./manage.py help existdb_index
-     $ ./manage.py help existdb_reindex
+System Dependencies
+-------------------
 
-For a first-time install, you will should run these two steps: 
-(Note that if all finding aids are loaded, the reindex step can take quite a while)::
+findingaids requires the following network resources:
 
-     $ ./manage.py existdb_index load
-     $ ./manage.py existdb_reindex  
+  * LDAP for user authentication
+  * A relational database for user and session information, task result status,
+    and deleted Finding Aids
+  * Persistent ID manager for minting ARKs to use as permanent URLs for Finding
+    Aid documents
+  * `eXist-db XML database <http://exist.sourceforge.net>`_ (1.4 or greater) for
+    loading, searching, browsing, & displaying EAD Finding Aid XML documents
+  * `RabbitMQ <http://www.rabbitmq.com/>`_ for brokering asynchronous tasks
+  * Squid Web Cache
 
-The EXISTDB_PREVIEW_COLLECTION should be set to an eXist collection outside of the
-main Finding Aids collection in eXist; it is used for admin functionality only.
+-----
 
-The FINDINGAID_EAD_SOURCE should be set to the directory path for the
-EAD files that will be accessible for loading to eXist via the admin
-interface.
-
-
-Install `Apache FOP <http://xmlgraphics.apache.org/fop/>`_ and configure
-the XSLFO_PROCESSOR setting to the full path to the command-line version of fop.
-
-Install `django-celery` and `rabbitmq` for asynchronous task handling.  On
-Ubuntu, this can be done as follows::
-
-  $ sudo easy_install django-celery
-  $ sudo apt-get install rabbitmq-server
-
-There is a celery daemon that should be running in order to process any 
-celery tasks that are scheduled. It can be started via manage.py::
-
-  $ python manage.py celeryd
-
-Install `zc.icp` in order to use the check_pdfcache manage command
-to check the status of PDFs in the configured cache.
-
-  $ sudo easy_install zc.icp
+For more detailed information, including installation instructions and upgrade
+notes, see :ref:`DEPLOYNOTES`.  For details about the features included in each release,
+see :ref:`CHANGELOG`.
 
 
-.. _eulcore-deps:
-
-eulcore dependencies
-^^^^^^^^^^^^^^^^^^^^
-.. include:: external/django-modules/eulcore/README.dependencies 
-
-
-To install all the necessary components for a development environment
-on an Ubuntu 10.04 workstation:
-
-sudo apt-get install python-ldap python-lxml python-ply rabbitmq-server python-dateutil fop
-sudo easy_install django-celery mimeparse
-
-This assumes you already have a django 1.2 installation and python bindings
-for the database platform you are using (e.g., python-mysqldb for mysql).

@@ -70,21 +70,36 @@ PIDMAN_USER = '' # Username for authentication to the pidman app.
 PIDMAN_PASSWORD = '' # Pasword for username above.
 PIDMAN_DOMAIN = ''      # PID manager domain, in this format: https://pid.emory.edu/domains/1/
 
-# configure an HTTP PROXY to enable lxml to cache XML Schemas (e.g., EAD XSD)
-import os
-os.putenv('HTTP_PROXY', 'http://localhost:3128/')  # local squid proxy on default port
-
 # local, full-path location for finding aids to be loaded to eXist via admin interface
 FINDINGAID_EAD_SOURCE= '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'
+
+# full path to XSL-FO processor (currently expects Apache Fop)
+XSLFO_PROCESSOR = '/usr/bin/fop'
 
 # settings for proxy host and site base url; used to configure cache to reload
 # a PDF when publishing a new or updated EAD
 PROXY_HOST = 'localhost:3128'
-SITE_BASE_URL = 'http://localhost:8000/'
+SITE_BASE_URL = 'http://findingaids.library.emory.edu'
 PROXY_ICP_PORT = 3130       # ICP port for checking status of objects in cache
 
-ADDITIONAL_DATA_INDEX   = ""
-DOI_PURL_HOST = "http://dx.doi.org/"
+# settings for celery & rabbit-mq for asynchronous task handling
+BROKER_HOST = '127.0.0.1'
+BROKER_PORT = 5672
+BROKER_VHOST = '/'
+BROKER_USER = 'guest'
+BROKER_PASSWORD = 'guest'
+
+# URLS for RSS feeds to populate site content pages
+CONTENT_RSS_FEEDS = {
+    'banner': '',
+    'news': '',
+    'content': '',
+}
+
+# reCAPTCHA keys for your server or domain from https://www.google.com/recaptcha/
+RECAPTCHA_PUBLIC_KEY = ''
+RECAPTCHA_PRIVATE_KEY = ''
+RECAPTCHA_OPTIONS = {}   # optional; e.g., {'theme': 'white'}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -120,31 +135,13 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
-# settings for celery & rabbit-mq, for asynchronous task handling
-BROKER_HOST = '127.0.0.1'
-BROKER_PORT = 5672
-BROKER_VHOST = '/'
-BROKER_USER = 'guest'
-BROKER_PASSWORD = 'guest'
+# configure an HTTP PROXY to enable lxml to cache XML Schemas (e.g., EAD XSD)
+import os
+os.putenv('HTTP_PROXY', 'http://localhost:3128/')  # local squid proxy on default port
 
-
-CONTENT_RSS_FEEDS = {
-    'banner': '',
-    'news': '',
-    'content': '',
-}
-
-# recaptcha keys for your server or domain from https://www.google.com/recaptcha/
-RECAPTCHA_PUBLIC_KEY = ''
-RECAPTCHA_PRIVATE_KEY = ''
-RECAPTCHA_OPTIONS = {}   # optional; e.g., {'theme': 'white'}
-
-#Logger Settings
+# Logger Settings
 import logging
 #logging levels: NOLOG, CRITICAL, ERROR, WARNING, INFO, DEBUG
 LOGGING_LEVEL=logging.NOLOG
 LOGGING_FORMAT="%(asctime)s : %(name)s:  %(levelname)s : %(message)s"
 LOGGING_FILENAME="" # "" will print to stdout
-
-# full path to XSL-FO processor (currently expects Apache Fop)
-XSLFO_PROCESSOR = '/usr/bin/fop'

@@ -13,6 +13,7 @@ Contents:
 
    readme
    changelog
+   deploynotes
    findingaids
 
 

@@ -1,51 +1,47 @@
-Change & Version Information
-============================
+.. _CHANGELOG:
+
+CHANGELOG
+=========
 
 The following is a summary of changes and improvements to the Finding
-Aids application.  New features in each version should be listed, with
-any necessary information about installation, upgrade, or deployment
-notes.
+Aids application.  New features in each version should be listed, with the most
+recent version first.  Upgrade or deployment notes should be found in
+:ref:`DEPLOYNOTES`. 
 
-0.4.1 - unitid identifiers
---------------------------
+0.5 Site Design & Content
+-------------------------
 
- * Custom manage command to add machine-readable identifiers to the top-level
-   unitid tag.
+* Users can view additional pages maintained by the finding aids administrator
+  which contain helpful information for regarding searching, defining terms,
+  participating institutions, etc.
+* User visiting the homepage sees one of several archivist-selected images
+  (rotate randomly on page refresh) to market unique items in MARBL's collections.
+* A user visiting the Finding Aids home page will see the most recent archivist-
+  entered/created announcement (if any), in order to receive up-to-date news
+  about special events or notifications about site downtime.
+* Researchers can submit feedback relating to the website site from the main
+  homepage to help improve content and functionality.
+* When a researcher is viewing a single finding aid, they can submit feedback to
+  help correct typos and errors in the text or provide additional information
+  which may be helpful to future researchers.
+* Prospective visitors/researchers can submit a request for materials to
+  facilitate retrieval prior to their arrival, which will be routed to the
+  appropriate repository via email.
+* Researchers can select a repository (other than 'All') on the advanced search
+  form and submit the form without entering any other search terms, in order to
+  browse all finding aids from a single repository.
+* Users view html and PDF versions of finding aids that are consistently and
+  cleanly formatted and displayed according to MARBL formatting requirements.
 
-Deploy Notes
-^^^^^^^^^^^^
+0.4.1 Unitid Identifiers
+------------------------
 
-Run the new manage command::
-  ``python manage.py unitid_identifiers``
-
-This command requires write access to the EAD source documents in the directory
-configured in localsettings.py.
-
+* Custom manage command to add machine-readable identifiers to the top-level
+  unitid tag.
 
 0.4 Persistent IDs
 ------------------
 
-Upgrade notes
-^^^^^^^^^^^^^
-
-1. Finding Aids now relies on the PID manager for generating ARKs.
-   (Requires at least 0.9.x, with REST API).  The following settings
-   should be configured in localsettings.py (see
-   localsettings-sample.py for more details)
-
-   - PIDMAN_HOST
-   - PIDMAN_USER
-   - PIDMAN_PASSWORD
-   - PIDMAN_DOMAIN
-
-2. Run the following manage commands to create ARKs for all EADs from the findingaids/findingaids directory:
-   - python ./manage.py prep_ead
-   - python ./manage.py load_ead
-
-
-
-New Features
-^^^^^^^^^^^^
 * A system administrator can run a command that will generate ARKs for
   all existing EAD documents that do not already have ARKs to update the
   documents and store the ARK in the appropriate eadid attribute.
@@ -67,163 +63,54 @@ New Features
 0.3 Enhanced Search
 -------------------
 
-Upgrade notes
-^^^^^^^^^^^^^
-
-1. Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
-   On Ubuntu, install Fop via ``apt-get install fop``.  Set the full path
-   to the command-line version of fop as the XSLFO_PROCESSOR in localsettings.py
-   (see localsettings-sample.py for an example)
-   Note that running Fop requires a valid JAVA_HOME be set in the environment.
-   Pisa and ReportLab are no longer in use and can be uninstalled.
-2. Search and browse pages now include a last-modified header to enable caching.
-   Browse and Search page urls are indicated via query string, e.g.::
-
-        titles/B?page=2
-        search?keywords=ciaran+carson
-
-   Some configuration may be required to enable caching on these pages.
-   Any cache (e.g., Squid) should be configured so that cached PDFs will be
-   kept in preference to search and browse pages.
-3. Logging is now available when running via runserver; it is currently NOT
-   enabled when running through mod wsgi (but could be enabled).  Any logging
-   settings should be configured in localsettings.py
-4. To get the latest database changes and fixtures, run ``python manage.py syncdb``
-5. Reload the exist index configuration::
-
-	python manage.py existdb_index load
-
-   (reindexing is not necessary at this point because we will be reloading data)
-6. Migrate EAD documents from DTD-format to EAD Schema::
-
-	python manage.py ead_to_xsd
-
-   (requires write access-- this will *modify* EAD files in the source directory
-    that is configured in localsettings.py)
-7. Reload converted EAD documents to eXist database::
-
-   	python manage.py load_ead
-
-8. OPTIONAL: To meet the response-time requirements, a response_time management
-   command was written.  To test response times in the deployed environment::
-
-	python manage.py response_times browse
-	python manage.py response_times search
-
-   (Tip: for minimal output with summary information only, use ``-v 0``)
-
-
-New Features
-^^^^^^^^^^^^
-
- * When viewing a finding aid after a search, a researcher can easily find search
-   terms and exact phrases because they are highlighted.
- * When viewing a finding aid after a search, a researcher sees an indicator of
-   which sections of the finding aid include their search terms.
- * A system administrator can run a script to migrate EAD files in the
-   configured source directory from EAD DTD format to EAD XSD schema.
- * When an admin cleans, publishes, or previews an schema-based EAD document,
-   the application validates against the XSD schema.
- * Researchers can retrieve an alphabetical browse list in less than 5 seconds,
-   based on the first letter of a stakeholder specified field.
- * Researchers receive their search results in less than 5 seconds.
- * Researchers can see how many pages of search results there are, and jump to
-   any section of search results from any page in the search results.
- * When viewing a finding aid with series or sub-series, a researcher can use
-   breadcrumbs to navigate within the hierarchy of the document.
- * Researchers can search for an exact phrase in all indexed fields in the full
-   text of the finding aid, to allow targeted discovery.
- * Researchers can search using wildcards to match partial or variant words.
- * Researchers can use grouping and boolean operators in the main search input,
-   to generate very precise, relevant search results.
- * Researchers find finding aids with matches in stake-holder specified fields
-   at the top of search results.
- * When viewing a finding aid, a researcher can search within that one document,
-   to find relevant folder contents in a large finding aid.
- * Researchers can click on a subject heading (any of the controlaccess terms)
-   in a single finding aid to discover other finding aids with the same subject headings.
- * When browsing finding aids by any first letter, a researcher can jump to
-   alphabetical groupings within that letter, to enable identifying and accessing
-   a particular portion of that browse listing (e.g., A-Ar, As-Ax, etc.).
- * When viewing a finding aid found via search, a researcher can get back to the
-   last page of search results they were on.
- * Researchers can filter their search by repository (MARBL, Pitts, University
-   Archives, etc.), to find resources available at a specific location.
- * Users interact with a site that has a consistent look and feel across
-   Emory Libraries websites.
+* When viewing a finding aid after a search, a researcher can easily find search
+  terms and exact phrases because they are highlighted.
+* When viewing a finding aid after a search, a researcher sees an indicator of
+  which sections of the finding aid include their search terms.
+* A system administrator can run a script to migrate EAD files in the
+  configured source directory from EAD DTD format to EAD XSD schema.
+* When an admin cleans, publishes, or previews an schema-based EAD document,
+  the application validates against the XSD schema.
+* Researchers can retrieve an alphabetical browse list in less than 5 seconds,
+  based on the first letter of a stakeholder specified field.
+* Researchers receive their search results in less than 5 seconds.
+* Researchers can see how many pages of search results there are, and jump to
+  any section of search results from any page in the search results.
+* When viewing a finding aid with series or sub-series, a researcher can use
+  breadcrumbs to navigate within the hierarchy of the document.
+* Researchers can search for an exact phrase in all indexed fields in the full
+  text of the finding aid, to allow targeted discovery.
+* Researchers can search using wildcards to match partial or variant words.
+* Researchers can use grouping and boolean operators in the main search input,
+  to generate very precise, relevant search results.
+* Researchers find finding aids with matches in stake-holder specified fields
+  at the top of search results.
+* When viewing a finding aid, a researcher can search within that one document,
+  to find relevant folder contents in a large finding aid.
+* Researchers can click on a subject heading (any of the controlaccess terms)
+  in a single finding aid to discover other finding aids with the same subject headings.
+* When browsing finding aids by any first letter, a researcher can jump to
+  alphabetical groupings within that letter, to enable identifying and accessing
+  a particular portion of that browse listing (e.g., A-Ar, As-Ax, etc.).
+* When viewing a finding aid found via search, a researcher can get back to the
+  last page of search results they were on.
+* Researchers can filter their search by repository (MARBL, Pitts, University
+  Archives, etc.), to find resources available at a specific location.
+* Users interact with a site that has a consistent look and feel across
+  Emory Libraries websites.
 
 **Minor changes**
 
- * Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
- * Logging now available in runserver
- * Clean urls for series/subseries/index (without redundant eadid)
- * Includes a prototype version simplepages for editable site content
+* Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
+* Logging now available in runserver
+* Clean urls for series/subseries/index (without redundant eadid)
+* Includes a prototype version simplepages for editable site content
 
 0.2 Data Preparation / Admin site
 ---------------------------------
 
 Replaces the legacy command-line ant process for validating EAD xml
 data and loading it to the eXist database.
-
-To upgrade from the previous version:
-
-1. There are a few new external dependencies; please see the README
-   for installation instructions.
-
-2. The application now requires that the celery daemon be running;
-   consult the README for more details.
-
-3. Update localsettings.py with configuration settings that have been
-   added since the last version: (examples in localsettings-sample.py)
-
-   - EXISTDB_SERVER_TIMEZONE and EXISTDB_PREVIEW_COLLECTION
-   - You should make sure that EXISTDB_PREVIEW_COLLECTION is present in
-     eXist, and that the configured eXist user has permission to write to 
-     that collection.
-   - FINDINGAID_EAD_SOURCE 
-   - Proxy/cache settings: PROXY_HOST & SITE_BASE_URL
-   - RabbitMQ settings (BROKER_*)
-
-4. The Finding Aids site now requires a sql database (for user
-   management and tracking deleted finding aids).  You should set up a
-   database, configure it in localsettings.pi, and run ``python manage.py
-   syncdb``.
-
-5. Run ``python manage.py prep_ead`` to prepare all the EAD documents
-   in the configured EAD source directory.  Note that this will
-   **modify** the EAD files; running the script should be coordinated
-   with anyone who might be editing those files.
-
-6. Run ``python manage.py load_ead`` to load all EAD documents in the
-   configured EAD source directory to the configured collection in eXist.
-   If you are loading to a new collection, it is recommend that you use
-   the existdb index manage scripts to load the index configuration
-   before loading data.  Because the load_ead script triggers celery
-   tasks to reload PDFs in the cache and waits until all celery tasks
-   have completed, loading all the Finding Aids may take a long time.
-
-7. After loading the data, you may wish check the data using the
-   ``python manage.py check_ead`` command.
-
-8. The admin section of the site is at /admin/ (under your site url).
-   This uses Emory LDAP for login, so should be configured to run under
-   SSL.
-
-9. eXist query response times are reported on templates in Debug mode
-   only.  To view them, set DEBUG = True in the settings, and add any IP
-   addresses that need access to the INTERNAL_IPS.  In staging and
-   production, DEBUG should be set to False.
-
-10. To check the status of PDFs in the cache, use 
-    ``python manage.py check_pdfcache``.  This uses Internat Cache 
-    Protocol (ICP) to query the configured cache, and requires that 
-    PROXY_ICP_PORT be configured in local settings, and that the 
-    cache is configured to allow ICP access.  For Squid, you should 
-    check the icp_port and icp_access settings.
-
-
-Features
-^^^^^^^^
 
 * An authorized archivist can log in to an admin section of the
   finding aids site inaccessible to other users.
@@ -270,9 +157,6 @@ Features
 
 Reimplementation of the functionality of the existing PHP Finding Aids
 site in django and eXist 1.4.
-
-Features
-^^^^^^^^
 
 * Researchers can browse finding aids alphabetically by first letter
   of title.

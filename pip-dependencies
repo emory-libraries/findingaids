@@ -1,0 +1,8 @@
+python-dateutil
+python-ldap
+zc.icp
+feedparser
+recaptcha-client
+ply
+lxml
+mimeparse
