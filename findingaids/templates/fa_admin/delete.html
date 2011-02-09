@@ -1,5 +1,5 @@
 {% extends "fa_admin/base.html" %}
-{% block page-subtitle %}: Delete {{ fa.unittitle }}{% endblock %}
+{% block page-subtitle %}{{block.super}} : Delete {{ fa.unittitle }}{% endblock %}
 
 {% block content-title %}Delete {{fa.unittitle}}{% endblock %}
 

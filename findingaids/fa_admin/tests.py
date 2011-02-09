@@ -16,6 +16,7 @@ from django.core.urlresolvers import reverse
 from django.http import HttpRequest
 
 from eulcore.django.existdb.db import ExistDB, ExistDBException
+from eulcore.django.taskresult.models import TaskResult
 from eulcore.django.test import TestCase
 from eulcore.xmlmap.core import load_xmlobject_from_file
 from eulcore.xmlmap.eadmap import EAD_NAMESPACE
@@ -24,7 +25,6 @@ from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.urls import TITLE_LETTERS
 from findingaids.fa_admin import tasks, views, utils
-from findingaids.fa_admin.models import TaskResult
 from findingaids.fa_admin.views import _get_recent_xml_files
 from findingaids.fa_admin.management.commands import prep_ead as prep_ead_cmd
 from findingaids.fa_admin.management.commands import unitid_identifier 
@@ -665,7 +665,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)        
         self.assertEqual(docinfo['name'], settings.EXISTDB_TEST_COLLECTION + '/' + filename)
 
-        task = TaskResult.objects.get(eadid='hartsfield558')
+        task = TaskResult.objects.get(object_id='hartsfield558')
         self.assert_(isinstance(task, TaskResult), 
             "TaskResult was created in db for pdf reload after successful publish")
 
@@ -765,7 +765,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
         self.assertEqual({}, docinfo)
 
-        task = TaskResult.objects.get(eadid='hartsfield558')
+        task = TaskResult.objects.get(object_id='hartsfield558')
         self.assert_(isinstance(task, TaskResult),
             "TaskResult was created in db for pdf reload after successful publish from preview")
 

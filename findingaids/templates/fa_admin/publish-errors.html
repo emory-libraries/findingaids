@@ -1,5 +1,5 @@
 {% extends "fa_admin/base.html" %}
-{% block page-subtitle %}: {{ mode|title }} Errors {% endblock %}
+{% block page-subtitle %}{{block.super}} : {{ mode|title }} Errors {% endblock %}
 {% block content-title %}{{ mode|title }}{% endblock %}
 
 {% block content-body %}

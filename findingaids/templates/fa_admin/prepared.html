@@ -1,5 +1,5 @@
 {% extends "fa_admin/base.html" %}
-{% block page-subtitle %}: Prepared EAD for {{ filename }}{% endblock %}
+{% block page-subtitle %}{{block.super}} : Prepared EAD for {{ filename }}{% endblock %}
 {% block content-title %}Prepared EAD for {{ filename }}{% endblock %}
 
 {% block content-body %}

@@ -163,7 +163,7 @@ table.box-folder tr.series-link th {
     line-height: 1.3em !important;
 }
 
-div#sidebar-left-inner div {
+div#sidebar-left-inner > div {
     border: 1px solid #D9D9D9;
     background-color: #f2f3f5;
     padding: 5px;
@@ -251,15 +251,6 @@ form#preview-publish { float: right; }
 div.section {
     border-top: 3px solid #D9D9D9;
 }
-
-div#task-results li {list-style-type: circle; margin-left:15px; }
-div#task-results li.success { list-style-image: url('../images/check.png'); }
-div#task-results li.failure { list-style-image: url('../images/x.png'); }
-
-div#task-results li.success span.code { color: green }
-div#task-results li.failure span.code { color: red }
-div#task-results div.task_end { border:0px; padding: 0px; margin:0px; font-size: 80%; }
-
 /* styles for deleted ead */
 div.removed-notice {
     margin:10px 60px;

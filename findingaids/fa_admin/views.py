@@ -20,13 +20,14 @@ from eulcore.django.auth import permission_required_with_403
 from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.django.http import HttpResponseSeeOtherRedirect
 from eulcore.django.log import message_logging
+from eulcore.django.taskresult.models import TaskResult
 from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulcore.existdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
 from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
-from findingaids.fa_admin.models import TaskResult, EadFile
+from findingaids.fa_admin.models import EadFile
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
 
@@ -231,7 +232,9 @@ def publish(request):
         if success:
             # request the cache to reload the PDF - queue asynchronous task
             result = reload_cached_pdf.delay(ead.eadid.value)
-            task = TaskResult(label='PDF reload', eadid=ead.eadid.value, task_id=result.task_id)
+            task = TaskResult(label='PDF reload', object_id=ead.eadid.value,
+                url=reverse('fa:findingaid', kwargs={'id': ead.eadid.value}),
+                task_id=result.task_id)
             task.save()
 
             ead_url = reverse('fa:findingaid', kwargs={ 'id' : ead.eadid.value })

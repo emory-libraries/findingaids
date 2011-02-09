@@ -1,7 +1,12 @@
 {% extends "fa_admin/base.html" %}
-{% block page-subtitle %}{% if files.number != 1 %}: Modified files (page {{ files.number }}){% endif %}{% endblock %}
+{% block page-subtitle %}{{block.super}} {% if files.number != 1 %}: Modified files (page {{ files.number }}){% endif %}{% endblock %}
 
 {% block content-title %}Manage Finding Aids{% endblock %}
+
+{% block style %}
+  {{ block.super }}
+   {% include 'taskresult/snippets/task_styles.html' %}
+{% endblock %}
 
 {% block sidebar-left %}
   {{ block.super }}
@@ -9,11 +14,14 @@
       <h3>Task Results</h3>
       <ul>
       {% for r in task_results %}
+      {% include 'taskresult/snippets/display_task.html' %}
+      {% comment %}
         <li class="{{r.task.status|lower}}">{{ r.label }}
             {% if r.eadid %}<a href="{% url fa:findingaid id=r.eadid %}">{{ r.eadid }}</a>{% endif %}:
             <span class="code">{{ r.task.status }}</span>
             {% if r.task_end %}<div class="task_end">ended {{ r.task_end|timesince }} ago</div>{% endif %}
             </li>
+            {% endcomment %}
       {% empty %}
         <li>No recent tasks.</li>
       {% endfor %}
