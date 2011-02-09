@@ -137,6 +137,7 @@ INSTALLED_APPS = (
     'eulcore.django.testsetup',
     'eulcore.django.existdb',
     'eulcore.django.emory_ldap',
+    'eulcore.django.taskresult',
     'eulcore.django.util',
     'findingaids.fa',
     'findingaids.fa_admin',
