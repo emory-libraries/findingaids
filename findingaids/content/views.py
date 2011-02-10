@@ -23,6 +23,7 @@ def site_index(request):
                  # banner feed items for rotating home page banner image
                 'banner': BannerFeed().items,
                 'news': news,
+                'about': ContentFeed().get_entry('about'),
             }, context_instance=RequestContext(request))
 
 def content_page(request, page):

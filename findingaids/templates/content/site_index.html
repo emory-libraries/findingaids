@@ -11,16 +11,8 @@
  {% block content-body %}
  <div class="top-half">
      <div id="about" class="right-col">
-         <h2>About/welcome</h2>
-         <p>This database searches detailed descriptions of manuscript collections,
-        which are called finding aids. Finding aids generally include:</p>
-        <ul>
-           <li>A description of the collection's creator</li>
-           <li>A description of the contents</li>
-           <li>A list of boxes and folders in which materials are stored</li>
-        </ul>
-
-        <p><i>Please note: this site includes finding aids for unprocessed collections.</i></p>
+         <h2>{{ about.title }}</h2> {# do we need fall-back content ? #}
+         {{ about.summary|safe }}
      </div>
 
      <div id="banner" class="left-col">
