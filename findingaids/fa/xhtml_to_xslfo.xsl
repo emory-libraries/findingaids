@@ -222,6 +222,10 @@
        <xsl:when test="@class = 'c03'">
          <xsl:attribute name="text-indent">20pt</xsl:attribute>
        </xsl:when>
+       <xsl:when test="@class = 'no-margin' or ancestor::div/@class = 'no-margin'">
+         <xsl:attribute name="space-before">0pt</xsl:attribute>
+         <xsl:attribute name="space-after">0pt</xsl:attribute>
+       </xsl:when>
        <xsl:otherwise>
          <xsl:attribute name="space-after">5pt</xsl:attribute> 
        </xsl:otherwise>       
@@ -230,18 +234,17 @@
    </fo:block>
  </xsl:template>
 
- <xsl:template match="i">
+ <xsl:template match="i | node()[@class='ead-italic'] | node()[@class='ead-title']">
    <fo:inline font-style="italic">
      <xsl:apply-templates/>
    </fo:inline>
  </xsl:template>
 
- <xsl:template match="b">
+ <xsl:template match="b | node()[@class='ead-bold']">
    <fo:inline font-weight="bold">
      <xsl:apply-templates/>
    </fo:inline>
  </xsl:template>
-
 
  <xsl:template match="table">
    <fo:table>
@@ -326,14 +329,17 @@
      </xsl:if>
      <fo:block padding-after="2pt">
        <!-- box & folder labels should be smaller -->
-       <xsl:if test="../@class = 'box-folder' or @class='bf' or @class='content'">
+       <xsl:if test="(ancestor::table/@class = 'box-folder' or @class='bf' or @class='content')
+                and name() = 'th'">
          <xsl:attribute name="font-size">10pt</xsl:attribute>
        </xsl:if>
        <xsl:if test="name() = 'th'">
          <xsl:attribute name="font-weight">bold</xsl:attribute>
        </xsl:if>
-       <xsl:if test="@class = 'section'">
-         <xsl:attribute name="padding-before">5pt</xsl:attribute>
+       <!-- section headings within container list should be bold & have extra space -->
+       <xsl:if test="parent::tr/@class = 'section' or @class = 'section'">
+         <xsl:attribute name="padding-before">12pt</xsl:attribute>
+         <xsl:attribute name="font-weight">bold</xsl:attribute>
        </xsl:if>
        <xsl:if test="@class = 'content'">
          <!-- indent secondary lines of content description -->

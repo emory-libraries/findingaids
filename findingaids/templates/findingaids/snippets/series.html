@@ -3,7 +3,11 @@
 <h2 class="{{ series.level }}">
   <a name="{{ series.short_id }}">
       {{ series.did.unitid }} <br/>
-      {{ series.did.unittitle|format_ead  }}  {{ series.did.unitdate|default:'' }} <br/>
+      {{ series.did.unittitle|format_ead  }}
+      {% if series.did.unitdate and series.did.unitdate not in series.did.unittitle %}
+        {{ series.did.unitdate }}
+      {% endif %}
+       <br/>
       {{ series.did.physdesc|default:'' }}
   </a>
 </h2>
@@ -29,6 +33,5 @@
         </ul>
     {% endif %}
 {% else %}
-  <hr/>
   {% include "findingaids/snippets/containerlist.html" %}
 {% endif %}

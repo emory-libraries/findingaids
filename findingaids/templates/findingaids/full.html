@@ -8,11 +8,11 @@
 <div class="fa">
 <h1><a name="{{ ead.eadid }}">{{ ead.title|format_ead }}</a></h1>
 
-<div id="publication_statement">
+<div id="publication_statement" class="no-margin">
     {% with ead.file_desc.publication as publication %}
     <p>{{ publication.publisher }}</p>
     {% for line in publication.address.lines %}
-        {{ line }} <br />
+        <p>{{ line }}</p>
     {% endfor %}
     {% endwith %}
 </div>
@@ -31,9 +31,8 @@
        {% endautoescape %}
     </ul>
   </div>
-{% else %}  {# not using next page for container list - causes blank page because of long table #}
+{% else %}
   {% with ead.dsc as series %}
-
   <div class="nextpage">
   <hr/>
     <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
