@@ -329,7 +329,11 @@ class RequestMaterialsFormTest(EmailTestCase):
 
 
 class ContentViewsTest(EmailTestCase):
-    feed_entries = ['news', 'banner']
+    feed_entries = [
+        feedparser.FeedParserDict({'title': 'news', 'link': 'fa-news'}),
+        feedparser.FeedParserDict({'title': 'banner', 'link': 'fa-banner'}),
+        feedparser.FeedParserDict({'title': 'about', 'link': 'fa-about'}),
+    ]
     exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
 
     def setUp(self):
