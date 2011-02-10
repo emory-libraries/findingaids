@@ -197,6 +197,20 @@ The **RECAPTCHA_PUBLIC_KEY** and **RECAPTCHA_PRIVATE_KEY** settings are required
 for the reCAPTCHA and feedback forms to work.  You may also set **RECAPTCHA_OPTIONS**,
 to customize the way the CAPTCHA widget is displayed.
 
+Django Cache
+""""""""""""
+
+A few small items within the site that are expected not to change frequently
+(browse starting letters, RSS feeds for content) are cached with Django's internal
+cache framework.  This should be configured with the **CACHE_BACKEND** setting.
+Where caching is used, it will use the configured cache timeout, so it is
+recommended to configure this explicitly.  The items being cached are not expected
+to change frequently, so a timeout of 30 minutes or more may be reasonable; the
+Django default timeout is 5 minutes.
+
+For more details, see the documentation for `Django's cache framework
+<http://docs.djangoproject.com/en/1.2/topics/cache/`_.
+
 Misc
 """"
 
@@ -329,12 +343,19 @@ Upgrade Notes
 To get the latest database changes and fixtures, run ``syncdb`` as documented in
 `Initialize/Update the Database`_.
 
+The eXist index configuration has changed slightly.  Please reload and reindex
+as described in `eXist Index`_.
+
 New python libraries are required for reCAPTCHA (recaptcha-client) and RSS feed
 parsing (feedparser).  The easiest way to install them is using the
 pip-dependencies file as documented in `Install python dependencies`_.
 
 Non-EAD content pages are now populated with RSS feeds; configure the expected
 feeds in the new **CONTENT_RSS_FEEDS**  setting as documented in `Misc`_.
+
+RSS feeds are cached using Django's internal caching framework; see `Django
+Cache`_ in the `Configuration`_ documentation for details on what should be
+configured in local settings.
 
 There are new two web-based forms that generate emails.  In support of this,
 several new configurations are required in localsettings.py.  New fields are

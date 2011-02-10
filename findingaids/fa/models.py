@@ -197,7 +197,7 @@ def title_letters():
     cache_key = 'browse-title-letters'
     if cache.get(cache_key) is None:
         letters = ListTitle.objects.only('first_letter').order_by('first_letter').distinct()
-        cache.set(cache_key, list(letters), 30*60)  # refresh every half hour
+        cache.set(cache_key, list(letters))  # use configured cache timeout
     return cache.get(cache_key)
 
 def repositories():
