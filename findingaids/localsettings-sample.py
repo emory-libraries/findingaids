@@ -35,7 +35,7 @@ DATABASES = {
 }
 
 #Specify Session Engine
-CACHE_BACKEND = 'file:///tmp/django_cache'
+CACHE_BACKEND = 'file:///tmp/findingaids_cache?timeout=1800'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 #Exist DB Settings

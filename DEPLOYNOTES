@@ -209,7 +209,7 @@ to change frequently, so a timeout of 30 minutes or more may be reasonable; the
 Django default timeout is 5 minutes.
 
 For more details, see the documentation for `Django's cache framework
-<http://docs.djangoproject.com/en/1.2/topics/cache/`_.
+<http://docs.djangoproject.com/en/1.2/topics/cache/>`_.
 
 Misc
 """"

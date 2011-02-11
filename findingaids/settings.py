@@ -2,6 +2,8 @@ from os import path
 
 import os
 os.environ['CELERY_LOADER'] = 'django'
+# use a differently-named default queue to keep separate from other projects using celery
+CELERY_DEFAULT_QUEUE = 'findingaids'
 
 
 #Logger Setup
