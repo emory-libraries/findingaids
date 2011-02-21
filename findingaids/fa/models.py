@@ -212,7 +212,23 @@ def repositories():
         cache.set(cache_key, list(repos), 30*60)  # refresh every half hour
     return cache.get(cache_key)
 
-class Series(XmlModel, Component):
+class LocalComponent(Component):
+    '''Extend default :class:`eulcore.xmlmap.eadmap.Component` class to add a
+    method to detect first file-item in a list.  (Needed for container list display
+    in templates).'''
+    ROOT_NAMESPACES = {
+        'e': EAD_NAMESPACE,
+    }
+    # by local convention, section headers are sibling components with no containers
+    preceding_files = xmlmap.NodeListField('preceding-sibling::node()[@level="file"][e:did/e:container]', "self")
+
+    @property
+    def first_file_item(self):
+        'Boolean: True if this component is the first file item in a series/container list'
+        return len(self.did.container) and len(self.preceding_files) == 0
+
+
+class Series(XmlModel, LocalComponent):
     """
       Top-level (c01) series.
 

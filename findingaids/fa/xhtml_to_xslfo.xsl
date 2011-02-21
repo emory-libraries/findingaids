@@ -248,8 +248,8 @@
 
  <xsl:template match="table">
    <fo:table>
-     <xsl:if test="@id != 'descriptivesummary'">
-       <xsl:attribute name="padding-before">10pt</xsl:attribute>
+     <xsl:if test="not(./@id) or ./@id != 'descriptivesummary'">
+       <xsl:attribute name="margin-top">12pt</xsl:attribute>
      </xsl:if>
      <!-- fop complains about table-layout auto; auto is treated as fixed, width=100% -->
      <xsl:attribute name="table-layout">fixed</xsl:attribute>
@@ -265,7 +265,8 @@
      <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths --> 
      <xsl:apply-templates select="col"/>
      <xsl:choose>
-     <xsl:when test="tr[th and not(td) and position() = 1]">
+     <xsl:when test="tr[th and not(td) and position() = 1] and
+            ./@class != 'box-folder'"> <!-- special case: suppress running header for box/folder/contents -->
        <fo:table-header>   
          <xsl:apply-templates select="tr[th and not(td) and position() = 1]"/>
        </fo:table-header>
@@ -338,8 +339,12 @@
        </xsl:if>
        <!-- section headings within container list should be bold & have extra space -->
        <xsl:if test="parent::tr/@class = 'section' or @class = 'section'">
-         <xsl:attribute name="padding-before">12pt</xsl:attribute>
          <xsl:attribute name="font-weight">bold</xsl:attribute>
+         <!-- add space if not first row & not *immediately* following another section row -->
+         <xsl:if test="parent::tr/preceding-sibling::tr or 
+                            parent::tr/preceding-sibling::tr[1][not(@class = 'section')]">
+            <xsl:attribute name="padding-before">12pt</xsl:attribute>
+         </xsl:if>
        </xsl:if>
        <xsl:if test="@class = 'content'">
          <!-- indent secondary lines of content description -->

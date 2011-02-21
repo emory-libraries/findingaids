@@ -15,7 +15,7 @@
       <tr><th>Call Number:</th><td>{{ ead.archdesc.unitid }}</td></tr>
    {% endif %}
    {% if ead.archdesc.extent %}
-      <tr><th>Extent:</th><td>{{ ead.archdesc.extent|join:", " }}</td></tr>
+      <tr><th>Extent:</th><td>{{ ead.physical_desc }}</td></tr>
    {% endif %}
    {% if ead.archdesc.location %}
       <tr><th>Location:</th><td>{{ ead.archdesc.location }}</td></tr>

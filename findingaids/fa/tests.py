@@ -18,7 +18,7 @@ from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 from eulcore.django.existdb.db import ExistDB
 from eulcore.django.test import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, LocalComponent, Deleted
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead
@@ -66,11 +66,11 @@ class FindingAidTestCase(DjangoTestCase):
                          self.findingaid['bailey807'].list_title.__unicode__())
         self.assertEqual("B", self.findingaid['bailey807'].first_letter)
 
-        #dc_subjects
+        # dc_subjects
         self.assert_(u'Irish drama--20th century.' in self.findingaid['abbey244'].dc_subjects)
         self.assert_(u'Theater--Ireland--20th century.' in self.findingaid['abbey244'].dc_subjects)
         self.assert_(u'Dublin (Ireland)' in self.findingaid['abbey244'].dc_subjects)
-        #dc_contributors
+        # dc_contributors
         self.assert_(u'Bailey, I. G. (Issac George), 1847-1914.' in self.findingaid['bailey807'].dc_contributors)
         self.assert_(u'Bailey, Susie E., d. 1948.' in self.findingaid['bailey807'].dc_contributors)
         self.assert_(u'Thurman, Howard, 1900-1981.' in self.findingaid['bailey807'].dc_contributors)
@@ -116,6 +116,17 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_("Thurman, Howard, 1900-1981." in fields["contributor"])
         self.assert_("Thurman, Sue Bailey." in fields["contributor"])
 
+    def test_local_component(self):
+        # local component with custom property - first_file_item
+        self.assert_(isinstance(self.findingaid['abbey244'].dsc.c[0], LocalComponent))
+        self.assert_(isinstance(self.findingaid['abbey244'].dsc.c[0].c[0], LocalComponent))
+        # abbey244 series 1 - no section headings, first c should be first file
+        self.assertTrue(self.findingaid['abbey244'].dsc.c[0].c[0].first_file_item)
+        self.assertFalse(self.findingaid['abbey244'].dsc.c[0].c[1].first_file_item)
+        self.assertFalse(self.findingaid['abbey244'].dsc.c[0].c[-1].first_file_item)
+        # raoul548 series 1.1 - first item is a section, second item should be first file
+        self.assertFalse(self.findingaid['raoul548'].dsc.c[0].c[0].c[0].first_file_item)
+        self.assertTrue(self.findingaid['raoul548'].dsc.c[0].c[0].c[1].first_file_item)
 
 class FaViewsTest(TestCase):
     exist_fixtures = {'directory' : exist_fixture_path }
@@ -388,8 +399,8 @@ class FaViewsTest(TestCase):
         # dsc
         self.assertPattern('<h2>.*Container List.*</h2>', response.content,
             "simple finding aid (leverette) view includes container list")
-        self.assertPattern('Box.*Folder.*Content.*Scrapbook 1.*MF1', response.content,
-            "Scrapbook 1 in container list")
+        self.assertPattern('Scrapbook 1.*Box.*Folder.*Content.*MF1', response.content,
+            "Scrapbook 1 in container list")    # box/folder now after section label if any
         self.assertPattern('MF1.*1.*Photo and clippings re Fannie Lee Leverette',
             response.content, "photo clippings in container list")
         self.assertPattern('MF1.*4.*Family and personal photos|', response.content,

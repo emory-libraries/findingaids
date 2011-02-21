@@ -6,7 +6,14 @@
     </head>
     <body>
 <div class="fa">
-<h1><a name="{{ ead.eadid }}">{{ ead.title|format_ead }}</a></h1>
+<h1>
+    <a name="{{ ead.eadid }}">
+    {{ ead.list_title|format_ead|upper }}
+    {% ifnotequal ead.unittitle|slugify ead.list_title|slugify %}
+        <br/>{{ ead.unittitle|format_ead }}
+    {% endifnotequal %}
+    </a>
+</h1>
 
 <div id="publication_statement" class="no-margin">
     {% with ead.file_desc.publication as publication %}
@@ -89,7 +96,7 @@
 <div id="firstpage-footer">
   Emory Libraries provides copies of its finding aids for use only in research
   and private study.  Copies supplied may not be copied for others or
-  otherwise distributed without prior consent of the holding institution.</div>
+  otherwise distributed without prior consent of the holding repository.</div>
 {# <div id="footer"> </div> #}
 <div id="header">
     <table>
