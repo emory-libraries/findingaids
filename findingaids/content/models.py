@@ -60,7 +60,6 @@ class CachedFeed(object):
             # If status is anything but 304 (Not Modified), feed has
             # changed and we need to update with the latest content
             if getattr(feed, 'status', None) != 304:
-                print 'DEBUG: feed has changed'
                 cached_feed = feed
 
         # store latest version in the cache
