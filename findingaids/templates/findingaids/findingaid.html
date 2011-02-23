@@ -18,11 +18,12 @@
 
 {% block page-subtitle %}: {{ ead.title }}{% endblock %}
 {% block content-title %}
-<span class="fa-title">{{ ead.list_title|format_ead }}
+<div class="fa-title">
     {% ifnotequal ead.unittitle|slugify ead.list_title|slugify %}
-        <br/>{{ ead.unittitle|format_ead }}
+        {{ ead.list_title|format_ead|upper }}<br/> {# origination all caps, if any #}
     {% endifnotequal %}
-</span>
+    {{ ead.unittitle|format_ead }}
+</div>
 {% endblock %}
 
 {% block sidebar-left %}

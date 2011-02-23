@@ -45,6 +45,7 @@ class AdvancedSearchForm(KeywordSearchForm):
         super(AdvancedSearchForm, self).__init__(*args, **kwargs)
         # generate a list of repository choices
         repo_choices = [('', 'All')]    # default option - no filter / all repos
+        repo_choices = []
         # distinct list of repositories from eXist db: use exact phrase match for value/search
         repo_choices.extend([('"%s"' % r, r) for r in repositories()])
         self.fields['repository'].choices = repo_choices

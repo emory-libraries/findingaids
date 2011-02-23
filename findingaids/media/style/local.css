@@ -1,6 +1,10 @@
-a:hover, a:active {
-    color: #f19b62;
+a:hover {   /* by default keep a tags blue on hover */
+    color: #3e6280;
 }
+a:link:hover, a:active, a:focus {   /* make *linked* a tags colored on hover/focus */
+    color: #f19b62 !important;
+}
+
 div#alphalist {
   width: 350px;
   height: 75px;
@@ -50,7 +54,8 @@ p.query-time {
     font-style:italic;
 }
 .fa-title {
-    text-transform: uppercase;
+    margin: auto;
+    text-align: center;
 }
 .fa-title a {
  text-decoration: none;
@@ -118,6 +123,9 @@ div.fa li {
 }
 .fa h3, .fa th {    /* within finding aid, use normal text size */
     font-size:100%;
+}
+.fa h3 {
+    padding: 4px 0px 0px;   /* override 8px top-padding from html-elements.css */
 }
 .fa table, table#descriptive_summary td {
     border: none;
