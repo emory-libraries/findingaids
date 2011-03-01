@@ -1,5 +1,8 @@
+from BeautifulSoup import BeautifulSoup
 import feedparser
 import logging
+import re
+
 
 from django.core.cache import cache
 from django.conf import settings
@@ -72,6 +75,41 @@ class CachedFeed(object):
         'Clear any cached feed data'
         cache.set(self._cache_key, None)
 
+    def convert_same_page_links(self, entry):
+        '''Convert any same-page anchor links by removing the base-url, so they
+        will behave as same-page anchor links when the content is embedded or
+        redisplayed on a different webpage.
+
+        :mod:`feedparser` does a fair bit of sanitization, including relative
+        link resolution (see http://www.feedparser.org/docs/resolving-relative-links.html).
+        In certain cases, we want to display same-page anchor links within feed
+        content so that they link within the page as it is re-displayed on this
+        website.  This method updates the **summary** portion of the specified
+        entry, by looking for a tags with an href beginning with the feed base url
+        followed by the # character, indicating an anchor link.  If an ``a`` tag
+        with the specified name anchor is found in the summary HTML, the href for
+        the link is converted to a relative anchor-link without the base url.
+
+        Use to convert the summary html for a single entry, when this functionality
+        is needed.
+        '''
+        if hasattr(entry, 'summary') and hasattr(self.feed, 'feed') and \
+            hasattr(self.feed, 'feed') and hasattr(self.feed.feed, 'title_detail'):
+            # if the necessary attributes aren't present, don't do anything
+            # (probably should only be the case with mock feed objects in unit tests)
+
+            soup = BeautifulSoup(entry.summary)
+            # search for links with base url followed directly by a # anchor link
+            same_page_prefix = '%s#' % self.feed.feed.title_detail['base']
+            links = soup.findAll('a', href=re.compile('^' + same_page_prefix))
+            for l in links:
+                anchor = l['href'][len(same_page_prefix):]
+                # if the named anchor is present, make the link relative
+                if len(soup.findAll('a', attrs={'name': anchor})):
+                    l['href'] = '#' + anchor
+            # replace the summary text with the converted soup
+            entry.summary = soup
+
 class BannerFeed(CachedFeed):
     'Feed object to access configured RSS feed for home page banner images'
     id = 'banner'
@@ -99,5 +137,7 @@ class ContentFeed(CachedFeed):
         for entry in self.items:
             prefix, sep, remainder = entry.link.partition(self.separator)
             if remainder == id:
+                # convert same-page anchor links before returning
+                self.convert_same_page_links(entry)
                 return entry
         
