@@ -33,7 +33,7 @@
     <p>Permanent link: <a rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
   <div id="sidebar-right">
-      <a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">Printable PDF</a>
+      <a class="printable" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">Printable PDF</a>
   </div>
 
 {% endwith %}

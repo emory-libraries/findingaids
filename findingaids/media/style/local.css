@@ -324,6 +324,7 @@ a.form-submit {
     margin:0;
     padding:1px 16px 3px 10px;
     text-transform:uppercase;
+    text-decoration:uppercase;
 }
 
 a.form-submit:hover {
@@ -332,3 +333,7 @@ a.form-submit:hover {
     border-color:#997300;
     color:#FFFFFF
 }
+
+a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 0 0; 
+                                padding:0 0 0 20px;
+                                display:inline-block; }
