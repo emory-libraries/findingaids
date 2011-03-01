@@ -413,7 +413,7 @@ class FaViewsTest(TestCase):
             'container list included in top-level table of contents')
 
         # title with formatting
-        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890.xml'}))
+        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
         # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
         self.assertPattern(r'''<h1[^>]*>.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # EAD title
@@ -428,8 +428,8 @@ class FaViewsTest(TestCase):
         self.assertNotContains(response, 'Creator:')
 
         # header link to EAD xml
-        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890.xml'}))
-        self.assertContains(response, 'href="%s"' % reverse('fa:eadxml', kwargs={'id': 'pomerantz890.xml'}))
+        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
+        self.assertContains(response, 'href="%s"' % reverse('fa:eadxml', kwargs={'id': 'pomerantz890'}))
 
         self.assertNotContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="non-highlighted finding aid does NOT include robots directives noindex, nofollow")
@@ -630,6 +630,18 @@ class FaViewsTest(TestCase):
         self.assertContains(response, reverse('content:feedback'),
             msg_prefix='url to feedback form should be included in response')
 
+
+        # series breadcrumb for ead with tag in unittitle
+        series_url = reverse('fa:series-or-index', kwargs={'id': 'pomerantz890',
+            'series_id': 'series1'})
+        response = self.client.get(series_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+            'Expected %s but returned %s for %s' % (expected, response.status_code, series_url))
+        self.assertPattern('<span class="ead-title">Where Peachtree Meets Sweet Auburn</span> research files and interviews\s+<',
+            response.content, msg_prefix='short document title in series breadcrumb should include formatted title text')
+        self.assertPattern('<span class="fa-title">.* >\s+Interview transcripts\s+</span>', response.content,
+            msg_prefix='short series title in breadcrumb displays text without date')
 
     def test_view_subseries__raoul_series1_6(self):
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',
