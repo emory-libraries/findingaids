@@ -15,10 +15,10 @@ from django.test import Client, TestCase as DjangoTestCase
 
 from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
 from eulcore.xmlmap.eadmap import EAD_NAMESPACE
-from eulcore.django.existdb.db import ExistDB
+from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.django.test import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, Deleted, EadRepository
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead
@@ -117,16 +117,32 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_("Thurman, Sue Bailey." in fields["contributor"])
 
 
+class EadRepositoryTestCase(TestCase):
+    exist_fixtures = {'files' : [path.join(exist_fixture_path, 'pomerantz890.xml')] }
+
+    def test_distinct(self):        
+        repos = EadRepository.distinct()
+        # should be a distinct, space-normalized list of subareas
+        self.assert_('Pitts Theology Library' in repos)
+        self.assert_('Manuscript, Archives, and Rare Book Library' in repos)
+
 class FaViewsTest(TestCase):
     exist_fixtures = {'directory' : exist_fixture_path }
     # NOTE: views that require full-text search tested separately below for response-time reasons
+    exist_files = []    # place-holder for any fixtures loaded by individual tests
 
     def setUp(self):
         self.client = Client()
         self.db = ExistDB()
 
     def tearDown(self):
-        pass
+        # clean up any documents that were created by individual tests
+        for f in self.exist_files:
+            try:
+                self.db.removeDocument(f)
+            except ExistDBException:
+                pass
+        self.exist_files = []
      
     def test_title_letter_list(self):
         titles_url = reverse('fa:browse-titles')
@@ -152,6 +168,7 @@ class FaViewsTest(TestCase):
         ead = load_xmlobject_from_file(path.join(exist_fixture_path, 'abbey244.xml'), FindingAid)
         ead.list_title.node.text = 'ABC alpha-test'
         self.db.load(ead.serialize(), alphatest_dbpath, overwrite=True)
+        self.exist_files.append(alphatest_dbpath)
 
         a_titles = reverse('fa:titles-by-letter', kwargs={'letter':'A'})
         response = self.client.get(a_titles)
@@ -192,8 +209,8 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''',
             response.content, msg_prefix='abstract with formatting should be formatted in list view')
         # repository subarea
-        self.assertPattern(r'''Repository: Manuscript,\s+Archives,\s+and\s+Rare\s+Book\s+Library''',
-            response.content, msg_prefix='short-record view should include holding repository')
+        self.assertPattern(r'''Repository: Manuscript,\s+Archives,\s+and\s+Rare\s+Book\s+Library/Pitts Theology Library''',
+            response.content, msg_prefix='short-record view should include multiple holding repositories')
 
         # no finding aids
         response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'Z'}))
@@ -214,9 +231,6 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content,
             msg_prefix='title within unittitle should be formatted on list view')
 
-
-        # clean up alpha-test doc
-        self.db.removeDocument(alphatest_dbpath)
 
 # view finding aid main page
 

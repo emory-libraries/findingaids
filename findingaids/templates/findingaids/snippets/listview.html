@@ -14,5 +14,5 @@
     {% endifnotequal %}
     <p class="indent">{{ fa.physical_desc }}</p>
     <p class="abstract indent">{{ fa.abstract|format_ead }}</p>
-    <p class="indent">Repository: {{ fa.repository }}</p>
+    <p class="indent">Repository: {{ fa.repository|join:'/' }}</p>
 </div>

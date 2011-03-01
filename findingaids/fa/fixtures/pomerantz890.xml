@@ -52,7 +52,8 @@
       <langmaterial encodinganalog="546">Materials entirely in
 		  <language langcode="eng">English</language>.</langmaterial>
       <repository encodinganalog="852">Emory University<subarea>Manuscript,
-		  Archives, and Rare Book Library</subarea></repository>
+		  Archives, and Rare Book Library</subarea>
+                  <subarea>Pitts Theology Library</subarea></repository>
     </did>
     <acqinfo encodinganalog="541">
       <head>Source</head>

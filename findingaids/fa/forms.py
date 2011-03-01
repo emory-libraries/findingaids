@@ -1,5 +1,5 @@
 from django import forms
-from findingaids.fa.models import repositories
+from findingaids.fa.models import EadRepository
 import re
 
 def boolean_to_upper(data):
@@ -46,7 +46,7 @@ class AdvancedSearchForm(KeywordSearchForm):
         # generate a list of repository choices
         repo_choices = [('', 'All')]    # default option - no filter / all repos
         # distinct list of repositories from eXist db: use exact phrase match for value/search
-        repo_choices.extend([('"%s"' % r, r) for r in repositories()])
+        repo_choices.extend([('"%s"' % r, r) for r in EadRepository.distinct()])
         self.fields['repository'].choices = repo_choices
         # configure select widget so all choices will be displayed
         self.fields['repository'].widget.attrs['size'] = len(repo_choices)
