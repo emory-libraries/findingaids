@@ -27,14 +27,14 @@
       Search for items in the container list of <b>{{ ead.title }}</b>
       <form action="{% url fa:singledoc-search ead.eadid %}" method="get">
         {{ docsearch_form.keywords }}
-        <input class="form-submit" type="submit" value="Search this document" />
+        <input class="form-submit" type="submit" value="Search this FindingAid" />
       </form>
   </div>
   {% endif %}
   {% if feedback_opts %}
-  <p>Do you have a factual or typographical correction for this Finding Aid?
-    <a href="{% url content:feedback %}?{{feedback_opts}}">Send us your feedback.</a>
-  </p>
+  <div id ="feedback" class="sidebar-search">Send us your feedback
+    <a href="{% url content:feedback %}?{{feedback_opts}}" class="form-submit">Feedback</a>
+  </div>
   {% endif %}
 
 {% endblock %}

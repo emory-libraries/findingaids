@@ -55,6 +55,11 @@ p.query-time {
 .fa-title a {
  text-decoration: none;
 }
+.fa-search_result {
+    text-transform: uppercase;
+    text-decoration: none !important;
+}
+p.indent { padding-left: 25px; }
 div#publication-address {
     margin: 0px auto 10px;
     text-align: center;
@@ -305,4 +310,25 @@ hr {
 }
 .email-form li {
     background: none !important;
+}
+
+
+/*This section  was copied from libraryglobals.css and adapted to work with anchors*/
+a.form-submit {
+    background:url("images/btn-sprite.gif") repeat-x scroll right -1px #02266D;
+    border:1px solid #002878;
+    color:#E6EDF2;
+    cursor:pointer;
+    font:0.833333em/1em "Trebuchet MS",Arial,Helvetica,sans-serif;
+    height:20px;
+    margin:0;
+    padding:1px 16px 3px 10px;
+    text-transform:uppercase;
+}
+
+a.form-submit:hover {
+    background-color:#B98B02;
+    background-position:right -21px;
+    border-color:#997300;
+    color:#FFFFFF
 }

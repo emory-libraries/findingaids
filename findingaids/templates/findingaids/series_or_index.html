@@ -33,10 +33,10 @@
 </span>
 {% endblock %}
 
-{% block sidebar-left %}
+{% block sidebar-right %}
   {{ block.super }}
-  <div class="doc-links">
-     <p><a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">PDF Version</a></p>
+  <div id="sidebar-right">
+     <a class="pdf" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">Printable PDF</a>
   </div>
 {% endblock %}
 
