@@ -36,7 +36,7 @@ class CachedFeed(object):
         if url is not None:
             self.url = url
         # error here if id or url are None?
-        self._cache_key = 'rss-data-%s' % id
+        self._cache_key = 'rss-data-%s' % self.id
 
         # initialize feed data from the django cache, if available
         cached_feed = cache.get(self._cache_key)
