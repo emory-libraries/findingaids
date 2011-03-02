@@ -55,10 +55,19 @@ p.query-time {
 .fa-title a {
  text-decoration: none;
 }
-.fa-search_result {
+.record_list a {
+    color: #3E80B2;
+    display: block;
+    font: 1.33333em/1em "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
+    padding: 0;
+    text-decoration: none;
     text-transform: uppercase;
-    text-decoration: none !important;
 }
+
+.record {
+    padding: 0px 0 0em 30px;
+}
+
 p.indent { padding-left: 25px; }
 div#publication-address {
     margin: 0px auto 10px;

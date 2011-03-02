@@ -312,7 +312,7 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<meta name="DC.identifier" content="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
 
         #Permalink with bookmark rel and ARK
-        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">Permalink</a>')
+        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">http://pidtest.library.emory.edu/ark:/25593/1fx</a>')
 
         #link in header with bookmark rel and ARK
         self.assertContains(response, '<link rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
