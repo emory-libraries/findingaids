@@ -1,4 +1,31 @@
-a:hover, a:active {
+h1, h2, h3 {
+    font-family: "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
+    color: #666666;
+}
+h1 {
+    font-size: 2em;
+    line-height: 1.5em;
+    text-transform: uppercase;
+    font-weight: normal;
+}
+h2 {
+    font-size: 1.66667em;
+    line-height: 1.25em;
+    text-transform: uppercase;
+    font-weight: normal;
+}
+h2 a {  /* h2 with a non-link a tag should look like a normal h2 */
+    color: #4c4c4c;
+}
+h3, #descriptive_summary th {
+    color: #4c4c4c;
+    font-weight: bold;
+}
+/* only links (not anchors) should have a hover/focus highlight color */
+a:hover, a:active, a:focus {
+    color: #3e6280;
+}
+a:link:hover, a:link:active, a:link:focus {
     color: #f19b62;
 }
 div#alphalist {
@@ -9,7 +36,7 @@ div#alphalist {
 }
 
 div#alphalist li {
-  margin: 0px 4px 4px 0px;
+  margin: 0px 4px 4px 0px !important;
   padding: 0px;
   text-indent: 0px;
   display:block;
@@ -139,8 +166,9 @@ div.fa li {
 }
 
 div#control_access ul, div#control_access li, div#index ul, div#index li { 
-    margin: 0px;
-    padding: 0px;
+    margin: 0px !important;
+    padding: 0px !important;
+    list-style-image: none !important;
 }
 div#control_access h3 {
     margin-top: 5px;
@@ -323,24 +351,36 @@ hr {
 
 
 /*This section  was copied from libraryglobals.css and adapted to work with anchors*/
-a.form-submit {
-    background:url("images/btn-sprite.gif") repeat-x scroll right -1px #02266D;
-    border:1px solid #002878;
+a.form-submit, input.form-submit {
+    /*background:url("images/btn-sprite.gif") repeat-x scroll right -1px #02266D;*/
+    background: #02266D;
+    border-top: 1px solid #2d5799;
+    border-left: 1px solid #2d5799;
+    border-bottom:1px solid #002878;
+    border-right:1px solid #002878;
     color:#E6EDF2;
     cursor:pointer;
     font:0.833333em/1em "Trebuchet MS",Arial,Helvetica,sans-serif;
     height:20px;
+    vertical-align: middle;
     margin:0;
-    padding:1px 16px 3px 10px;
+    padding:1px 5px 3px 10px;
     text-transform:uppercase;
-    text-decoration:uppercase;
+    text-decoration:none;
+}
+a.form-submit:after { /* using jQuery for equivalent on inputs */
+    content: "  ▶";
+    padding-left: 5px;
+    line-height: 18px;
 }
 
-a.form-submit:hover {
-    background-color:#B98B02;
-    background-position:right -21px;
-    border-color:#997300;
-    color:#FFFFFF
+a.form-submit:hover, input.form-submit:hover {
+    background-color:#f19b62;
+    border-top:1px solid #edbd9d;
+    border-left:1px solid #edbd9d;
+    border-bottom:1px solid #f19557;
+    border-right:1px solid #f19557;
+    color:#FFFFFF;
 }
 
 a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 0 0; 
@@ -357,4 +397,12 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     background: url('../images/arrow-orange-right_MARBL.gif') no-repeat scroll 17px 3px transparent;
     padding: 0px 0px 16px 30px;
     line-height: 1.333em;
+}
+
+#content ul li {
+    background: none;
+    list-style-image: url('../images/arrow-orange-right_MARBL.gif');
+    padding: 0px;
+    margin-left: 25px;
+    margin-bottom: 10px;
 }
