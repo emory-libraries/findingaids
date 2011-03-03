@@ -408,3 +408,12 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     margin-left: 25px;
     margin-bottom: 10px;
 }
+
+/* suppress bullet on form error messages */
+#content ul.errorlist li {
+    background: none;
+    list-style-image: none;
+    padding: 0px;
+    margin-left: 25px;
+    margin-bottom: 10px;
+}
