@@ -14,11 +14,11 @@
 {% endblock %}
 
 {% block content-title %}
-<span class="fa-title">
+<div class="fa-title">
     {# generate and store url for main finding aid page #}
     {% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid as ead_url %}
     <a href="{{ ead_url }}{{ url_params }}" rel="contents">
-        {% if ead.archdesc.origination %}{{ ead.archdesc.origination|format_ead }}<br/>{% endif %}
+        {% if ead.archdesc.origination %}{{ ead.archdesc.origination|format_ead|upper }}<br/>{% endif %}
         {{ ead.unittitle.short|format_ead|cut:',' }}
     </a> >
 {# breadcrumb trail to current series/subseries/index #}
@@ -30,7 +30,7 @@
 {% endif %}
 {# current series or index title #}
 {{ series.did.unittitle.short|cut:',' }} {{ index.head|format_ead }}
-</span>
+</div>
 {% endblock %}
 
 {% block sidebar-right %}
