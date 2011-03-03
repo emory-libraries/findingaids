@@ -34,7 +34,7 @@ class AdvancedSearchForm(KeywordSearchForm):
     "Advanced search form for keyword, subject and repository"
     #redefining keywords because it is optional in the AdvancedSearchForm
     keywords = forms.CharField(required=False,
-        help_text="one or more terms; will search anywhere in the finding aid")
+        help_text="Enter any word or phrase to search the findingaids.")
     subject = forms.CharField(required=False,
         help_text="Controlled subject headings: subject, genre, geography, etc.")
     # delay initializing choices until object init, since they are dynamic
@@ -60,8 +60,8 @@ class AdvancedSearchForm(KeywordSearchForm):
         subject = cleaned_data.get('subject')
         if not keywords and not subject and not cleaned_data.get('repository'):
             # for now, repository can only be used as a filter with keywords or subjects
-            raise forms.ValidationError('Please enter search terms for at least ' +
-                'one of keywords and subject or select a repository')
+            raise forms.ValidationError('Please enter at least one, search terms for ' +
+                'keywords or select a repository')
 
         # TODO: if we can parse out subject:term or subject:"exact phrase"
         # from a keyword search, it would be nice to convert that to a subject search
