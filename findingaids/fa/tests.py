@@ -640,7 +640,7 @@ class FaViewsTest(TestCase):
             'Expected %s but returned %s for %s' % (expected, response.status_code, series_url))
         self.assertPattern('<span class="ead-title">Where Peachtree Meets Sweet Auburn</span> research files and interviews\s+<',
             response.content, msg_prefix='short document title in series breadcrumb should include formatted title text')
-        self.assertPattern('<span class="fa-title">.* >\s+Interview transcripts\s+</span>', response.content,
+        self.assertPattern('<div class="fa-title">.* >\s+Interview transcripts\s+</div>', response.content,
             msg_prefix='short series title in breadcrumb displays text without date')
 
     def test_view_subseries__raoul_series1_6(self):
@@ -657,7 +657,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 1\.6.*Gaston C\. Raoul papers,.*1882-1959.*</h2>',
             response.content, "subseries title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*Raoul family.*Raoul family papers' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*RAOUL FAMILY.*Raoul family papers' % \
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
             
@@ -716,7 +716,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
             response.content, "sub-subseries title displayed, no physdesc")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*Raoul family.*Raoul family papers' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*RAOUL FAMILY.*Raoul family papers' % \
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
 
