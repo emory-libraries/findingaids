@@ -14,7 +14,7 @@ h2 {
     text-transform: uppercase;
     font-weight: normal;
 }
-h2 a {  /* h2 with a non-link a tag should look like a normal h2 */
+h2 a, h2 a:hover {  /* h2 with a non-link a tag should look like a normal h2 */
     color: #4c4c4c;
 }
 h3, #descriptive_summary th {
@@ -114,6 +114,10 @@ div#toc_series {
     padding: 20px;
     padding-bottom: 0px;
 }
+div#toc_series.short-toc {
+    padding: 5px;
+    height: 2.5em;
+}
 
 div#toc {
     float: left;
@@ -124,15 +128,14 @@ div#series {
     float:left;
     width:400px;
 }
-div.hover-menu h2 {
-    background-image: url("../images/icon_arrow-blue-down.gif");
-    background-position: 0px 22px;
-    background-repeat: no-repeat;
-    padding-left: 15px;
+
+div.hover-menu h2:before {
+    content: "+ ";
 }
-div.hover-menu.collapsed h2 {
-    background-image: url("../genlib_media/style/images/icon_arrow-blue-right.gif");
-    background-position: 0px 20px;
+div.hover-menu h2 {
+    margin: 0px;
+    padding: 0px;
+    padding-left: 15px;
 }
 div.hover-menu.collapsed ul {
     display:none;
@@ -145,6 +148,9 @@ div.hover-menu ul {
 
 .clear {
     clear:both;
+}
+.clear-right {
+    clear: right;
 }
 th, td {
     text-align: left;

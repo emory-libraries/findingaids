@@ -19,10 +19,8 @@
 {% block page-subtitle %}: {{ ead.title }}{% endblock %}
 {% block content-title %}
 <div class="fa-title">
-    {% ifnotequal ead.unittitle|slugify ead.list_title|slugify %}
-        {{ ead.unittitle|format_ead|upper }}<br/> {# origination #}
-    {% endifnotequal %}
-    {{ ead.list_title|format_ead }}
+    {% if ead.archdesc.origination %}{{ ead.archdesc.origination|format_ead|upper }}<br/>{% endif %}
+    {{ ead.unittitle|format_ead }}
 </div>
 {% endblock %}
 

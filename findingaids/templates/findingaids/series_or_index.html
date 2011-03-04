@@ -42,8 +42,8 @@
 
 
 {% block content-body %}
-<div id="toc_series">
-  {% include "findingaids/snippets/toc.html" %}
+<div id="toc_series" class="short-toc">
+{% with 1 as collapsed %}{% include "findingaids/snippets/toc.html" %}{% endwith %}
 
 {% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
     <div id="series" class="hover-menu collapsed">
@@ -68,7 +68,7 @@
         </ul>
     </div>
 {% endif %}
-<br class="clear"/> 
+<br class="clear-right"/> {# don't clear left/all because that will clear the sidebar also #}
 </div>
 
 {% if series %} {% include "findingaids/snippets/series.html" %} {% endif %}

@@ -5,7 +5,7 @@
 {% load ifurl %}
 {# generate and store url for main finding aid page #}
 {% ifurl preview admin:preview:findingaid fa:findingaid ead.eadid as ead_url %}
-<div id="toc">
+<div id="toc" {% if collapsed %}class="hover-menu collapsed"{% endif %}>
     <h2>Table of Contents</h2>
     <ul>
          <li>
