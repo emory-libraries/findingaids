@@ -13,6 +13,9 @@
      <div id="about" class="right-col">
          <h2>{{ about.title }}</h2> {# do we need fall-back content ? #}
          {{ about.summary|safe }}
+         <div class="block-links subsection">
+             <a href="{% url content:page 'faq' %}">Learn more</a>
+         </div>
      </div>
 
      <div id="banner" class="left-col">
@@ -30,19 +33,20 @@
 {% endif %}
  <div class="bottom-half">
         <div id="search" class="left-col">
-             <h2>Search Finding Aids</h2>
+             <h2>Search FindingAids</h2>
               <form action="{% url fa:search %}" method="get">
                 {{kwsearch_form.keywords}}
                 <input class="form-submit" type="submit" value="Search" />
               </form>
-             <p>
-                <a class="form-submit" href="{% url fa:search %}">Advanced Search</a>
-                <a class="form-submit" href="{% url content:page 'search-tips' %}">Search Tips</a>
-             </p>
+
+             <div class="block-links">
+                <a href="{% url fa:search %}">Advanced Search</a>
+                <a href="{% url content:page 'search-tips' %}">Search Tips</a>
+             </div>
          </div>
 
          <div id="browse" class="right-col">
-             <h2>Browse Finding Aids</h2>
+             <h2>Browse FindingAids</h2>
              {% include "findingaids/browse_letters.html" %}
          </div>
 

@@ -1,12 +1,18 @@
 /* CSS for site home page - different layout than the rest of the site */
 
 /* TODO: possibly move home-page CSS to a separate file? not used elsewhere */
-div#content {
+#content {
     margin-left:15px; /* undo normal content margin for sidebar */
+}
+#content-inner {
+    padding-bottom: 0px;
+}
+#footer {
+    margin-left: -10px; /* ?!?!  compensate for something on this page pushing the footer over slightly */
 }
 .top-half > div {
     margin-top: 0px;
-    margin-bottom: 35px;
+    margin-bottom: 10px;
     padding: 10px;
 }
 .left-col {
@@ -22,19 +28,27 @@ div#content {
     width: 540px;
     height: 250px;
 }
+#banner p {
+    margin: 0px;
+}
+#banner img {
+    margin: 0px;
+}
 .bottom-half {
     clear: both;    /* clear top-half floating columns */
 }
 .bottom-half > div {
     width: 48%;
     padding: 5px;
+    padding-bottom: 25px;
 }
 h2 {
-    background-color: gray;
-    color: white;
-    padding: 3px;
-    padding-left: 15px;
-    margin-bottom: 5px;
+    border-bottom: 3px solid #F19B62;
+    margin-bottom:20px;
+    color: #666666;
+    font-weight: normal;
+    text-transform: uppercase;
+    padding: 0px;
 }
 input {
     margin: 5px;
@@ -43,21 +57,25 @@ input[type="text"] {
     width: 225px;
     font-size: 110%;
 }
-#search form, #search p {
+#search form, #search div {
     margin-left: 25px;
 }
 #browse ul {
     margin: 5px 35px;
 }
-
 .announcement {
     padding: 10px;
+    margin: 10px 10px;
 }
 .announcement h2 {
-    background-color: white;
-    color: black;
     display:inline;
+    border: 0px;
+    text-transform: none;
 }
 .announcement p {
     display:inline;
+}
+
+.subsection {
+    border-top: 1px dashed #818181;
 }

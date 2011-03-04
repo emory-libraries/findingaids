@@ -97,7 +97,38 @@ class CachedFeedTest(TestCase):
         cf = models.CachedFeed(self.testid, self.url)
         cf.clear_cache()
         self.assertEqual(None, cache.get(self.cache_key),
-            'cached data should be None after calling clear_cache()')      
+            'cached data should be None after calling clear_cache()')
+
+    def test_convert_same_page_links(self):
+        # create a mock feed & entry with base url & anchors to be converted
+        entry = feedparser.FeedParserDict()
+        base_url = 'http://base.url/test'
+        entry.summary = '''<html>
+        <a href="%(base_url)s#same-page">link1</a>
+        <a href="%(base_url)s#not-same-page">link2</a>
+        <a name="same-page">text</a>
+        </html>''' % {'base_url': base_url }
+        self.mockfeedparser.entries = [entry]
+        cached_feed = feedparser.FeedParserDict({
+            'feed': feedparser.FeedParserDict({
+                'title_detail': feedparser.FeedParserDict({
+                    'base': 'http://base.url/test'
+                })
+            })
+        })
+        cached_feed['entries'] = [entry]
+        cached_feed.status = 200
+        cache.set(self.cache_key, cached_feed)
+        # set status to 304 Not Modified so cached mock data will be used
+        self.mockfeedparser.status = 304
+
+        cf = models.CachedFeed(self.testid, self.url)
+        cf.convert_same_page_links(entry)
+        self.assert_('href="#same-page"' in str(entry.summary),
+            'same-page anchor link should be converted to a relative anchor')
+        self.assert_('href="#not-same-page"' not in str(entry.summary),
+            'anchor link that does not match an anchor in the page should not be converted to a relative link')
+
 
 class ContentFeedTest(TestCase):
 

@@ -12,17 +12,15 @@
 <img src="{{ MEDIA_URL}}/images/EmoryFindingAids-logo.png" alt="EmoryFindingAids"/>
 {% endblock %}
 
-{% load eulcore_tags %}
-{% block navbar %}   {# override the whole block - no 'HOME' #}
-<ul>
-    <li><a href="{% url fa:search %}">Advanced Search</a></li>
-    <li><a href="{% url content:request-materials %}">Request Materials</a></li>
-    <li><a href="{% url content:page 'institutions' %}">Participating Institutions</a></li>
-    <li><a href="{% url content:page 'search-tips' %}">Search Tips</a></li>
-    <li><a href="{% url content:page 'faq' %}">{# FindingAid #}FAQ</a></li>
-    <li><a href="{% url content:feedback %}">Feedback</a></li>
-   {# <li><a href="{% url content:page 'about-database' %}">About the Database</a></li>  #}
-</ul>
+{% block navbar %}   {# override the whole block #}
+    <a class="first" href="{% url site-index %}">Home</a>
+    <a href="{% url fa:search %}">Advanced Search</a>
+    <a href="{% url content:request-materials %}">Request Materials</a>
+    <a href="{% url content:page 'institutions' %}">Participating Institutions</a>
+    <a href="{% url content:page 'search-tips' %}">Search Tips</a>
+    <a href="{% url content:page 'faq' %}">{# FindingAid #}FAQ</a>
+    <a class="last" href="{% url content:feedback %}">Feedback</a>
+   {# <a href="{% url content:page 'about-database' %}">About the Database</a>  #}
 {% endblock %}
 {% block admin-url %}{% url fa-admin:index %}{% endblock %}
 
@@ -60,8 +58,14 @@
 
 {% block scripts %}
   {{ block.super }}
-{# Google Analytics tracking code #}
 <script type="text/javascript">
+    $(document).ready(function() {
+        $('input.form-submit').each(function() { // {# append arrows to inputs (can't use CSS :after) #}
+             $(this).attr('value', $(this).attr('value') + '  ▶');
+        });
+    });
+</script>
+<script type="text/javascript"> // {# Google Analytics tracking code #}
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-21014785-1']);
   _gaq.push(['_trackPageview']);

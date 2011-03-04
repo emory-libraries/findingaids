@@ -66,7 +66,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     subject = xmlmap.StringField('.//e:controlaccess')
 
     # local repository *subarea* - e.g., MARBL, University Archives
-    repository = xmlmap.StringField('.//e:subarea')
+    repository = xmlmap.StringListField('.//e:subarea')
 
     # boosted fields in the index: must be searched to get proper relevance score
     boostfields = xmlmap.StringField('.//e:titleproper | .//e:origination | \
@@ -200,17 +200,20 @@ def title_letters():
         cache.set(cache_key, list(letters))  # use configured cache timeout
     return cache.get(cache_key)
 
-def repositories():
-    """Cached list of distinct owning repositories in all Finding Aids.
-    Cached results should be refreshed after half an hour."""
-    # FIXME: may be able to keep longer than this, as it is unlikely to change frequently...
-    cache_key = 'findingaid-repositories'
-    if cache.get(cache_key) is None:
-        # using normalize space because whitespace is inconsistent in this field
-        repos = FindingAid.objects.only('normalize-space(%s)' % \
-                                FindingAid.repository.field.xpath).distinct()
-        cache.set(cache_key, list(repos), 30*60)  # refresh every half hour
-    return cache.get(cache_key)
+class EadRepository(XmlModel):
+    ROOT_NAMESPACES = {'e': EAD_NAMESPACE }
+    normalized = xmlmap.StringField('normalize-space(.)')
+    objects = Manager('//e:subarea')
+
+    @staticmethod
+    def distinct():
+        """Cached list of distinct owning repositories in all Finding Aids."""
+        cache_key = 'findingaid-repositories'
+        if cache.get(cache_key) is None:
+            # using normalized version because whitespace is inconsistent in this field
+            repos = EadRepository.objects.only('normalized').distinct()
+            cache.set(cache_key, list(repos))  # use configured default cache timeout
+        return cache.get(cache_key)
 
 class LocalComponent(Component):
     '''Extend default :class:`eulcore.xmlmap.eadmap.Component` class to add a

@@ -402,7 +402,7 @@ def search(request):
             if repository:
                 # if repository is set, filter finding aids by requested repository
                 # expecting repository value to come in as exact phrase
-                findingaids = findingaids.filter(repository__fulltext_terms=repository)
+                findingaids = findingaids.filter(repository__fulltext_terms=repository).order_by('list_title')
             if keywords:
                 # if keywords were specified, do a fulltext search
                 return_fields.append('fulltext_score')

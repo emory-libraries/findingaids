@@ -47,6 +47,8 @@ following python libraries:
  * feedparser -  ``easy_install feedparser`` or ``pip install feedparser``
  * `recaptcha-client <http://pypi.python.org/pypi/recaptcha-client>`_  
    ``easy_install recaptcha-client``
+ * `Beautiful Soup <http://www.crummy.com/software/BeautifulSoup/>`_
+    ``easy_install beautifulsoup` or `pip install beautifulsoup`
 
 Note that :mod:`eulcore` and :mod:`pidservices` are currently included with the
 source code (as subversion externals).  See :ref:`eulcore dependencies <eulcore-deps>`
@@ -363,6 +365,10 @@ several new configurations are required in localsettings.py.  New fields are
 Notifications`_. These forms also make use of reCAPTCHA, which requires that
 you set reCAPTHCA public and private keys in localsettings.py as documented
 in `reCAPTCHA`_.
+
+Now using the BeautifulSoup python library for some minimal processing of RSS
+feed HTML content; install using the pip-dependencies file as documented in
+ `Install python dependencies`_.
 
 0.4.1 Unitid Identifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~

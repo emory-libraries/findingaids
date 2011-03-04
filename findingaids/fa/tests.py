@@ -15,10 +15,11 @@ from django.test import Client, TestCase as DjangoTestCase
 
 from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
 from eulcore.xmlmap.eadmap import EAD_NAMESPACE
-from eulcore.django.existdb.db import ExistDB
+from eulcore.django.existdb.db import ExistDB, ExistDBException
 from eulcore.django.test import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Series2, Series3, LocalComponent, Deleted
+from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
+    LocalComponent, Deleted, EadRepository
 from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead
@@ -128,16 +129,32 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertFalse(self.findingaid['raoul548'].dsc.c[0].c[0].c[0].first_file_item)
         self.assertTrue(self.findingaid['raoul548'].dsc.c[0].c[0].c[1].first_file_item)
 
+class EadRepositoryTestCase(TestCase):
+    exist_fixtures = {'files' : [path.join(exist_fixture_path, 'pomerantz890.xml')] }
+
+    def test_distinct(self):        
+        repos = EadRepository.distinct()
+        # should be a distinct, space-normalized list of subareas
+        self.assert_('Pitts Theology Library' in repos)
+        self.assert_('Manuscript, Archives, and Rare Book Library' in repos)
+
 class FaViewsTest(TestCase):
     exist_fixtures = {'directory' : exist_fixture_path }
     # NOTE: views that require full-text search tested separately below for response-time reasons
+    exist_files = []    # place-holder for any fixtures loaded by individual tests
 
     def setUp(self):
         self.client = Client()
         self.db = ExistDB()
 
     def tearDown(self):
-        pass
+        # clean up any documents that were created by individual tests
+        for f in self.exist_files:
+            try:
+                self.db.removeDocument(f)
+            except ExistDBException:
+                pass
+        self.exist_files = []
      
     def test_title_letter_list(self):
         titles_url = reverse('fa:browse-titles')
@@ -163,6 +180,7 @@ class FaViewsTest(TestCase):
         ead = load_xmlobject_from_file(path.join(exist_fixture_path, 'abbey244.xml'), FindingAid)
         ead.list_title.node.text = 'ABC alpha-test'
         self.db.load(ead.serialize(), alphatest_dbpath, overwrite=True)
+        self.exist_files.append(alphatest_dbpath)
 
         a_titles = reverse('fa:titles-by-letter', kwargs={'letter':'A'})
         response = self.client.get(a_titles)
@@ -203,8 +221,8 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''',
             response.content, msg_prefix='abstract with formatting should be formatted in list view')
         # repository subarea
-        self.assertPattern(r'''Repository: Manuscript,\s+Archives,\s+and\s+Rare\s+Book\s+Library''',
-            response.content, msg_prefix='short-record view should include holding repository')
+        self.assertPattern(r'''Repository: Manuscript,\s+Archives,\s+and\s+Rare\s+Book\s+Library/Pitts Theology Library''',
+            response.content, msg_prefix='short-record view should include multiple holding repositories')
 
         # no finding aids
         response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'Z'}))
@@ -225,9 +243,6 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content,
             msg_prefix='title within unittitle should be formatted on list view')
 
-
-        # clean up alpha-test doc
-        self.db.removeDocument(alphatest_dbpath)
 
 # view finding aid main page
 
@@ -309,7 +324,7 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<meta name="DC.identifier" content="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
 
         #Permalink with bookmark rel and ARK
-        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">Permalink</a>')
+        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">http://pidtest.library.emory.edu/ark:/25593/1fx</a>')
 
         #link in header with bookmark rel and ARK
         self.assertContains(response, '<link rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
@@ -410,7 +425,7 @@ class FaViewsTest(TestCase):
             'container list included in top-level table of contents')
 
         # title with formatting
-        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890.xml'}))
+        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
         # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
         self.assertPattern(r'''<h1[^>]*>.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # EAD title
@@ -425,8 +440,8 @@ class FaViewsTest(TestCase):
         self.assertNotContains(response, 'Creator:')
 
         # header link to EAD xml
-        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890.xml'}))
-        self.assertContains(response, 'href="%s"' % reverse('fa:eadxml', kwargs={'id': 'pomerantz890.xml'}))
+        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
+        self.assertContains(response, 'href="%s"' % reverse('fa:eadxml', kwargs={'id': 'pomerantz890'}))
 
         self.assertNotContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="non-highlighted finding aid does NOT include robots directives noindex, nofollow")
@@ -628,6 +643,18 @@ class FaViewsTest(TestCase):
             msg_prefix='url to feedback form should be included in response')
 
 
+        # series breadcrumb for ead with tag in unittitle
+        series_url = reverse('fa:series-or-index', kwargs={'id': 'pomerantz890',
+            'series_id': 'series1'})
+        response = self.client.get(series_url)
+        expected = 200
+        self.assertEqual(response.status_code, expected,
+            'Expected %s but returned %s for %s' % (expected, response.status_code, series_url))
+        self.assertPattern('<span class="ead-title">Where Peachtree Meets Sweet Auburn</span> research files and interviews\s+<',
+            response.content, msg_prefix='short document title in series breadcrumb should include formatted title text')
+        self.assertPattern('<div class="fa-title">.* >\s+Interview transcripts\s+</div>', response.content,
+            msg_prefix='short series title in breadcrumb displays text without date')
+
     def test_view_subseries__raoul_series1_6(self):
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',
             'series_id': 's1', 'series2_id': 's1.6'})
@@ -642,7 +669,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 1\.6.*Gaston C\. Raoul papers,.*1882-1959.*</h2>',
             response.content, "subseries title displayed")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*Raoul family.*Raoul family papers' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*RAOUL FAMILY.*Raoul family papers' % \
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
             
@@ -701,7 +728,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
             response.content, "sub-subseries title displayed, no physdesc")
         # - ead title
-        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*Raoul family.*Raoul family papers' % \
+        self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*RAOUL FAMILY.*Raoul family papers' % \
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
 
@@ -1358,8 +1385,7 @@ class FullTextFaViewsTest(TestCase):
 
         # keyword now optional - no search terms should be an invalid form
         response = self.client.get(search_url, { 'subject' : '', 'keywords': ''})
-        self.assertContains(response, 'Please enter search terms for at least one of keywords and subject ' +
-            'or select a repository')
+        self.assertContains(response, 'Enter any word or phrase to search the findingaids.')
 
     def test_repository_search(self):
         search_url = reverse('fa:search')
@@ -1381,6 +1407,10 @@ class FullTextFaViewsTest(TestCase):
         self.assertNotContains(response, reverse('fa:findingaid', kwargs={'id': 'abbey244'}),
             msg_prefix='search for "papers" & repository "University Archives" does not include non-UA finding aid')
 
+        #Attempting to demonstrate the the repo only search returns sorted  results
+        response = self.client.get(search_url, { 'repository': '"Manuscript, Archives, and Rare Book Library"'})
+        self.assertPattern("Abbey Theatre\..*Adams.*Leverette.*Pitts.*Pomerantz.*Raoul", response.content,
+            msg_prefix='repository search returns results in alphabetical order')
         
     def test_search__boolean(self):
         search_url = reverse('fa:search')
