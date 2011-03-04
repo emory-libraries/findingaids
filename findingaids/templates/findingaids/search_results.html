@@ -34,6 +34,7 @@
     </p>
 {% endif %}
 
+{% if 'keywords' in search_params %}<div id="relevance-label">Relevance</div>{% endif %}
 <hr/>
 {% for fa in findingaids.object_list %}
     {% include "findingaids/snippets/listview.html" %}

@@ -278,6 +278,10 @@ a#no-decoration {
      height: 8px;
      background-color: #eeeeee;
 }
+#relevance-label {
+     float: right;
+     width: 2cm;
+}
 
 .score {
      max-width: 2cm;
