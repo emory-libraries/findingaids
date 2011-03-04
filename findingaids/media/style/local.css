@@ -421,5 +421,13 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     list-style-image: none;
     padding: 0px;
     margin-left: 25px;
-    margin-bottom: 10px;
+}
+
+/* used to format Request Materials form and error messages*/
+#content .email-form span.errors li {
+    margin-bottom: 30px; 
+}
+
+#content form.email-form div#Repository_block {
+    margin-bottom: 30px;
 }

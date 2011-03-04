@@ -60,8 +60,7 @@ class AdvancedSearchForm(KeywordSearchForm):
         subject = cleaned_data.get('subject')
         if not keywords and not subject and not cleaned_data.get('repository'):
             # for now, repository can only be used as a filter with keywords or subjects
-            raise forms.ValidationError('Please enter at least one, search terms for ' +
-                'keywords or select a repository')
+            raise forms.ValidationError('Please enter search terms or choose a repository.')
 
         # TODO: if we can parse out subject:term or subject:"exact phrase"
         # from a keyword search, it would be nice to convert that to a subject search
