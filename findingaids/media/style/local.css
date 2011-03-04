@@ -63,7 +63,8 @@ div#alphalist a {
 }
 
 div#alphalist a:hover, div#alphalist a.current {
-  background-color: #f19b62; /*#f19b62;*/
+  background-color: #f19b62;
+  color: black !important;
 }
 
 div.record_list {
@@ -397,9 +398,11 @@ a.form-submit:hover, input.form-submit:hover {
     border-right:1px solid #f19557;
     color:#FFFFFF;
 }
-
+#sidebar-right {
+    text-align: right;
+}
 a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 0 0; 
-                                padding:0 0 0 20px;
+                                padding:0px 0px 6px 20px;
                                 display:inline-block; }
 
 .block-links {
