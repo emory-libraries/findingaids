@@ -16,9 +16,9 @@
     <a class="first" href="{% url site-index %}">Home</a>
     <a href="{% url fa:search %}">Advanced Search</a>
     <a href="{% url content:request-materials %}">Request Materials</a>
-    <a href="{% url content:page 'institutions' %}">Participating Institutions</a>
+    <a href="{% url content:page 'institutions' %}">Contributors</a>
     <a href="{% url content:page 'search-tips' %}">Search Tips</a>
-    <a href="{% url content:page 'faq' %}">{# FindingAid #}FAQ</a>
+    <a href="{% url content:page 'faq' %}">FindingAid FAQ</a>
     <a class="last" href="{% url content:feedback %}">Feedback</a>
    {# <a href="{% url content:page 'about-database' %}">About the Database</a>  #}
 {% endblock %}
@@ -27,7 +27,7 @@
 {% block sidebar-left %}
   {% if kwsearch_form %}
   <div id="search" class="sidebar-search">
-      Search all Finding Aids
+      Search all FindingAids
       <form action="{% url fa:search %}" method="get">
         {{kwsearch_form.keywords}}
         <input class="form-submit" type="submit" value="Search" />
