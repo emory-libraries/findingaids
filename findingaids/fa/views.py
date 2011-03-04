@@ -104,7 +104,7 @@ def findingaid(request, id, preview=False):
     """
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
-        url_params = '?' + urlencode({'keywords': search_terms})
+        url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
         filter = {'highlight': search_terms}
     else:
         url_params = ''
@@ -228,7 +228,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
 
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
-        url_params = '?' + urlencode({'keywords': search_terms})
+        url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
         #filter further based on highlighting
         filter = {'highlight': search_terms}
         all_series = all_series.filter(**filter)
@@ -436,11 +436,12 @@ def search(request):
                                                  if value)
 
             #set query and last page in session and set it to expire on browser close
-            last_search = search_params
+            for key, val in search_params.iteritems():
+                search_params[key] = val.encode('utf-8')
             last_search = search_params.copy()
             last_search['page'] = page
-            last_search = urlencode(last_search)
-            last_search = "%s?%s" % (reverse("fa:search"), last_search)
+            url_params = urlencode(last_search)
+            last_search = "%s?%s" % (reverse("fa:search"), url_params)
             last_search = {"url" : last_search, "txt" : "Return to Search Results"}
             request.session["last_search"] = last_search
             request.session.set_expiry(0) #set to expire when browser closes
@@ -448,7 +449,7 @@ def search(request):
             response_context = {
                 'findingaids' : result_subset,
                  'search_params': search_params,    # actual search terms, for display
-                 'url_params' : urlencode(search_params),   # url opts for pagination/highlighting
+                 'url_params' : url_params,   # url opts for pagination/highlighting
                  'querytime': [query_times],
                  'show_pages' : show_pages
             }
@@ -505,7 +506,7 @@ def document_search(request, id):
                     'ead': ead,
                     'querytime': [files.queryTime(), ead.queryTime()],
                     'keywords': search_terms,
-                    'url_params': '?' + urlencode({'keywords': search_terms}),
+                    'url_params': '?' + urlencode({'keywords': search_terms.encode('utf-8')}),
                     'docsearch_form': KeywordSearchForm(),
                  }, context_instance=RequestContext(request))
         except ExistDBException, e:
