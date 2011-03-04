@@ -64,7 +64,7 @@ div#alphalist a {
 
 div#alphalist a:hover, div#alphalist a.current {
   background-color: #f19b62;
-  color: black !important;
+  color: white !important;
 }
 
 div.record_list {
