@@ -22,13 +22,13 @@ h3, #descriptive_summary th {
     font-weight: bold;
 }
 /* only links (not anchors) should have a hover/focus highlight color */
-a:hover, a:active, a:focus {
+#content a:hover, #content a:active, #content a:focus {
     color: #3e6280;
 }
-a:link:hover, a:link:active, a:link:focus {
+#content a:link:hover, #content a:link:active, #content a:link:focus {
     color: #f19b62;
 }
-a:link:hover, a:active, a:focus {   /* make *linked* a tags colored on hover/focus */
+#content a:link:hover, #content a:active, #content a:focus {   /* make *linked* a tags colored on hover/focus */
     color: #f19b62 !important;
 }
 
