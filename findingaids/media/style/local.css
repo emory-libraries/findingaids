@@ -22,14 +22,17 @@ h3, #descriptive_summary th {
     font-weight: bold;
 }
 /* only links (not anchors) should have a hover/focus highlight color */
-#content a:hover, #content a:active, #content a:focus {
+#main a:hover, #main a:active, #main a:focus {
     color: #3e6280;
 }
-#content a:link:hover, #content a:link:active, #content a:link:focus {
+#main a:link:hover, #main a:link:active, #main a:link:focus {
     color: #f19b62;
 }
-#content a:link:hover, #content a:active, #content a:focus {   /* make *linked* a tags colored on hover/focus */
+#main a:link:hover, #main a:active, #main a:focus {   /* make *linked* a tags colored on hover/focus */
     color: #f19b62 !important;
+}
+#navbar #primary a:hover, #navbar #primary a:active, #navbar #primary a:focus {
+    color: white !important;
 }
 
 div#alphalist {
