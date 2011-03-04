@@ -1,5 +1,4 @@
 import feedparser
-from recaptcha.client import captcha
 from os import path
 
 from django.test import Client, TestCase
@@ -27,7 +26,6 @@ class MockFeedParser:
     
 class CachedFeedTest(TestCase):
     testid = 'testfeed'
-    cache_key = 'rss-data-%s' % testid
     url = 'http://'
     
     def setUp(self):
@@ -35,6 +33,9 @@ class CachedFeedTest(TestCase):
         self.mockfeedparser = MockFeedParser()   
         self._feedparser = models.feedparser
         models.feedparser = self.mockfeedparser
+        # get & store cache key from a model instance
+        cf = models.CachedFeed(self.testid, self.url)
+        self.cache_key = cf._cache_key
         
     def tearDown(self):
         # restore the real feedparser
@@ -42,17 +43,19 @@ class CachedFeedTest(TestCase):
         # clear any feed data cached by tests
         cache.set(self.cache_key, None)
 
-    def test_init_nocache(self):
+    def test_load_from_cache(self):
+        # populate the cache
+        cached_feed = feedparser.FeedParserDict()
+        cached_feed['entries'] = ['a', 'b']
+        cached_feed.status = 200
+        cache.set(self.cache_key, cached_feed)
+        # set mock feed parser to return something different
+        self.mockfeedparser.entries = ['c', 'd']
+        self.mockfeedparser.status = 304    # simulate content not modified
         cf = models.CachedFeed(self.testid, self.url)
-        self.assertEqual(None, cf._feed,
-            'initial feed data should not be set on init when feed is not previously cached')
-
-    def test_init_with_cache(self):
-        # pre-populate the cache with test feed result
-        cache.set(self.cache_key, self.mockfeedparser.parse(self.url))
-        cf = models.CachedFeed(self.testid, self.url)
-        self.assertNotEqual(None, cf._feed,
-            'initial feed data should be set on init when feed is cached')
+        # original cached content should be returned
+        self.assertEqual(cached_feed['entries'], cf.items,
+            'feed should be loaded from cache when possible')
 
     def test_load_feed(self):
         data = ['a', 'b']

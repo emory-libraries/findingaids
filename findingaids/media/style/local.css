@@ -28,6 +28,10 @@ a:hover, a:active, a:focus {
 a:link:hover, a:link:active, a:link:focus {
     color: #f19b62;
 }
+a:link:hover, a:active, a:focus {   /* make *linked* a tags colored on hover/focus */
+    color: #f19b62 !important;
+}
+
 div#alphalist {
   width: 350px;
   height: 75px;
@@ -167,6 +171,9 @@ div.fa li {
 }
 .fa h3, .fa th {    /* within finding aid, use normal text size */
     font-size:100%;
+}
+.fa h3 {
+    padding: 4px 0px 0px;   /* override 8px top-padding from html-elements.css */
 }
 .fa table, table#descriptive_summary td {
     border: none;

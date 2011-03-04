@@ -26,7 +26,6 @@ class CachedFeed(object):
             url = 'http://my.custom.url/feed.rss'
 
     '''
-    _feed = None
 
     def __init__(self, id=None, url=None):
         # NOTE: id and url are optional here to simplify extending this class
@@ -38,11 +37,6 @@ class CachedFeed(object):
         # error here if id or url are None?
         self._cache_key = 'rss-data-%s' % self.id
 
-        # initialize feed data from the django cache, if available
-        cached_feed = cache.get(self._cache_key)
-        if cached_feed is not None:
-            self._feed = cached_feed
-
     @property
     def items(self):
         'List of items in a feed'
@@ -51,25 +45,29 @@ class CachedFeed(object):
     @property
     def feed(self):
         'Feed result as returned from :meth:`feedparser.parse`'
-        if self._feed is None:
-            self._feed = feedparser.parse(self.url)
+        # attemp to initialize feed data from the django cache
+        cached_feed = cache.get(self._cache_key)
+        # if the feed is not cached, retrieve it
+        if cached_feed is None:
+            cached_feed = feedparser.parse(self.url)
+        # if the feed was cached, check if it has changed since last retrieved
         else:
             # if the feed supports it, use etag & last-modified to only
             # grab content when it has changed
             opts = {}
-            if hasattr(self._feed, 'etag'):
-                opts['etag'] = self._feed.etag
-            if hasattr(self._feed, 'modified'):
-                opts['modified'] = self._feed.modified
+            if hasattr(cached_feed, 'etag'):
+                opts['etag'] = cached_feed.etag
+            if hasattr(cached_feed, 'modified'):
+                opts['modified'] = cached_feed.modified
             feed = feedparser.parse(self.url, **opts)
             # If status is anything but 304 (Not Modified), feed has
             # changed and we need to update with the latest content
             if getattr(feed, 'status', None) != 304:
-                self._feed = feed
+                cached_feed = feed
 
         # store latest version in the cache
-        cache.set(self._cache_key, self._feed)
-        return self._feed
+        cache.set(self._cache_key, cached_feed)
+        return cached_feed
 
     def clear_cache(self):
         'Clear any cached feed data'
