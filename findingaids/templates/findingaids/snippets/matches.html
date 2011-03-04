@@ -1,1 +1,1 @@
- {% if count > 0 %}<span class="exist-match">{{ count|floatformat }} match{{count|pluralize:'es'}}</span>{% endif %}
+{% if count and count > 0 %}<span class="exist-match">{{ count|floatformat }} match{{count|pluralize:'es'}}</span>{% endif %}
