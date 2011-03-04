@@ -1407,6 +1407,10 @@ class FullTextFaViewsTest(TestCase):
         self.assertNotContains(response, reverse('fa:findingaid', kwargs={'id': 'abbey244'}),
             msg_prefix='search for "papers" & repository "University Archives" does not include non-UA finding aid')
 
+        #Attempting to demonstrate the the repo only search returns sorted  results
+        response = self.client.get(search_url, { 'repository': '"Manuscript, Archives, and Rare Book Library"'})
+        self.assertPattern("Abbey Theatre\..*Adams.*Leverette.*Pitts.*Pomerantz.*Raoul", response.content,
+            msg_prefix='repository search returns results in alphabetical order')
         
     def test_search__boolean(self):
         search_url = reverse('fa:search')
