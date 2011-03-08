@@ -47,7 +47,7 @@
 
 {% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
     <div id="series" class="hover-menu collapsed">
-      <h2><a href="{{ ead_url }}{{ url_params }}#dsc">{{ ead.dsc.head }}</a></h2>
+      <h2>{{ ead.dsc.head }}</h2>
       <ul>
           {% for component in all_series %}
             <li>
