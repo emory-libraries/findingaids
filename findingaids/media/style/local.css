@@ -5,13 +5,13 @@ h1, h2, h3 {
 h1 {
     font-size: 2em;
     line-height: 1.5em;
-    text-transform: uppercase;
+    font-variant: small-caps;
     font-weight: normal;
 }
 h2 {
-    font-size: 1.66667em;
     line-height: 1.25em;
-    text-transform: uppercase;
+    font-size: 1.8em;
+    font-variant: small-caps;
     font-weight: normal;
 }
 h2 a, h2 a:hover {  /* h2 with a non-link a tag should look like a normal h2 */
