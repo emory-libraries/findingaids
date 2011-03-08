@@ -22,6 +22,15 @@ h3, #descriptive_summary th {
     font-weight: bold;
     font-size: 1.25em;
 }
+h1.toplevel { /* similar to h2 on home page */
+    border-bottom: 3px solid #F19B62;
+    margin-bottom:20px;
+    color: #666666;
+    font-weight: normal;
+    padding: 0px;
+    width: 50%;
+}
+
 /* only links (not anchors) should have a hover/focus highlight color */
 #main a:hover, #main a:active, #main a:focus {
     color: #3e6280;
@@ -71,15 +80,15 @@ div#alphalist a:hover, div#alphalist a.current {
   color: white !important;
 }
 
-div.record_list {
+.list-record {
    border-bottom: 1px dashed #cccccc;
    padding-bottom: 10px;
    margin-bottom: 10px;
 }
-div.record_list p {
+.list-record p {
     margin: 0px;
 }
-div.record_list a:link {
+.list-record a:link {
     color: #3e80b2;
 }
 p.query-time {
@@ -93,17 +102,17 @@ p.query-time {
 .fa-title a {
  text-decoration: none;
 }
-.record_list a {
+.list-record a {
     color: #3E80B2;
     display: block;
     font: 1.33333em/1em "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
-    padding: 0;
+    padding: 0px 0px 5px;
     text-decoration: none;
     text-transform: uppercase;
 }
 
 .record {
-    padding: 0px 0 0em 30px;
+    padding-left: 30px;
 }
 
 p.indent { padding-left: 25px; }
@@ -235,9 +244,7 @@ div.sidebar-search input {
 
 form#advanced-search input[type="text"], form#advanced-search select {
     width: 42em;
-}
-form#advanced-search input {
-   padding: 3px 0px;
+   padding: 3px;
 }
 
 div.doc-links {

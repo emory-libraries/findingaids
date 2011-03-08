@@ -1,6 +1,6 @@
 {# list view of a single finding aid - expects FindingAid object as fa, with list fields #}
 {% load ead %}
-<div class="record_list">
+<div class="list-record">
     {% if fa.fulltext_score %}
       <div class="relevance">
 	<div class="score" style="width:{% widthratio fa.fulltext_score  1 100 %}px">&nbsp;</div>
