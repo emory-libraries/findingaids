@@ -17,7 +17,7 @@
 <p>Enter a keyword and choose a repository to limit your search <br />
 or leave the keyword field blank and choose a repository to browse a complete list of holdings.</p>
 
-<form action="{% url fa:search %}" method="get">
+<form id="advanced-search" action="{% url fa:search %}" method="get">
      
     {# display errors if any #}
     {{ form.non_field_errors}}

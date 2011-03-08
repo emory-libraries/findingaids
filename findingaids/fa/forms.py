@@ -33,8 +33,7 @@ class KeywordSearchForm(forms.Form):
 class AdvancedSearchForm(KeywordSearchForm):
     "Advanced search form for keyword, subject and repository"
     #redefining keywords because it is optional in the AdvancedSearchForm
-    keywords = forms.CharField(required=False,
-        help_text="Enter any word or phrase to search the findingaids.")
+    keywords = forms.CharField(required=False)
     subject = forms.CharField(required=False,
         help_text="Controlled subject headings: subject, genre, geography, etc.")
     # delay initializing choices until object init, since they are dynamic

@@ -235,6 +235,13 @@ div.sidebar-search input {
     margin: 2px;
 }
 
+form#advanced-search input[type="text"], form#advanced-search select {
+    width: 42em;
+}
+form#advanced-search input {
+   padding: 3px 0px;
+}
+
 div.doc-links {
     border: none !important;
     background-color: #ffffff !important;
