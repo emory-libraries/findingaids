@@ -20,6 +20,7 @@ h2 a, h2 a:hover {  /* h2 with a non-link a tag should look like a normal h2 */
 h3, #descriptive_summary th {
     color: #4c4c4c;
     font-weight: bold;
+    font-size: 1.25em;
 }
 /* only links (not anchors) should have a hover/focus highlight color */
 #main a:hover, #main a:active, #main a:focus {
@@ -174,10 +175,10 @@ div.fa li {
    background: none !important;
 }
 .fa h3, .fa th {    /* within finding aid, use normal text size */
-    font-size:100%;
+/*    font-size:100%;*/
 }
 .fa h3 {
-    padding: 4px 0px 0px;   /* override 8px top-padding from html-elements.css */
+    padding: 0px;   /* override 8px top-padding from html-elements.css */
 }
 .fa table, table#descriptive_summary td {
     border: none;
@@ -383,13 +384,16 @@ a.form-submit, input.form-submit {
     border-right:1px solid #002878;
     color:#E6EDF2;
     cursor:pointer;
-    font:0.833333em/1em "Trebuchet MS",Arial,Helvetica,sans-serif;
+    font:0.833333em "Trebuchet MS",Arial,Helvetica,sans-serif;
     height:20px;
     vertical-align: middle;
     margin:0;
-    padding:1px 5px 3px 10px;
+    padding:3px 5px 3px 10px;
     text-transform:uppercase;
     text-decoration:none;
+}
+a.form-submit {
+    padding-left: 12px;
 }
 a.form-submit:after { /* using jQuery for equivalent on inputs */
     content: "  ▶";
@@ -397,13 +401,13 @@ a.form-submit:after { /* using jQuery for equivalent on inputs */
     line-height: 18px;
 }
 
-a.form-submit:hover, input.form-submit:hover {
+#main a.form-submit:hover, #main input.form-submit:hover {
     background-color:#f19b62;
     border-top:1px solid #edbd9d;
     border-left:1px solid #edbd9d;
     border-bottom:1px solid #f19557;
     border-right:1px solid #f19557;
-    color:#FFFFFF;
+    color:#FFFFFF !important;
 }
 #sidebar-right {
     text-align: right;
