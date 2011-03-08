@@ -174,9 +174,7 @@ div.fa li {
    list-style-type:none;
    background: none !important;
 }
-.fa h3, .fa th {    /* within finding aid, use normal text size */
-/*    font-size:100%;*/
-}
+
 .fa h3 {
     padding: 0px;   /* override 8px top-padding from html-elements.css */
 }
@@ -372,13 +370,25 @@ hr {
 
 .email-form label {
     display: block;
+    margin-top: 12px;
 }
 .email-form input[type='text'], .email-form textarea {
     width: 85%;
+    padding: 2px;
 }
 .email-form li {
     background: none !important;
 }
+.email-form ul.errorlist {
+    margin-bottom: 15px !important;
+}
+.email-form div#Repository_block {
+    margin-bottom: 30px;
+}
+.email-form div#Repository_block ul {
+    margin-top: 10px;
+}
+
 
 
 /*This section  was copied from libraryglobals.css and adapted to work with anchors*/
@@ -449,13 +459,4 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     list-style-image: none;
     padding: 0px;
     margin-left: 25px;
-}
-
-/* used to format Request Materials form and error messages*/
-#content .email-form span.errors li {
-    margin-bottom: 30px; 
-}
-
-#content form.email-form div#Repository_block {
-    margin-bottom: 30px;
 }

@@ -14,9 +14,10 @@
 
 {% block content-body %}
 
-<p>If you plan to visit MARBL, you may use this form to request that materials be placed on hold for you prior to your arrival.</p>
-
 {% if form %}
+<p>If you plan to visit MARBL, you may use this form to request that materials
+    be placed on hold for you prior to your arrival.</p>
+
  <form class="email-form" action="{% url content:request-materials %}" method="post">{% csrf_token %}
     {{ form.non_field_errors }}
     {% with ' <span class="required" title="required">*</span>' as req %}
