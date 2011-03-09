@@ -72,10 +72,10 @@ div#alphalist a {
   display:block;
   text-decoration:none;
   line-height:22px;
-  background-color:  #3a3a3a; /* FIXME: was using small gradient bg image */
+  background-color:  #3a3a3a; 
 }
 
-div#alphalist a:hover, div#alphalist a.current {
+#main div#alphalist a:hover, #main div#alphalist a.current {
   background-color: #f19b62;
   color: white !important;
 }

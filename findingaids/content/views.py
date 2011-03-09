@@ -13,9 +13,9 @@ def site_index(request):
 
    # announcements - if any, pass the first (most recent) for display
     newsfeed = NewsFeed()
-    if newsfeed.items:
+    try:
         news = newsfeed.items[0]
-    else:
+    except IndexError:
         news = None
 
     return render_to_response('content/site_index.html', {
