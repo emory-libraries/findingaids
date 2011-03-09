@@ -64,7 +64,8 @@
         });
     });
 </script>
-<script type="text/javascript"> // {# Google Analytics tracking code #}
+{% if not debug %} {# Google Analytics tracking code #}
+<script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-21014785-1']);
   _gaq.push(['_trackPageview']);
@@ -74,6 +75,7 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 </script>
+{% endif %}
 {% endblock %}
 
 {% block contact-us-link %}{% url content:feedback %}{% endblock %}
