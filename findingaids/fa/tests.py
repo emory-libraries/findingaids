@@ -1385,7 +1385,7 @@ class FullTextFaViewsTest(TestCase):
 
         # keyword now optional - no search terms should be an invalid form
         response = self.client.get(search_url, { 'subject' : '', 'keywords': ''})
-        self.assertContains(response, 'Enter any word or phrase to search the findingaids.')
+        self.assertContains(response, 'Please enter search terms or choose a repository.')
 
     def test_repository_search(self):
         search_url = reverse('fa:search')
