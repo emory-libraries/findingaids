@@ -18,7 +18,7 @@
     {# generate and store url for main finding aid page #}
     {% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid as ead_url %}
     <a href="{{ ead_url }}{{ url_params }}" rel="contents">
-        {% if ead.archdesc.origination %}{{ ead.archdesc.origination|format_ead|upper }}<br/>{% endif %}
+        {% if ead.archdesc.origination %}{{ ead.archdesc.origination|upper }}<br/>{% endif %}
         {{ ead.unittitle.short|format_ead|cut:',' }}
     </a> >
 {# breadcrumb trail to current series/subseries/index #}
