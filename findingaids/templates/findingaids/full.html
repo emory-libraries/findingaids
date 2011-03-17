@@ -8,10 +8,8 @@
 <div class="fa">
 <h1>
     <a name="{{ ead.eadid }}">
-    {{ ead.list_title|format_ead|upper }}
-    {% ifnotequal ead.unittitle|slugify ead.list_title|slugify %}
-        <br/>{{ ead.unittitle|format_ead }}
-    {% endifnotequal %}
+    {% if ead.archdesc.origination %}{{ ead.archdesc.origination|upper }}<br/>{% endif %}
+    {{ ead.unittitle|format_ead }}
     </a>
 </h1>
 

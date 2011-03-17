@@ -1699,6 +1699,15 @@ class FullTextFaViewsTest(TestCase):
             "expected status code %s for %s with bogus eadid, got %s" %\
             (expected, search_url, got))
 
+        # simple document with no series/subseries
+        search_url = reverse('fa:singledoc-search', kwargs={'id': 'leverette135'})
+        response = self.client.get(search_url, { 'keywords' : 'photos'})
+        # response should return without an error
+        self.assertContains(response, "Search results for : <b>photos</b>",
+            msg_prefix='single-document search returns normally for simple finding aid with no series')
+        self.assertNotContains(response, "Series",
+            msg_prefix='single-document search response in simple finding aid should not include series')
+
     def test_findingaid_match_count(self):
         # finding aid match_count field can only be tested via eXist return
         findingaid = FindingAid.objects.filter(highlight='mansion institute').get(eadid='raoul548')
