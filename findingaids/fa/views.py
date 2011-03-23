@@ -60,22 +60,23 @@ def titles_by_letter(request, letter):
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('~list_title').only(*fa_listfields)
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
     page_labels = alpha_pagelabels(paginator, fa, label_attribute='list_title')
-    show_pages = pages_to_show(paginator, fa_subset.number, page_labels)
+    # No longer restricting the number of page labels shown using pages_to_show (like we do for numeric pages).
+    # That doesn't make sense here, since the alpha range labels should ideally allow anyone to jump directly
+    # to the section they want based on the labels.
 
     response_context = {
         'findingaids' : fa_subset,
          'querytime': [fa.queryTime()],
          'letters': title_letters(),
          'current_letter': letter,
-         'show_pages' : show_pages,
-         # This is displayted in the title bar of the browser to indicate which page you are on
-         #example: (Cua - Cut)
-         'title_range' : show_pages[fa_subset.number]
+         'show_pages' : page_labels,
     }
-    if page_labels:     # if there is content and page labels to show, add to context
-         # other page labels handled by show_pages, but first & last are special
-         response_context['first_page_label'] = page_labels[1]
-         response_context['last_page_label'] = page_labels[paginator.num_pages]
+    if page_labels:
+        response_context['title_range'] = page_labels[fa_subset.number]
+         # current page range label is displayed in the title bar of the browser to indicate which page you are on
+         #example: (Cua - Cut)
+
+    # no special first/last page label is required, since we are displaying all labels (not limiting to 9)
 
     return render_to_response('findingaids/titles_list.html',
         response_context, context_instance=RequestContext(request))
