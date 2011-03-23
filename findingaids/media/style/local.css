@@ -243,8 +243,8 @@ div.sidebar-search input {
 }
 
 form#advanced-search input[type="text"], form#advanced-search select {
-    width: 42em;
-   padding: 3px;
+   width: 42em;
+   padding: 3px 0px; /* no side-padding (makes input longer than select) */
 }
 
 div.doc-links {
@@ -411,7 +411,6 @@ a.form-submit, input.form-submit {
     font:0.833333em "Trebuchet MS",Arial,Helvetica,sans-serif;
     height:20px;
     vertical-align: middle;
-    margin:0;
     padding:3px 5px 3px 10px;
     text-transform:uppercase;
     text-decoration:none;
@@ -466,4 +465,8 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     list-style-image: none;
     padding: 0px;
     margin-left: 25px;
+}
+
+#feedback p {
+    margin: 0px 0px 5px;
 }
