@@ -37,12 +37,18 @@
               <form action="{% url fa:search %}" method="get">
                 {{kwsearch_form.keywords}}
                 <input class="form-submit" type="submit" value="Search" />
+
+                <p><b>Tip:</b> Exact phrase ("civil war"), Boolean operators (AND, OR, and NOT), and wildcard (theat*)
+                available. </p>
               </form>
 
              <div class="block-links">
                 <a href="{% url fa:search %}">Advanced Search</a>
                 <a href="{% url content:page 'search-tips' %}">Search Tips</a>
              </div>
+
+
+            
          </div>
 
          <div id="browse" class="right-col">

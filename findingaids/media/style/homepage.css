@@ -59,6 +59,9 @@ input[type="text"] {
 #search form, #search div {
     margin-left: 25px;
 }
+#search p {
+    margin-bottom: 0px;
+}
 #browse ul {
     margin: 5px 35px;
 }
