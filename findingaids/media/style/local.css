@@ -231,6 +231,11 @@ div.sidebar-search input {
     margin: 2px;
 }
 
+form#advanced-search input[type="text"], form#advanced-search select {
+   width: 42em;
+   padding: 3px 0px; /* no side-padding (makes input longer than select) */
+}
+
 div.doc-links {
     border: none !important;
     background-color: #ffffff !important;
@@ -379,7 +384,6 @@ a.form-submit, input.form-submit {
     font:0.833333em/1em "Trebuchet MS",Arial,Helvetica,sans-serif;
     height:20px;
     vertical-align: middle;
-    margin:0;
     padding:1px 5px 3px 10px;
     text-transform:uppercase;
     text-decoration:none;
@@ -432,12 +436,14 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     padding: 0px;
     margin-left: 25px;
 }
-
-/* used to format Request Materials form and error messages*/
 #content .email-form span.errors li {
     margin-bottom: 30px; 
 }
 
 #content form.email-form div#Repository_block {
     margin-bottom: 30px;
+}
+
+#feedback p {
+    margin: 0px 0px 5px;
 }

@@ -1840,6 +1840,8 @@ class AdvancedSearchFormTest(TestCase):
         form = AdvancedSearchForm(data={'subject': 'bar'})
         self.assertTrue(form.is_valid(),
             'advanced search form is valid when only subject is specified')
+        # FIXME: this could break due to caching when testing & running a dev site at the same time
+        # adjust the test to clear the cache or use a separate cache for tests
         form = AdvancedSearchForm(data={'repository': '"University Archives"'})
         self.assertTrue(form.is_valid(),
             'advanced search form is valid when only repository is specified')
