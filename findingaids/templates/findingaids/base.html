@@ -34,7 +34,7 @@
   {% if feedback_opts %}
   <div id ="feedback" class="sidebar-search">
       <p>Send us your feedback.</p>
-    <a href="{% url content:feedback %}?{{feedback_opts}}" class="form-submit">Feedback</a>
+    <a rel="nofollow" href="{% url content:feedback %}?{{feedback_opts}}" class="form-submit">Feedback</a>
   </div>
   {% endif %}
 
