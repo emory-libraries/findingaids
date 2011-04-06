@@ -3,6 +3,7 @@ from lxml import etree
 from urllib import urlencode
 
 from django.http import HttpResponse, Http404, HttpResponsePermanentRedirect
+from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -17,8 +18,7 @@ from eulcore.xmlmap.eadmap import EAD_NAMESPACE
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
             FileComponent, title_letters, Index, shortform_id
 from findingaids.fa.forms import KeywordSearchForm, AdvancedSearchForm
-from findingaids.fa.utils import render_to_pdf, use_preview_collection, \
-            restore_publish_collection, get_findingaid, pages_to_show, \
+from findingaids.fa.utils import render_to_pdf, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified, alpha_pagelabels, html_to_xslfo
 
@@ -179,102 +179,99 @@ def _view_series(request, eadid, *series_ids, **kwargs):
 
     Also takes an optional named argument for preview mode.
     """
+    # explicitly set the collection to be queried so we can always use it, whether in preview mode or not
+    collection = settings.EXISTDB_ROOT_COLLECTION
     if 'preview' in kwargs and kwargs['preview']:
+        collection = settings.EXISTDB_PREVIEW_COLLECTION
         preview_mode = True
-        use_preview_collection()
     else:
         preview_mode = False
 
-    try:
-        # unspecified sub- and sub-sub-series come in as None; filter them out
-        _series_ids = list(series_ids)
-        while None in _series_ids:
-            _series_ids.remove(None)
+    # unspecified sub- and sub-sub-series come in as None; filter them out
+    _series_ids = list(series_ids)
+    while None in _series_ids:
+        _series_ids.remove(None)
 
 
-        # user-facing urls should use short-form ids (eadid not repeated)
-        # to query eXist, we need full ids with eadid
-        # check and convert them here
-        series_ids = []
-        redirect_ids = []
-        redirect = False
-        for id in _series_ids:
-            if id.startswith('%s_' % eadid):
-                # an unshortened id was passed in - shorten and redirect to canonical url
-                redirect = True
-                redirect_ids.append(shortform_id(id, eadid))
-            else:
-                # a shortened id was passed in - generate long-form for query to exist
-                series_ids.append('%s_%s' % (eadid, id))
-                # append to redirect ids in case redirect is required for a later id
-                redirect_ids.append(id)
-
-        # if any id was passed in unshortened, return a permanent redirect to the canonical url
-        if redirect:
-            # log redirects - if any of them are coming from this application, they should be fixed
-            if 'HTTP_REFERER' in request.META:
-                referrer = 'Referrer %s' % request.META['HTTP_REFERER']
-            else:
-                referrer = ' (referrer not available)'
-            logger.info('''Redirecting from long-form series/index %s url to short-form url. %s''' \
-                        % (request.path, referrer))
-            return HttpResponsePermanentRedirect(_series_url(eadid, *redirect_ids))
-
-        # build initial series and index filters and field lists
-        filter_list = {'ead__eadid':eadid}
-        series_fields =['id', 'level', 'did__unitid', 'did__unittitle']
-        index_fields =['id', 'head']
-
-        # info needed to construct navigation links within this ead
-        # - summary info for all top-level series in this finding aid
-        all_series = Series.objects.filter(**filter_list)
-        # - summary info for any indexes
-        all_indexes = Index.objects.filter(**filter_list)
-
-        if 'keywords' in request.GET:
-            search_terms = request.GET['keywords']
-            url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
-            #filter further based on highlighting
-            filter = {'highlight': search_terms}
-            all_series = all_series.filter(**filter)
-            all_indexes = all_indexes.filter(**filter)
-            series_fields.append('match_count')
-            index_fields.append('match_count')
-
+    # user-facing urls should use short-form ids (eadid not repeated)
+    # to query eXist, we need full ids with eadid
+    # check and convert them here
+    series_ids = []
+    redirect_ids = []
+    redirect = False
+    for id in _series_ids:
+        if id.startswith('%s_' % eadid):
+            # an unshortened id was passed in - shorten and redirect to canonical url
+            redirect = True
+            redirect_ids.append(shortform_id(id, eadid))
         else:
-            url_params = ''
-            filter = {}
-        # get the item to be displayed (series, subseries, index)
-        result = _get_series_or_index(eadid, *series_ids, filter=filter)
+            # a shortened id was passed in - generate long-form for query to exist
+            series_ids.append('%s_%s' % (eadid, id))
+            # append to redirect ids in case redirect is required for a later id
+            redirect_ids.append(id)
 
-        if 'keywords' in request.GET:
-            # when full-text highlighting is enabled, ead must be retrieved separately
-            # in order to retrieve match counts for main page ToC items
-
-            # fields needed for top-level display (some redundancy with list in _get_series_or_index)
-            return_fields = ['eadid', 'title', 'archdesc__controlaccess__head',
-                             'archdesc__origination',
-                             'dsc__head', 'archdesc__did']
-            fa = FindingAid.objects.filter(eadid=eadid).filter(**filter)
-            # using raw xpaths for exist-specific logic to expand and count matches
-            ead = fa.only(*return_fields).only_raw(coll_desc_matches=FindingAid.coll_desc_matches_xpath,
-                admin_info_matches=FindingAid.admin_info_matches_xpath,
-                archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath,
-                ).get()
+    # if any id was passed in unshortened, return a permanent redirect to the canonical url
+    if redirect:
+        # log redirects - if any of them are coming from this application, they should be fixed
+        if 'HTTP_REFERER' in request.META:
+            referrer = 'Referrer %s' % request.META['HTTP_REFERER']
         else:
-            # when no highlighting, use partial ead retrieved with main item
-            ead = result.ead
+            referrer = ' (referrer not available)'
+        logger.info('''Redirecting from long-form series/index %s url to short-form url. %s''' \
+                    % (request.path, referrer))
+        return HttpResponsePermanentRedirect(_series_url(eadid, *redirect_ids))
 
-        # info needed to construct navigation links within this ead
-        # - summary info for all top-level series in this finding aid
-        all_series = all_series.only(*series_fields).all()
-        # - summary info for any indexes
-        all_indexes = all_indexes.only(*index_fields).all()
+    # build initial series and index filters and field lists
+    filter_list = {'ead__eadid': eadid}
+    series_fields = ['id', 'level', 'did__unitid', 'did__unittitle']
+    index_fields = ['id', 'head']
 
-        
-    finally:
-        if preview_mode:
-            restore_publish_collection()
+    # info needed to construct navigation links within this ead
+    # - summary info for all top-level series in this finding aid
+    all_series = Series.objects.filter(**filter_list).using(collection)
+    # - summary info for any indexes
+    all_indexes = Index.objects.filter(**filter_list).using(collection)
+
+    if 'keywords' in request.GET:
+        search_terms = request.GET['keywords']
+        url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
+        #filter further based on highlighting
+        filter = {'highlight': search_terms}
+        # add highlighting & match counts to series & index lists for navigation links
+        all_series = all_series.filter(**filter)
+        all_indexes = all_indexes.filter(**filter)
+        series_fields.append('match_count')
+        index_fields.append('match_count')
+
+    else:
+        url_params = ''
+        filter = {}
+    # get the item to be displayed (series, subseries, index)
+    result = _get_series_or_index(eadid, *series_ids, filter=filter, use_collection=collection)
+
+    if 'keywords' in request.GET:
+        # when full-text highlighting is enabled, ead must be retrieved separately
+        # in order to retrieve match counts for main page ToC items
+
+        # fields needed for top-level display (some redundancy with list in _get_series_or_index)
+        return_fields = ['eadid', 'title', 'archdesc__controlaccess__head',
+                         'archdesc__origination',
+                         'dsc__head', 'archdesc__did']
+        fa = FindingAid.objects.filter(eadid=eadid).filter(**filter).using(collection)
+        # using raw xpaths for exist-specific logic to expand and count matches
+        ead = fa.only(*return_fields).only_raw(coll_desc_matches=FindingAid.coll_desc_matches_xpath,
+            admin_info_matches=FindingAid.admin_info_matches_xpath,
+            archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath,
+            ).using(collection).get()
+    else:
+        # when no highlighting, use partial ead retrieved with main item
+        ead = result.ead
+
+    # info needed to construct navigation links within this ead
+    # - summary info for all top-level series in this finding aid
+    all_series = all_series.only(*series_fields).all()
+    # - summary info for any indexes
+    all_indexes = all_indexes.only(*index_fields).all()
 
     #find index of requested object so next and prev can be determined
     index = 0
@@ -332,8 +329,13 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
 
+    filter = None
     if 'filter' in kwargs:
         filter = kwargs['filter']
+    use_collection = None
+    if 'use_collection' in kwargs:
+        use_collection = kwargs['use_collection']
+        
     try:
         if len(series_ids) == 1:
             # if there is only on id, either a series or index is requested
@@ -342,12 +344,16 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
                 queryset = Series.objects.also(*return_fields).filter(**search_fields)
                 if filter:
                     queryset = queryset.filter(**filter)
+                if use_collection is not None:
+                    queryset = queryset.using(use_collection)
                 record = queryset.get()
             except DoesNotExist:
                 # if series is not found, look for an index
                 queryset = Index.objects.also(*return_fields).filter(**search_fields)
                 if filter:
                     queryset = queryset.filter(**filter)
+                if use_collection is not None:
+                    queryset = queryset.using(use_collection)
                 record = queryset.get()                
             return record
         
@@ -368,6 +374,8 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
         # NOTE: applying search fields filter first because it should be faster (find by id)
         if filter:
             queryset = queryset.filter(**filter)
+        if use_collection is not None:
+            queryset = queryset.using(use_collection)
         record = queryset.get()
         
     except DoesNotExist:
