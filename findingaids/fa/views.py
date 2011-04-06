@@ -368,8 +368,11 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
             return_fields.extend(['series__id', 'series2__id', 'series__did', 'series2__did'])
             search_fields.update({"series__id": series_ids[0], "series2__id" : series_ids[1]})
             queryset = Series3.objects
-        
-        queryset = queryset.filter(**search_fields).also(*return_fields)
+
+        # search by the most specific filter first (direct id) to make eXist xquery as efficient as possible
+        other_filters = search_fields.copy()
+        del other_filters['id']
+        queryset = queryset.filter(id=search_fields['id']).filter(**other_filters).also(*return_fields)
         # if there are any additional filters specified, apply before getting item
         # NOTE: applying search fields filter first because it should be faster (find by id)
         if filter:
