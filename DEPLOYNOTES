@@ -59,7 +59,7 @@ To install python dependencies, cd into the repository checkout and::
 
 FindingAids requires a SQL database, but the type does not matter,
 so this is not included in the pip-dependencies file.  You may want to
-pip install  ``MySQL-python`` or ``psycopq``, depending on the database you
+pip install  ``MySQL-python`` or ``psycopg``, depending on the database you
 plan to use.
 
 If you are a developer or are installing to a continuous ingration server
@@ -67,6 +67,18 @@ where you plan to run unit tests, code coverage reports, or build sphinx
 documentation, you probably will also want to::
 
   $ pip install -r build-dependencies
+
+Known Issues
+""""""""""""
+
+* As of 04/2011, installing **python-eulcore** from SVN via pip does not
+  install the eulcore template themes correctly.  The easiest way to fix
+  this is to manually create a symbolic link from the root of your
+  virtualenv to the python-eulcore theme directory::
+
+    $ cd /home/findingaids/fa-env
+    $ ln -s src/python-eulcore/themes/
+
 
 -----
 
@@ -83,8 +95,8 @@ following python libraries:
  * `recaptcha-client <http://pypi.python.org/pypi/recaptcha-client>`_  
    ``easy_install recaptcha-client``
  * `Beautiful Soup <http://www.crummy.com/software/BeautifulSoup/>`_
-   ``easy_install beautifulsoup`
-
+   ``easy_install beautifulsoup``
+   
 Note that :mod:`eulcore` and :mod:`pidservices` are currently included with the
 source code (as subversion externals).  See :ref:`eulcore dependencies <eulcore-deps>`
 for per-module dependencies in eulcore. To see an up-to-date list of eulcore
@@ -374,7 +386,27 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
-0.5 Site Design & Content
+1.0.5 bugfix release
+~~~~~~~~~~~~~~~~~~~~
+
+FindingAids has been updated for deploy with pip+virtualenv.  All dependencies
+are now managed through pip, rather than using svn externals for local
+dependencies.  To get the latest version of the software::
+
+    $ . /home/findingaids/fa-env/bin/activate
+    $ pip install -r pip-dependencies
+
+There is currently a problem with automatic installation of eulcore themes.
+Please follow the work-around instructions described under `Known Issues`_.
+
+Because of this change, the CSS and images for the genlib theme are now
+located under the ``themes`` directory in the virtualenv.  You should either
+create a symbolic link to the genlib_media directory under the project media
+director, or add a new apache alias to the virtualenv location, e.g.::
+
+  Alias /static/genlib_media /home/findingaids/env/themes/genlib/genlib_media
+
+1.0 Site Design & Content
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get the latest database changes and fixtures, run ``syncdb`` as documented in
@@ -492,18 +524,3 @@ eXist query response times can be reported on web pages for developers; see
 
 There is a new script to check the status of PDFs in the configured cache.  See
 `Cached PDFs`_ for details.
-
-----
-
-Appendix
---------
-
-Additional information that may be helpful.
-
-.. _eulcore-deps:
-
-eulcore dependencies
-~~~~~~~~~~~~~~~~~~~~
-.. include:: external/django-modules/eulcore/README.dependencies
-
-
