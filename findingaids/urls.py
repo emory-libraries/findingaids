@@ -21,7 +21,6 @@ if settings.DEV_ENV:
             'VIRTUAL_ENV' in os.environ:
         genlib_media_root = os.path.join(os.environ['VIRTUAL_ENV'],
                                          'themes', 'genlib', 'genlib_media')
-        print "DEBUG: genlib_media root is ", genlib_media_root
         urlpatterns += patterns('',
             (r'^static/genlib_media/(?P<path>.*)$', 'django.views.static.serve', {
                 'document_root': genlib_media_root,
