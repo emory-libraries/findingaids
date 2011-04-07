@@ -93,12 +93,20 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'findingaids.urls'
 
-TEMPLATE_DIRS = (
+TEMPLATE_DIRS = [
     path.join(BASE_DIR, 'templates'),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-)
+]
+
+# also look for templates in virtualenv
+import os
+if 'VIRTUAL_ENV' in os.environ:
+    genlib_path = os.path.join(os.environ['VIRTUAL_ENV'], 'themes', 'genlib')
+    TEMPLATE_DIRS.append(genlib_path)
+
+
 TEMPLATE_CONTEXT_PROCESSORS = (
     #django default context processors
     "django.core.context_processors.auth",
@@ -147,7 +155,7 @@ INSTALLED_APPS = (
 )
 
 EXTENSION_DIRS = (
-    path.join(BASE_DIR, '../external/django-modules'),
+    #path.join(BASE_DIR, '../external/django-modules'),
 )
 
 

@@ -12,16 +12,44 @@ and run various scripts to load initial data.
 Software Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-We recommend the use of `pip <http://pip.openplans.org/>`_ to easily install
-all python library dependencies.  If you don't have pip installed, you can get
-it with ``sudo easy_install pip`` or ``sudo apt-get install python-pip`` on
-Ubuntu systems.
+We recommend the use of `pip <http://pip.openplans.org/>`_ and `virtualenv
+<http://virtualenv.openplans.org/>`_ for environment and dependency
+management in this and other Python projects. If you don't have them
+installed, you can get them with ``sudo easy_install pip`` and then ``sudo pip install
+virtualenv``.
+
+Setup the environment
+~~~~~~~~~~~~~~~~~~~~~
+
+When first installing this project, it is recommended to create a virtual environment
+for it.  The virtualenv environment is a directory that can be installed anywhere you like,
+perhaps adjacent to wherever the source code is deployed. To create your new environment,
+simply run the virtualenv command::
+
+  $ virtualenv --no-site-packages /home/findingaids/fa-env
+
+.. Note::
+  For Apache/WSGI installations, you should run this command as the apache user.
+
+Source the activation file to invoke your new virtual environment (this requires that you
+use the bash shell)::
+
+  $ . /home/findingaids/fa-env
+
+Once the environment has been activated inside a shell, Python programs
+spawned from that shell will read their environment only from this
+directory, not from the system-wide site packages. Installations will
+correspondingly be installed into this environment.
+
+.. Note::
+  Installation instructions and upgrade notes below assume that
+  you are already in an activated shell.
 
 Install python dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 FindingAids depends on several python libraries. If you are using pip, you can
-install all of the dependecies in an automated fashion that will print status
+install all of the dependencies in an automated fashion that will print status
 messages as packages are installed. If there are any errors, pip should display
 messages indicating the problem.
 
@@ -29,11 +57,18 @@ To install python dependencies, cd into the repository checkout and::
 
   $ pip install -r pip-dependencies
 
+FindingAids requires a SQL database, but the type does not matter,
+so this is not included in the pip-dependencies file.  You may want to
+pip install  ``MySQL-python`` or ``psycopq``, depending on the database you
+plan to use.
+
 If you are a developer or are installing to a continuous ingration server
 where you plan to run unit tests, code coverage reports, or build sphinx
 documentation, you probably will also want to::
 
   $ pip install -r build-dependencies
+
+-----
 
 If you are **not** using pip to install python libraries, you will need the
 following python libraries:
@@ -44,11 +79,11 @@ following python libraries:
  * `zc.icp <http://pypi.python.org/pypi/zc.icp>`_ for querying cache status;
    install via ``easy_install zc.icp``
  * django-celery installed via ``easy_install django-celery``
- * feedparser -  ``easy_install feedparser`` or ``pip install feedparser``
+ * feedparser -  ``easy_install feedparser``
  * `recaptcha-client <http://pypi.python.org/pypi/recaptcha-client>`_  
    ``easy_install recaptcha-client``
  * `Beautiful Soup <http://www.crummy.com/software/BeautifulSoup/>`_
-    ``easy_install beautifulsoup` or `pip install beautifulsoup`
+   ``easy_install beautifulsoup`
 
 Note that :mod:`eulcore` and :mod:`pidservices` are currently included with the
 source code (as subversion externals).  See :ref:`eulcore dependencies <eulcore-deps>`
@@ -368,7 +403,7 @@ in `reCAPTCHA`_.
 
 Now using the BeautifulSoup python library for some minimal processing of RSS
 feed HTML content; install using the pip-dependencies file as documented in
- `Install python dependencies`_.
+`Install python dependencies`_.
 
 0.4.1 Unitid Identifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~
