@@ -127,10 +127,8 @@
       <head>Selected Search Terms</head>
       <controlaccess>
         <head>Topical Terms</head>
-        <subject encodinganalog="650" source="lcsh">Irish drama--20th
-			 century.</subject>
-        <subject encodinganalog="650" source="lcsh">Theater--Ireland--20th
-			 century.</subject>
+        <subject encodinganalog="650" source="lcsh">Irish drama--20th century.</subject>
+        <subject encodinganalog="650" source="lcsh">Theater--Ireland--20th century.</subject>
       </controlaccess>
       <controlaccess>
         <head>Geographic Names</head>
@@ -139,8 +137,7 @@
       <controlaccess>
         <head>Form/Genre Terms</head>
         <genreform encodinganalog="655" source="aat">Scripts.</genreform>
-        <genreform encodinganalog="655" source="aat">Theater
-			 programs.</genreform>
+        <genreform encodinganalog="655" source="aat">Theater programs.</genreform>
       </controlaccess>
     </controlaccess>
     <separatedmaterial encodinganalog="544 0">
