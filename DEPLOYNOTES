@@ -12,16 +12,44 @@ and run various scripts to load initial data.
 Software Dependencies
 ~~~~~~~~~~~~~~~~~~~~~
 
-We recommend the use of `pip <http://pip.openplans.org/>`_ to easily install
-all python library dependencies.  If you don't have pip installed, you can get
-it with ``sudo easy_install pip`` or ``sudo apt-get install python-pip`` on
-Ubuntu systems.
+We recommend the use of `pip <http://pip.openplans.org/>`_ and `virtualenv
+<http://virtualenv.openplans.org/>`_ for environment and dependency
+management in this and other Python projects. If you don't have them
+installed, you can get them with ``sudo easy_install pip`` and then ``sudo pip install
+virtualenv``.
+
+Setup the environment
+~~~~~~~~~~~~~~~~~~~~~
+
+When first installing this project, it is recommended to create a virtual environment
+for it.  The virtualenv environment is a directory that can be installed anywhere you like,
+perhaps adjacent to wherever the source code is deployed. To create your new environment,
+simply run the virtualenv command::
+
+  $ virtualenv --no-site-packages /home/findingaids/fa-env
+
+.. Note::
+  For Apache/WSGI installations, you should run this command as the apache user.
+
+Source the activation file to invoke your new virtual environment (this requires that you
+use the bash shell)::
+
+  $ . /home/findingaids/fa-env
+
+Once the environment has been activated inside a shell, Python programs
+spawned from that shell will read their environment only from this
+directory, not from the system-wide site packages. Installations will
+correspondingly be installed into this environment.
+
+.. Note::
+  Installation instructions and upgrade notes below assume that
+  you are already in an activated shell.
 
 Install python dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 FindingAids depends on several python libraries. If you are using pip, you can
-install all of the dependecies in an automated fashion that will print status
+install all of the dependencies in an automated fashion that will print status
 messages as packages are installed. If there are any errors, pip should display
 messages indicating the problem.
 
@@ -29,11 +57,30 @@ To install python dependencies, cd into the repository checkout and::
 
   $ pip install -r pip-dependencies
 
+FindingAids requires a SQL database, but the type does not matter,
+so this is not included in the pip-dependencies file.  You may want to
+pip install  ``MySQL-python`` or ``psycopg``, depending on the database you
+plan to use.
+
 If you are a developer or are installing to a continuous ingration server
 where you plan to run unit tests, code coverage reports, or build sphinx
 documentation, you probably will also want to::
 
   $ pip install -r build-dependencies
+
+Known Issues
+""""""""""""
+
+* As of 04/2011, installing **python-eulcore** from SVN via pip does not
+  install the eulcore template themes correctly.  The easiest way to fix
+  this is to manually create a symbolic link from the root of your
+  virtualenv to the python-eulcore theme directory::
+
+    $ cd /home/findingaids/fa-env
+    $ ln -s src/python-eulcore/themes/
+
+
+-----
 
 If you are **not** using pip to install python libraries, you will need the
 following python libraries:
@@ -44,12 +91,12 @@ following python libraries:
  * `zc.icp <http://pypi.python.org/pypi/zc.icp>`_ for querying cache status;
    install via ``easy_install zc.icp``
  * django-celery installed via ``easy_install django-celery``
- * feedparser -  ``easy_install feedparser`` or ``pip install feedparser``
+ * feedparser -  ``easy_install feedparser``
  * `recaptcha-client <http://pypi.python.org/pypi/recaptcha-client>`_  
    ``easy_install recaptcha-client``
  * `Beautiful Soup <http://www.crummy.com/software/BeautifulSoup/>`_
-    ``easy_install beautifulsoup` or `pip install beautifulsoup`
-
+   ``easy_install beautifulsoup``
+   
 Note that :mod:`eulcore` and :mod:`pidservices` are currently included with the
 source code (as subversion externals).  See :ref:`eulcore dependencies <eulcore-deps>`
 for per-module dependencies in eulcore. To see an up-to-date list of eulcore
@@ -339,7 +386,27 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
-0.5 Site Design & Content
+1.0.5 bugfix release
+~~~~~~~~~~~~~~~~~~~~
+
+FindingAids has been updated for deploy with pip+virtualenv.  All dependencies
+are now managed through pip, rather than using svn externals for local
+dependencies.  To get the latest version of the software::
+
+    $ . /home/findingaids/fa-env/bin/activate
+    $ pip install -r pip-dependencies
+
+There is currently a problem with automatic installation of eulcore themes.
+Please follow the work-around instructions described under `Known Issues`_.
+
+Because of this change, the CSS and images for the genlib theme are now
+located under the ``themes`` directory in the virtualenv.  You should either
+create a symbolic link to the genlib_media directory under the project media
+director, or add a new apache alias to the virtualenv location, e.g.::
+
+  Alias /static/genlib_media /home/findingaids/env/themes/genlib/genlib_media
+
+1.0 Site Design & Content
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To get the latest database changes and fixtures, run ``syncdb`` as documented in
@@ -368,7 +435,7 @@ in `reCAPTCHA`_.
 
 Now using the BeautifulSoup python library for some minimal processing of RSS
 feed HTML content; install using the pip-dependencies file as documented in
- `Install python dependencies`_.
+`Install python dependencies`_.
 
 0.4.1 Unitid Identifiers
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -457,18 +524,3 @@ eXist query response times can be reported on web pages for developers; see
 
 There is a new script to check the status of PDFs in the configured cache.  See
 `Cached PDFs`_ for details.
-
-----
-
-Appendix
---------
-
-Additional information that may be helpful.
-
-.. _eulcore-deps:
-
-eulcore dependencies
-~~~~~~~~~~~~~~~~~~~~
-.. include:: external/django-modules/eulcore/README.dependencies
-
-

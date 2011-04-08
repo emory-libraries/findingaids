@@ -8,7 +8,39 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`. 
 
-0.5 Site Design & Content
+1.0 micro releases
+------------------
+
+1.0.5
+~~~~~
+* Fix response-time issue for series/subseries page with highlighted search
+  terms.
+* Rework admin site preview mode logic so site cannot get stuck in preview
+  mode.
+* Use pip+virtualenv to manage dependencies like eulcore.
+
+1.0.4
+~~~~~
+* Fix preview subseries link so it stays in series mode
+* Update to eulcore to try to improve xpath error reporting for errors that
+  are being generated on the prodution site by web spiders.
+
+1.0.3
+~~~~~
+Minor usability and display tweaks:
+* Show all alpha-browse page labels instead of only 9
+* Brief search tips on the main page
+
+1.0.2
+~~~~~
+* Fix character corruption issue in origination field on main finding aid
+  page.
+
+1.0.1
+~~~~~
+* Correct single-doucment search for simple finding aids with no series.
+
+1.0 Site Design & Content
 -------------------------
 
 * Users can view additional pages maintained by the finding aids administrator

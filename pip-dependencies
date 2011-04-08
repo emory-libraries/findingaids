@@ -1,9 +1,11 @@
+django==1.2.5
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/release-0.13.x
+svn+https://svn.library.emory.edu/svn/persis/pidmanclient/tags/release-1.1.0
 python-dateutil
 python-ldap
+django-celery
 zc.icp
-feedparser
+feedparser==4.1
 recaptcha-client
-ply
-lxml
 mimeparse
 beautifulsoup

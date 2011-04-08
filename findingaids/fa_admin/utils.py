@@ -162,9 +162,10 @@ def check_eadxml(ead):
     if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:
         for ca in ead.archdesc.controlaccess.controlaccess:
             for term in ca.terms:
-                if re.match('\s+', term.value):
+                # NOTE: using node text because term.value is now normalized
+                if re.match('\s+', unicode(term.node.text)):
                     errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
-                                 % (term.value, local_name(term.node)))
+                                 % (term.node.text, local_name(term.node)))
 
     # eadid url should contain resolvable ARK
     if ead.eadid.url is None or not is_ark(ead.eadid.url):

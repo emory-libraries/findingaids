@@ -194,28 +194,6 @@ def alpha_pagelabels(paginator, objects, label_attribute):
 
     return page_labels
 
-# functionality for switching to preview mode
-
-_stored_publish_collection = None
-
-def use_preview_collection():
-    # for preview mode: store real exist collection, and switch to preview collection
-    global _stored_publish_collection
-    _stored_publish_collection = getattr(settings, "EXISTDB_ROOT_COLLECTION", None)
-
-    # temporarily override settings
-    settings.EXISTDB_ROOT_COLLECTION = settings.EXISTDB_PREVIEW_COLLECTION
-    db = ExistDB()
-    # create preview collection, but don't complain if it already exists
-    db.createCollection(settings.EXISTDB_ROOT_COLLECTION, overwrite=True)
-
-def restore_publish_collection():
-    # for preview mode: switch back to real exist collection
-    global _stored_publish_collection
-
-    if _stored_publish_collection is not None:
-        settings.EXISTDB_ROOT_COLLECTION = _stored_publish_collection
-
 def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=None,
         filter=None):
     """Retrieve a  :class:`~findingaids.fa.models.FindingAid` (or
@@ -239,10 +217,8 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
             or a :class:`~findingaids.fa.models.FindingAid` :class:`eulcore.django.existdb.manager.Manager`
             (if no eadid is specified)
     """
-    if preview:
-        use_preview_collection()
     try:
-        fa = FindingAid.objects
+        fa = FindingAid.objects.all()   # make sure we always have a queryset to start with
         if only is not None:
             fa = fa.only(*only)
         if also is not None:
@@ -251,14 +227,12 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
             fa = fa.order_by(order_by)
         if filter is not None:
             fa = fa.filter(**filter)
+        if preview:
+            fa = fa.using(settings.EXISTDB_PREVIEW_COLLECTION)
         if eadid is not None:
             fa = fa.get(eadid=eadid)
     except DoesNotExist:
         raise http.Http404
-    finally:
-        # collection setting should be restored no matter what goes wrong
-        if preview:    
-            restore_publish_collection()
     return fa
 
 def ead_lastmodified(request, id, preview=False, *args, **kwargs):
