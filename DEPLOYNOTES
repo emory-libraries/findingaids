@@ -406,6 +406,13 @@ director, or add a new apache alias to the virtualenv location, e.g.::
 
   Alias /static/genlib_media /home/findingaids/env/themes/genlib/genlib_media
 
+Make sure that the apache configuration specifies the virtualenv in the
+WSGI python-path and edit your django.wsgi file to set the **VIRTUAL_ENV**
+environment variable, eg.::
+
+    os.environ['VIRTUAL_ENV'] = '/home/httpd/findingaids/env/'
+
+
 1.0 Site Design & Content
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
