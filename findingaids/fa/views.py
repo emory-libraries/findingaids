@@ -402,7 +402,6 @@ def search(request):
         keywords = form.cleaned_data['keywords']
         repository = form.cleaned_data['repository']
         page = request.REQUEST.get('page', 1)
-        
               
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
@@ -462,7 +461,7 @@ def search(request):
             url_params = urlencode(last_search)
             # store the current page (even if not specified in URL) for saved search
             last_search['page'] = page
-            last_search = "%s?%s" % (reverse("fa:search"), url_params)
+            last_search = "%s?%s" % (reverse("fa:search"), urlencode(last_search))
             last_search = {"url" : last_search, "txt" : "Return to Search Results"}
             request.session["last_search"] = last_search
             request.session.set_expiry(0) #set to expire when browser closes
