@@ -243,7 +243,11 @@ def prep_ead(ead, filename):
     if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:
         for ca in ead.archdesc.controlaccess.controlaccess:
             for term in ca.terms:
-                term.value = term.value.lstrip()            
+                # Using node.text here because term.value is normalized
+                # NOT forcing normalization on control access terms because
+                # XML editor line-wrap settings would force
+                # re-running the prep step every time a document is edited.
+                term.value = term.node.text.lstrip()
 
     # check that ARK is set correctly (both long and short-form)
     # - if eadid url is not set or is not an ark, generate an ark
