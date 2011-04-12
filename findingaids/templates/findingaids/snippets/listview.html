@@ -7,7 +7,7 @@
         {% if debug %}{{ fa.fulltext_score }}{% endif %}{# display numerical score in debug mode #}
       </div>	
     {% endif %}
-    <p><a href="{% url fa:findingaid fa.eadid %}{% if url_params %}?{{ url_params }}{% endif %}" class="fa-search_result">{{ fa.list_title|format_ead }}</a> </p>
+    <p><a href="{% url fa:findingaid fa.eadid %}{% if highlight_params %}?{{ highlight_params }}{% endif %}" class="fa-search_result">{{ fa.list_title|format_ead }}</a> </p>
     <div class="record">
     	{# only show unittitle if different from list title; usings slugs to ignore whitespace differences #}
     	{% ifnotequal fa.unittitle|slugify fa.list_title|slugify %}

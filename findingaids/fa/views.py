@@ -49,7 +49,7 @@ def titles_by_letter(request, letter):
     Includes list of browse first-letters as in :meth:`browse_titles`.
     """
 
-    #set last browse letter and page in session
+    # set last browse letter and page in session
     page = request.REQUEST.get('page', 1)
     last_search  = "%s?page=%s" % (reverse("fa:titles-by-letter", kwargs={'letter': letter}), page)
     last_search = {"url" : last_search, "txt" : "Return to Browse Results" }
@@ -456,17 +456,29 @@ def search(request):
             for key, val in search_params.iteritems():
                 search_params[key] = val.encode('utf-8')
             last_search = search_params.copy()
-            last_search['page'] = page
+            # pagination url params should NOT include page
+            if 'page' in last_search:
+                del(last_search['page'])
             url_params = urlencode(last_search)
+            # store the current page (even if not specified in URL) for saved search
+            last_search['page'] = page
             last_search = "%s?%s" % (reverse("fa:search"), url_params)
             last_search = {"url" : last_search, "txt" : "Return to Search Results"}
             request.session["last_search"] = last_search
             request.session.set_expiry(0) #set to expire when browser closes
 
+            # ONLY keywords - not page or subject - should be included in
+            # document url for search term highlighting
+            if 'keywords' in search_params:
+                highlight_params = urlencode({'keywords': search_params['keywords']})
+            else:
+                highlight_params = None
+
             response_context = {
                 'findingaids' : result_subset,
                  'search_params': search_params,    # actual search terms, for display
-                 'url_params' : url_params,   # url opts for pagination/highlighting
+                 'url_params' : url_params,   # url opts for pagination
+                 'highlight_params': highlight_params, # keyword highlighting
                  'querytime': [query_times],
                  'show_pages' : show_pages
             }
