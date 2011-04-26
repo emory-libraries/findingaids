@@ -39,13 +39,18 @@ CACHE_BACKEND = 'file:///tmp/findingaids_cache?timeout=1800'
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 
 #Exist DB Settings
-EXISTDB_SERVER_URL      = 'http://user:password@existdb.example.com/exist/xmlrpc'
+EXISTDB_SERVER_USER     = 'user'
+EXISTDB_SERVER_PASSWORD = 'password'
+EXISTDB_SERVER_URL      = "http://existdb.example.com/exist"
 # collection should begin with / -  e.g., /edc
 EXISTDB_ROOT_COLLECTION = ""
 # preview collection - should be outside main findingaids collection
 EXISTDB_PREVIEW_COLLECTION = ""
 EXISTDB_TEST_COLLECTION = ""
 # NOTE: EXISTDB_INDEX_CONFIGFILE is configured in settings.py
+
+# connection timeout for requests to eXist in seconds
+EXISTDB_TIMEOUT = 30
 
 # a bug in python xmlrpclib loses the timezone; override it here
 # most likely, you want either tz.tzlocal() or tz.tzutc()

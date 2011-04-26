@@ -11,6 +11,11 @@ recent version first.  Upgrade or deployment notes should be found in
 1.0 micro releases
 ------------------
 
+1.0.6
+~~~~~
+* Newer version of :mod:`eulcore.existdb` that adds a configurable
+  timeout on queries made to the eXist database.
+
 1.0.5
 ~~~~~
 * Fix response-time issue for series/subseries page with highlighted search

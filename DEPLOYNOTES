@@ -386,6 +386,25 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.0.6
+~~~~~
+
+To update to the latest version of :mod:`eulcore`, activate the
+virtualenv environment and run::
+
+    $ pip install -r pip-dependencies
+
+This update requires a slight modification in the **EXISTDB**
+configuration values in django settings and adds a new timeout
+configuration.  You should update ``localsettings.py`` to split out
+the eXist-db username and password from the **EXISTDB_SERVER_URL**
+setting.  See ``localsettings-sample.py`` for an example.
+
+You may now configure a timeout for eXist XML-RPC connections via the
+new **EXISTDB_TIMEOUT** setting in ``localsettings.py``.  See
+``localsettings-sample.py`` for an example and additional information.
+
+
 1.0.5 bugfix release
 ~~~~~~~~~~~~~~~~~~~~
 
