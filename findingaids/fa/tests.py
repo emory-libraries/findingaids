@@ -1060,21 +1060,23 @@ class FaViewsTest(TestCase):
         response = self.client.get(url, HTTP_ACCEPT = "text/xml")
         self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
 
-    def test_cache_control(self):
-        #No session varialbes set so not Cache-Control should not be set
+    def test_return_to_search_or_browse(self):
+        #No session variables set so Cache-Control should not be set
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(url)
         session = self.client.session
         last_search = session.get("last_search", None)
         self.assertFalse(last_search)
-        self.assertFalse(response.get('Cache-Control', None), "Cache-Control should not be set since there are no session variables set")
-        self.assertNotContains(response, 'return to browse', msg_prefix="No return to browse link should apear since there are no session variables set")
+        self.assertFalse(response.get('Cache-Control', None),
+                         "Cache-Control should not be set since there are no session variables set")
+        self.assertNotContains(response, 'Return to Browse',
+                               msg_prefix="No return to browse link should appear since there are no session variables set")
         
 
         #With last_search set in search
         #Calling search view first to set session info to simulate a user searching
         search_url = reverse('fa:search')
-        response = self.client.get(search_url, { 'keywords' : 'raoul'})
+        self.client.get(search_url, { 'keywords' : 'raoul'})
 
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(url)
@@ -1092,7 +1094,7 @@ class FaViewsTest(TestCase):
         #Calling title-by-letter view first to set session info to simulate a user
         letter = "R"
         browse_url = reverse('fa:titles-by-letter', kwargs={'letter':letter})
-        response = self.client.get(browse_url)
+        self.client.get(browse_url)
 
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(url)

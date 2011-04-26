@@ -99,7 +99,7 @@ class RequestMaterialsForm(forms.Form):
     repo = forms.MultipleChoiceField(settings.REQUEST_MATERIALS_CONTACTS,
             label='Repository', required=True, widget=forms.CheckboxSelectMultiple)
     name = forms.CharField(required=True)
-    date = forms.CharField(label='Date of Visit', required=False)
+    date = forms.CharField(label='Date of Visit', required=True)
     email = forms.EmailField(label='Email address', required=True)
     phone = forms.CharField(label='Phone Number', required=False)
     request = forms.CharField(label='Materials Requested', widget=forms.Textarea)
