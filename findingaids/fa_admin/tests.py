@@ -73,6 +73,8 @@ class BaseAdminViewsTest(TestCase):
         self.real_collection = settings.EXISTDB_ROOT_COLLECTION
         self.preview_collection = settings.EXISTDB_PREVIEW_COLLECTION
         self.real_exist_url = settings.EXISTDB_SERVER_URL
+        self._existdb_user = getattr(settings, 'EXISTDB_SERVER_USER', None)
+        self._existdb_password = getattr(settings, 'EXISTDB_SERVER_PASSWORD', None)
 
         # save pid config settings to restore in teardown
         self._pid_config = {
@@ -95,6 +97,8 @@ class BaseAdminViewsTest(TestCase):
         settings.EXISTDB_ROOT_COLLECTION = self.real_collection
         settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection
         settings.EXISTDB_SERVER_URL = self.real_exist_url
+        settings.EXISTDB_SERVER_USER = self._existdb_user
+        settings.EXISTDB_SERVER_PASSWORD = self._existdb_password
 
         # restore pid config settings
         for key, val in self._pid_config.iteritems():
@@ -274,6 +278,21 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
 
+        # simulate incorrect eXist permissions by not specifying username/password
+        settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection   # restore setting
+        # ensure guest account cannot update
+        self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-update')
+
+        settings.EXISTDB_SERVER_USER = None
+        settings.EXISTDB_SERVER_PASSWORD = None
+        
+        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not preview")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "not allowed to write to collection",
+                msg_prefix="error page displays specific eXist permission message")
+
         # - simulate eXist not running by setting existdb url to non-existent exist
         settings.EXISTDB_SERVER_URL = 'http://kamina.library.emory.edu:9191/not-exist'
         response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
@@ -282,19 +301,6 @@ class AdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="error page displays explanation and instructions to user")
         self.assertContains(response, "I/O Error: Connection refused",
                 msg_prefix="error page displays specific connection error message")
-
-        # simulate incorrect eXist permissions by not specifying username/password
-        settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection   # restore setting
-        # ensure guest account cannot update
-        self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-update')
-
-        settings.EXISTDB_SERVER_URL = settings.EXISTDB_SERVER_PROTOCOL + settings.EXISTDB_SERVER_HOST
-        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
-        self.assertContains(response, "Could not preview")
-        self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "not allowed to write to collection",
-                msg_prefix="error page displays specific eXist permission message")
 
         
     def test_logout(self):
@@ -704,6 +710,21 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
 
+        # simulate incorrect eXist permissions by not specifying username/password
+        settings.EXISTDB_ROOT_COLLECTION = self.real_collection # restore
+        # ensure guest account cannot update
+        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+
+        settings.EXISTDB_SERVER_USER = None
+        settings.EXISTDB_SERVER_PASSWORD = None
+
+        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        self.assertContains(response, "Could not publish")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "update is not allowed",
+                msg_prefix="error page displays specific exist permissions message")
+
         # - simulate eXist not running by setting existdb url to non-existent exist
         settings.EXISTDB_SERVER_URL = 'http://kamina.library.emory.edu:9191/not-exist'
         response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
@@ -712,18 +733,6 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="error page displays explanation and instructions to user")
         self.assertContains(response, "I/O Error: Connection refused",
                 msg_prefix="error page displays specific connection error message")
-
-        # simulate incorrect eXist permissions by not specifying username/password
-        settings.EXISTDB_ROOT_COLLECTION = self.real_collection # restore
-        # ensure guest account cannot update
-        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
-        settings.EXISTDB_SERVER_URL = settings.EXISTDB_SERVER_PROTOCOL + settings.EXISTDB_SERVER_HOST
-        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
-        self.assertContains(response, "Could not publish")
-        self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "update is not allowed",
-                msg_prefix="error page displays specific exist permissions message")
 
 
     def test_publish_from_preview(self):
