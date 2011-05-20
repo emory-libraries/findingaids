@@ -8,7 +8,7 @@ from django import template
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-from eulcore.xmlmap.eadmap import EAD_NAMESPACE
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
 __all__ = [ 'format_ead', 'format_ead_children' ]
 

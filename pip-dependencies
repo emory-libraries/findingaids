@@ -1,5 +1,9 @@
-django==1.2.5
--e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/release-0.13.x
+django
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eulxml#egg=eulxml
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eulexistdb#egg=eulexistdb
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eullocal#egg=eullocal
+-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/eulcommon#egg=eulcommon
+#-e svn+https://svn.library.emory.edu/svn/python-eulcore/branches/release-0.13.x
 -e svn+https://svn.library.emory.edu/svn/persis/pidmanclient/tags/release-1.1.0
 python-dateutil
 python-ldap

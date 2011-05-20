@@ -13,10 +13,10 @@ from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
 from django.test import Client, TestCase as DjangoTestCase
 
-from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
-from eulcore.xmlmap.eadmap import EAD_NAMESPACE
-from eulcore.django.existdb.db import ExistDB, ExistDBException
-from eulcore.django.test import TestCase
+from eulxml.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
+from eulexistdb.db import ExistDB, ExistDBException
+from eulexistdb.testutil import TestCase
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
     LocalComponent, Deleted, EadRepository

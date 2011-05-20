@@ -15,11 +15,11 @@ from django.core.management.base import BaseCommand, CommandError
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest
 
-from eulcore.django.existdb.db import ExistDB, ExistDBException
-from eulcore.django.taskresult.models import TaskResult
-from eulcore.django.test import TestCase
-from eulcore.xmlmap.core import load_xmlobject_from_file
-from eulcore.xmlmap.eadmap import EAD_NAMESPACE
+from eulexistdb.db import ExistDB, ExistDBException
+from eullocal.django.taskresult.models import TaskResult
+from eulexistdb.testutil import TestCase
+from eulxml.xmlmap.core import load_xmlobject_from_file
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
 
 from findingaids.fa.models import FindingAid, Deleted

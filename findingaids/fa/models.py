@@ -4,12 +4,12 @@ from django.contrib import admin
 from django.core.cache import cache
 from django.db import models
 
-from eulcore import xmlmap
-from eulcore.xmlmap.eadmap import EncodedArchivalDescription, Component, \
+from eulxml import xmlmap
+from eulxml.xmlmap.eadmap import EncodedArchivalDescription, Component, \
         SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
         UnitTitle
-from eulcore.django.existdb.manager import Manager
-from eulcore.django.existdb.models import XmlModel
+from eulexistdb.manager import Manager
+from eulexistdb.models import XmlModel
 
 
 # finding aid models
@@ -18,7 +18,7 @@ ID_DELIMITER = '_'
 
 class FindingAid(XmlModel, EncodedArchivalDescription):
     """
-    Customized version of :class:`eulcore.xmlmap.eadmap.EncodedArchivalDescription` EAD object.
+    Customized version of :class:`eulxml.EncodedArchivalDescription` EAD object.
 
     Additional fields and methods are used for search, browse, and display.
     """

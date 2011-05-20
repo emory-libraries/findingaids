@@ -8,8 +8,8 @@ from time import sleep
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from eulcore.xmlmap.core import load_xmlobject_from_file
-from eulcore.django.existdb import ExistDB, ExistDBException
+from eulxml.xmlmap.core import load_xmlobject_from_file
+from eulexistdb.db import ExistDB, ExistDBException
 
 from findingaids.fa.models import FindingAid
 from findingaids.fa_admin.utils import check_ead
