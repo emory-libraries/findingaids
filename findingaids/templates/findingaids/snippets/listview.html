@@ -13,7 +13,7 @@
     	{% ifnotequal fa.unittitle|slugify fa.list_title|slugify %}
         <p>{{ fa.unittitle|format_ead }}</p>
     	{% endifnotequal %}
-    	<p>{{ fa.physical_desc }}</p>
+    	<p>{{ fa.physical_descriptions|join:'; ' }}</p>
     	<p class="abstract">{{ fa.abstract|format_ead }}</p>
     	<p>Repository: {{ fa.repository|join:'/' }}</p>
     </div>

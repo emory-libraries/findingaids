@@ -42,11 +42,8 @@
       <unittitle encodinganalog="245$a">Abbey Theatre collection,<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" normal="1921/1995" type="inclusive">1921-1995</unitdate></unittitle>
       <unitid countrycode="US" repositorycode="geu-s">Manuscript Collection No.
 		  244</unitid>
-      <physdesc encodinganalog="300">
-        <extent>4 linear ft.</extent>
-        <extent>(8
-		  boxes)</extent>
-      </physdesc>
+      <physdesc encodinganalog="300"><extent>4 linear ft.</extent></physdesc>
+      <physdesc encodinganalog="300"><extent>(8 boxes)</extent></physdesc>
       <abstract>Collection of play scripts and programs from the Abbey Theatre
 		  from 1921-1995.</abstract>
       <langmaterial encodinganalog="546">Materials entirely in

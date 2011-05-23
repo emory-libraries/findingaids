@@ -200,6 +200,9 @@ class FaViewsTest(TestCase):
             msg_prefix='browse by titles for A should include Abbey finding aid abstract')
         self.assertContains(response, '3 finding aids found',
             msg_prefix='browse by titles for A should return 3 finding aids')
+        self.assertPattern(r'4 linear ft..*; .*(8 boxes)', response.content,
+            msg_prefix='browse view should handle multiple physdesc elements')
+
         # test case-insensitive sorting
         self.assertPattern('Abbey.*ABC', response.content,
             msg_prefix='Abbey Theater should be listed before ABC (case-insensitive sort)')
@@ -461,6 +464,9 @@ class FaViewsTest(TestCase):
             response.content, "admin info - historical note")
         self.assertPattern('Arrangement Note.*Organized into three series',
             response.content, "admin info - arrangement")
+        self.assertPattern(r'4 linear ft..*; .*(8 boxes)', response.content,
+            msg_prefix='findingaid view should handle multiple physdesc elements')
+
 
         # series instead of container list
         self.assertPattern('<h2>.*Description of Series.*</h2>', response.content,
