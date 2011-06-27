@@ -16,7 +16,12 @@ def reload_cached_pdf(eadid):
         connection = httplib.HTTPConnection(settings.PROXY_HOST)
         url = "%s%s" % (settings.SITE_BASE_URL.rstrip('/'), reverse('fa:printable', kwargs={'id': eadid }))
         logger.info("Requesting PDF for %s from configured cache at %s" % (eadid, url))
-        connection.request('GET', url)      # Pragma no-cache?  seems to avoid cache entirely
+        # set headers to force the cache to get a fresh copy
+        nocache = {
+            'Cache-Control': 'no-cache' 	# HTTP/1.1 compliant header  
+            # NOTE: if necessary, add Pragma: no-cache (HTTP/1.0 equivalent)
+            }
+        connection.request('GET', url, None, nocache)     # no request body, no-cache headers
         r = connection.getresponse()    # actually get the response to trigger PDF generation
         if r.status == 200:
             return True

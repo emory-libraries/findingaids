@@ -59,9 +59,11 @@ class MockHttpResponse():
 
 class MockHttpConnection():
     response = MockHttpResponse()
-    def request(self, method, url):
+    def request(self, method, url, body=None, headers=None):
         self.method = method
         self.url = url
+        self.body = body
+        self.headers = headers
     def getresponse(self):
         return self.response
 
