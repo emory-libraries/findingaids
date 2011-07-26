@@ -17,11 +17,12 @@ def reload_cached_pdf(eadid):
         url = "%s%s" % (settings.SITE_BASE_URL.rstrip('/'), reverse('fa:printable', kwargs={'id': eadid }))
         logger.info("Requesting PDF for %s from configured cache at %s" % (eadid, url))
         # set headers to force the cache to get a fresh copy
-        nocache = {
-            'Cache-Control': 'no-cache' 	# HTTP/1.1 compliant header  
-            # NOTE: if necessary, add Pragma: no-cache (HTTP/1.0 equivalent)
+        refresh_cache = {
+            # tell the cache to grab a fresh copy (implied: cache the fresh copy)
+            'Cache-Control': 'max-age=0'
+            # NOTE: using Cache-Control: no-cache clears the cache but does not populate
             }
-        connection.request('GET', url, None, nocache)     # no request body, no-cache headers
+        connection.request('GET', url, None, refresh_cache)     # no request body, cache header
         r = connection.getresponse()    # actually get the response to trigger PDF generation
         if r.status == 200:
             return True

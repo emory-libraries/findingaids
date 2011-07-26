@@ -1193,7 +1193,7 @@ class ReloadCachedPdfTestCase(TestCase):
         self.assert_(self.mock_httplib.connection.url.endswith(pdf_url),
             "http request url should end with PDF url; expected ending with %s, got %s" \
             % (pdf_url, self.mock_httplib.connection.url))
-        self.assertEqual(self.mock_httplib.connection.headers['Cache-Control'], 'no-cache')
+        self.assertEqual(self.mock_httplib.connection.headers['Cache-Control'], 'max-age=0')
 
     def test_404(self):
         # set the response to mock returning a 404 error
