@@ -961,6 +961,14 @@ class UtilsTest(TestCase):
         self.assert_('Site expects 2 containers per did; found 1 did(s) with only 1'
                     in errors, 'did with only 1 container reported')
 
+        # make sure we handle quirky document with a <title> at the beginning of the <unittitle> 
+        eadfile = os.path.join(settings.BASE_DIR, 'fa',
+            'fixtures', 'pittsfreeman1036.xml')
+        ead_nested_title = load_xmlobject_from_file(eadfile, FindingAid)
+        errors = utils.check_eadxml(ead_nested_title)
+        self.assert_(all('list title' not in err for err in errors),
+                     'nested <title> in <unittitle> should not generate a list title whitespace error')
+
         
     def test_prep_ead(self):
         # valid fixtures is an ead with series/subseries, and index

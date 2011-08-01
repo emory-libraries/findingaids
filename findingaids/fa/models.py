@@ -48,6 +48,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     "list title used for alphabetical browse - any origination name, or unittitle if there is none"
 
     # first letter of title field
+    #first_letter = xmlmap.StringField("substring(normalize-space(%s),1,1)" % list_title_xpath)
     first_letter = xmlmap.StringField("substring(%s,1,1)" % list_title_xpath)
     "First letter of list title"
 
