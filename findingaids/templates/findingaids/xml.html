@@ -1,0 +1,15 @@
+<html>
+<head>
+  <title>EmoryFindingAids : EAD XML index</title>
+</head>
+<body>
+
+<h1>EAD XML for all Finding Aids</h1>
+
+<ul>
+{% for fa in findingaids %}
+   <li><a href="{% url fa:eadxml fa.eadid %}">{{ fa.eadid }}.xml</a></li>
+{% endfor %}
+</ul>
+</body>
+</html>
