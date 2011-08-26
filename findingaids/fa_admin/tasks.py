@@ -22,8 +22,11 @@ def reload_cached_pdf(eadid):
             'Cache-Control': 'max-age=0'
             # NOTE: using Cache-Control: no-cache clears the cache but does not populate
             }
+        logger.debug('Request headers: \n%s' % refresh_cache)
         connection.request('GET', url, None, refresh_cache)     # no request body, cache header
         r = connection.getresponse()    # actually get the response to trigger PDF generation
+        logger.debug('Response headers: \n%s' % \
+                     '\n'.join(['\t%s: %s' % header for header in r.getheaders()]))
         if r.status == 200:
             return True
         else:
