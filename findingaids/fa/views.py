@@ -81,6 +81,22 @@ def titles_by_letter(request, letter):
     return render_to_response('findingaids/titles_list.html',
         response_context, context_instance=RequestContext(request))
 
+@condition(last_modified_func=collection_lastmodified)
+def xml_titles(request):
+    """List all findingaids in the database and link to the EAD xml,
+    as a simple way to make content available for harvesting.
+    """
+    # retrieve  all findingaids in the database and return eadids
+    # - no sorting, title, etc. - barebones display for 
+    fa = FindingAid.objects.only('eadid')
+    response_context = {
+        'findingaids' : fa,
+    }
+
+    return render_to_response('findingaids/xml.html',
+        response_context, context_instance=RequestContext(request))
+
+
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def eadxml(request, id, preview=False):

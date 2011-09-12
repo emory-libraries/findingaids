@@ -11,6 +11,18 @@ recent version first.  Upgrade or deployment notes should be found in
 1.0 micro releases
 ------------------
 
+1.0.8
+~~~~~
+
+* bugfix: allow admin publication of documents with a ``<title>`` at
+  the beginning of the document ``<unittitle>``
+* bugfix: Revised logic for celery PDF caching task, to ensure cache is
+  cleared and reloaded with the new version of a published document.
+* Plain HTML page with a list of all published findingaids, with a
+  link to the full EAD xml for each, as a simple way to allow
+  harvesting content.
+
+
 1.0.6
 ~~~~~
 * Newer version of :mod:`eulcore.existdb` that adds a configurable

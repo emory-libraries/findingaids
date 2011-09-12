@@ -1,5 +1,6 @@
 import cStringIO
 import logging
+from mock import patch
 import os
 import re
 from shutil import rmtree, copyfile
@@ -961,6 +962,14 @@ class UtilsTest(TestCase):
         self.assert_('Site expects 2 containers per did; found 1 did(s) with only 1'
                     in errors, 'did with only 1 container reported')
 
+        # make sure we handle quirky document with a <title> at the beginning of the <unittitle> 
+        eadfile = os.path.join(settings.BASE_DIR, 'fa',
+            'fixtures', 'pittsfreeman1036.xml')
+        ead_nested_title = load_xmlobject_from_file(eadfile, FindingAid)
+        errors = utils.check_eadxml(ead_nested_title)
+        self.assert_(all('list title' not in err for err in errors),
+                     'nested <title> in <unittitle> should not generate a list title whitespace error')
+
         
     def test_prep_ead(self):
         # valid fixtures is an ead with series/subseries, and index
@@ -1153,9 +1162,9 @@ def _celerytest_setUp(testcase):
 
     # OK, this is a little weird: swap out the real httplib in tasks with
     # the mock httplib object defined above
-    testcase.real_httplib = tasks.httplib
-    testcase.mock_httplib = MockHttplib()
-    tasks.httplib = testcase.mock_httplib
+    # testcase.real_httplib = tasks.httplib
+    # testcase.mock_httplib = MockHttplib()
+    # tasks.httplib = testcase.mock_httplib
 
 def _celerytest_tearDown(testcase):
         if testcase.proxy_host:
@@ -1172,9 +1181,13 @@ class ReloadCachedPdfTestCase(TestCase):
     def tearDown(self):
         _celerytest_tearDown(self)
 
-    def test_success(self):
+    @patch('findingaids.fa_admin.tasks.urllib2')
+    def test_success(self, mockurllib2):
         # set mock response to return 200
-        self.mock_httplib.connection.response.status = 200
+        mockurllib2.urlopen.return_value.code = 200
+        #request = urllib2.Request(url, None, refresh_cache)
+        #response = urllib2.urlopen(request)
+        #logger.debug('Response headers: \n%s' % response.info())
         result = tasks.reload_cached_pdf.delay('eadid')
         result.task_id = 'random_id'
         self.assertEquals(True, result.get(),
@@ -1182,21 +1195,32 @@ class ReloadCachedPdfTestCase(TestCase):
         self.assertTrue(result.successful(),
             "for http status 200, task result successful() returns True")
 
-        # inspect mock http objects to confirm correct urls were used
-        self.assertEqual(settings.PROXY_HOST, self.mock_httplib.url,
-            "http connection should use PROXY_HOST from settings; expected %s, got %s" \
-            % (settings.PROXY_HOST, self.mock_httplib.url))
-        self.assert_(self.mock_httplib.connection.url.startswith(settings.SITE_BASE_URL),
-            "http request url should begin with SITE_BASE_URL from settings; expected starting with %s, got %s" \
-            % (settings.SITE_BASE_URL, self.mock_httplib.connection.url))
-        pdf_url = reverse('fa:printable', kwargs={'id': 'eadid'})
-        self.assert_(self.mock_httplib.connection.url.endswith(pdf_url),
-            "http request url should end with PDF url; expected ending with %s, got %s" \
-            % (pdf_url, self.mock_httplib.connection.url))
+        # inspect mock urllib2 objects to confirm correct urls were used
+        #proxy_args, proxy_kwargs = mockurllib2.ProxyHandler.call_args
+        mockurllib2.ProxyHandler.assert_called_with({'http': settings.PROXY_HOST})
+#        print 'debug proxy args are ', proxy_args
+        # self.assertEqual(settings.PROXY_HOST, proxy_args['http'],
+        #     "http connection should use PROXY_HOST from settings; expected %s, got %s" \
+        #     % (settings.PROXY_HOST, proxy_args['http']))
 
-    def test_404(self):
+        rqst_args, rqst_kwargs = mockurllib2.Request.call_args
+        # request args : url, data, headers
+        rqst_url = rqst_args[0]
+        rqst_headers = rqst_args[2]
+        self.assert_(rqst_url.startswith(settings.SITE_BASE_URL),
+                     "http request url should begin with SITE_BASE_URL from settings; expected starting with %s, got %s" \
+                     % (settings.SITE_BASE_URL, rqst_url))
+        pdf_url = reverse('fa:printable', kwargs={'id': 'eadid'})
+        self.assert_(rqst_url.endswith(pdf_url),
+            "http request url should end with PDF url; expected ending with %s, got %s" \
+            % (pdf_url, rqst_url))
+        
+        self.assertEqual(rqst_headers['Cache-Control'], 'max-age=0')
+
+    @patch('findingaids.fa_admin.tasks.urllib2')
+    def test_404(self, mockurllib2):
         # set the response to mock returning a 404 error
-        self.mock_httplib.connection.response.status = 404
+        mockurllib2.urlopen.return_value.code = 404
         result = tasks.reload_cached_pdf.delay('eadid')
         self.assertRaises(Exception, result.get,
             "for http status 404, task result raises an Exception")
