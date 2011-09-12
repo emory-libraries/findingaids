@@ -1198,7 +1198,6 @@ class ReloadCachedPdfTestCase(TestCase):
         # inspect mock urllib2 objects to confirm correct urls were used
         #proxy_args, proxy_kwargs = mockurllib2.ProxyHandler.call_args
         mockurllib2.ProxyHandler.assert_called_with({'http': settings.PROXY_HOST})
-#        print 'debug proxy args are ', proxy_args
         # self.assertEqual(settings.PROXY_HOST, proxy_args['http'],
         #     "http connection should use PROXY_HOST from settings; expected %s, got %s" \
         #     % (settings.PROXY_HOST, proxy_args['http']))
