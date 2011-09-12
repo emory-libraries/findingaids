@@ -386,6 +386,13 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.0.8
+~~~~~
+
+Because the PDF caching celery task has been modified, the FindingAids
+celery daemon process should be restarted after updating the code.
+
+
 1.0.6
 ~~~~~
 
