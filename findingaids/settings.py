@@ -177,7 +177,7 @@ except ImportError:
         'localsettings.py and setting appropriately for your environment.'
     pass
 
-TEST_RUNNER = 'eulexistdb.testutil.ExistDBTestSuiteRunner'
+TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
 
 try:
     # use xmlrunner if it's installed; default runner otherwise. download
@@ -185,7 +185,6 @@ try:
     # test results in JUnit-compatible XML.
     import xmlrunner
     TEST_RUNNER = 'eulexistdb.testutil.ExistDBXmlTestSuiteRunner'
-    #TEST_RUNNER='xmlrunner.extra.djangotestrunner.run_tests'
     TEST_OUTPUT_DIR='test-results'
 except ImportError:
     pass
