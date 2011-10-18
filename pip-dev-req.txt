@@ -3,3 +3,4 @@ sphinx
 coverage
 MySQL-python
 unittest2
+mock

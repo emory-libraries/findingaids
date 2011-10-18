@@ -243,6 +243,23 @@ class FaViewsTest(TestCase):
         self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content,
             msg_prefix='title within unittitle should be formatted on list view')
 
+    def test_titles_xml(self):
+        xml_titles = reverse('fa:all-xml')
+        response = self.client.get(xml_titles)
+        expected = 200
+        self.assertEqual(response.status_code, expected, 
+                        'Expected %s but returned %s for %s'
+                            % (expected, response.status_code, xml_titles))
+        # all eads from test fixtures should be listed
+        for eadid in ['abbey244', 'bailey807', 'leverette135', 'adams465',
+                      'pittsfreeman1036.xml', 'pomerantz890', 'raoul548']:
+            self.assertContains(response, '%s.xml' % eadid,
+                msg_prefix='eadid %s should be included in all-xml page' % eadid)
+            self.assertContains(response, reverse('fa:eadxml', kwargs={'id': eadid}))
+   
+
+
+
 
 # view finding aid main page
 

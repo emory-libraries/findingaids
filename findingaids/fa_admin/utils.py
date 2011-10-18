@@ -141,6 +141,8 @@ def check_eadxml(ead):
         errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
 
     # - no leading whitespace in list title
+    # FIXME: this first test may be redundant - possibly use only the first_letter check,
+    # now that the first_letter xpath uses normalize-space
     title_node = ead.node.xpath("%s/text()" % ead.list_title_xpath,
                                 namespaces={'e': EAD_NAMESPACE})
     if hasattr(title_node[0], 'text'):
