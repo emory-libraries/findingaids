@@ -1,4 +1,4 @@
-django
+Django
 eulxml
 eulexistdb
 eulcommon

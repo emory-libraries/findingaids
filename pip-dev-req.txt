@@ -1,5 +1,5 @@
 unittest-xml-reporting
-sphinx
+Sphinx
 coverage
 MySQL-python
 unittest2
