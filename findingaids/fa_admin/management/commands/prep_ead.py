@@ -6,8 +6,8 @@ import os
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 
-from eulcore.django.existdb import ExistDB
-from eulcore.xmlmap.core import load_xmlobject_from_file
+from eulexistdb.db import ExistDB
+from eulxml.xmlmap.core import load_xmlobject_from_file
 
 from findingaids.fa.models import FindingAid
 from findingaids.fa_admin import utils

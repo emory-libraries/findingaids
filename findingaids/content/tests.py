@@ -6,7 +6,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
-from eulcore.django.test import TestCase as EulDjangoTestCase
+from eulexistdb.testutil import TestCase as EulexistdbTestCase
+from eullocal.django.forms.tests import MockCaptcha
 
 from findingaids.content import models, forms
 
@@ -158,11 +159,10 @@ class ContentFeedTest(TestCase):
         # non-existent
         self.assertEqual(None, content.get_entry('bogus'))
 
-from eulcore.django.forms.tests import MockCaptcha
 
 
 
-class EmailTestCase(EulDjangoTestCase):
+class EmailTestCase(EulexistdbTestCase):
     # Common test class with logic to mock sending mail and mock captcha submission
     # to test functionality without actual sending email or querying captcha servers.
     # Extending EulDjangoTestCase to allow use of eXist fixtures

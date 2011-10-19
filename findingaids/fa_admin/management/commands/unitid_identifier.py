@@ -6,7 +6,7 @@ import re
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-from eulcore.xmlmap.core import load_xmlobject_from_file
+from eulxml.xmlmap.core import load_xmlobject_from_file
 from findingaids.fa.models import FindingAid
 
 class Command(BaseCommand):

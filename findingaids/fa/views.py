@@ -10,10 +10,10 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import condition
 
-from eulcore.django.http import content_negotiation
-from eulcore.existdb.db import ExistDBException
-from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
-from eulcore.xmlmap.eadmap import EAD_NAMESPACE
+from eulcommon.djangoextras.http import content_negotiation
+from eulexistdb.db import ExistDBException
+from eulexistdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
             FileComponent, title_letters, Index, shortform_id

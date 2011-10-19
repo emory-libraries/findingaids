@@ -16,8 +16,8 @@ from django.shortcuts import get_object_or_404
 
 from django.template import RequestContext
 
-from eulcore.django.existdb.db import ExistDB
-from eulcore.existdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+from eulexistdb.db import ExistDB
+from eulexistdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 
 from findingaids.fa.models import FindingAid, Deleted
 

@@ -7,8 +7,8 @@ from urllib2 import HTTPError
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
-from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
-from eulcore.xmlmap.eadmap import EAD_NAMESPACE
+from eulxml.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 from pidservices.djangowrapper.shortcuts import DjangoPidmanRestClient
 from pidservices.clients import is_ark, parse_ark
 
