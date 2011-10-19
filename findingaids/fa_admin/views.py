@@ -16,13 +16,13 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 
-from eulcore.django.auth import permission_required_with_403
-from eulcore.django.existdb.db import ExistDB, ExistDBException
-from eulcore.django.http import HttpResponseSeeOtherRedirect
-from eulcore.django.log import message_logging
-from eulcore.django.taskresult.models import TaskResult
-from eulcore.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
-from eulcore.existdb.exceptions import DoesNotExist
+from eulcommon.djangoextras.auth import permission_required_with_403
+from eulexistdb.db import ExistDB, ExistDBException
+from eulcommon.djangoextras.http import HttpResponseSeeOtherRedirect
+from eullocal.django.log import message_logging
+from eullocal.django.taskresult.models import TaskResult
+from eulxml.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
+from eulexistdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset

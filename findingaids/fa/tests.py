@@ -13,10 +13,10 @@ from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
 from django.test import Client, TestCase as DjangoTestCase
 
-from eulcore.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
-from eulcore.xmlmap.eadmap import EAD_NAMESPACE
-from eulcore.django.existdb.db import ExistDB, ExistDBException
-from eulcore.django.test import TestCase
+from eulxml.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
+from eulexistdb.db import ExistDB, ExistDBException
+from eulexistdb.testutil import TestCase
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
     LocalComponent, Deleted, EadRepository
@@ -1635,12 +1635,12 @@ class FullTextFaViewsTest(TestCase):
 
         self.assertContains(response, "Search results for : <b>correspondence</b>",
             msg_prefix='search results include search term')
-        self.assertContains(response, "44 matches found",  # 22 ? 45 ? 
+        self.assertContains(response, "22 matches found",  # 22 ? 44 ? 45 ? 
             msg_prefix='search for "correspondence" in raoul548 matches 44 items')
         # box/folder/contents headings should display once for each series
-        self.assertContains(response, "Box", 8,
+        self.assertContains(response, "Box", 4,
             msg_prefix='"Box" heading appears once for each series match')
-        self.assertContains(response, "Folder", 8,
+        self.assertContains(response, "Folder", 4,
             msg_prefix='"Folder" heading appears once for each series match')
 
         # series from fixture with matches:  s1.1, 4, 4.1b

@@ -1,5 +1,6 @@
-unittest-xml-reporting==1.0.3
+unittest-xml-reporting
 sphinx
 coverage
 MySQL-python
+unittest2
 mock

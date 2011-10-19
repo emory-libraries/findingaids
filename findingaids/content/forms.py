@@ -2,7 +2,7 @@ from django import forms
 from django.conf import settings
 from django.core.mail import send_mail
 
-from eulcore.django.forms import captchafield
+from eullocal.django.forms import captchafield
  
 from findingaids.fa.utils import get_findingaid
 

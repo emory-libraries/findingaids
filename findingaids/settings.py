@@ -34,8 +34,8 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = ''           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = ''             # Or path to database file if using sqlite3.
+DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'fa.db'             # Or path to database file if using sqlite3.
 DATABASE_USER = ''             # Not used with sqlite3.
 DATABASE_PASSWORD = ''         # Not used with sqlite3.
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
@@ -85,9 +85,9 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.http.ConditionalGetMiddleware',
 )
 
@@ -123,7 +123,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 # Enable additional backends.
 # Enable this for LDAP and see ReadMe for install dependencies.
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 
-                           'eulcore.django.emory_ldap.backends.EmoryLDAPBackend')
+                           'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
 
 AUTH_PROFILE_MODULE = 'emory_ldap.EmoryLDAPUserProfile'
 
@@ -143,12 +143,12 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'djcelery',
-    'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
-    'eulcore.django.testsetup',
-    'eulcore.django.existdb',
-    'eulcore.django.emory_ldap',
-    'eulcore.django.taskresult',
-    'eulcore.django.util',
+    #'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
+    'eullocal.django.emory_ldap',
+    'eullocal.django.taskresult',
+    'eullocal.django.util',
+    'eulexistdb',
+    'eulxml',
     'findingaids.fa',
     'findingaids.fa_admin',
     'findingaids.content',
@@ -177,12 +177,14 @@ except ImportError:
         'localsettings.py and setting appropriately for your environment.'
     pass
 
+TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
+
 try:
     # use xmlrunner if it's installed; default runner otherwise. download
     # it from http://github.com/danielfm/unittest-xml-reporting/ to output
     # test results in JUnit-compatible XML.
     import xmlrunner
-    TEST_RUNNER='xmlrunner.extra.djangotestrunner.run_tests'
+    TEST_RUNNER = 'eulexistdb.testutil.ExistDBXmlTestSuiteRunner'
     TEST_OUTPUT_DIR='test-results'
 except ImportError:
     pass
