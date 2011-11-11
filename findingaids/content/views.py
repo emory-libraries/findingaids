@@ -62,11 +62,14 @@ def feedback(request):
                 response.status_code = 500
             return response
     else:
+        ead = None
         if 'eadid' in request.GET:
             # retrieve minimal ead info to display ead title to user on the form
-            ead = get_findingaid(eadid=request.GET['eadid'], only=['title'])
-        else:
-            ead = None
+            try:
+                ead = get_findingaid(eadid=request.GET['eadid'], only=['title'])
+            except:
+                # if retrieval fails, ignore it - not required for the form to work
+                pass
 
         # GET may include eadid & url; use as initial data to populate those fields
         form = FeedbackForm(initial=request.GET)

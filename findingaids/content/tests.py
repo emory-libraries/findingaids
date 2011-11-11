@@ -457,12 +457,22 @@ class ContentViewsTest(EmailTestCase):
              % (expected, response.status_code, feedback_url))
         self.assert_(isinstance(response.context['form'], forms.FeedbackForm),
             'feedback form should be set in template context for GET on %s' % feedback_url)
+        self.assertNotContains(response, 'noindex,nofollow',
+             msg_prefix='default feedback page should not include noindex,nofollow bots directive')
+        self.assertNotContains(response, 'link rel="canonical"',
+             msg_prefix='default feedback page should not include link rel=canonical')
 
         # GET with an eadid
         response = self.client.get(feedback_url, {'eadid': 'abbey244'})
         self.assertPattern('Sending feedback about.*Abbey\s+Theatre\s+collection,\s+1921-1995',
             response.content,
             msg_prefix='feedback page should include title when sending feedback about a single ead');
+        self.assertContains(response, ': Feedback on Abbey Theatre collection',
+            msg_prefix='html header should differentiate from default feedback page')
+        self.assertContains(response, 'noindex,nofollow',
+            msg_prefix='item feedback page should include noindex, no follow bots directive')
+        self.assertContains(response, 'link rel="canonical"',
+             msg_prefix='item feedback page should include link to canonical feedback page')
 
         # POST - send an email
         feedback_data = {
