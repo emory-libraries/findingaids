@@ -1,7 +1,15 @@
 {% extends "site_base.html" %}
-{% block page-subtitle %}: Feedback{% endblock %}
+{% block page-subtitle %}: Feedback{% if findingaid %} on {{ findingaid.title }}{% endif %}{% endblock %}
 {% block content-header  %}
  <h1 class="title toplevel">Feedback</h1>
+{% endblock %}
+
+{% block page-head %}
+  {{block.super}}
+  {% if form.eadid.value %}  {# don't index per-item feedback pages, link main feedback as canonical #}
+   <meta name="robots" content="noindex,nofollow" />
+   <link rel="canonical" href="{% url content:feedback %}" />
+  {% endif %}
 {% endblock %}
 
 {% block content-body %}
