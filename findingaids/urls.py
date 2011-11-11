@@ -2,11 +2,15 @@ from django.conf.urls.defaults import *
 from django.conf import settings
 from django.contrib import admin
 from django.views.generic.simple import direct_to_template
+from django.views.generic.base import RedirectView
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
    url(r'^robots\.txt$', direct_to_template, {'template': 'robots.txt', 'mimetype': 'text/plain'}),
+   # embedded url on non-library Emory sites that gets picked up by search bots
+   url(r'^-Libraries-EmoryFindingAids$', RedirectView.as_view(url='/', permanent=True)),
+                       
    url(r'^db-admin/', include(admin.site.urls)),
    url(r'^admin/', include('findingaids.fa_admin.urls', namespace='fa-admin')),
    url(r'^$', 'findingaids.content.views.site_index', name='site-index'),
