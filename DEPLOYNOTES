@@ -386,10 +386,10 @@ Upgrade Notes
 1.0.9
 ~~~~~
 
-Upgrade to Django 1.3 and broken-out eulcore modules (:mod:`eulxml`,
-:mod:`eulexistdb`, and :mod:`eulcommon). To update to the latest
-versions of Python dependencies, activate the virtualenv environment
-and run::
+This update requires an upgrade to Django 1.3 and broken-out eulcore
+modules (:mod:`eulxml`, :mod:`eulexistdb`, and :mod:`eulcommon). To
+update to the latest versions of Python dependencies, activate the
+virtualenv environment and run::
 
     $ pip install -r pip-install-req.txt
 
