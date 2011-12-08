@@ -402,6 +402,10 @@ Logging must now be configured in ``localsettings.py`` in the Django
 example configuration, and
 http://docs.djangoproject.com/en/dev/topics/logging for more details.
 
+Previous, custom logging configurations (**LOGGING_LEVEL**,
+**LOGGING_FORMAT**, and **LOGGING_FILENAME**) will no longer be used,
+so you may want to remove them from your ``localsettings.py`` file.
+
 1.0.8
 ~~~~~
 
