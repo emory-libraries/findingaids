@@ -397,6 +397,11 @@ If you wish to remove the old version of :mod:`eulcore`::
 
     $ pip uninstall eulcore
 
+Logging must now be configured in ``localsettings.py`` in the Django
+1.3 logging config format; see ``localsettings-sample.py`` for an
+example configuration, and
+http://docs.djangoproject.com/en/dev/topics/logging for more details.
+
 1.0.8
 ~~~~~
 

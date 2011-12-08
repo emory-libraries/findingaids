@@ -144,9 +144,51 @@ SECRET_KEY = ''
 import os
 os.putenv('HTTP_PROXY', 'http://localhost:3128/')  # local squid proxy on default port
 
-# Logger Settings
-import logging
-#logging levels: NOLOG, CRITICAL, ERROR, WARNING, INFO, DEBUG
-LOGGING_LEVEL=logging.NOLOG
-LOGGING_FORMAT="%(asctime)s : %(name)s:  %(levelname)s : %(message)s"
-LOGGING_FILENAME="" # "" will print to stdout
+# Sample logging configuration for Django 1.3.
+# Be sure to preserve the configuration is to send an email to the
+# site admins on every HTTP 500 error.
+# See http://docs.djangoproject.com/en/dev/topics/logging for more
+# details on how to customize your logging configuration.
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'basic': {
+            'format': '[%(asctime)s] %(levelname)s:%(name)s::%(message)s',
+            'datefmt': '%d/%b/%Y %H:%M:%S',
+         },
+    },
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler',
+            'include_html': True,
+        }
+        ,
+        'console':{
+            'level':'INFO',
+            'class':'logging.StreamHandler',
+            'formatter': 'basic'
+        },
+        'file':{
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': '/tmp/django-findingaids.log',
+            'maxBytes': 1024,
+            'backupCount': 3,
+            'formatter': 'basic',
+        },
+
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+       'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    }
+}
