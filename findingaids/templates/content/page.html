@@ -5,5 +5,7 @@
 {% endblock %}
 
 {% block content-body %}
-{{ page.summary|safe }}
+
+{% firstof page.summary_detail.value|safe page.summary|safe %}
+
 {% endblock %}
