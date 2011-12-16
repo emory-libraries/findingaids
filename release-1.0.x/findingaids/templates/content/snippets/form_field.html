@@ -1,7 +1,0 @@
-{# display a single form field; expects field named 'field' and required indicator named 'req' #}
-<div id ="{{ field.label }}_block">
-  <label for="id_{{ field.name }}">{{ field.label }}:  {% if field.field.required %}{{ req }}{% endif %}</label>
-  {{ field }}  
-  {% if field.help_text %}<span class="help-text">{{ field.help_text }}</span> {% endif %}
-  {% if field.errors %}<span class="errors">{{ field.errors }}</span> {% endif %}
-</div>

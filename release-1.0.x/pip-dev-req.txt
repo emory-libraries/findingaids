@@ -1,6 +1,0 @@
-unittest-xml-reporting
-Sphinx
-coverage
-MySQL-python
-unittest2
-mock
