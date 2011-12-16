@@ -1,0 +1,56 @@
+{% extends "site_base.html" %}
+{% block page-subtitle %}: Request Materials{% endblock %}
+{% block content-header  %}
+ <h1 class="title toplevel">Request Materials</h1>
+{% endblock %}
+
+{# TODO: share snippet with feedback form #}
+{% block scripts %}
+    {{ block.super }}
+    {% if captcha_theme %} {# set captcha theme option if specified #}
+        <script type="text/javascript">
+             var RecaptchaOptions = { theme : '{{ captcha_theme }}' };
+         </script>
+    {% endif %}
+{% endblock %}
+
+{% block content-body %}
+
+{% if form %}
+<p>If you plan to visit MARBL, you may use this form to request that materials
+    be placed on hold for you prior to your arrival.</p>
+
+ <form class="email-form" action="{% url content:request-materials %}" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
+    {% with ' <span class="required" title="required">*</span>' as req %}
+        {% for field in form.visible_fields %}
+            {% include 'content/snippets/form_field.html' %}
+        {% endfor %}
+    {% endwith %}
+    
+    <p><strong>Please include the following information:</strong><br/>
+    Collection number (MSS); Collection Name<br/>
+    Boxes Requested<br/></p>
+    <p>Please note that the types of materials present in a collection may
+      include: boxes, Oversized Papers (OPs), Bound Volumes (BVs),
+      Oversized Bound Volumes (OBVs), CDs or DVDs, and Microfilm reels (MF).
+      Please note both the item type and number. It is not necessary to list
+      individual folders, as the repositories pull whole boxes, rather than
+      individual items. For instance:</p>
+      <p>MSS644 Ted Hughes<br/>
+            Box 1</br>
+            Box 5<br/>
+            OP12<br/>
+      </p>
+<hr/>
+    {% include 'content/snippets/captcha.html' %}
+    <input class="form-submit" type="submit" value="Send"/>
+</form>
+{% else %}
+    {# if form not included, display email success/error #}
+    {% with 'request for materials' as message_type %}
+        {% include 'content/snippets/email_sent.html' %}
+    {% endwith %}
+
+{% endif %}
+{% endblock %}

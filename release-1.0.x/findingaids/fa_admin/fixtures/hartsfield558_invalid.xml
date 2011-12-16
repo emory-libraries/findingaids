@@ -1,0 +1,867 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ead xmlns="urn:isbn:1-931666-22-9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:isbn:1-931666-22-9 http://www.loc.gov/ead/ead.xsd" relatedencoding="MARC21" invalid="attribute">
+  <eadheader langencoding="iso639-2b" relatedencoding="Dublin Core" scriptencoding="iso15924" dateencoding="iso8601" countryencoding="iso3166-1" repositoryencoding="iso15511">
+    <eadid countrycode="US" mainagencycode="geu-s" identifier="hartsfield558.xml">hartsfield558.xml</eadid>
+    <filedesc>
+      <titlestmt>
+        <titleproper encodinganalog="Title">William Berry Hartsfield papers, circa 1860s-1983</titleproper>
+        <author encodinganalog="Creator">Manuscript, Archives, and Rare Book
+			 Library, Emory University</author>
+      </titlestmt>
+      <publicationstmt>
+        <publisher encodinganalog="Publisher">Emory University</publisher>
+        <address>
+          <addressline>Manuscript, Archives, and Rare Book
+				Library</addressline>
+          <addressline>Atlanta, GA 30322</addressline>
+          <addressline>404-727-6887</addressline>
+          <addressline>Fax: 404-727-0360</addressline>
+        </address>
+        <date encodinganalog="Date" normal="2010-05-07">May 7, 2010</date>
+      </publicationstmt>
+    </filedesc>
+    <profiledesc>
+      <creation>Finding aid encoded, 
+		  <date encodinganalog="Date" normal="2010-05-07">May 7, 2010</date></creation>
+      <langusage>
+        <language langcode="eng" encodinganalog="Language" scriptcode="Latn">English</language>
+      </langusage>
+    </profiledesc>
+  </eadheader>
+  <archdesc level="collection" relatedencoding="MARC21">
+    <did>
+      <origination>
+        <persname source="lcnaf" encodinganalog="100">  Hartsfield, William Berry.</persname>
+      </origination>
+      <origination/>
+      <unittitle encodinganalog="245$a"> William Berry Hartsfield papers, <unitdate type="inclusive" encodinganalog="245$f" normal="1860/1983" era="ce" calendar="gregorian">circa 1860s-1983</unitdate></unittitle>
+      <unitid repositorycode="geu-s" countrycode="US">Manuscript Collection No.
+		  558</unitid>
+      <physdesc encodinganalog="300"><extent>38.25 linear ft.</extent><extent>(79
+		  boxes)</extent>, <extent>78 oversized papers (OP)</extent>, <extent>12 bound volumes (BV)</extent>, and <extent>2 oversized bound volumes (OBV)</extent></physdesc>
+      <abstract encodinganalog="520">Papers of Atlanta mayor William Berry Hartsfield including personal papers, correspondence, subject files, writings, printed material, photographs, memorabilia, and audiovisual material.</abstract>
+      <langmaterial encodinganalog="546">Materials entirely in
+		  <language langcode="eng">English</language>.</langmaterial>
+      <repository encodinganalog="852">Emory University<subarea>Manuscript,
+		  Archives, and Rare Book Library</subarea></repository>
+    </did>
+    <acqinfo encodinganalog="541">
+      <head>Source</head>
+      <p>Gift, with subsequent additions.</p>
+    </acqinfo>
+    <accessrestrict encodinganalog="506">
+      <head>Restrictions on Access</head>
+      <p>Researchers must contact MARBL in advance to access audiovisual materials in this collection.</p>
+    </accessrestrict>
+    <userestrict encodinganalog="540">
+      <head>Terms Governing Use and Reproduction</head>
+      <p>All requests subject to limitations noted in departmental policies on
+		  reproduction.</p>
+    </userestrict>
+    <prefercite encodinganalog="524">
+      <head>Citation</head>
+      <p>[after identification of item(s)], William Berry Hartsfield papers, Manuscript,
+		  Archives, and Rare Book Library, Emory University.</p>
+    </prefercite>
+    <processinfo>
+      <head>Processing</head>
+      <p>Processed by Elizabeth Russey Roke, May 2010.</p>
+      <note>
+        <p>Control level 3</p>
+      </note>
+      <note>
+        <p>File name: hartsfield588.doc</p>
+      </note>
+    </processinfo>
+    <bioghist encodinganalog="545">
+      <head>Biographical Note</head>
+      <p>William Berry Hartsfield (March 1, 1890-February 22, 1971), attorney, politician, and mayor of Atlanta was born in Atlanta, Georgia, the son of Charles Green Hartsfield, a tinsmith, and Victoria Dagnall Hartsfield.  He married Pearl Williams on August 2, 1913 and they had two children, William Berry Hartsfield, Jr. and Mildred Hartsfield Cheshire.  They divorced after forty-eight years of marriage and Hartsfield married Tollie Tolan on July 11, 1962.  He later adopted her son, Carl.</p>
+      <p>Hartsfield attended Boys High School in Atlanta and found employment as a clerk for the General Fire Extinguisher Company.  In 1916, while working as a clerk for the legal firm of Rosser, Slaton, Phillips, and Hopkins, he began reading law.  His formal education was completed in 1937, when the Atlanta Law School awarded him a Bachelor of Law degree. Hartsfield was admitted to the Georgia Bar in 1917 and established a practice in Atlanta.  His first entrance into the political arena came in 1923, with his election to the City Council of Atlanta.  He remained a council member until 1928.  During this time, he served on the municipal airport committee and helped arrange the purchase of Candler Field as the site for the city's first municipal airport.  The Hartsfield International Airport is named in his honor.</p>
+      <p>From 1933 to 1937, Hartsfield served as a Fulton County Representative to the Georgia Legislature.  In 1936, he defeated incumbent Mayor James L. Key in the first of the seven mayoral elections he entered.  With the exception of an eighteen-month period in 1941-1942, Hartsfield served as the city's chief administrator continuously from 1937 to 1962.  As mayor, Hartsfield saw the city more than triple in land area, grow to have over a million inhabitants, and survive the Depression and World War II fiscally sound and ready to undertake such civic improvements as building expressways and city parks.  An early racial moderate, he guided the city through the 1950s and the beginnings of the Civil Rights Movement.  Hartsfield also served as an officer in two mining companies, the Southern Talc Company of Atlanta and Chatsworth, Georgia (1933-1942) and the Georgia Lightweight Aggregate Company (1951-1954).  Throughout most of his life, he maintained an interest in Georgia's mineral development.</p>
+      <p>Following Hartsfield's retirement from city government in 1962, he was named Mayor Emeritus and became a consultant to the Ford Foundation's Committee of Review and Evaluation, Urban Program; to the Rockefeller Foundation's Performing Arts Panel; and to the Coca Cola Company.  He was also named president of the Southeastern Fair Association.  A life-long member of the First Baptist Church of Atlanta, Hartsfield was also a Democrat, a Mason, and a Shriner.  Among the many honors he received were honorary Doctorate of Law degrees from Oglethorpe University and Atlanta University, both in 1961.</p>
+    </bioghist>
+    <scopecontent encodinganalog="520">
+      <head>Scope and Content Note</head>
+      <p>The collection consists of the papers of William B. Hartsfield from circa 1860-1983.  The papers include personal papers, correspondence, subject files, writings by Hartsfield (speeches and articles), pamphlets, newspaper clippings, magazine articles, photographs, memorabilia, and audiovisual materials.  The bulk of the collection dates from the mid-1930s to the time of his death in 1971.  </p>
+      <p>The Hartsfield papers document Hartsfield's political, business, and personal life.  Materials relating to his 23 years as mayor are extensive and can be found in every series.  Particularly valuable are the election materials in Series 3: Election files, which include notes about campaign tactics, correspondence, literature, and financial records for his seven mayoral elections.  The personal papers, correspondence, subject files, and photograph series illustrate the importance politics played in his life.  Hartsfield's business interests are revealed in Series 1: Personal papers and Series 6: Personal Business records.  Material relating to his personal life, including family correspondence and financial records, is in Series 1: Personal papers.</p>
+      <p>Other topics covered by the papers are the growth of commercial aviation in Atlanta; annexation of Buckhead and Sandy Springs; Chattahoochee River development and the building of the Buford Dam to assure the city's water supply; the 1939 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Gone with The Wind</title> premiere; race relations in the city in the 1940s, 1950s, and early 1960s (from hiring the first black policemen to integrating Atlanta schools); Hartsfield's fight to prevent the fluoridation of Atlanta's water; the growth of performing arts in Atlanta; and, in general, the evolution of Atlanta into a major metropolitan area.</p>
+      <p>Major correspondents include political and business leaders of Atlanta, Georgia, governors, senators, congressmen, national political figures, and persons active in the motion picture and mining industries.  Among the names represented in the correspondence are Ivan Allen, Jr., Henry L. Bowden, Helen Bullard, Lester Maddox, Everett Millican, Ralph McGill, Lawrence "Chip" Robert, Richard Russell, David O. Selznick, Herman Talmadge, and Robert W. Woodruff.</p>
+    </scopecontent>
+    <arrangement encodinganalog="351">
+      <head>Arrangement Note</head>
+      <p>Organized into eleven series: (1) Personal papers, (2) Correspondence, (3) Elections, (4) Subject files (5) Writings, (6) Personal business records, (7) Printed materials, (8) Photographs, (9) Memorabilia, (10) Moses Cox files, and (11) Audiovisual materials.</p>
+    </arrangement>
+    <otherfindaid encodinganalog="555">
+      <head>Finding Aid Note</head>
+      <p>An index to selected correspondence in this collection is available.</p>
+    </otherfindaid>
+    <controlaccess>
+      <head>Selected Search Terms</head>
+      <controlaccess>
+        <head>Uniform Title</head>
+        <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" encodinganalog="630" source="lcnaf" xlink:href=""> Gone with the wind (Motion picture)</title>
+      </controlaccess>
+      <controlaccess>
+        <head>Personal Names</head>
+        <persname source="lcnaf" encodinganalog="600">        Allen, Ivan.</persname>
+        <persname source="lcnaf" encodinganalog="600">Bullard, Helen, 1908-1979.</persname>
+        <persname source="lcnaf" encodinganalog="600">Maddox, Lester, 1915-2003.</persname>
+        <persname source="lcnaf" encodinganalog="600">McGill, Ralph, 1898-1969.</persname>
+        <persname source="lcnaf" encodinganalog="600">Robert, Lawrence Wood, 1889-1976.</persname>
+        <persname source="lcnaf" encodinganalog="600">Russell, Richard B. (Richard Brevard), 1897-1971.</persname>
+        <persname source="lcnaf" encodinganalog="600">  	   Selznick, David O., 1902-1965.</persname>
+        <persname source="lcnaf" encodinganalog="600">Talmadge, Herman E. (Herman Eugene), 1913-2002.</persname>
+        <persname source="lcnaf" encodinganalog="600">  	   Woodruff, Robert Winship.</persname>
+      </controlaccess>
+      <controlaccess>
+        <head>Corporate Names</head>
+        <corpname source="lcnaf" encodinganalog="610 or 710">Atlanta (Ga.). Mayor.</corpname>
+        <corpname source="lcnaf" encodinganalog="610 or 710">Southern Talc Company.</corpname>
+      </controlaccess>
+      <controlaccess>
+        <head>Topical Terms</head>
+        <subject source="lcsh" encodinganalog="650">Elections--Georgia.</subject>
+        <subject source="lcsh" encodinganalog="650">  	   Mines and mineral resources--Georgia.</subject>
+        <subject source="lcsh" encodinganalog="650">Motion pictures--Georgia. …</subject>
+        <subject source="lcsh" encodinganalog="650">Municipal government--Georgia.</subject>
+        <subject source="lcsh" encodinganalog="650">Municipal water supply--Georgia.</subject>
+        <subject source="lcsh" encodinganalog="650">Talc industry--Georgia.</subject>
+        <subject source="lcsh" encodinganalog="650">Water--Fluoridation--Georgia. </subject>
+      </controlaccess>
+      <controlaccess>
+        <head>Geographic Names</head>
+        <geogname encodinganalog="651">Atlanta (Ga.)--Politics and government.</geogname>
+        <geogname encodinganalog="651">Atlanta (Ga.)--Race relations.</geogname>
+        <geogname encodinganalog="651">Atlanta (Ga.)--Transportation--Aviation.</geogname>
+        <geogname encodinganalog="651">Georgia--Politics and government--1865-1950.</geogname>
+        <geogname encodinganalog="651">Georgia--Politics and government--1951-</geogname>
+        <geogname encodinganalog="651">Georgia--Race relations.</geogname>
+        <geogname encodinganalog="651">Georgia--Transportation--Aviation.</geogname>
+      </controlaccess>
+      <controlaccess>
+        <head>Form/Genre Terms</head>
+        <genreform source="aat" encodinganalog="655"> Motion pictures.</genreform>
+        <genreform source="aat" encodinganalog="655">Sound recordings.</genreform>
+      </controlaccess>
+    </controlaccess>
+    <dsc type="combined">
+      <head>Description of Series</head>
+      <c01 level="series">
+        <did>
+          <unitid>Series 1</unitid>
+          <unittitle encodinganalog="245$a">Personal papers, 
+				<unitdate type="inclusive" encodinganalog="245$f" normal="1918/1986" era="ce" calendar="gregorian">1918-1986</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 1-9; OP 1-8, 57-58; OBV 1</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>The series contains materials concerning members of the Hartsfield family, including biographical material, calendars, legal records, and correspondence to and from family members. Biographical data includes Hartsfield family genealogical records, subject files relating to dependents of William B. Hartsfield, and biographical sketches of William B. Hartsfield.  Correspondence includes letters to and from Hartsfield family members, including correspondence between Hartsfield and his second wife Tollie Tolan.  Tolan's correspondence makes up approximately half of the family correspondence, spanning the periods before her marriage to Hartsfield and after his death (1940-1986). Her correspondence is comprised of love letters from Hartsfield, communication regarding social and political engagements, letters to and from friends and family, and sympathy letters following Hartsfield's death in 1971. Correspondence relating to Hartsfield's political career as mayor may be found in Series 2: Correspondence.</p>
+          <p>Calendars were kept by William Hartsfield and contain appointments and other notations.  Financial records pertain mostly to Hartsfield and contain banking records (including paycheck stubs showing Hartsfield's salary as mayor), income tax reports, investments, and records of travel reimbursements from the city of Atlanta.  Financial records relating to election campaigns and mineral investments can be found in the appropriate subject files in Series 3: Elections and Series 6: Personal business records.  Legal records in this series include financial documents; wills and estates; passports and birth certificates; property mortgages; military, education, and employment documents; and other legal documents. The records pertain mainly to Hartsfield, Tollie Tolan (Mrs. W.B. Hartsfield), and their adopted son, Carl Siegfried Hartsfield. Several documents concerning estates and wills pertain to other members of the Hartsfield family.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged by record type.</p>
+        </arrangement>
+        <otherfindaid encodinganalog="555">
+          <head>Finding Aid Note</head>
+          <p>An index to selected correspondence in this series is available.</p>
+        </otherfindaid>
+        <c02 level="file">
+          <did>
+            <unittitle>Biographical records</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">1</container>
+            <container type="folder">1</container>
+            <unittitle>Bettis, Fannie Lee</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">1</container>
+            <container type="folder">2</container>
+            <unittitle>Hartsfield family genealogical correspondence</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">1</container>
+            <container type="folder">3</container>
+            <unittitle>Hartsfield family genealogical records</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s2">
+        <did>
+          <unitid>Series 2</unitid>
+          <unittitle encodinganalog="245$a">Correspondence, 
+				<unitdate type="inclusive" normal="1918/1975" encodinganalog="245$f" era="ce" calendar="gregorian">1918-1975</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 10-16</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series contains Hartsfield's professional and political correspondence.  The remainder of Hartsfield's correspondence is scattered throughout the rest of the collection.  For his correspondence to, from, and directly regarding family members, see Series 1: Personal papers; for correspondence relating to elections, see Series 3: Elections; for correspondence regarding his personal business interests, see Series 6: Personal business records; for all other subjects see Hartsfield's subject files located in Series 4. </p>
+          <p>The majority of the correspondence in this series is from his time as mayor (1937-1961).  A much smaller amount of material is from pre-mayoral (1918-1936) and post-mayoral (1962-1971) periods; letters posted to him after his death are also included (1971-1975). Pre-mayoral correspondence includes letters relating to his law office and letters to and from friends. Mayoral correspondence includes letters to and from local and national politicians, correspondence relating to political and social issues, V-mail written by Atlantans serving in World War II, postcards from friends traveling in foreign countries, routine correspondence about business travel, congratulatory letters, birthday and Christmas greetings, event invitations, thank-you letters, and other matters. Correspondents include well-known political advisors Everett Millican and Helen Bullard.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged in chronological order.</p>
+        </arrangement>
+        <otherfindaid encodinganalog="555">
+          <head>Finding Aid Note</head>
+          <p>An index to selected correspondence in this series is available.</p>
+        </otherfindaid>
+        <c02 level="file">
+          <did>
+            <unittitle>Pre-mayoral correspondence</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">10</container>
+            <container type="folder">1</container>
+            <unittitle>October 1918-December 1933</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">10</container>
+            <container type="folder">2</container>
+            <unittitle>January 1934-December 1936</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <unittitle>Mayoral correspondence</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">10</container>
+            <container type="folder">3</container>
+            <unittitle>January 1937-December 1939</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">10</container>
+            <container type="folder">4</container>
+            <unittitle>January 1940-May 1941</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">10</container>
+            <container type="folder">5</container>
+            <unittitle>June-December 1941</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">10</container>
+            <container type="folder">6</container>
+            <unittitle>January-June 1942</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s3">
+        <did>
+          <unitid>Series 3</unitid>
+          <unittitle encodinganalog="245$a">Election files, 
+				<unitdate type="inclusive" normal="1932/1979" encodinganalog="245$f" era="ce" calendar="gregorian">1932-1970s</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 17-25; OP 9-24, 58-63</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series contains materials related to Hartsfield's political campaigns from 1932 to the 1970s.  Materials include correspondence; campaign lists, schedules, and notes; financial records; campaign advertisements; newspaper clippings; political cartoons; and speeches.  The series also contains materials Hartsfield and his campaign staff collected about opposition candidates.  Arranged by election, the series ranges from one of Hartsfield's earliest elections as the Fulton County Representative to the Georgia Legislature in 1932 to his campaigns for mayor of Atlanta from 1936-1957.</p>
+          <p>Correspondence includes letters of support from constituents, memos from political consultants such as Helen Bullard, and correspondence from opposition campaigns sent to Hartsfield.  Most letters also include a copy of Hartsfield's response.  Campaign lists and notes consist of lists of people to contact and notes about campaign strategy.  Newspaper clippings are mostly from the <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Atlanta Journal</title> and include appearances, editorials, political cartoons, and election results.  The series also contains a few original, hand-drawn "Baldy" political cartoons.  Speeches include those of Hartsfield and his opposition.  Many were broadcast on WSB radio</p>
+          <p>Materials in this series document issues of public interest in Atlanta.  Public housing, annexation, police department policies and activities, and expansion of the airport were all debated in mayoral races.  Hartsfield's moderate racial stance was a major election issue as well.  After the white primary was outlawed in the mid-1940s, Hartsfield won most of his elections by building coalitions of white and black voters, a strategy documented in the campaign literature and campaign notes in this series.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged in chronological order by election.</p>
+        </arrangement>
+        <otherfindaid encodinganalog="555">
+          <head>Finding Aid Note</head>
+          <p>An index to selected correspondence in this series is available.</p>
+        </otherfindaid>
+        <c02 level="file">
+          <did>
+            <unittitle>Legislative races, 1932-1934</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">17</container>
+            <container type="folder">1</container>
+            <unittitle>Campaign advertisements, 1932-1934</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">17</container>
+            <container type="folder">2</container>
+            <unittitle>Campaign lists and notes</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">17</container>
+            <container type="folder">3</container>
+            <unittitle>Correspondence, 1932-1934</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">17</container>
+            <container type="folder">4</container>
+            <unittitle>Financial records</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">17</container>
+            <container type="folder">5</container>
+            <unittitle>Newspaper clippings</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">OP9</container>
+            <container/>
+            <unittitle>Newspaper clippings, <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Bulletin</title>, May 12, 1932, July 1932 [entire issues]</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s4">
+        <did>
+          <unitid>Series 4</unitid>
+          <unittitle encodinganalog="245$a">Subject files, 
+				<unitdate type="inclusive" normal="1906/1982" encodinganalog="245$f" era="ce" calendar="gregorian">1906-1982</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 26-38; OP 25-28, 64-67; BV 1-3</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series consists of subject files relating to Hartsfield's wide and varied interests in the city of Atlanta, primarily from his time as Mayor and Mayor Emeritus (1937-1970). Correspondence, newspaper clippings, reports, programs, and other collected materials make up the series. Prominent topics include operations of the Atlanta City Government, Hartsfield's investigation of fluoridation and his battle against fluoridation of Atlanta's water system, correspondence and programs related to the world premiere of <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Gone with the Wind</title> in Atlanta, and development of the Hartsfield International Airport. Other subjects include the annexation of Buckhead, school desegregation, Hartsfield's nomination for the Assistant Secretary for Aeronautics in the U.S. Commerce Department, consultation work with the Ford and Rockefeller Foundations, and his role in promoting the Atlanta Symphony Guild.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged in alphabetical order.</p>
+        </arrangement>
+        <otherfindaid encodinganalog="555">
+          <head>Finding Aid Note</head>
+          <p>An index to selected correspondence in this series is available.</p>
+        </otherfindaid>
+        <c02 level="file">
+          <did>
+            <container type="box">26</container>
+            <container type="folder">1</container>
+            <unittitle>Alcohol, 1960s</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">26</container>
+            <container type="folder">2</container>
+            <unittitle>American Society of Civil Engineers, 1950-1954, correspondence and reports</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">26</container>
+            <container type="folder">3</container>
+            <unittitle>American Society of Civil Engineers, 1950-1954, reports</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">26</container>
+            <container type="folder">4</container>
+            <unittitle>Amusement parks, 1957, 1960</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">26</container>
+            <container type="folder">5</container>
+            <unittitle>Atlanta Annexation, general, Buckhead, Sandy Springs, 1940s-1960s</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">26</container>
+            <container type="folder">6</container>
+            <unittitle>Atlanta Arts Alliance, 1960s-1980s</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s5">
+        <did>
+          <unitid>Series 5</unitid>
+          <unittitle encodinganalog="245$a">Writings, 
+				<unitdate type="inclusive" normal="1937/1980" encodinganalog="245$f" era="ce" calendar="gregorian">1937-1980</unitdate></unittitle>
+          <physdesc encodinganalog="300">Box 39</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series contains writings by Hartsfield and others.  Writings by Hartsfield make up the bulk of this series, the majority dating from his twenty-three years as mayor and his ten years as Mayor Emeritus (1937-1970). His writings include speeches and public statements made as both Mayor and private citizen.  A volume of his addresses to the General Board of the City of Atlanta and to the city's Board of Aldermen (1937-1962) is found here, as are four small notebooks of diary entries about travels to Europe and Japan (1950s-1970).  His campaign speeches may be found in Series 3: Elections.  Writings by others make up a smaller portion of this series, including article drafts, speeches, and scripts for television and radio broadcasts featuring Hartsfield.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged by record type.</p>
+        </arrangement>
+        <c02 level="file">
+          <did>
+            <unittitle>Hartsfield, William B.</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">39</container>
+            <container type="folder">1</container>
+            <unittitle>"Annual Addresses" (bound volume), 1937-1962</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">39</container>
+            <container type="folder">2</container>
+            <unittitle>Annual and Final Message of Mayor William B. Hartsfield, January 2, 1962 (with notes)</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">39</container>
+            <container type="folder">3</container>
+            <unittitle>Interview with Hartsfield, transcript, sit-ins of the 1960s, January 6, 1966</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">39</container>
+            <container type="folder">4</container>
+            <unittitle>Speeches, 1930s-1947</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s6">
+        <did>
+          <unitid>Series 6</unitid>
+          <unittitle encodinganalog="245$a">Personal business records, 
+				<unitdate type="inclusive" normal="1929/1970" encodinganalog="245$f" era="ce" calendar="gregorian">1929-1970</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 40-49</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series contains the personal business records of Hartsfield.  In addition to his work as Mayor of Atlanta, Hartsfield maintained an active interest in the development of Georgia's mineral and mining activities.  He helped to found the Southern Talc Company in 1933, serving as its president throughout the 1930s and 1940s.  This series contains the business records of the Southern Talc Company and documents Hartsfield's work in that company.  The series also contains Hartsfield's subject files on minerals and mining in Georgia.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Organized into two subseries: (6.1) Minerals and mining files and (6.2) Southern Talc Company records.</p>
+        </arrangement>
+        <otherfindaid encodinganalog="555">
+          <head>Finding Aid Note</head>
+          <p>An index to selected correspondence in this series is available.</p>
+        </otherfindaid>
+        <c02 level="subseries">
+          <did>
+            <unitid>Subseries 6.1</unitid>
+            <unittitle type="245$a">Minerals and mining files, 
+				  <unitdate type="inclusive" normal="1929/1970" encodinganalog="245$f" era="ce" calendar="gregorian">1929-1970</unitdate></unittitle>
+            <physdesc encodinganalog="300">Boxes 40-44</physdesc>
+          </did>
+          <scopecontent encodinganalog="520">
+            <head>Scope and Content Note</head>
+            <p>This subseries contains subject files related to Hartsfield's interest in minerals and mining, his primary non-Atlanta and non-mayoral pastime.  From the early 1930s through the late 1950s, Hartsfield maintained an active interest in the development of Georgia's mineral industries, occasionally investing in mining ventures.  He investigated the possibility of drilling for oil in the north Georgia mountains and bought shares in talc, mica, and phosphate mines.  He was also a founder and director of the Georgia Lightweight Aggregate Company, 1951-1954.  Hartsfield never achieved the financial success he desired and, by the time of his retirement from politics, he had turned his attentions elsewhere.  This subseries consists mostly of correspondence, although there are occasional financial records, newspaper clippings, and published reports among the correspondence in the files.</p>
+          </scopecontent>
+          <arrangement encodinganalog="351">
+            <head>Arrangement Note</head>
+            <p>Arranged in alphabetical order.</p>
+          </arrangement>
+          <otherfindaid encodinganalog="555">
+            <head>Finding Aid Note</head>
+            <p>An index to selected correspondence in this series is available.</p>
+          </otherfindaid>
+          <c03 level="file">
+            <did>
+              <container type="box">40</container>
+              <container type="folder">1</container>
+              <unittitle>Bentonite clay, 1934-1953</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">40</container>
+              <container type="folder">2</container>
+              <unittitle>Brecon Loading Company, 1941-1946</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">40</container>
+              <container type="folder">3</container>
+              <unittitle>Chromite (Louise Property, Troupe County, Ga.), 1942- March 1943</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">40</container>
+              <container type="folder">4</container>
+              <unittitle>Chromite (Louise Property, Troupe County, Ga.), April 1943-1949</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">40</container>
+              <container type="folder">5</container>
+              <unittitle>Columbia, South America, prospecting, 1955-1959</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">40</container>
+              <container type="folder">6</container>
+              <unittitle>Flagstone, 1941</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">40</container>
+              <container type="folder">7</container>
+              <unittitle>Fuller's Earth (clay), 1953-1954</unittitle>
+            </did>
+          </c03>
+        </c02>
+        <c02 level="subseries" id="s6.2">
+          <did>
+            <unitid>Subseries 6.2</unitid>
+            <unittitle type="245$a">Southern Talc Company records, 
+				  <unitdate type="inclusive" normal="1934/1949" encodinganalog="245$f" era="ce" calendar="gregorian">1934-1949</unitdate></unittitle>
+            <physdesc encodinganalog="300">Boxes 45-49</physdesc>
+          </did>
+          <scopecontent encodinganalog="520">
+            <head>Scope and Content Note</head>
+            <p>This series contains the records of the Southern Talc Company of Atlanta and Chatsworth, Georgia.  The company was incorporated in 1933 and sold in 1942. Hartsfield helped organize the company and served as legal counsel and president.  This was apparently Hartsfield's first major business venture and the only time he played such an active role in guiding the affairs of a company.  Included among the company's papers are letters advertising the talc for sale; correspondence with sales agents and purchasers; inventories; purchasing orders; receipts; and correspondence between Hartsfield, T.N. Brooks, and V.C. Pickering, fellow officers of the Company.  The Southern Talc Company was a small mining company which battled both the sluggish economy of the Depression and the mineral use restrictions of the first years of World War II and was only a limited financial success.  This subseries consists mostly of correspondence, with scattered blueprints, reports, and financial records.</p>
+          </scopecontent>
+          <arrangement encodinganalog="351">
+            <head>Arrangement Note</head>
+            <p>Arranged in alphabetical order.</p>
+          </arrangement>
+          <otherfindaid encodinganalog="555">
+            <head>Finding Aid Note</head>
+            <p>An index to selected correspondence in this series is available.</p>
+          </otherfindaid>
+          <c03 level="file">
+            <did>
+              <container type="box">45</container>
+              <container type="folder">1</container>
+              <unittitle>Advertisements</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">45</container>
+              <container type="folder">2</container>
+              <unittitle>Agents (sales), 1935-1940</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">45</container>
+              <container type="folder">3</container>
+              <unittitle>American Cyanamid Company, 1936-1940</unittitle>
+            </did>
+          </c03>
+          <c03 level="file">
+            <did>
+              <container type="box">45</container>
+              <container type="folder">4</container>
+              <unittitle>Atlanta Freight Bureau, 1937-1940</unittitle>
+            </did>
+          </c03>
+        </c02>
+      </c01>
+      <c01 level="series" id="s7">
+        <did>
+          <unitid>Series 7</unitid>
+          <unittitle encodinganalog="245$a">Printed material, 
+				<unitdate type="inclusive" normal="1920/1983" encodinganalog="245$f" era="ce" calendar="gregorian">circa 1920-1983</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 50-55; OP 29-33; BV 4</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series contains collected printed material about Hartsfield and materials collected by him.  Hartsfield saved many magazine and newspaper articles, pamphlets, and reports relating to himself and to the government and welfare of Atlanta.  These include magazine, periodical, and newspaper clippings; pamphlets, flyers, and reports of various Atlanta organizations; and event programs. Magazine and newspaper clippings featuring Hartsfield are listed separately from general clippings. Programs commemorate public events attended by Hartsfield, including dedications, awards ceremonies, and dinners. Among the many topics, issues, and events dating from the 1920s to the early 1980s documented in this series are Atlanta roadways and traffic, elections of Atlanta government officials, local crime, aviation, and debate on local legislature. A large number of political cartoons are also found in this series.  For additional printed material arranged by subject, see Series 4: Subject Files.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Articles and clippings arranged in chronological order; pamphlets and reports arranged in alphabetical order.</p>
+        </arrangement>
+        <c02 level="file">
+          <did>
+            <unittitle>Clippings, William B. Hartsfield</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">50</container>
+            <container type="folder">1</container>
+            <unittitle>Magazines and periodicals, 1940s</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">50</container>
+            <container type="folder">2</container>
+            <unittitle>Magazines and periodicals, 1950s</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">50</container>
+            <container type="folder">3</container>
+            <unittitle>Magazines and periodicals, 1960-1964</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">OP29</container>
+            <container/>
+            <unittitle>Magazines and periodicals, May 1961</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s8">
+        <did>
+          <unitid>Series 8</unitid>
+          <unittitle encodinganalog="245$a">Photographs, 
+				<unitdate type="inclusive" normal="1960/1979" encodinganalog="245$f" era="ce" calendar="gregorian" certainty="circa">circa 1960s-1970s</unitdate></unittitle>
+          <physdesc encodinganalog="300"> Boxes 56-65; OP 34-56, 68-76; BV 5-12; OBV 2</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series contains photographs of William B. Hartsfield, his family, other politicians and national figures, and Atlanta events from the 1860s to the 1970s.  The bulk of this series highlights the ceremonial duties of the mayor of a growing American city (1930s-1971).  Welcoming Hollywood stars and city visitors, cutting ribbons for grand openings, and attending dinners and banquets are well-photographed mayoral duties.  Other events are <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Gone with the Wind</title> premieres; travels to Europe and South America; meetings with Presidents, politicians, the Pope, and others; various stages in the development of the Chattahoochee River and Buford Dam water systems; the expansion of the airport; and several inaugural air flights on which Hartsfield was a passenger.  Portrait photographs of Hartsfield from childhood to shortly before his death are also included in this series (1892-1971).  There is also a large collection of family and other personal photographs (circa 1860s-1960s).  Tollie Tolan Hartsfield's personal photographs (circa 1890s-1970s), also located in this series, contain few pictures related to Mayor Hartsfield.  They primarily show scenes of friends, family, and vacations from before her marriage to Hartsfield and after his death.  Eight photograph albums of ceremonial events, such as the launching of the U.S.S. Atlanta and the dedication of St. Joseph's Hospital, are also included in this series.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged in alphabetical order by subject.</p>
+        </arrangement>
+        <c02 level="file">
+          <did>
+            <unittitle>William B. Hartsfield portraits</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">56</container>
+            <container type="folder">1</container>
+            <unittitle>1892-1919</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">56</container>
+            <container type="folder">2</container>
+            <unittitle>1920-1949</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">OP68</container>
+            <unittitle>1940s</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">OP68</container>
+            <container/>
+            <unittitle>1950s</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">56</container>
+            <container type="folder">3</container>
+            <unittitle>1950-1956</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s9">
+        <did>
+          <unitid>Series 9</unitid>
+          <unittitle encodinganalog="245$a">Memorabilia, 
+				<unitdate type="inclusive" normal="1930/1972" encodinganalog="245$f" era="ce" calendar="gregorian">1930s-1972</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 66-71, OP 77</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>The memorabilia series contains various objects collected by Hartsfield during his political career and after his retirement.  Included are multiple keys to cities, including two oversized wooden keys given to Hartsfield by Atlanta residents, two gavels, and cards from various businesses and civic associations.  There is also a substantial amount of campaign ephemera, including buttons, combs, match books, nail files, and thimbles, from local, state and federal political campaigns.  Ribbons, medals and name tags show Hartsfield's many associations and involvement in regional conferences.  Tickets, name tags and visitor passes shed light on Hartsfield's travels to Democratic National Conventions, Congress, the White House, and events he attended, such as the launching of Apollo 12.  There is also a pen in the collection from the White House which was possibly used by President Lyndon B. Johnson to sign the 1964 Civil Rights Bill into law.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged by material type.</p>
+        </arrangement>
+        <c02 level="file">
+          <did>
+            <container type="box">66</container>
+            <container type="folder">1</container>
+            <unittitle>Advertisement, Southeastern Fair, Atlanta, undated</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">66</container>
+            <container type="folder">2</container>
+            <unittitle>Artificial money, Twe dollar bill [sic], anti-paper money arguments, Liberty Books, St. Louis, Missouri, undated</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">66</container>
+            <container type="folder">3</container>
+            <unittitle>Autographed picture, Rebo the clown, Nani Darnell, Mark Wilson, "Magic Kingdom of Alakazam," CBS, [1960-1965]</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">66</container>
+            <container type="folder">4</container>
+            <unittitle>Bumper sticker, "Arnall for Governor," undated</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">66</container>
+            <container type="folder">5</container>
+            <unittitle>Business card, Hartsfield, William B.</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">66</container>
+            <container type="folder">5</container>
+            <unittitle>Business card, Reitz, Josef, Coca-Cola, Frankfurt/ Main, Germany, undated</unittitle>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s10">
+        <did>
+          <unitid>Series 10</unitid>
+          <unittitle encodinganalog="245$a">Moses Cox files, 
+				<unitdate type="inclusive" normal="1946/1954" encodinganalog="245$f" era="ce" calendar="gregorian">1946-1954</unitdate></unittitle>
+          <physdesc encodinganalog="300">Boxes 72-78</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series contains subject files and correspondence belonging to Moses Cox from 1946-1954.  The series contains very little material directly to or from Hartsfield.  Cox was associated with the Georgia State Highway Department and the American Society of Civil Engineers and involved in Atlanta roadway planning and construction during the Hartsfield administration from the 1920s through the 1960s.  Correspondence, memorandums, cost estimates, reports, and plans document parking, traffic, roadway planning and construction.  Federal funding for roadway construction, safety reports, and bond commission activity, the Atlanta Expressway, land purchases for roadway development, and water services for new roadways are all topics covered in this series.  The secretarial files are Cox's correspondence, organized by last name, from his time as secretary of the Joint Bond Commission.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged in alphabetical order.</p>
+        </arrangement>
+        <c02 level="file">
+          <did>
+            <unittitle>Alphabetical files</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">72</container>
+            <container type="folder">1</container>
+            <unittitle>Atlanta Traffic Commission, 1950-1953</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">72</container>
+            <container type="folder">2</container>
+            <unittitle>Chicago Transportation trip</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">72</container>
+            <container type="folder">3</container>
+            <unittitle>Commissioners of Roads and Revenues, 1926-1930</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">72</container>
+            <container type="folder">4</container>
+            <unittitle>Construction estimates, undated - 1953</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">72</container>
+            <container type="folder">5</container>
+            <container type="folder">Donaldson, Clark, correspondence, 1947-1950</container>
+            <unittitle/>
+          </did>
+        </c02>
+      </c01>
+      <c01 level="series" id="s11">
+        <did>
+          <unitid>Series 11</unitid>
+          <unittitle encodinganalog="245$a">Audiovisual materials, 
+				<unitdate type="inclusive" normal="1960/1971" encodinganalog="245$f" era="ce" calendar="gregorian">1960, 1971</unitdate></unittitle>
+          <physdesc encodinganalog="300">Box 79</physdesc>
+        </did>
+        <scopecontent encodinganalog="520">
+          <head>Scope and Content Note</head>
+          <p>This series consists of audiovisual material related to Hartsfield.  The series contains two items:  an audio recording of the 1971 Shining Light Award originally broadcast of WSB radio and a film of Hartsfield's retirement from politics in 1960.</p>
+        </scopecontent>
+        <arrangement encodinganalog="351">
+          <head>Arrangement Note</head>
+          <p>Arranged in chronological order.</p>
+        </arrangement>
+        <accessrestrict encodinganalog="506">
+          <head>Restrictions on Access</head>
+          <p>Use copies have not been made for all of the audiovisual series at this time.  Researchers must contact MARBL in advance for access to these materials.</p>
+        </accessrestrict>
+        <c02 level="file">
+          <did>
+            <container type="box">79</container>
+            <container type="folder">1</container>
+            <unittitle>Hartsfield's retirement, (film), June 1960</unittitle>
+          </did>
+        </c02>
+        <c02 level="file">
+          <did>
+            <container type="box">79</container>
+            <container type="folder">2</container>
+            <unittitle>Shining Light Award Ceremonies, honoring William B. Hartsfield, WSB Radio, June 8, 1971 [digitized; filename 7805]</unittitle>
+          </did>
+        </c02>
+      </c01>
+    </dsc>
+    <index>
+      <head>Index of Selected Correspondents</head>
+      <note>
+        <p>Correspondence with prominent local citizens, local, state and national politicians, Atlanta business leaders, and other well-known personalities is indexed here.  Correspondence from Series 1: Personal Papers, Series 2:Correspondence, Series 3: Election files, Series 4: Subject Files, and Series 6: Personal Business files have been indexed.  Index is to series or subseries number, folder title (if needed), and date.  Please refer to the complete finding aid for box and folder number.</p>
+        <p>This is not an index to all correspondents represented in this collection. Indexed items include correspondence from particular individuals. Other materials (newspaper clippings, photographs) relating to the same individual have not been included.</p>
+      </note>
+      <indexentry>
+        <persname>Abram, Morris B.</persname>
+        <ptrgrp>
+          <ref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Series 2 - December 6, 1962, December 8, 1962, January 7, 1963, May 17, 1966, October 8, 1968, October 17, 1968</ref>
+          <ref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Series 4 - WLWA television station: August 13, 1962</ref>
+        </ptrgrp>
+      </indexentry>
+      <indexentry>
+        <persname>Acheson, Dean </persname>
+        <ptrgrp>
+          <ref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Series 2 - July 2, 1968</ref>
+        </ptrgrp>
+      </indexentry>
+      <indexentry>
+        <persname>Agnew, Spiro T.</persname>
+        <ptrgrp>
+          <ref xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Series 2 - October 31, 1969</ref>
+        </ptrgrp>
+      </indexentry>
+    </index>
+  </archdesc>
+</ead>

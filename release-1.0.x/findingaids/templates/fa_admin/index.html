@@ -1,0 +1,65 @@
+{% extends "fa_admin/base.html" %}
+{% block page-subtitle %}{{block.super}} {% if files.number != 1 %}: Modified files (page {{ files.number }}){% endif %}{% endblock %}
+
+{% block content-title %}Manage Finding Aids{% endblock %}
+
+{% block style %}
+  {{ block.super }}
+   {% include 'taskresult/snippets/task_styles.html' %}
+{% endblock %}
+
+{% block sidebar-left %}
+  {{ block.super }}
+  <div id="task-results">
+      <h3>Task Results</h3>
+      <ul>
+      {% for r in task_results %}
+      {% include 'taskresult/snippets/display_task.html' %}
+      {% comment %}
+        <li class="{{r.task.status|lower}}">{{ r.label }}
+            {% if r.eadid %}<a href="{% url fa:findingaid id=r.eadid %}">{{ r.eadid }}</a>{% endif %}:
+            <span class="code">{{ r.task.status }}</span>
+            {% if r.task_end %}<div class="task_end">ended {{ r.task_end|timesince }} ago</div>{% endif %}
+            </li>
+            {% endcomment %}
+      {% empty %}
+        <li>No recent tasks.</li>
+      {% endfor %}
+      </ul>
+  </div>
+{% endblock %}
+
+{% block content-body %} {# no permissions to do any finding aid tasks #}
+{% if not perms.fa_admin.can_publish and not perms.fa_admin.can_preview and not perms.fa_admin.can_preview %}
+<p>You don't have permission to do anything yet.  If you don't have the permissions
+you require to do your work, please contact a site administrator and ask them to
+give your account the appropriate permissions.</p>
+{% endif %}
+
+{% if user.is_superuser %}
+  <div class="section">
+      <h2>Manage users and site</h2>
+          <ul>
+            <li><a href="{% url fa-admin:list-staff %}">Manage user accounts</a></li>
+            <li><a href="{% url admin:index %}">Django DB admin site</a></li>
+          </ul>
+  </div>
+{% endif %}
+
+{% if perms.fa_admin.can_delete or perms.fa_admin.can_preview %}
+ <div class="section">
+  <h2>Manage documents</h2>
+    <ul>
+      <li><a href="{% url fa-admin:list-published %}">Published documents</a></li>
+      {% if perms.fa_admin.can_preview %}
+        <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
+      {% endif %}
+  </ul>
+ </div>
+{% endif %}
+
+{% if perms.fa_admin.can_publish or perms.fa_admin.can_preview %}
+  {% include "fa_admin/snippets/list_files.html" %}
+{% endif %}
+
+{% endblock %}

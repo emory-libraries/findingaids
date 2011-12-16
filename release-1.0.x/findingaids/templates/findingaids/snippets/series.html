@@ -1,0 +1,37 @@
+{# display common series information - expects finding aid component as series #}
+{% load ead %}
+<h2 class="{{ series.level }}">
+  <a name="{{ series.short_id }}">
+      {{ series.did.unitid }} <br/>
+      {{ series.did.unittitle|format_ead  }}
+      {% if series.did.unitdate and series.did.unitdate not in series.did.unittitle %}
+        {{ series.did.unitdate }}
+      {% endif %}
+       <br/>
+      {{ series.did.physdesc|default:'' }}
+  </a>
+</h2>
+
+{% for section in series.series_info %}
+   <div>
+   	<h3>{{ section.head|default:'' }}</h3>
+	{% for para in section.content %}
+	    <p>{{para|format_ead}}</p>
+	{% endfor %}
+   </div>
+{% endfor %}
+
+{# container list or series/subseries listing #}
+{% if series.hasSubseries %}
+  {% if subseries %}  {# if list of subseries links is defined (unused in full/pdf view #}
+    <hr/>
+    <h3>Description of Subseries</h3>
+        <ul>
+           {% autoescape off %}
+               {{ subseries|unordered_list }}
+           {% endautoescape %}
+        </ul>
+    {% endif %}
+{% else %}
+  {% include "findingaids/snippets/containerlist.html" %}
+{% endif %}

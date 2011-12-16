@@ -1,0 +1,15 @@
+{# index and index entries - expects single FindingAid Index object as index #}
+{% load ead %}
+<div class="nextpage">
+<a name="{{ index.id }}"><h2>{{ index.head|format_ead }}</h2></a>
+{% for entry in  index.entry %}
+   <div class="indexentry">
+       <b>{{ entry.name|format_ead }}</b>
+       <ul>
+       {% for ref in entry.ptrgroup.ref %}
+         <li>{{ ref.value|format_ead }}</li>
+       {% endfor %}
+       </ul>
+    </div>
+{% endfor %}
+</div>

@@ -1,0 +1,95 @@
+{# display a single series or subseries or index of a finding aid #}
+{# expects ead and either series or index #}
+{% extends "findingaids/base.html" %}
+{% load ead %} {% load ifurl %}
+
+{% block page-subtitle %}: {{ ead.title }} : {% firstof series.display_label index.head %}{% endblock %}
+
+{% block page-head %}
+  {{block.super}}
+  {% if url_params %}  {# don't index highlighted pages, link non-highlighted page as canonical #}
+   <meta name="robots" content="noindex,nofollow" />
+   <link rel="canonical" href="{{ canonical_url }}" />
+  {% endif %}
+{% endblock %}
+
+{% block content-title %}
+<div class="fa-title">
+    {# generate and store url for main finding aid page #}
+    {% ifurl preview fa-admin:preview:findingaid fa:findingaid id=ead.eadid as ead_url %}
+    <a href="{{ ead_url }}{{ url_params }}" rel="contents">
+        {% if ead.archdesc.origination %}{{ ead.archdesc.origination|upper }}<br/>{% endif %}
+        {{ ead.unittitle.short|format_ead|cut:',' }}
+    </a> >
+{# breadcrumb trail to current series/subseries/index #}
+{% if series.series.id %}
+  <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid, series_id=series.series.short_id %}{{ url_params }}">{{series.series.did.unittitle.short|cut:','}}</a> >
+{% endif %}
+{% if series.series2.id %}
+   <a href="{% ifurl preview fa-admin:preview:series2 fa:series2 id=ead.eadid, series_id=series.series.short_id, series2_id=series.series2.short_id %}{{ url_params }}">{{series.series2.did.unittitle.short|cut:','}}</a> >
+{% endif %}
+{# current series or index title #}
+{{ series.did.unittitle.short|cut:',' }} {{ index.head|format_ead }}
+</div>
+{% endblock %}
+
+{% block sidebar-right %}
+  {{ block.super }}
+  <div id="sidebar-right">
+     <a class="printable" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}">Printable PDF</a>
+  </div>
+{% endblock %}
+
+
+{% block content-body %}
+<div id="toc_series" class="short-toc">
+{% with 1 as collapsed %}{% include "findingaids/snippets/toc.html" %}{% endwith %}
+
+{% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
+    <div id="series" class="hover-menu collapsed">
+      <h2>{{ ead.dsc.head }}</h2>
+      <ul>
+          {% for component in all_series %}
+            <li>
+                {#  currently selected page #}
+                {% ifequal series.id component.id %}
+                   {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+                    {{ component.did.unittitle|format_ead }}
+                {# all other links that are not currently selected page #}
+                {# next prev and start rel attributes are calculated in the view #}
+                {% else %}
+                   <a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=component.short_id %}{{ url_params }}"
+                   {% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% if forloop.first %}rel="start"{% endif %}>
+                    {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
+                        {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count|floatformat }} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
+                {% endifequal %}
+             </li>
+          {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+<br class="clear-right"/> {# don't clear left/all because that will clear the sidebar also #}
+</div>
+
+{% if series %} {% include "findingaids/snippets/series.html" %} {% endif %}
+{% if index %} {% include "findingaids/snippets/indexentry.html" %} {% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.hover-menu').hover(
+            function () {
+                $(this).removeClass('collapsed');
+                $(this).find('ul').slideDown(100);
+            },
+            function () {
+                $(this).addClass('collapsed');
+                $(this).find('ul').slideUp(100);
+            }
+        );
+    });
+</script>
+{% endblock %}
