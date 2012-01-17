@@ -249,7 +249,8 @@ def prep_ead(ead, filename):
                 # NOT forcing normalization on control access terms because
                 # XML editor line-wrap settings would force
                 # re-running the prep step every time a document is edited.
-                term.value = term.node.text.lstrip()
+                if term.node.text:
+                    term.value = term.node.text.lstrip()
 
     # check that ARK is set correctly (both long and short-form)
     # - if eadid url is not set or is not an ark, generate an ark
