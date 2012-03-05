@@ -944,6 +944,11 @@ class UtilsTest(TestCase):
         self.assert_("First letter ('1') of list title field origination/persname does not match browse letter URL regex '%s'" \
                      % TITLE_LETTERS in errors, 'title first letter regex error reported')
 
+        # empty/unset list title field
+        ead.list_title.node.text = None
+        errors = utils.check_eadxml(ead)
+        self.assert_("List title seems to be empty" in errors) 
+
         # - whitespace in control access terms
         self.assert_("Found leading whitespace in controlaccess term ' Gone with the wind (Motion picture)' (title)"
                     in errors, 'controlaccess title leading whitespace reported')

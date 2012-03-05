@@ -149,7 +149,10 @@ def check_eadxml(ead):
         title_text = title_node[0].text
     else:
         title_text = unicode(title_node)
-    if re.match('\s+', title_text):
+
+    if title_text is None:
+        errors.append("List title seems to be empty")
+    elif re.match('\s+', title_text):
         # using node.text because unicode() normalizes, which obscures whitespace problems
         errors.append("Found leading whitespace in list title field (%s): '%s'" % \
                         (list_title_path, ead.list_title.node.text) )
