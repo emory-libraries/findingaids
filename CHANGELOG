@@ -11,6 +11,13 @@ recent version first.  Upgrade or deployment notes should be found in
 1.0 micro releases
 ------------------
 
+1.0.10
+~~~~~~
+
+* Better error-handling for empty list title in EAD when prepping for
+  preview/load.
+* Require eulxml 0.17.1 for improved xpath parser handling.
+
 1.0.9
 ~~~~~
 
