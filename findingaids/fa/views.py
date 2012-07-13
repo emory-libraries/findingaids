@@ -542,9 +542,13 @@ def document_search(request, id):
             # do a full-text search at the file level
             # include parent series information and enough ancestor series ids
             # in order to generate link to containing series at any level (c01-c03)
-            files = FileComponent.objects.filter(ead__eadid=id,
-                fulltext_terms=search_terms).also('parent__id', 'parent__did',
-                    'series1__id', 'series1__did', 'series2__id', 'series2__did')
+            # NOTE: filter by parent ead id first, then by keyword
+            # (this is significantly faster for common keywords in large findingaids)
+            files = FileComponent.objects.filter(ead__eadid=id) \
+                    	.filter(fulltext_terms=search_terms) \
+                        .also('parent__id', 'parent__did',
+                              'series1__id', 'series1__did', 'series2__id', 'series2__did')
+            
             return render_to_response('findingaids/document_search.html', {
                     'files' : files,
                     'ead': ead,

@@ -11,6 +11,14 @@ recent version first.  Upgrade or deployment notes should be found in
 1.0 micro releases
 ------------------
 
+
+1.0.11
+~~~~~~
+
+* Adjust the XQuery for single-document searches to be more efficient
+  for large documents, in order to address a time-out issue identified
+  in SCLC1083.
+
 1.0.10
 ~~~~~~
 
