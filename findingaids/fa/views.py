@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.views.decorators.http import condition
 
 from eulcommon.djangoextras.http import content_negotiation
-from eulexistdb.db import ExistDBException
+from eulexistdb.db import ExistDBException, ExistDBTimeout
 from eulexistdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
@@ -557,6 +557,11 @@ def document_search(request, id):
                     'url_params': '?' + urlencode({'keywords': search_terms.encode('utf-8')}),
                     'docsearch_form': KeywordSearchForm(),
                  }, context_instance=RequestContext(request))
+        except ExistDBTimeout, e:
+            # error for exist db timeout
+            messages.error(request, "Your search has resulted in too many hits, \
+                please make your terms more specific by using a direct phrase \
+                search (e.g. \"Martin Luther King\").")
         except ExistDBException, e:
             # for an invalid full-text query (e.g., missing close quote), eXist
             # error reports 'Cannot parse' and 'Lexical error'
