@@ -16,18 +16,17 @@
     <a class="first" href="{% url site-index %}">Home</a>
     <a href="{% url fa:search %}">Advanced Search</a>
     <a href="{% url content:request-materials %}">Request Materials</a>
-    <a href="{% url content:page 'institutions' %}">Participating Institutions</a>
+    <a href="{% url content:page 'institutions' %}">Contributors</a>
     <a href="{% url content:page 'search-tips' %}">Search Tips</a>
-    <a href="{% url content:page 'faq' %}">{# FindingAid #}FAQ</a>
+    <a href="{% url content:page 'faq' %}">FindingAid FAQ</a>
     <a class="last" href="{% url content:feedback %}">Feedback</a>
-   {# <a href="{% url content:page 'about-database' %}">About the Database</a>  #}
 {% endblock %}
 {% block admin-url %}{% url fa-admin:index %}{% endblock %}
 
 {% block sidebar-left %}
   {% if kwsearch_form %}
   <div id="search" class="sidebar-search">
-      Search all Finding Aids
+      Search EmoryFindingAids
       <form action="{% url fa:search %}" method="get">
         {{kwsearch_form.keywords}}
         <input class="form-submit" type="submit" value="Search" />
@@ -65,7 +64,8 @@
         });
     });
 </script>
-<script type="text/javascript"> // {# Google Analytics tracking code #}
+{% if not debug %} {# Google Analytics tracking code #}
+<script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-21014785-1']);
   _gaq.push(['_trackPageview']);
@@ -75,4 +75,5 @@
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
 </script>
+{% endif %}
 {% endblock %}

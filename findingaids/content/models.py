@@ -96,7 +96,11 @@ class CachedFeed(object):
             # if the necessary attributes aren't present, don't do anything
             # (probably should only be the case with mock feed objects in unit tests)
 
-            soup = BeautifulSoup(entry.summary)
+            if hasattr(entry, 'summary_detail'):
+                soup = BeautifulSoup(entry.summary_detail.value)
+            else:
+                soup = BeautifulSoup(entry.summary)
+                
             # search for links with base url followed directly by a # anchor link
             same_page_prefix = '%s#' % self.feed.feed.title_detail['base']
             links = soup.findAll('a', href=re.compile('^' + same_page_prefix))
@@ -106,7 +110,10 @@ class CachedFeed(object):
                 if len(soup.findAll('a', attrs={'name': anchor})):
                     l['href'] = '#' + anchor
             # replace the summary text with the converted soup
-            entry.summary = soup
+            if hasattr(entry, 'summary_detail'):
+                entry.summary_detail.value = unicode(soup)
+            else:
+                entry.summary = unicode(soup)
 
 class BannerFeed(CachedFeed):
     'Feed object to access configured RSS feed for home page banner images'

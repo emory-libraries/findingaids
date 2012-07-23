@@ -11,7 +11,7 @@ from django.template import RequestContext
 from django.views.decorators.http import condition
 
 from eulcommon.djangoextras.http import content_negotiation
-from eulexistdb.db import ExistDBException
+from eulexistdb.db import ExistDBException, ExistDBTimeout
 from eulexistdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
@@ -121,7 +121,7 @@ def findingaid(request, id, preview=False):
     """
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
-        url_params = '?' + urlencode({'keywords': search_terms})
+        url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
         filter = {'highlight': search_terms}
     else:
         url_params = ''
@@ -250,7 +250,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
 
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
-        url_params = '?' + urlencode({'keywords': search_terms})
+        url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
         #filter further based on highlighting
         filter = {'highlight': search_terms}
         # add highlighting & match counts to series & index lists for navigation links
@@ -468,7 +468,8 @@ def search(request):
                                                  if value)
 
             #set query and last page in session and set it to expire on browser close
-            last_search = search_params
+            for key, val in search_params.iteritems():
+                search_params[key] = val.encode('utf-8')
             last_search = search_params.copy()
             # pagination url params should NOT include page
             if 'page' in last_search:
@@ -541,17 +542,26 @@ def document_search(request, id):
             # do a full-text search at the file level
             # include parent series information and enough ancestor series ids
             # in order to generate link to containing series at any level (c01-c03)
-            files = FileComponent.objects.filter(ead__eadid=id,
-                fulltext_terms=search_terms).also('parent__id', 'parent__did',
+            # NOTE: filter by parent ead id first, then by keyword
+            # (this is significantly faster for common keywords in large findingaids)
+            files = FileComponent.objects.filter(ead__eadid=id) \
+                    	.filter(fulltext_terms=search_terms) \
+                        .also('parent__id', 'parent__did',
                     'series1__id', 'series1__did', 'series2__id', 'series2__did')
+            
             return render_to_response('findingaids/document_search.html', {
                     'files' : files,
                     'ead': ead,
                     'querytime': [files.queryTime(), ead.queryTime()],
                     'keywords': search_terms,
-                    'url_params': '?' + urlencode({'keywords': search_terms}),
+                    'url_params': '?' + urlencode({'keywords': search_terms.encode('utf-8')}),
                     'docsearch_form': KeywordSearchForm(),
                  }, context_instance=RequestContext(request))
+        except ExistDBTimeout, e:
+            # error for exist db timeout
+            messages.error(request, "Your search has resulted in too many hits, \
+                please make your terms more specific by using a direct phrase \
+                search (e.g. \"Martin Luther King\").")
         except ExistDBException, e:
             # for an invalid full-text query (e.g., missing close quote), eXist
             # error reports 'Cannot parse' and 'Lexical error'

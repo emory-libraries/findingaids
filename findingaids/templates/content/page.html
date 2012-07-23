@@ -1,7 +1,11 @@
 {% extends "site_base.html" %}
 {% block page-subtitle %}: {{ page.title }}{% endblock %}
-{% block content-title %}{{ page.title }}{% endblock %}
+{% block content-header  %}
+ <h1 class="title toplevel">{{ page.title }}</h1>
+{% endblock %}
 
 {% block content-body %}
-{{ page.summary|safe }}
+
+{% firstof page.summary_detail.value|safe page.summary|safe %}
+
 {% endblock %}

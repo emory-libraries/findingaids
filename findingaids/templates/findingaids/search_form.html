@@ -2,8 +2,9 @@
 
 {% block page-subtitle %}: Advanced Search {% endblock %}
 
-{% block content-title %}Advanced Search {% endblock %}
-
+{% block content-header  %}
+ <h1 class="title toplevel">Advanced Search</h1>
+{% endblock %}
 
 {# not calling supper so simple search block is not shown  #}
 {% block sidebar-left %}
@@ -17,7 +18,7 @@
 <p>Enter a keyword and choose a repository to limit your search <br />
 or leave the keyword field blank and choose a repository to browse a complete list of holdings.</p>
 
-<form action="{% url fa:search %}" method="get">
+<form id="advanced-search" action="{% url fa:search %}" method="get">
      
     {# display errors if any #}
     {{ form.non_field_errors}}
@@ -41,6 +42,7 @@ or leave the keyword field blank and choose a repository to browse a complete li
         </tr>
     </table>
     <input class="form-submit" type="submit" value="Search" />
+    <input class="form-submit" type="reset" value="Reset" />
 </form>
 
 {# TODO: link to search help #}

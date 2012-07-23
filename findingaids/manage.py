@@ -14,7 +14,7 @@ if __name__ == "__main__":
         import testsettings as settings
 
      #setup logger
-    import localsettings
-    import logging
-    logging.basicConfig(level=localsettings.LOGGING_LEVEL, format=localsettings.LOGGING_FORMAT, filename=localsettings.LOGGING_FILENAME)
+    # import localsettings
+    # import logging
+    # logging.basicConfig(level=localsettings.LOGGING_LEVEL, format=localsettings.LOGGING_FORMAT, filename=localsettings.LOGGING_FILENAME)
     execute_manager(settings)

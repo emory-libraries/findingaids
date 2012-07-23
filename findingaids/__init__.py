@@ -1,4 +1,4 @@
-__version_info__ = (1, 1, 0, 'dev')
+__version_info__ = (1, 0, 11, 'pre')
 
 # Dot-connect all but the last. Last is dash-connected if not None.
 __version__ = '.'.join(str(i) for i in __version_info__[:-1])
@@ -13,6 +13,7 @@ if __version_info__[-1] is not None:
 # I also added the SCRIPT_NAME to dictionary so it would be available to templates
 # Since I always uset his for this application it makes sense for this app but
 # I'm unsure this is the best way overall.
+# TODO: update to use new render shortcut provided in newer versions of django
 def render_with_context(req, *args, **kwargs):
     kwargs['context_instance'] = RequestContext(req, {'script_name': req.META['SCRIPT_NAME']})
     # Line below was an attempt to add script name to the context so I could

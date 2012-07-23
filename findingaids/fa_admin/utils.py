@@ -149,7 +149,10 @@ def check_eadxml(ead):
         title_text = title_node[0].text
     else:
         title_text = unicode(title_node)
-    if re.match('\s+', title_text):
+
+    if title_text is None:
+        errors.append("List title seems to be empty")
+    elif re.match('\s+', title_text):
         # using node.text because unicode() normalizes, which obscures whitespace problems
         errors.append("Found leading whitespace in list title field (%s): '%s'" % \
                         (list_title_path, ead.list_title.node.text) )
@@ -249,7 +252,8 @@ def prep_ead(ead, filename):
                 # NOT forcing normalization on control access terms because
                 # XML editor line-wrap settings would force
                 # re-running the prep step every time a document is edited.
-                term.value = term.node.text.lstrip()
+                if term.node.text:
+                    term.value = term.node.text.lstrip()
 
     # check that ARK is set correctly (both long and short-form)
     # - if eadid url is not set or is not an ark, generate an ark

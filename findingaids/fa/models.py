@@ -34,7 +34,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # in the constructed return object returned from eXist for search/browse
     unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', UnitTitle)
     abstract = xmlmap.NodeField('.//e:abstract[not(ancestor::e:dsc)]', xmlmap.XmlObject)
-    physical_desc = xmlmap.StringField('.//e:physdesc[not(ancestor::e:dsc)]')
+    physical_descriptions = xmlmap.StringListField('.//e:physdesc[not(ancestor::e:dsc)]', normalize=True)
 
     list_title_xpaths = ["e:archdesc/e:did/e:origination/e:corpname",
         "e:archdesc/e:did/e:origination/e:famname",

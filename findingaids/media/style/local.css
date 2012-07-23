@@ -5,13 +5,13 @@ h1, h2, h3 {
 h1 {
     font-size: 2em;
     line-height: 1.5em;
-    text-transform: uppercase;
+    font-variant: small-caps;
     font-weight: normal;
 }
 h2 {
-    font-size: 1.66667em;
     line-height: 1.25em;
-    text-transform: uppercase;
+    font-size: 1.8em;
+    font-variant: small-caps;
     font-weight: normal;
 }
 h2 a, h2 a:hover {  /* h2 with a non-link a tag should look like a normal h2 */
@@ -20,16 +20,29 @@ h2 a, h2 a:hover {  /* h2 with a non-link a tag should look like a normal h2 */
 h3, #descriptive_summary th {
     color: #4c4c4c;
     font-weight: bold;
+    font-size: 1.25em;
 }
+h1.toplevel { /* similar to h2 on home page */
+    border-bottom: 3px solid #F19B62;
+    margin-bottom:20px;
+    color: #666666;
+    font-weight: normal;
+    padding: 0px;
+    width: 50%;
+}
+
 /* only links (not anchors) should have a hover/focus highlight color */
-a:hover, a:active, a:focus {
+#main a:hover, #main a:active, #main a:focus {
     color: #3e6280;
 }
-a:link:hover, a:link:active, a:link:focus {
+#main a:link:hover, #main a:link:active, #main a:link:focus {
     color: #f19b62;
 }
-a:link:hover, a:active, a:focus {   /* make *linked* a tags colored on hover/focus */
+#main a:link:hover, #main a:active, #main a:focus {   /* make *linked* a tags colored on hover/focus */
     color: #f19b62 !important;
+}
+#navbar #primary a:hover, #navbar #primary a:active, #navbar #primary a:focus {
+    color: white !important;
 }
 
 div#alphalist {
@@ -59,23 +72,23 @@ div#alphalist a {
   display:block;
   text-decoration:none;
   line-height:22px;
-  background-color:  #3a3a3a; /* FIXME: was using small gradient bg image */
+  background-color:  #3a3a3a; 
 }
 
-div#alphalist a:hover, div#alphalist a.current {
+#main div#alphalist a:hover, #main div#alphalist a.current {
   background-color: #f19b62;
-  color: black !important;
+  color: white !important;
 }
 
-div.record_list {
+.list-record {
    border-bottom: 1px dashed #cccccc;
    padding-bottom: 10px;
    margin-bottom: 10px;
 }
-div.record_list p {
+.list-record p {
     margin: 0px;
 }
-div.record_list a:link {
+.list-record a:link {
     color: #3e80b2;
 }
 p.query-time {
@@ -89,17 +102,17 @@ p.query-time {
 .fa-title a {
  text-decoration: none;
 }
-.record_list a {
+.list-record a {
     color: #3E80B2;
     display: block;
     font: 1.33333em/1em "Trebuchet MS",Verdana,Arial,Helvetica,sans-serif;
-    padding: 0;
+    padding: 0px 0px 5px;
     text-decoration: none;
     text-transform: uppercase;
 }
 
 .record {
-    padding: 0px 0 0em 30px;
+    padding-left: 30px;
 }
 
 p.indent { padding-left: 25px; }
@@ -170,11 +183,9 @@ div.fa li {
    list-style-type:none;
    background: none !important;
 }
-.fa h3, .fa th {    /* within finding aid, use normal text size */
-    font-size:100%;
-}
+
 .fa h3 {
-    padding: 4px 0px 0px;   /* override 8px top-padding from html-elements.css */
+    padding: 0px;   /* override 8px top-padding from html-elements.css */
 }
 .fa table, table#descriptive_summary td {
     border: none;
@@ -233,7 +244,7 @@ div.sidebar-search input {
 
 form#advanced-search input[type="text"], form#advanced-search select {
    width: 42em;
-   padding: 3px 0px; /* no side-padding (makes input longer than select) */
+   padding: 3px;
 }
 
 div.doc-links {
@@ -279,6 +290,10 @@ a#no-decoration {
      width: 2cm;
      height: 8px;
      background-color: #eeeeee;
+}
+#relevance-label {
+     float: right;
+     width: 2cm;
 }
 
 .score {
@@ -362,13 +377,25 @@ hr {
 
 .email-form label {
     display: block;
+    margin-top: 12px;
 }
 .email-form input[type='text'], .email-form textarea {
     width: 85%;
+    padding: 2px;
 }
 .email-form li {
     background: none !important;
 }
+.email-form ul.errorlist {
+    margin-bottom: 15px !important;
+}
+.email-form div#Repository_block {
+    margin-bottom: 30px;
+}
+.email-form div#Repository_block ul {
+    margin-top: 10px;
+}
+
 
 
 /*This section  was copied from libraryglobals.css and adapted to work with anchors*/
@@ -381,12 +408,16 @@ a.form-submit, input.form-submit {
     border-right:1px solid #002878;
     color:#E6EDF2;
     cursor:pointer;
-    font:0.833333em/1em "Trebuchet MS",Arial,Helvetica,sans-serif;
+    font:0.833333em "Trebuchet MS",Arial,Helvetica,sans-serif;
     height:20px;
     vertical-align: middle;
-    padding:1px 5px 3px 10px;
+    margin:0;
+    padding:3px 5px 3px 10px;
     text-transform:uppercase;
     text-decoration:none;
+}
+a.form-submit {
+    padding-left: 12px;
 }
 a.form-submit:after { /* using jQuery for equivalent on inputs */
     content: "  ▶";
@@ -394,13 +425,13 @@ a.form-submit:after { /* using jQuery for equivalent on inputs */
     line-height: 18px;
 }
 
-a.form-submit:hover, input.form-submit:hover {
+#main a.form-submit:hover, #main input.form-submit:hover {
     background-color:#f19b62;
     border-top:1px solid #edbd9d;
     border-left:1px solid #edbd9d;
     border-bottom:1px solid #f19557;
     border-right:1px solid #f19557;
-    color:#FFFFFF;
+    color:#FFFFFF !important;
 }
 #sidebar-right {
     text-align: right;

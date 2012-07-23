@@ -11,8 +11,8 @@
  {% block content-body %}
  <div class="top-half">
      <div id="about" class="right-col">
-         <h2>{{ about.title }}</h2> {# do we need fall-back content ? #}
-         {{ about.summary|safe }}
+         <h2>{{ about.title|default:"About EmoryFindingAids" }}</h2>
+         {% firstof about.summary_detail.value|safe about.summary|safe %}
          <div class="block-links subsection">
              <a href="{% url content:page 'faq' %}">Learn more</a>
          </div>
@@ -28,7 +28,7 @@
  <div class="clear"/>
  {% if news %}
  <div class="announcement">
-     <h2>{{ news.title }}</h2> {{ news.summary|safe}}
+     <h2>{{ news.title }}</h2> {% firstof news.summary_detail.value|safe news.summary|safe %}
  </div>
 {% endif %}
  <div class="bottom-half">

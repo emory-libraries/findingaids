@@ -6,21 +6,13 @@ os.environ['CELERY_LOADER'] = 'django'
 CELERY_DEFAULT_QUEUE = 'findingaids'
 
 
-#Logger Setup
-#Add custom logging level to allow us to tun off logging via tha config file
-import logging
-logging.NOLOG = 60
-logging.addLevelName(logging.NOLOG, "NOLOG")
-
-
-
 # Get the directory of this file for relative dir paths.
 # Django sets too many absolute paths.
 BASE_DIR = path.dirname(path.abspath(__file__))
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
+    'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.load_template_source',
 #     'django.template.loaders.eggs.load_template_source',
 )
@@ -75,13 +67,6 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'ha=7$wd7wq7n)8!#h&qn_%0*rul!ez*h-xm#v)l$wg&5nkjk%7'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.load_template_source',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
-)
-
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -109,7 +94,7 @@ if 'VIRTUAL_ENV' in os.environ:
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     #django default context processors
-    "django.core.context_processors.auth",
+    "django.contrib.auth.context_processors.auth",
     "django.core.context_processors.debug",
     "django.core.context_processors.i18n",
     "django.core.context_processors.media",
