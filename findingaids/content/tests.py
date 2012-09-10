@@ -1,5 +1,6 @@
 import feedparser
 from os import path
+from mock import patch
 
 from django.test import Client, TestCase
 from django.conf import settings
@@ -57,6 +58,17 @@ class CachedFeedTest(TestCase):
         # original cached content should be returned
         self.assertEqual(cached_feed['entries'], cf.items,
             'feed should be loaded from cache when possible')
+
+        # exception on cache retrieval should not error,
+        # but simply trigger content reload
+        with patch('findingaids.content.models.cache.get') as mockget:
+            mockget.side_effect = UnicodeDecodeError
+            cached_items = ['y', 'z']
+            cached_feed['entries'] = cached_items
+            cf = models.CachedFeed(self.testid, self.url)
+
+            # should use the mockfeed entries, not the cached values
+            self.assertNotEqual(cached_items, cf.items)
 
     def test_load_feed(self):
         data = ['a', 'b']

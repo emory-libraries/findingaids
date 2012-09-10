@@ -44,9 +44,19 @@ class CachedFeed(object):
 
     @property
     def feed(self):
-        'Feed result as returned from :meth:`feedparser.parse`'
+        '''Feed result as returned from :meth:`feedparser.parse`.
+        Uses cached feed data if available; if cache is empty or
+        attempt to load the cache triggers an exception, the data
+        will be retrieved from the configured url.
+        '''
         # attemp to initialize feed data from the django cache
-        cached_feed = cache.get(self._cache_key)
+        try:
+            cached_feed = cache.get(self._cache_key)
+        except Exception:
+            # could be a utf8 decode errror, or a pickle load / import error
+            # - anytime cache load errors, simply refresh content
+            cached_feed = None
+            
         # if the feed is not cached, retrieve it
         if cached_feed is None:
             cached_feed = feedparser.parse(self.url)
