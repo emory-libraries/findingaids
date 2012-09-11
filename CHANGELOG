@@ -11,6 +11,10 @@ recent version first.  Upgrade or deployment notes should be found in
 1.0 micro releases
 ------------------
 
+1.0.12
+~~~~~~
+
+* Catch exceptions when reloading cached content feed data.
 
 1.0.11
 ~~~~~~
