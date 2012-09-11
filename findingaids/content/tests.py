@@ -61,8 +61,8 @@ class CachedFeedTest(TestCase):
 
         # exception on cache retrieval should not error,
         # but simply trigger content reload
-        with patch('findingaids.content.models.cache.get') as mockget:
-            mockget.side_effect = UnicodeDecodeError
+        with patch('findingaids.content.models.cache.get') as mockcacheget:
+            mockcacheget.side_effect = ImportError('cannot import from file')
             cached_items = ['y', 'z']
             cached_feed['entries'] = cached_items
             cf = models.CachedFeed(self.testid, self.url)

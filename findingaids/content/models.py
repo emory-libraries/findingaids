@@ -49,12 +49,13 @@ class CachedFeed(object):
         attempt to load the cache triggers an exception, the data
         will be retrieved from the configured url.
         '''
-        # attemp to initialize feed data from the django cache
+        # attempt to initialize feed data from the django cache
         try:
             cached_feed = cache.get(self._cache_key)
-        except Exception:
+        except Exception as err:
             # could be a utf8 decode errror, or a pickle load / import error
-            # - anytime cache load errors, simply refresh content
+            # - anytime cache load errors, simply get a fresh copy of the feed
+            logger.warn('Failed to retrieve cached feed data: %s' % err)
             cached_feed = None
             
         # if the feed is not cached, retrieve it
