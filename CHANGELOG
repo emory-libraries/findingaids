@@ -6,10 +6,44 @@ CHANGELOG
 The following is a summary of changes and improvements to the Finding
 Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
-:ref:`DEPLOYNOTES`. 
+:ref:`DEPLOYNOTES`.
 
 1.0 micro releases
 ------------------
+
+1.0.12
+~~~~~~
+
+* Catch exceptions when reloading cached content feed data.
+
+1.0.11
+~~~~~~
+
+* Adjust the XQuery for single-document searches to be more efficient
+  for large documents, in order to address a time-out issue identified
+  in SCLC1083.
+
+1.0.10
+~~~~~~
+
+* Better error-handling for empty list title in EAD when prepping for
+  preview/load.
+* Require eulxml 0.17.1 for improved xpath parser handling.
+
+1.0.9
+~~~~~
+
+* Now compatible with Python 2.7
+* Upgrade to Django 1.3 and the latest released versions of the
+  broken-out eulcore modules (:mod:`eulxml`, :mod:`eulexistdb`, and
+  :mod:`eulcommon`).
+* Minor error-handling and search-engine optimization for the feedback
+  page.
+* Rewrite rule to handle non-existent URL
+  ('-Libraries-EmoryFindingAids') that search engines follow from
+  other Emory sites.
+* Add a reset button to the advanced search form so that a selected
+  repository can be unselected.
 
 1.0.8
 ~~~~~
@@ -95,18 +129,18 @@ Minor usability and display tweaks:
   all existing EAD documents that do not already have ARKs to update the
   documents and store the ARK in the appropriate eadid attribute.
 * When an archivist runs the 'prep' step in the Finding Aid admin
-  site, an ARK will be generated and added to the 'prepared' EAD. 
+  site, an ARK will be generated and added to the 'prepared' EAD.
 * When an archivist runs the 'prep' step on a Finding Aid with no ARK
   stored in the EADID, but for which an ARK has already been generated,
   the existing ARK will be used and the archivist will see an
-  explanatory message. 
+  explanatory message.
 * When an archivist attempts to publish a Finding Aid without an ARK
   stored in the EADID, the document will not be published and the
-  archivist will see an explanatory message. 
+  archivist will see an explanatory message.
 * A researcher or search engine accessing a Finding Aid document has
-  access to view and bookmark the permanent url for that document. 
+  access to view and bookmark the permanent url for that document.
 * When researchers try to use the Emory Finding Aids Database and it
-  is down, they will see a message about the problem and who to contact. 
+  is down, they will see a message about the problem and who to contact.
 
 
 0.3 Enhanced Search
@@ -166,7 +200,7 @@ data and loading it to the eXist database.
 * Logged in admins can view a list of finding aid files recently
   modified on F:\ and ready for upload, sorted by last modified.
 * Logged in admins can select files from the recently modified list
-  for upload directly to publication. 
+  for upload directly to publication.
 * Logged in admins can select a file from the recently modified list
   for preparing, see a list of changes made, and optionally download
   the prepared version if changes were made, in order to safely
@@ -175,7 +209,7 @@ data and loading it to the eXist database.
   for preview; multiple admins can preview different documents
   simultaneously.
 * An admin previewing a finding aid can click a link (on any page in a
-  multi-page finding aid) to publish that document. 
+  multi-page finding aid) to publish that document.
 * When an admin tries to publish or preview an invalid finding aid,
   the user sees a meaningful error message directing them how to fix
   it.

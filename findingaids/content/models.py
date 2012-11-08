@@ -1,3 +1,19 @@
+# file findingaids/content/models.py
+#
+#   Copyright 2012 Emory University Library
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 from BeautifulSoup import BeautifulSoup
 import feedparser
 import logging
@@ -7,7 +23,8 @@ import re
 from django.core.cache import cache
 from django.conf import settings
 
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
+
 
 class CachedFeed(object):
     '''RSS feed object with django caching.  When initialized, will load feed
@@ -44,9 +61,20 @@ class CachedFeed(object):
 
     @property
     def feed(self):
-        'Feed result as returned from :meth:`feedparser.parse`'
-        # attemp to initialize feed data from the django cache
-        cached_feed = cache.get(self._cache_key)
+        '''Feed result as returned from :meth:`feedparser.parse`.
+        Uses cached feed data if available; if cache is empty or
+        attempt to load the cache triggers an exception, the data
+        will be retrieved from the configured url.
+        '''
+        # attempt to initialize feed data from the django cache
+        try:
+            cached_feed = cache.get(self._cache_key)
+        except Exception as err:
+            # could be a utf8 decode errror, or a pickle load / import error
+            # - anytime cache load errors, simply get a fresh copy of the feed
+            logger.warn('Failed to retrieve cached feed data: %s' % err)
+            cached_feed = None
+
         # if the feed is not cached, retrieve it
         if cached_feed is None:
             cached_feed = feedparser.parse(self.url)
@@ -100,7 +128,7 @@ class CachedFeed(object):
                 soup = BeautifulSoup(entry.summary_detail.value)
             else:
                 soup = BeautifulSoup(entry.summary)
-                
+
             # search for links with base url followed directly by a # anchor link
             same_page_prefix = '%s#' % self.feed.feed.title_detail['base']
             links = soup.findAll('a', href=re.compile('^' + same_page_prefix))
@@ -115,15 +143,18 @@ class CachedFeed(object):
             else:
                 entry.summary = unicode(soup)
 
+
 class BannerFeed(CachedFeed):
     'Feed object to access configured RSS feed for home page banner images'
     id = 'banner'
     url = settings.CONTENT_RSS_FEEDS[id]
 
+
 class NewsFeed(CachedFeed):
     'Feed object to access configured RSS feed for home page announcements'
     id = 'news'
     url = settings.CONTENT_RSS_FEEDS[id]
+
 
 class ContentFeed(CachedFeed):
     'Feed object to access configured RSS feed for drupal-managed site content pages'
@@ -145,4 +176,4 @@ class ContentFeed(CachedFeed):
                 # convert same-page anchor links before returning
                 self.convert_same_page_links(entry)
                 return entry
-        
+

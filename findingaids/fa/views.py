@@ -1,3 +1,19 @@
+# file findingaids/fa/views.py
+#
+#   Copyright 2012 Emory University Library
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 import logging
 from lxml import etree
 from urllib import urlencode
@@ -12,7 +28,7 @@ from django.views.decorators.http import condition
 
 from eulcommon.djangoextras.http import content_negotiation
 from eulexistdb.db import ExistDBException, ExistDBTimeout
-from eulexistdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+from eulexistdb.exceptions import DoesNotExist  # ReturnedMultiple needed also ?
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
@@ -22,26 +38,29 @@ from findingaids.fa.utils import render_to_pdf, get_findingaid, pages_to_show, \
             ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
             collection_lastmodified, alpha_pagelabels, html_to_xslfo
 
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
 
 
-fa_listfields = ['eadid', 'list_title','archdesc__did']
+fa_listfields = ['eadid', 'list_title', 'archdesc__did']
 "List of fields that should be returned for brief list display of a finding aid."
 # NOTE: returning archdesc/did as a single chunk instead of unittitle, abstract,
 # and physdesc individually because eXist can construct the return xml much more
 # efficiently; unittitle and abstract should be accessed via FindingAid.unittitle
 # and FindingAid.abstract
 
+
 def site_index(request):
-    "Site home page.  Currently includes browse letter links."    
+    "Site home page.  Currently includes browse letter links."
     return render_to_response('findingaids/index.html', {'letters': title_letters()},
-                                                          context_instance=RequestContext(request)
-                                                          )
+                                                          context_instance=RequestContext(request))
+
+
 def browse_titles(request):
     "List all first letters in finding aid list title, with a link to browse by letter."
     return render_to_response('findingaids/browse_letters.html',
                               {'letters': title_letters()},
                               context_instance=RequestContext(request))
+
 
 @condition(last_modified_func=collection_lastmodified)
 def titles_by_letter(request, letter):
@@ -51,10 +70,10 @@ def titles_by_letter(request, letter):
 
     # set last browse letter and page in session
     page = request.REQUEST.get('page', 1)
-    last_search  = "%s?page=%s" % (reverse("fa:titles-by-letter", kwargs={'letter': letter}), page)
-    last_search = {"url" : last_search, "txt" : "Return to Browse Results" }
+    last_search = "%s?page=%s" % (reverse("fa:titles-by-letter", kwargs={'letter': letter}), page)
+    last_search = {"url": last_search, "txt": "Return to Browse Results"}
     request.session['last_search'] = last_search
-    request.session.set_expiry(0) #set to expire when browser closes
+    request.session.set_expiry(0)  # set to expire when browser closes
 
     # using ~ to do case-insensitive ordering
     fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('~list_title').only(*fa_listfields)
@@ -65,11 +84,11 @@ def titles_by_letter(request, letter):
     # to the section they want based on the labels.
 
     response_context = {
-        'findingaids' : fa_subset,
+        'findingaids': fa_subset,
          'querytime': [fa.queryTime()],
          'letters': title_letters(),
          'current_letter': letter,
-         'show_pages' : page_labels,
+         'show_pages': page_labels,
     }
     if page_labels:
         response_context['title_range'] = page_labels[fa_subset.number]
@@ -81,16 +100,17 @@ def titles_by_letter(request, letter):
     return render_to_response('findingaids/titles_list.html',
         response_context, context_instance=RequestContext(request))
 
+
 @condition(last_modified_func=collection_lastmodified)
 def xml_titles(request):
     """List all findingaids in the database and link to the EAD xml,
     as a simple way to make content available for harvesting.
     """
     # retrieve  all findingaids in the database and return eadids
-    # - no sorting, title, etc. - barebones display for 
+    # - no sorting, title, etc. - barebones display for
     fa = FindingAid.objects.only('eadid')
     response_context = {
-        'findingaids' : fa,
+        'findingaids': fa,
     }
 
     return render_to_response('findingaids/xml.html',
@@ -109,13 +129,14 @@ def eadxml(request, id, preview=False):
     xml_ead = fa.serialize(pretty=True)
     return HttpResponse(xml_ead, mimetype='application/xml')
 
+
 @ead_gone_or_404
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
-@content_negotiation({'text/xml' : eadxml, 'application/xml' : eadxml})
+@content_negotiation({'text/xml': eadxml, 'application/xml': eadxml})
 def findingaid(request, id, preview=False):
     """View a single finding aid.   In preview mode, pulls the document from the
     configured eXist-db preview collection instead of the default public one.
-    
+
     :param id: eadid for the document to view
     :param preview: boolean indicating preview mode, defaults to False
     """
@@ -131,16 +152,16 @@ def findingaid(request, id, preview=False):
         url_params=url_params)
 
     response = render_to_response('findingaids/findingaid.html', {
-        'ead' : fa,
-        'series' : series,
-        'all_indexes' : fa.archdesc.index,
+        'ead': fa,
+        'series': series,
+        'all_indexes': fa.archdesc.index,
         'preview': preview,
         'url_params': url_params,
         'docsearch_form': KeywordSearchForm(),
-        'last_search' : request.session.get('last_search', None),
+        'last_search': request.session.get('last_search', None),
         'feedback_opts': _get_feedback_options(request, id),
      },  context_instance=RequestContext(request, current_app='preview'))
-    #Set Cache-Control to private when there is a last_search
+    # Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
 
@@ -162,8 +183,8 @@ def full_findingaid(request, id, mode, preview=False):
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor, preview=preview)
 
     template = 'findingaids/full.html'
-    template_args = { 'ead' : fa, 'series' : series,
-                    'mode' : mode, 'preview': preview, 'request' : request}
+    template_args = {'ead': fa, 'series': series,
+                    'mode': mode, 'preview': preview, 'request': request}
     if mode == 'html':
         return render_to_response(template, template_args)
     elif mode == 'pdf':
@@ -187,6 +208,7 @@ def series_or_index(request, id, series_id, series2_id=None,
     """
     return _view_series(request, id, series_id, series2_id, series3_id, preview=preview)
 
+
 def _view_series(request, eadid, *series_ids, **kwargs):
     """Retrieve and display a series, subseries, or index.
 
@@ -207,7 +229,6 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     _series_ids = list(series_ids)
     while None in _series_ids:
         _series_ids.remove(None)
-
 
     # user-facing urls should use short-form ids (eadid not repeated)
     # to query eXist, we need full ids with eadid
@@ -294,23 +315,23 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     for i, s in enumerate(all_series):
         if(s.id == result.id):
             index = i
-    prev= index -1
-    next = index +1
+    prev = index - 1
+    next = index + 1
 
     query_times = [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()]
     if hasattr(ead, 'queryTime'):
         query_times.append(ead.queryTime())
 
-    render_opts = { 'ead': ead,
-                    'all_series' : all_series,
-                    'all_indexes' : all_indexes,
-                    "querytime" : query_times,
+    render_opts = {'ead': ead,
+                    'all_series': all_series,
+                    'all_indexes': all_indexes,
+                    "querytime": query_times,
                     'prev': prev,
                     'next': next,
                     'url_params': url_params,
-                    'canonical_url' : _series_url(eadid, *[shortform_id(id) for id in series_ids]),
+                    'canonical_url': _series_url(eadid, *[shortform_id(id) for id in series_ids]),
                     'docsearch_form': KeywordSearchForm(),
-                    'last_search' : request.session.get('last_search', None),
+                    'last_search': request.session.get('last_search', None),
                     'feedback_opts': _get_feedback_options(request, eadid),
                     }
     # include any keyword args in template parameters (preview mode)
@@ -322,8 +343,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         render_opts['series'] = result
         render_opts['subseries'] = _subseries_links(result, preview=preview_mode, url_params=url_params)
 
-    
-    response =  render_to_response('findingaids/series_or_index.html',
+    response = render_to_response('findingaids/series_or_index.html',
                             render_opts, context_instance=RequestContext(request))
 
     #Cache-Control to private when there is a last_search
@@ -331,6 +351,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         response['Cache-Control'] = 'private'
 
     return response
+
 
 def _get_series_or_index(eadid, *series_ids, **kwargs):
     """Retrieve a series or index from a Finding Aid.
@@ -343,7 +364,7 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
     return_fields = ['ead__eadid', 'ead__title', 'ead__unittitle', 'ead__archdesc__origination',
         'ead__archdesc__controlaccess__head', 'ead__dsc__head']
     # common search parameters - last series id should be requested series, of whatever type
-    search_fields = {'ead__eadid' : eadid, 'id': series_ids[-1]}
+    search_fields = {'ead__eadid': eadid, 'id': series_ids[-1]}
 
     filter = None
     if 'filter' in kwargs:
@@ -351,7 +372,7 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
     use_collection = None
     if 'use_collection' in kwargs:
         use_collection = kwargs['use_collection']
-        
+
     try:
         if len(series_ids) == 1:
             # if there is only on id, either a series or index is requested
@@ -370,9 +391,9 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
                     queryset = queryset.filter(**filter)
                 if use_collection is not None:
                     queryset = queryset.using(use_collection)
-                record = queryset.get()                
+                record = queryset.get()
             return record
-        
+
         elif len(series_ids) == 2:
             # returning a subseries (c02); include id and did from parent c01 for breadcrumbs
             return_fields.extend(['series__id', 'series__did'])
@@ -382,7 +403,7 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
             # returning a sub-subseries (c03); include ids and dids from c01 and c02
             # series this c03 belogs to, for generating breadcrumbs
             return_fields.extend(['series__id', 'series2__id', 'series__did', 'series2__did'])
-            search_fields.update({"series__id": series_ids[0], "series2__id" : series_ids[1]})
+            search_fields.update({"series__id": series_ids[0], "series2__id": series_ids[1]})
             queryset = Series3.objects
 
         # search by the most specific filter first (direct id) to make eXist xquery as efficient as possible
@@ -396,34 +417,36 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
         if use_collection is not None:
             queryset = queryset.using(use_collection)
         record = queryset.get()
-        
+
     except DoesNotExist:
         raise Http404
     return record
+
 
 def _get_feedback_options(request, id):
     'Generate single-finding aid feedback options as a url parameter.'
     return urlencode({'eadid': id, 'url': request.build_absolute_uri()})
 
+
 @condition(last_modified_func=collection_lastmodified)
 def search(request):
     "Simple keyword search - runs exist full-text terms query on all terms included."
-    
+
     form = AdvancedSearchForm(request.GET)
     query_error = False
-    
+
     if form.is_valid():
         # form validation requires that at least one of subject & keyword is not empty
         subject = form.cleaned_data['subject']
         keywords = form.cleaned_data['keywords']
         repository = form.cleaned_data['repository']
         page = request.REQUEST.get('page', 1)
-              
+
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
 
         # local copy of return fields (fulltext-score may be added-- don't modify master copy!)
-        return_fields = fa_listfields[:]     
+        return_fields = fa_listfields[:]
 
         try:
             if subject:
@@ -448,8 +471,6 @@ def search(request):
                         boostfields__fulltext_terms=keywords,
                         highlight=False,    # disable highlighting in search results list
                     ).order_by('-fulltext_score')
-
-
 
             findingaids = findingaids.only(*return_fields)
             result_subset, paginator = paginate_queryset(request, findingaids,
@@ -478,9 +499,9 @@ def search(request):
             # store the current page (even if not specified in URL) for saved search
             last_search['page'] = page
             last_search = "%s?%s" % (reverse("fa:search"), urlencode(last_search))
-            last_search = {"url" : last_search, "txt" : "Return to Search Results"}
+            last_search = {"url": last_search, "txt": "Return to Search Results"}
             request.session["last_search"] = last_search
-            request.session.set_expiry(0) #set to expire when browser closes
+            request.session.set_expiry(0)  # set to expire when browser closes
 
             # ONLY keywords - not page or subject - should be included in
             # document url for search term highlighting
@@ -490,18 +511,18 @@ def search(request):
                 highlight_params = None
 
             response_context = {
-                'findingaids' : result_subset,
+                'findingaids': result_subset,
                  'search_params': search_params,    # actual search terms, for display
-                 'url_params' : url_params,   # url opts for pagination
-                 'highlight_params': highlight_params, # keyword highlighting
+                 'url_params': url_params,   # url opts for pagination
+                 'highlight_params': highlight_params,  # keyword highlighting
                  'querytime': [query_times],
-                 'show_pages' : show_pages
+                 'show_pages': show_pages
             }
             if page_labels:     # if there are page labels to show, add to context
-                 # other page labels handled by show_pages, but first & last are special
-                 response_context['first_page_label'] = page_labels[1]
-                 response_context['last_page_label'] = page_labels[paginator.num_pages]
-                 
+                # other page labels handled by show_pages, but first & last are special
+                response_context['first_page_label'] = page_labels[1]
+                response_context['last_page_label'] = page_labels[paginator.num_pages]
+
             return render_to_response('findingaids/search_results.html',
                     response_context, context_instance=RequestContext(request))
 
@@ -523,12 +544,13 @@ def search(request):
 
     # if form is invalid (no search terms) or there was an error, display search form
     response = render_to_response('findingaids/search_form.html',
-                    {'form' : form, 'request': request },
+                    {'form': form, 'request': request},
                     context_instance=RequestContext(request))
     # if query could not be parsed, set a 'Bad Request' status code on the response
     if query_error:
         response.status_code = 400
     return response
+
 
 def document_search(request, id):
     "Keyword search on file-level items in a single Finding Aid."
@@ -545,12 +567,12 @@ def document_search(request, id):
             # NOTE: filter by parent ead id first, then by keyword
             # (this is significantly faster for common keywords in large findingaids)
             files = FileComponent.objects.filter(ead__eadid=id) \
-                    	.filter(fulltext_terms=search_terms) \
+                        .filter(fulltext_terms=search_terms) \
                         .also('parent__id', 'parent__did',
-                    'series1__id', 'series1__did', 'series2__id', 'series2__did')
-            
+                              'series1__id', 'series1__did', 'series2__id', 'series2__did')
+
             return render_to_response('findingaids/document_search.html', {
-                    'files' : files,
+                    'files': files,
                     'ead': ead,
                     'querytime': [files.queryTime(), ead.queryTime()],
                     'keywords': search_terms,
@@ -574,11 +596,11 @@ def document_search(request, id):
                 # generic error message for any other exception
                 messages.error(request, 'There was an error processing your search.')
     else:
-        # invalid form 
+        # invalid form
         messages.error(request, 'Please enter a search term.')
     # display empty search results
     response = render_to_response('findingaids/document_search.html', {
-                    'files' : [],
+                    'files': [],
                     'ead': ead,
                     'docsearch_form': KeywordSearchForm(),
                  }, context_instance=RequestContext(request))
@@ -586,6 +608,7 @@ def document_search(request, id):
     if query_error:
         response.status_code = 400
     return response
+
 
 def _series_url(eadid, series_id, *ids, **extra_opts):
     """
@@ -596,7 +619,7 @@ def _series_url(eadid, series_id, *ids, **extra_opts):
     Default url callback for :meth:`_subseries_links`.
     """
     # common args for generating all urls
-    args = {'id' : eadid, 'series_id' : series_id}
+    args = {'id': eadid, 'series_id': series_id}
 
     if len(ids) == 0:       # no additional args
         view_name = 'series-or-index'
@@ -614,6 +637,7 @@ def _series_url(eadid, series_id, *ids, **extra_opts):
 
     return reverse('%s:%s' % (view_namespace, view_name), kwargs=args)
 
+
 def _series_anchor(*ids, **extra_opts):
     """Generate a same-page id-based anchor link for a series.
 
@@ -622,6 +646,7 @@ def _series_anchor(*ids, **extra_opts):
     """
     # only actually use the last of all ids passed in
     return "#%s" % ids[-1]
+
 
 def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=False,
         url_params=''):
@@ -634,7 +659,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
     Series element must include ead.eadid; if series is c02 or c03, must also
     include parent c01 (and c02) id, in order to generate urls.
 
-    :param series: :class:`findingaids.fa.models.Series` instance (with access 
+    :param series: :class:`findingaids.fa.models.Series` instance (with access
             to eadid for the document and parent series ids if a subseries)
     :param url_ids: list of series ids for generating urls
     :param url_callback: method to use for generating the series url
@@ -655,7 +680,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                         % (series.node.tag, series.id))
 
         url_ids = [series.ead.eadid]
-        
+
         # if c02/c03, check to ensure we have enough information to generate the correct link
         if series.node.tag in [C02, C03]:
             # if initial series passed in is c02 or c03, add c01 series id to url ids before current series id
@@ -676,23 +701,23 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
         #  current series id
         if series.node.tag in [C01, C02, C03]:
             url_ids.append(series.short_id)
-        
+
     links = []
     if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
         for component in series.c:
             # get match count for each series / subseries and append it to the link if > 0
             if component.match_count > 0:
-                plural ="es" if component.match_count > 1 else ""
-                match_count = "<span class='exist-match'>%s match%s</span>" %(component.match_count, plural)
+                plural = "es" if component.match_count > 1 else ""
+                match_count = "<span class='exist-match'>%s match%s</span>" % (component.match_count, plural)
             else:
                 match_count = ""
 
             current_url_ids = url_ids + [component.short_id]
             #set c01 rel attrib to 'section' c02 and c03 to 'subsection'
             if (component.node.tag == C01):
-                rel='section'
+                rel = 'section'
             elif (component.node.tag in [C02, C03]):
-                rel='subsection'
+                rel = 'subsection'
             text = "<a href='%(url)s%(url_params)s' rel='%(rel)s'>%(linktext)s</a> %(match_count)s" % \
                 {'url': url_callback(preview=preview, *current_url_ids),
                  'url_params': url_params,

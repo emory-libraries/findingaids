@@ -1,3 +1,19 @@
+# file findingaids/fa_admin/tasks.py
+#
+#   Copyright 2012 Emory University Library
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
 import urllib2
 from time import sleep
 from celery.decorators import task
@@ -20,7 +36,7 @@ def reload_cached_pdf(eadid):
         # set headers to force the cache to get a fresh copy
         basic_headers = {
             'User-Agent': 'FindingAids PDF Reloader/%s' % SW_VERSION,
-            'Accept': '*/*',                        
+            'Accept': '*/*',
         }
         refresh_cache = {
             # tell the cache to grab a fresh copy (implied: cache the fresh copy)
@@ -42,7 +58,7 @@ def reload_cached_pdf(eadid):
             raise Exception("Got unexpected HTTP status code from response: %s" \
                             % response.code)
         return True
-    
+
     else:
         raise Exception("PROXY_HOST and/or SITE_BASE_URL settings not available.  Failed to reload cached PDF.")
 
