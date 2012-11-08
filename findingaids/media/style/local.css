@@ -59,12 +59,12 @@ div#alphalist li {
   display:block;
   float:left;
   text-align: center;
-  line-height:22px;  
+  line-height:22px;
   background: none;
 }
 
 div#alphalist a {
-  border:1px solid black;  
+  border:1px solid black;
   font-weight:bold;
   color:white;
   width:22px;
@@ -72,7 +72,7 @@ div#alphalist a {
   display:block;
   text-decoration:none;
   line-height:22px;
-  background-color:  #3a3a3a; 
+  background-color:  #3a3a3a;
 }
 
 #main div#alphalist a:hover, #main div#alphalist a.current {
@@ -192,7 +192,7 @@ div.fa li {
     margin: 0px;
 }
 
-div#control_access ul, div#control_access li, div#index ul, div#index li { 
+div#control_access ul, div#control_access li, div#index ul, div#index li {
     margin: 0px !important;
     padding: 0px !important;
     list-style-image: none !important;
@@ -218,7 +218,7 @@ ul.series-list > li {
     padding-left: 0px !important;   /* no indent on top-level series */
 }
 /* remove top-padding on subseries lists so list-item spacing will be consistently */
-ul.series-list ul {                 
+ul.series-list ul {
     padding-top: 0px !important;
 }
 /* shift padding to the top so nested list items will be consistently spaced */
@@ -353,11 +353,11 @@ div.removed-notice {
 }
 
 div.pagination a {
-    padding-right: 2px; 
+    padding-right: 2px;
 }
 
 a.pdf {
-    line-height: 20px; 
+    line-height: 20px;
 }
 
 hr {
@@ -411,6 +411,7 @@ a.form-submit, input.form-submit {
     font:0.833333em "Trebuchet MS",Arial,Helvetica,sans-serif;
     height:20px;
     vertical-align: middle;
+    margin:0;
     padding:3px 5px 3px 10px;
     text-transform:uppercase;
     text-decoration:none;
@@ -435,7 +436,7 @@ a.form-submit:after { /* using jQuery for equivalent on inputs */
 #sidebar-right {
     text-align: right;
 }
-a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 0 0; 
+a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 0 0;
                                 padding:0px 0px 6px 20px;
                                 display:inline-block; }
 
@@ -465,6 +466,14 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     list-style-image: none;
     padding: 0px;
     margin-left: 25px;
+}
+
+#content .email-form span.errors li {
+    margin-bottom: 30px;
+}
+
+#content form.email-form div#Repository_block {
+    margin-bottom: 30px;
 }
 
 #feedback p {

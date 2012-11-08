@@ -1,5 +1,5 @@
 # file findingaids/__init__.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__version_info__ = (1, 0, 13, 'pre')
+__version_info__ = (1, 1, 0, 'dev')
 
 # Dot-connect all but the last. Last is dash-connected if not None.
 __version__ = '.'.join(str(i) for i in __version_info__[:-1])

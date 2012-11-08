@@ -1,5 +1,5 @@
 # file findingaids/content/tests.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,27 +34,27 @@ exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..', 'fa',
 class MockFeedParser:
     entries = []
     status = 200
-    
+
     def parse(self, url):
         # construct a new feed result based on current entries & status
         feed = feedparser.FeedParserDict()
         feed['entries'] = self.entries
         feed.status = self.status
         return feed
-    
+
 class CachedFeedTest(TestCase):
     testid = 'testfeed'
     url = 'http://'
-    
+
     def setUp(self):
         # replace feedparser module with a mock for testing
-        self.mockfeedparser = MockFeedParser()   
+        self.mockfeedparser = MockFeedParser()
         self._feedparser = models.feedparser
         models.feedparser = self.mockfeedparser
         # get & store cache key from a model instance
         cf = models.CachedFeed(self.testid, self.url)
         self.cache_key = cf._cache_key
-        
+
     def tearDown(self):
         # restore the real feedparser
         models.feedparser = self._feedparser
@@ -99,7 +99,7 @@ class CachedFeedTest(TestCase):
         initial = ['a', 'b']
         self.mockfeedparser.entries = initial
         cf = models.CachedFeed(self.testid, self.url)
-        cf.feed # access feed to load initial feed
+        cf.feed  # access feed to load initial feed
         # change the data for comparison
         mod = ['z', 'y']
         self.mockfeedparser.entries = mod
@@ -188,8 +188,6 @@ class ContentFeedTest(TestCase):
         self.assertEqual(None, content.get_entry('bogus'))
 
 
-
-
 class EmailTestCase(EulexistdbTestCase):
     # Common test class with logic to mock sending mail and mock captcha submission
     # to test functionality without actual sending email or querying captcha servers.
@@ -233,7 +231,7 @@ class EmailTestCase(EulexistdbTestCase):
         settings.SERVER_EMAIL = self.server_email
         settings.EMAIL_SUBJECT_PREFIX = self.email_prefix
         settings.FEEDBACK_EMAIL = self.feedback_email
-        
+
         # swap out captcha with mock
         self._captcha = forms.captchafield.captcha
         forms.captchafield.captcha = MockCaptcha()
@@ -271,9 +269,9 @@ class EmailTestCase(EulexistdbTestCase):
             delattr(settings, 'RECAPTCHA_PUBLIC_KEY')
         else:
             settings.RECAPTCHA_PUBLIC_KEY = self._captcha_public_key
-       
+
 class FeedbackFormTest(EmailTestCase):
-    
+
     exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
 
     def setUp(self):
@@ -303,7 +301,7 @@ class FeedbackFormTest(EmailTestCase):
             'when email is not specified on form, email should come from configured email address')
         self.assertEqual(self.feedback_email, self.sent_mail['recipients'],
             'feedback email should be sent to configured email recipients')
-        
+
         # message + email address
         user_email = 'me@my.domain.com'
         data.update({'email': user_email})
@@ -345,7 +343,8 @@ class FeedbackFormTest(EmailTestCase):
             'when eadid is specified on form, ead title should be included in message text')
         self.assert_(ead_url in self.sent_mail['message'],
             'when url is specified on form, it should be included in message text')
-        
+
+
 class RequestMaterialsFormTest(EmailTestCase):
 
     def setUp(self):
@@ -353,7 +352,6 @@ class RequestMaterialsFormTest(EmailTestCase):
 
     def tearDown(self):
         super(RequestMaterialsFormTest, self).tearDown()
-        
 
     def test_send_email(self):
         # form data with message only
@@ -471,7 +469,7 @@ class ContentViewsTest(EmailTestCase):
         content_url = reverse('content:page', args=['bogus'])
         response = self.client.get(content_url)
         expected = 404
-        self.assertEqual(response.status_code, expected, 
+        self.assertEqual(response.status_code, expected,
             'Expected %s but returned %s for %s (non-existent page)'
              % (expected, response.status_code, content_url))
 
@@ -494,7 +492,7 @@ class ContentViewsTest(EmailTestCase):
         response = self.client.get(feedback_url, {'eadid': 'abbey244'})
         self.assertPattern('Sending feedback about.*Abbey\s+Theatre\s+collection,\s+1921-1995',
             response.content,
-            msg_prefix='feedback page should include title when sending feedback about a single ead');
+            msg_prefix='feedback page should include title when sending feedback about a single ead')
         self.assertContains(response, ': Feedback on Abbey Theatre collection',
             msg_prefix='html header should differentiate from default feedback page')
         self.assertContains(response, 'noindex,nofollow',
@@ -521,13 +519,12 @@ class ContentViewsTest(EmailTestCase):
         self.simulate_email_exception()
         response = self.client.post(feedback_url, feedback_data)
         expected = 500
-        self.assertEqual(expected, response.status_code, 
+        self.assertEqual(expected, response.status_code,
             'Expected %s but returned %s for POST on %s'
              % (expected, response.status_code, feedback_url))
         self.assertContains(response, 'here was an error sending your feedback',
             msg_prefix='response should display error message when sending email triggers an exception',
             status_code=500)
-
 
     def test_request_materials(self):
         # GET - display the form
