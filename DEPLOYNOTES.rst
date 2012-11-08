@@ -62,11 +62,30 @@ so this is not included in the pip-dependencies file.  You may want to
 pip install  ``MySQL-python`` or ``psycopg``, depending on the database you
 plan to use.
 
+FindingAids requires a SQL database, but the type does not matter,
+so this is not included in the pip-dependencies file.  You may want to
+pip install  ``MySQL-python`` or ``psycopg``, depending on the database you
+plan to use.
+
 If you are a developer or are installing to a continuous ingration server
 where you plan to run unit tests, code coverage reports, or build sphinx
 documentation, you probably will also want to::
 
   $ pip install -r pip-dev-req.txt
+
+Known Issues
+""""""""""""
+
+* As of 04/2011, installing **python-eulcore** from SVN via pip does not
+  install the eulcore template themes correctly.  The easiest way to fix
+  this is to manually create a symbolic link from the root of your
+  virtualenv to the python-eulcore theme directory::
+
+    $ cd /home/findingaids/fa-env
+    $ ln -s src/python-eulcore/themes/
+
+
+-----
 
 Known Issues
 """"""""""""
@@ -92,12 +111,19 @@ following python libraries:
    install via ``easy_install zc.icp``
  * django-celery installed via ``easy_install django-celery``
  * feedparser -  ``easy_install feedparser``
- * `recaptcha-client <http://pypi.python.org/pypi/recaptcha-client>`_  
+ * `recaptcha-client <http://pypi.python.org/pypi/recaptcha-client>`_
    ``easy_install recaptcha-client``
  * `Beautiful Soup <http://www.crummy.com/software/BeautifulSoup/>`_
    ``easy_install beautifulsoup``
  * PIDmanager REST client - http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x
  * eulxml, eulexistdb, eulcommon, and eullocal
+
+
+Note that :mod:`eulcore` and :mod:`pidservices` are currently included with the
+source code (as subversion externals).  See :ref:`eulcore dependencies <eulcore-deps>`
+for per-module dependencies in eulcore. To see an up-to-date list of eulcore
+modules in use by FindingAids, check the **INSTALLED_APPS** in settings.py.
+
 
 System Dependencies
 ~~~~~~~~~~~~~~~~~~~
@@ -339,8 +365,8 @@ Load the converted & prepared EAD documents to the eXist database::
 By default, ``load_ead`` will start celery tasks to generate and cache the PDFs
 in the configured web cache.  This requires the celery daemon process to be
 running.  The default behavior can be adjusted with command-line options (use
-``--h`` to see available options).  When run in a mode that caches the PDFs, 
-the load script will wait until all celery tasks have completed in order to 
+``--h`` to see available options).  When run in a mode that caches the PDFs,
+the load script will wait until all celery tasks have completed in order to
 report on the outcome; this can take a long time to finish.
 
 (OPTIONAL) After you have loaded the data, you may want to check that all

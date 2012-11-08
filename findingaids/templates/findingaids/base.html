@@ -10,7 +10,7 @@
         <form id="preview-publish" action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
             <button class="admin-action" type="submit" name="preview_id" value="{% firstof findingaid.eadid ead.eadid %}">PUBLISH</button>
         </form>
-    {% endif %} 
+    {% endif %}
     <h1 class="title">{% if preview %}<span class="preview-label">PREVIEW:</span> {% endif %}{% block content-title %}{% endblock %}</h1>
 {% endblock %}
 

@@ -1,5 +1,5 @@
 # file findingaids/content/models.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,8 @@ import re
 from django.core.cache import cache
 from django.conf import settings
 
-logger = logging.getLogger(__name__) 
+logger = logging.getLogger(__name__)
+
 
 class CachedFeed(object):
     '''RSS feed object with django caching.  When initialized, will load feed
@@ -73,7 +74,7 @@ class CachedFeed(object):
             # - anytime cache load errors, simply get a fresh copy of the feed
             logger.warn('Failed to retrieve cached feed data: %s' % err)
             cached_feed = None
-            
+
         # if the feed is not cached, retrieve it
         if cached_feed is None:
             cached_feed = feedparser.parse(self.url)
@@ -127,7 +128,7 @@ class CachedFeed(object):
                 soup = BeautifulSoup(entry.summary_detail.value)
             else:
                 soup = BeautifulSoup(entry.summary)
-                
+
             # search for links with base url followed directly by a # anchor link
             same_page_prefix = '%s#' % self.feed.feed.title_detail['base']
             links = soup.findAll('a', href=re.compile('^' + same_page_prefix))
@@ -142,15 +143,18 @@ class CachedFeed(object):
             else:
                 entry.summary = unicode(soup)
 
+
 class BannerFeed(CachedFeed):
     'Feed object to access configured RSS feed for home page banner images'
     id = 'banner'
     url = settings.CONTENT_RSS_FEEDS[id]
 
+
 class NewsFeed(CachedFeed):
     'Feed object to access configured RSS feed for home page announcements'
     id = 'news'
     url = settings.CONTENT_RSS_FEEDS[id]
+
 
 class ContentFeed(CachedFeed):
     'Feed object to access configured RSS feed for drupal-managed site content pages'
@@ -172,4 +176,4 @@ class ContentFeed(CachedFeed):
                 # convert same-page anchor links before returning
                 self.convert_same_page_links(entry)
                 return entry
-        
+
