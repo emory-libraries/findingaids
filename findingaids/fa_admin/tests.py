@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/tests.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ import sys
 import tempfile
 from time import sleep
 
-from django.test import Client, TestCase
+from django.test import Client
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
@@ -38,31 +38,31 @@ from eulexistdb.testutil import TestCase
 from eulxml.xmlmap.core import load_xmlobject_from_file
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.urls import TITLE_LETTERS
 from findingaids.fa_admin import tasks, views, utils
 from findingaids.fa_admin.views import _get_recent_xml_files
 from findingaids.fa_admin.management.commands import prep_ead as prep_ead_cmd
-from findingaids.fa_admin.management.commands import unitid_identifier 
-from findingaids.fa_admin.mocks import MockDjangoPidmanClient, MockHttplib
+from findingaids.fa_admin.management.commands import unitid_identifier
+from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
 
 ### unit tests for findingaids.fa_admin.views
 
 # note: tests for publish view are in a separate test case because
 # publish makes use of a celery task, which requires additional setup for testing
 
+
 class BaseAdminViewsTest(TestCase):
     "Base TestCase for admin views tests.  Common setup/teardown for admin view tests."
-    fixtures =  ['user']
+    fixtures = ['user']
     credentials = {'superuser': {'username': 'testadmin', 'password': 'secret'},
                    'admin': {'username': 'marbl', 'password': 'marbl'},
                    'no_perms': {'username': 'peon', 'password': 'peon'},
-    }    
+    }
     exist_fixtures = {'files': [
             os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
     ]}
- 
+
     db = ExistDB()
 
     def setUp(self):
@@ -74,7 +74,7 @@ class BaseAdminViewsTest(TestCase):
         self.tmpfiles = []
         for num in ['first', 'second', 'third']:
             self.tmpfiles.append(tempfile.NamedTemporaryFile(suffix='.xml',
-                    prefix=num+'_', dir=self.tmpdir, delete=False))
+                    prefix=num + '_', dir=self.tmpdir, delete=False))
             sleep(1)        # ensure modification times are different
         # add a non-xml file
         self.nonxml_tmpfile = tempfile.NamedTemporaryFile(suffix='.txt',
@@ -98,7 +98,7 @@ class BaseAdminViewsTest(TestCase):
             'PIDMAN_HOST': settings.PIDMAN_HOST,
             'PIDMAN_USER': settings.PIDMAN_USER,
             'PIDMAN_PASSWORD': settings.PIDMAN_PASSWORD,
-            'PIDMAN_DOMAIN' : settings.PIDMAN_DOMAIN
+            'PIDMAN_DOMAIN': settings.PIDMAN_DOMAIN
             }
         self._django_pid_client = views.utils.DjangoPidmanRestClient
         views.utils.DjangoPidmanRestClient = MockDjangoPidmanClient
@@ -142,11 +142,11 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix='response for user with no permissions does not include link to list/edit staff')
         self.assertContains(response, reverse('admin:index'), 0,
             msg_prefix='response for user with no permissions does not include link to django db admin')
-            
+
         # user with limited permissions - in findingaid group
         self.client.login(**self.credentials['admin'])
         response = self.client.get(admin_index)
-        self.assertContains(response, reverse('fa-admin:list-published'), 
+        self.assertContains(response, reverse('fa-admin:list-published'),
             msg_prefix='response for FA admin includes link to published docs')
         self.assertContains(response, reverse('fa-admin:preview-ead'),
             msg_prefix='response for FA admin includes link to preview docs')
@@ -178,7 +178,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.get(admin_index, follow=True)
         (redirect_url, code) = response.redirect_chain[0]
         self.assert_("?next=%s" % admin_index in redirect_url)
-        
+
         # log in as an admin user
         self.client.login(**self.credentials['admin'])
         response = self.client.get(admin_index)
@@ -222,25 +222,25 @@ class AdminViewsTest(BaseAdminViewsTest):
     def test_preview(self):
         preview_url = reverse('fa-admin:preview-ead')
         self.client.login(**self.credentials['admin'])
-        
+
         # use fixture directory to test preview
         filename = 'hartsfield558.xml'
         eadid = 'hartsfield558'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
-        response = self.client.post(preview_url, {'filename' : filename},
-                follow=True) # follow redirect so we can inspect message on response
+        response = self.client.post(preview_url, {'filename': filename},
+                follow=True)  # follow redirect so we can inspect message on response
         (redirect_url, code) = response.redirect_chain[0]
         preview_docurl = reverse('fa-admin:preview:findingaid', kwargs={'id': eadid})
         self.assert_(preview_docurl in redirect_url)
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
                              % (expected, code, preview_url))
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_("Successfully loaded" in messages[0],
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_("Successfully loaded" in msgs[0],
                 "success message present in response context")
-            
+
         # confirm that document was actually saved to exist
-        docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)        
+        docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
         self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # GET should just list files available for preview
@@ -255,7 +255,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix="preview summary should link to preview page for document loaded to preview")
         self.assertContains(response, 'last modified: 0 minutes ago',
             msg_prefix="preview summary listing includes modification time")
-            
+
         # preview page should include publish form for users with permission to publish
         preview_fa_url = reverse('fa-admin:preview:findingaid', kwargs={'id': eadid})
         response = self.client.get(preview_fa_url)
@@ -266,12 +266,11 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, publish_submit,
                 msg_prefix="publish form submit button has document eadid for value")
 
-
         # clean up
         self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # preview invalid document - should display errors
-        response = self.client.post(preview_url, {'filename' : 'hartsfield558_invalid.xml'})
+        response = self.client.post(preview_url, {'filename': 'hartsfield558_invalid.xml'})
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
@@ -284,14 +283,13 @@ class AdminViewsTest(BaseAdminViewsTest):
         docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/hartsfield558_invalid.xml')
         self.assertEqual({}, docinfo, "invalid xml document not loaded to exist preview")
 
-
         # exist save errors should be caught & handled gracefully
         # - force an error by setting preview collection to a non-existent collection
         settings.EXISTDB_PREVIEW_COLLECTION = "/bogus/doesntexist"
-        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
+        response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
         self.assertContains(response, "Could not preview")
         self.assertContains(response,
-                "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)     
+                "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
 
@@ -302,8 +300,8 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         settings.EXISTDB_SERVER_USER = None
         settings.EXISTDB_SERVER_PASSWORD = None
-        
-        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
+
+        response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
@@ -311,22 +309,22 @@ class AdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="error page displays specific eXist permission message")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
-        settings.EXISTDB_SERVER_URL = 'http://kamina.library.emory.edu:9191/not-exist'
-        response = self.client.post(preview_url, {'filename' : 'hartsfield558.xml'})
-        self.assertContains(response, "Could not preview")
-        self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "I/O Error: Connection refused",
-                msg_prefix="error page displays specific connection error message")
+        settings.EXISTDB_SERVER_URL = 'http://localhost:9191/not-exist'
+        with patch.object(settings, 'EXISTDB_TIMEOUT', new=150):
+            response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
+            self.assertContains(response, "Could not preview")
+            self.assertContains(response, "Database Error",
+                    msg_prefix="error page displays explanation and instructions to user")
+            self.assertContains(response, "I/O Error: Connection refused",
+                    msg_prefix="error page displays specific connection error message")
 
-        
     def test_logout(self):
         admin_logout = reverse('fa-admin:logout')
         # log in as admin user to test logging out
-        self.client.login(**self.credentials['admin'])        
+        self.client.login(**self.credentials['admin'])
         response = self.client.get(admin_logout, follow=True)
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_('You are now logged out' in messages[0])
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('You are now logged out' in msgs[0])
 
     def test_list_staff(self):
         list_staff = reverse('fa-admin:list-staff')
@@ -339,7 +337,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "peon")
 
     def test_edit_user(self):
-        edit_user = reverse('fa-admin:edit-user', args=[2]) # edit 2nd user fixture
+        edit_user = reverse('fa-admin:edit-user', args=[2])  # edit 2nd user fixture
         # Test as an admin with permission to edit users
         self.client.login(**self.credentials['superuser'])
         user = User.objects.create_user('test', 'test@emory.edu', 'testpassword')
@@ -347,7 +345,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         user.save()
         response = self.client.get(edit_user)
         self.assertContains(response, "Edit the user account")
-        
+
     def test_prep_ead(self):
          # use fixture directory to test publication
         filename = 'hartsfield558.xml'
@@ -356,7 +354,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         prep_xml = reverse('fa-admin:prep-ead', args=[filename])
         prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
         prep_diff = reverse('fa-admin:prep-ead-diff', args=[filename])
-        
+
         self.client.login(**self.credentials['admin'])
         response = self.client.get(prep_summary)
 
@@ -365,7 +363,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
                         (expected, code, prep_summary))
         self.assert_(response.context['changes'])
-                        
+
         self.assertContains(response, 'Prepared EAD for %s' % filename)
         self.assertContains(response, 'View file differences line by line')
         self.assertContains(response, prep_diff,
@@ -417,9 +415,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (prepared EAD)'
                              % (expected, code, prep_summary))
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_("No changes made to <b>%s</b>" % filename in messages[0])
-        self.assert_("already prepared" in messages[0])
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_("No changes made to <b>%s</b>" % filename in msgs[0])
+        self.assert_("already prepared" in msgs[0])
 
         # prep an ead that needs an ARK, force ark generation error
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
@@ -442,7 +440,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(response.status_code, expected,
             'Expected %s but returned %s for %s (prep ead, ARK generation error)' % \
             (expected, response.status_code, prep_xml))
-
 
     def test_prep_ark_messages(self):
         # test that ARK generation messages are displayed to user
@@ -467,7 +464,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # use a fixture that does not have an ARK
         filename = 'bailey807.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
-        response = views.prepared_eadxml(request, filename)
+        views.prepared_eadxml(request, filename)  # response object not used
         # retrieve messages from the request
         msgs = messages.get_messages(request)
         self.assert_('Found 2 ARKs when searching' in msgs[0],
@@ -477,7 +474,7 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # restore non-mock pid client
         views.utils.DjangoPidmanRestClient = _real_pid_client
-        
+
     def test_prep_badlyformedxml(self):
         # use fixture directory to test publication
         filename = 'badlyformed.xml'
@@ -508,7 +505,6 @@ class AdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="prep summary for badly formed xml should NOT link to line-by-line diff")
         self.assertNotContains(response, prep_xml,
                 msg_prefix="prep summary for badly formed xml should NOT link to xml for download")
-        
 
     # tests for view helper functions
 
@@ -523,7 +519,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         filenames = [eadfile.filename for eadfile in recent_xml]
         self.assert_(os.path.basename(self.nonxml_tmpfile.name) not in filenames)
 
-
     def test_list_published(self):
         # login to test admin-only view
         self.client.login(**self.credentials['admin'])
@@ -533,9 +528,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Published Finding Aids")
 
         fa = response.context['findingaids']
-        self.assert_(fa,"findingaids is set in response context")
+        self.assert_(fa, "findingaids is set in response context")
         self.assertEqual(fa.object_list[0].eadid.value, 'hartsfield558',
-            "fixture document is included in findingaids object list")                
+            "fixture document is included in findingaids object list")
         self.assertPattern('Pages:\s*1', response.content,
             "response contains pagination")
 
@@ -553,7 +548,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # POST form data to trigger a deletion
         title, note = 'William Berry Hartsfield papers', 'Moved to another archive.'
         response = self.client.post(delete_url, {'eadid': eadid, 'title': title,
-                                    'note' : note, 'date': '2010-07-01 15:01:20'}, follow=True)
+                                    'note': note, 'date': '2010-07-01 15:01:20'}, follow=True)
         # on success:
         # - the document should have been removed from eXist
         self.assertFalse(self.db.hasDocument('%s/%s.xml' % (settings.EXISTDB_TEST_COLLECTION, eadid)),
@@ -570,27 +565,26 @@ class AdminViewsTest(BaseAdminViewsTest):
         expected = 303      # redirect - see other
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST)'
                              % (expected, code, delete_url))
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_('Successfully removed <b>%s</b>.' % eadid in messages[0],
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Successfully removed <b>%s</b>.' % eadid in msgs[0],
                 "delete success message is set in response context")
-
 
         # test for expected failures for a non-existent eadid
         eadid = 'bogus-id'
         delete_nonexistent = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
         # GET - attempt to load form to delete an ead not present in eXist db
         response = self.client.get(delete_nonexistent, follow=True)
-        messages = [ str(msg) for msg in response.context['messages'] ]
+        msgs = [str(msg) for msg in response.context['messages']]
         self.assertEqual("Error: could not retrieve <b>%s</b> for deletion." \
-                % eadid, messages[0],
+                % eadid, msgs[0],
                 "'not found' message set in response context when attempting to " +
                 " GET delete form for a nonexistent eadid")
-        # POST - attempt to actually delete an ead that isn't in eXist        
+        # POST - attempt to actually delete an ead that isn't in eXist
         response = self.client.post(delete_nonexistent, {'eadid': eadid, 'title': title,
-                                                'note' : note}, follow=True)
-        messages = [ str(msg) for msg in response.context['messages'] ]
+                                                'note': note}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
         self.assertEqual("Error: could not retrieve <b>%s</b> for deletion." \
-                % eadid, messages[0],
+                % eadid, msgs[0],
                 "'not found' message set in response context when attempting to " +
                 "POST delete form for a nonexistent eadid")
 
@@ -601,11 +595,11 @@ class AdminViewsTest(BaseAdminViewsTest):
         # test deleting when there is already an existing deleted record in the DB
         # (e.g., document was published, deleted, re-published, and now being deleted again)
         # - update existing delete_info with new values to simplify testing
-        
+
         self.client.login(**self.credentials['admin'])
         eadid = 'hartsfield558'
         delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
-        
+
         title, note = 'Deleted EAD record', 'removed because of foo'
         Deleted(eadid=eadid, title=title, note=note).save()
 
@@ -619,27 +613,26 @@ class AdminViewsTest(BaseAdminViewsTest):
         new_title, new_note = 'William Berry Hartsfield papers', 'Moved to another archive.'
         new_date = '2011-08-09 15:01:20'
         response = self.client.post(delete_url, {'eadid': eadid, 'title': new_title,
-                                    'note' : new_note, 'date': new_date }, follow=True)
+                                    'note': new_note, 'date': new_date}, follow=True)
         # *existing* deleted DB record should be updated with posted data
         deleted_info = Deleted.objects.get(eadid=eadid)
         self.assertEqual(new_title, deleted_info.title)
         self.assertEqual(new_note, deleted_info.note)
-        
 
- 
+
 # unit tests for views that make use of celery tasks (additional setup required)
 
 # in test mode, celery task returns an EagerResult with no task id
 # intercept the result from the real task and add a task id for testing
 class Mock_reload_pdf:
-    def delay(self, eadid):        
+    def delay(self, eadid):
         result = tasks.reload_cached_pdf.delay(eadid)
         result.task_id = "test-task-id"
-        return result       
-        
+        return result
+
 
 class CeleryAdminViewsTest(BaseAdminViewsTest):
-   
+
     def setUp(self):
         super(CeleryAdminViewsTest, self).setUp()
         _celerytest_setUp(self)
@@ -655,7 +648,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # restore the real celery task
         views.reload_cached_pdf = self.real_reload
 
-    def test_publish(self):       
+    def test_publish(self):
         publish_url = reverse('fa-admin:publish-ead')
         self.client.login(**self.credentials['admin'])
         # GET should just list files available to be published
@@ -669,7 +662,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # use fixture directory to test publication
         filename = 'hartsfield558.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
-        response = self.client.post(publish_url, {'filename' : filename}, follow=True)        
+        response = self.client.post(publish_url, {'filename': filename}, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
@@ -680,20 +673,20 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
                              % (expected, code, publish_url))
 
-        # convert mesages into an easier format to test
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_("Successfully updated" in messages[0], "success message set in context")
+        # convert messages into an easier format to test
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_("Successfully updated" in msgs[0], "success message set in context")
 
         # confirm that document was actually saved to exist
-        docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)        
+        docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)
         self.assertEqual(docinfo['name'], settings.EXISTDB_TEST_COLLECTION + '/' + filename)
 
         task = TaskResult.objects.get(object_id='hartsfield558')
-        self.assert_(isinstance(task, TaskResult), 
+        self.assert_(isinstance(task, TaskResult),
             "TaskResult was created in db for pdf reload after successful publish")
 
         # publish invalid document - should display errors
-        response = self.client.post(publish_url, {'filename' : 'hartsfield558_invalid.xml'})
+        response = self.client.post(publish_url, {'filename': 'hartsfield558_invalid.xml'})
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
@@ -706,7 +699,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
         # attempt to publish non-well-formed xml - display errors
-        response = self.client.post(publish_url, {'filename' : 'badlyformed.xml'})
+        response = self.client.post(publish_url, {'filename': 'badlyformed.xml'})
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, not well-formed xml) as admin user'
@@ -718,7 +711,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # exist save errors should be caught & handled gracefully
         # - force an exist save error by setting collection to a non-existent collection
         settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
-        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
         self.assertContains(response, "Could not publish",
                 msg_prefix="exist save error on publish displays error to user")
         self.assertContains(response,
@@ -728,14 +721,14 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="error page displays explanation and instructions to user")
 
         # simulate incorrect eXist permissions by not specifying username/password
-        settings.EXISTDB_ROOT_COLLECTION = self.real_collection # restore
+        settings.EXISTDB_ROOT_COLLECTION = self.real_collection  # restore
         # ensure guest account cannot update
         self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
 
         settings.EXISTDB_SERVER_USER = None
         settings.EXISTDB_SERVER_PASSWORD = None
 
-        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
         self.assertContains(response, "Could not publish")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
@@ -743,14 +736,13 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 msg_prefix="error page displays specific exist permissions message")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
-        settings.EXISTDB_SERVER_URL = 'http://kamina.library.emory.edu:9191/not-exist'
-        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        settings.EXISTDB_SERVER_URL = 'http://localhost:9191/not-exist'
+        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
         self.assertContains(response, "Could not publish")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
         self.assertContains(response, "I/O Error: Connection refused",
                 msg_prefix="error page displays specific connection error message")
-
 
     def test_publish_from_preview(self):
         # test publishing a document that has been loaded for preview
@@ -760,10 +752,10 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # load a file to preview to test
         filename = 'hartsfield558.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
-        response = self.client.post(reverse('fa-admin:preview-ead'), {'filename' : filename})
+        response = self.client.post(reverse('fa-admin:preview-ead'), {'filename': filename})
 
         # publish the preview file
-        response =  self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
@@ -775,13 +767,14 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                              % (expected, code, publish_url))
 
         # convert mesages into an easier format to test
-        messages = [ str(msg) for msg in response.context['messages'] ]
+        msgs = [str(msg) for msg in response.context['messages']]
         # last message is the publication one (preview load message still in message queue)
-        self.assert_("Successfully updated" in messages[-1],
-            "publication success message set in response context")        
-        self.assert_('href="%s"' % reverse('fa:findingaid', kwargs={'id': 'hartsfield558'}) in messages[-1],
+        self.assert_("Successfully updated" in msgs[-1],
+            "publication success message set in response context")
+        self.assert_('href="%s"' % reverse('fa:findingaid',
+            kwargs={'id': 'hartsfield558'}) in msgs[-1],
             'success message links to published document')
-        self.assert_('William Berry Hartsfield papers' in messages[-1],
+        self.assert_('William Berry Hartsfield papers' in msgs[-1],
             'success message includes unit title of published document')
 
         # confirm that document was moved to main collection
@@ -796,15 +789,15 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
             "TaskResult was created in db for pdf reload after successful publish from preview")
 
         # attempt to publish a document NOT loaded to preview
-        response =  self.client.post(publish_url, {'preview_id': 'bogus345'}, follow=True)
-        messages = [ str(msg) for msg in response.context['messages'] ]
-        self.assert_('Publish failed. Could not retrieve' in messages[0],
+        response = self.client.post(publish_url, {'preview_id': 'bogus345'}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Publish failed. Could not retrieve' in msgs[0],
             'error message set in response context attempting to publish a document not in preview')
 
         # force an exist save error by setting collection to a non-existent collection
         real_collection = settings.EXISTDB_ROOT_COLLECTION
         settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
-        response = self.client.post(publish_url, {'filename' : 'hartsfield558.xml'})
+        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
         self.assertContains(response, "Could not publish",
                 msg_prefix="exist save error on publish displays error to user")
         self.assertContains(response,
@@ -832,7 +825,7 @@ class UtilsTest(TestCase):
             'PIDMAN_HOST': settings.PIDMAN_HOST,
             'PIDMAN_USER': settings.PIDMAN_USER,
             'PIDMAN_PASSWORD': settings.PIDMAN_PASSWORD,
-            'PIDMAN_DOMAIN' : settings.PIDMAN_DOMAIN
+            'PIDMAN_DOMAIN': settings.PIDMAN_DOMAIN
             }
 
         # initialize valid and invalid ead fixtures
@@ -848,7 +841,7 @@ class UtilsTest(TestCase):
         # ensure test file gets removed even if tests fail
         try:
             self.db.removeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml')
-        except ExistDBException, e:
+        except ExistDBException:
             # not an error if this fails - not used by every test
             pass
 
@@ -932,9 +925,9 @@ class UtilsTest(TestCase):
         ark1_short = "ark:/25593/1234"
         ark2_short = "ark:/25593/567"
         ead.eadid.url = ark1
-        ead.eadid.identifier =  ark2_short
+        ead.eadid.identifier = ark2_short
         errors = utils.check_eadxml(ead)
-        
+
         self.assert_("eadid url is either not set or not an ARK. " +
             "To correct, run the prep process again."
                     not in errors, 'valid eadid ark set in url')
@@ -945,9 +938,9 @@ class UtilsTest(TestCase):
         self.assert_("eadid url and identifier do not match: url '%s' should end with identifier '%s'" % (ark1, ark2_short)
                     in errors, 'eadid url and  identifier do not march')
 
-        #Change url  and identifier to match
+        # Change url and identifier to match
         ead.eadid.url = ark1
-        ead.eadid.identifier =  ark1_short
+        ead.eadid.identifier = ark1_short
         errors = utils.check_eadxml(ead)
 
         self.assert_("eadid url and identifier do not match: url '%s' should end with identifier '%s'" % (ark1, ark1_short)
@@ -955,7 +948,7 @@ class UtilsTest(TestCase):
 
         # - list title first letter regex
         # simulate non-whitespace, non-alpha first letter in list title
-        ead.list_title.node.text = "1234" # list title is not normally settable; overriding for test
+        ead.list_title.node.text = "1234"  # list title is not normally settable; overriding for test
         errors = utils.check_eadxml(ead)
         self.assert_("First letter ('1') of list title field origination/persname does not match browse letter URL regex '%s'" \
                      % TITLE_LETTERS in errors, 'title first letter regex error reported')
@@ -963,12 +956,12 @@ class UtilsTest(TestCase):
         # empty/unset list title field
         ead.list_title.node.text = None
         errors = utils.check_eadxml(ead)
-        self.assert_("List title seems to be empty" in errors) 
+        self.assert_("List title seems to be empty" in errors)
 
         # - whitespace in control access terms
         self.assert_("Found leading whitespace in controlaccess term ' Gone with the wind (Motion picture)' (title)"
                     in errors, 'controlaccess title leading whitespace reported')
-        self.assert_("Found leading whitespace in controlaccess term '  \t   Selznick, David O., 1902-1965.' (persname)" 
+        self.assert_("Found leading whitespace in controlaccess term '  \t   Selznick, David O., 1902-1965.' (persname)"
                     in errors, 'controlaccess name leading whitespace reported')
         self.assert_("Found leading whitespace in controlaccess term '  \t   Mines and mineral resources--Georgia.' (subject)"
                     in errors, 'controlaccess subject leading whitespace reported')
@@ -983,7 +976,7 @@ class UtilsTest(TestCase):
         self.assert_('Site expects 2 containers per did; found 1 did(s) with only 1'
                     in errors, 'did with only 1 container reported')
 
-        # make sure we handle quirky document with a <title> at the beginning of the <unittitle> 
+        # make sure we handle quirky document with a <title> at the beginning of the <unittitle>
         eadfile = os.path.join(settings.BASE_DIR, 'fa',
             'fixtures', 'pittsfreeman1036.xml')
         ead_nested_title = load_xmlobject_from_file(eadfile, FindingAid)
@@ -991,7 +984,6 @@ class UtilsTest(TestCase):
         self.assert_(all('list title' not in err for err in errors),
                      'nested <title> in <unittitle> should not generate a list title whitespace error')
 
-        
     def test_prep_ead(self):
         # valid fixtures is an ead with series/subseries, and index
         # - clear out fixture ark url to trigger generating a new one (simulated)
@@ -1028,7 +1020,7 @@ class UtilsTest(TestCase):
         origination = ead.node.xpath('//e:origination/e:persname', namespaces={'e': EAD_NAMESPACE})
         self.assertEqual(u'Hartsfield, William Berry.', origination[0].text)
         # test the node text directly (does not include unitdate)
-        self.assertEqual(u'William Berry Hartsfield papers, ', ead.unittitle.node.text)        
+        self.assertEqual(u'William Berry Hartsfield papers, ', ead.unittitle.node.text)
         self.assertEqual(u'Gone with the wind (Motion picture)',
                         ead.archdesc.controlaccess.controlaccess[0].title[0].value)
         self.assertEqual(u'Allen, Ivan.',
@@ -1122,12 +1114,12 @@ class UtilsTest(TestCase):
         sh = logging.StreamHandler(buffer)
         sh.setLevel(logging.DEBUG)
         logger.addHandler(sh)
-        
+
         ark = utils.generate_ark(self.valid_ead)
 
         logger.removeHandler(sh)
         log_output = buffer.getvalue()
-        
+
         self.assertEqual(found_ark, ark,
             'generate ark returns access uri from search results')
         search_args = MockDjangoPidmanClient.search_args
@@ -1140,7 +1132,7 @@ class UtilsTest(TestCase):
             'log reports an existing ARK was used')
 
     def test_generate_ark_existing_pids(self):
-        # simulate search finding multiple pids 
+        # simulate search finding multiple pids
         found_ark = 'http://pid.emory.edu/ark:/78912/16x3n'
         # create mock search result with two matches
         MockDjangoPidmanClient.search_result = {
@@ -1186,6 +1178,7 @@ def _celerytest_setUp(testcase):
     # testcase.real_httplib = tasks.httplib
     # testcase.mock_httplib = MockHttplib()
     # tasks.httplib = testcase.mock_httplib
+
 
 def _celerytest_tearDown(testcase):
         if testcase.proxy_host:
@@ -1235,7 +1228,7 @@ class ReloadCachedPdfTestCase(TestCase):
         self.assert_(rqst_url.endswith(pdf_url),
             "http request url should end with PDF url; expected ending with %s, got %s" \
             % (pdf_url, rqst_url))
-        
+
         self.assertEqual(rqst_headers['Cache-Control'], 'max-age=0')
 
     @patch('findingaids.fa_admin.tasks.urllib2')
@@ -1251,11 +1244,11 @@ class ReloadCachedPdfTestCase(TestCase):
     def test_missing_settings(self):
         delattr(settings, 'PROXY_HOST')
         delattr(settings, 'SITE_BASE_URL')
-        
+
         result = tasks.reload_cached_pdf.delay('eadid')
         self.assertRaises(Exception, result.get,
             "when required settings are missing, task raises an Exception")
-        
+
 
 ### unit tests for django-admin manage commands
 
@@ -1263,6 +1256,7 @@ class TestCommand(BaseCommand):
     output = ''
     # test command class to simplify calling a command as if running from the commandline
     # base command will set up default args before calling handle method
+
     def run_command(self, *args):
         '''Run the command as if calling from command line by giving a list
         of command-line arguments, e.g.::
@@ -1292,6 +1286,7 @@ class TestCommand(BaseCommand):
 class PrepEadTestCommand(prep_ead_cmd.Command, TestCommand):
     pass
 
+
 class PrepEadCommandTest(TestCase):
     def setUp(self):
         self.command = PrepEadTestCommand()
@@ -1299,7 +1294,7 @@ class PrepEadCommandTest(TestCase):
         self._ead_src = settings.FINDINGAID_EAD_SOURCE
         self._existdb_root = settings.EXISTDB_ROOT_COLLECTION
         self._pidman_pwd = settings.PIDMAN_PASSWORD
-        
+
         self.tmpdir = tempfile.mkdtemp(prefix='findingaids-prep_ead-test')
         settings.FINDINGAID_EAD_SOURCE = self.tmpdir
 
@@ -1340,11 +1335,11 @@ class PrepEadCommandTest(TestCase):
     def test_prep_all(self):
         # force ark generation error
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
-        
+
         # with no filenames - should process all files
         self.command.run_command('-v', '2')
         output = self.command.output
-        
+
         # badly-formed xml - should be reported
         self.assert_(re.search(r'^Error.*badlyformed.xml.*not well-formed.*$', output, re.MULTILINE),
             'prep_ead reports error for non well-formed xml')
@@ -1368,8 +1363,7 @@ class PrepEadCommandTest(TestCase):
         copyfile(os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
                  hfield_copy)
         self.file_sizes['hartsfield558-2.xml'] = os.path.getsize(hfield_copy)
-                 
-       
+
         # process a single file
         self.command.run_command('hartsfield558.xml')
         output = self.command.output
@@ -1401,13 +1395,13 @@ class PrepEadCommandTest(TestCase):
         self.command.run_command('hartsfield558_invalid.xml')
         output = self.command.output
 
-        self.assert_('WARNING: Found 2 ARKs'  in output)
+        self.assert_('WARNING: Found 2 ARKs' in output)
         self.assert_('INFO: Using existing ARK' in output)
-
 
 
 class UnitidIdentifierTestCommand(unitid_identifier.Command, TestCommand):
     pass
+
 
 class UnitidIdentifierCommandTest(TestCase):
     def setUp(self):
@@ -1452,5 +1446,3 @@ class UnitidIdentifierCommandTest(TestCase):
         self.assertEqual(self.file_sizes['badlyformed.xml'],
                         os.path.getsize(self.files['badlyformed.xml']),
                     'file with errors not modified by unitid_identifier script')
-
-
