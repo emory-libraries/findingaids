@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/utils.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -73,11 +73,15 @@ def check_ead(filename, dbpath, xml=None):
         # if not valid, report all schema validation errors
         # - simplify error message: report line & columen #s, and text of the error
         errors.extend('Line %d, column %d: %s' % (err.line, err.column, err.message)
-                        for err in ead.validation_errors())
-    
+                        for err in set(ead.validation_errors()))
+
+        # NOTE: somewhere between lxml 2.3.1 and 3.0.1 this started
+        # returning duplicate validation errors (possibly an issue in eulxml?)
+        # Would be good to uniquify (better to fix in eulxml, if possible)
+
     # eadid is expected to match filename without .xml extension
     expected_eadid = os.path.basename(filename).replace('.xml', '')
-    if ead.eadid.value != expected_eadid :
+    if ead.eadid.value != expected_eadid:
         errors.append("eadid '%s' does not match expected value of '%s'" % (ead.eadid.value, expected_eadid))
     else:   # if eadid is acceptable, check for uniqueness in configured database
         fa = FindingAid.objects.filter(eadid=ead.eadid.value).only("document_name", "collection_name")
@@ -94,6 +98,7 @@ def check_ead(filename, dbpath, xml=None):
     errors.extend(check_eadxml(ead))
 
     return errors
+
 
 def check_eadxml(ead):
     """Sanity checks specific to the EAD xml, independent of file or eXist.
@@ -131,7 +136,7 @@ def check_eadxml(ead):
 
     # multiple tests to ensure xml used for search/browse list-title matches what code expects
     # -- since list title is pulled from multiple places, give enough context so it can be found & corrected
-    list_title_path = "%s/%s" % (local_name(ead.list_title.node.getparent()), 
+    list_title_path = "%s/%s" % (local_name(ead.list_title.node.getparent()),
                                  local_name(ead.list_title.node))
     # - check for at most one top-level origination
     origination_count = ead.node.xpath('count(e:archdesc/e:did/e:origination)',
@@ -173,7 +178,7 @@ def check_eadxml(ead):
         errors.append("Found leading whitespace in list title field (%s): '%s'" % \
                         (list_title_path, ead.list_title.node.text) )
         # report with enough context that they can find the appropriate element to fix
-        
+
     # - first letter of title matches regex   -- only check if whitespace test fails
     elif not re.match(TITLE_LETTERS, ead.first_letter):
         errors.append("First letter ('%s') of list title field %s does not match browse letter URL regex '%s'" % \
@@ -206,10 +211,10 @@ def check_eadxml(ead):
 
 
     return errors
-   
+
 def check_series_ids(series):
     """Recursive function to check that series and subseries ids are present.
-    
+
     :param series: :class:`findingaids.fa.models.Series`
     :returns: list of errors, if any
     """
@@ -227,7 +232,7 @@ def check_series_ids(series):
 
 def prep_ead(ead, filename):
     """Prepare EAD xml for publication.  Currently does the following:
-    
+
      - sets the eadid and ids on any series, subseries, and index elements based
        on filename and series unitid or index number.
      - removes any leading whitespace from controlaccess terms
@@ -243,7 +248,7 @@ def prep_ead(ead, filename):
     if ead.dsc and ead.dsc.hasSeries():
         for i, series in enumerate(ead.dsc.c):
             set_series_ids(series, ead.eadid.value, i)
-    # set index ids 
+    # set index ids
     for i, index in enumerate(ead.archdesc.index):
         # generate index ids based on eadid and index number (starting at 1, not 0)
         index.id = "%s%sindex%s" % (ead.eadid.value, ID_DELIMITER, i+1)
