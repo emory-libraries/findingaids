@@ -1,5 +1,5 @@
 # file findingaids/fa/tests.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,8 @@ import re
 from time import sleep
 from types import ListType
 from lxml import etree
+from mock import patch
+import unittest
 from urllib import quote as urlquote
 
 from django.conf import settings
@@ -29,7 +31,8 @@ from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
 from django.test import Client, TestCase as DjangoTestCase
 
-from eulxml.xmlmap  import load_xmlobject_from_file, load_xmlobject_from_string, XmlObject
+from eulxml.xmlmap import load_xmlobject_from_file, \
+    load_xmlobject_from_string, XmlObject
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 from eulexistdb.db import ExistDB, ExistDBException
 from eulexistdb.testutil import TestCase
@@ -45,6 +48,7 @@ from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), 'fixtures')
 exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', 'exist_index.xconf')
 
+
 class FindingAidTestCase(DjangoTestCase):
     # test finding aid model (customization of eulcore xmlmap ead object)
     FIXTURES = ['leverette135.xml',  # simple finding aid (no series/subseries), origination is a person name
@@ -53,14 +57,13 @@ class FindingAidTestCase(DjangoTestCase):
                 'bailey807.xml',     # finding aid with series, no origination
                 'adams465.xml'
                 ]
-    
+
     def setUp(self):
         self.findingaid = dict()
         for file in self.FIXTURES:
             filebase = file.split('.')[0]
             self.findingaid[filebase] = load_xmlobject_from_file(path.join(exist_fixture_path,
                                   file), FindingAid)
-
 
     def test_init(self):
         for file, fa in self.findingaid.iteritems():
@@ -98,11 +101,12 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_(isinstance(info, ListType))
         self.assertEqual("Scope and Content Note", unicode(info[0].head))
         self.assertEqual("Arrangement Note", unicode(info[1].head))
-        
+
         # series info problem when scopecontent is missing a <head>; contains use restriction
         info = self.findingaid['raoul548'].dsc.c[-1].c[-1].series_info()
         self.assert_(isinstance(info, ListType))
-        self.assert_("contains all materials related to " in info[0].content[0].__unicode__()) # scopecontent with no head
+        self.assert_("contains all materials related to " in
+            info[0].content[0].__unicode__())  # scopecontent with no head
         self.assertEqual("Arrangement Note", unicode(info[1].head))
         self.assertEqual("Terms Governing Use and Reproduction", unicode(info[2].head))
         self.assertEqual("Restrictions on Access", unicode(info[3].head))
@@ -145,17 +149,19 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertFalse(self.findingaid['raoul548'].dsc.c[0].c[0].c[0].first_file_item)
         self.assertTrue(self.findingaid['raoul548'].dsc.c[0].c[0].c[1].first_file_item)
 
-class EadRepositoryTestCase(TestCase):
-    exist_fixtures = {'files' : [path.join(exist_fixture_path, 'pomerantz890.xml')] }
 
-    def test_distinct(self):        
+class EadRepositoryTestCase(TestCase):
+    exist_fixtures = {'files': [path.join(exist_fixture_path, 'pomerantz890.xml')] }
+
+    def test_distinct(self):
         repos = EadRepository.distinct()
         # should be a distinct, space-normalized list of subareas
         self.assert_('Pitts Theology Library' in repos)
         self.assert_('Manuscript, Archives, and Rare Book Library' in repos)
 
+
 class FaViewsTest(TestCase):
-    exist_fixtures = {'directory' : exist_fixture_path }
+    exist_fixtures = {'directory': exist_fixture_path }
     # NOTE: views that require full-text search tested separately below for response-time reasons
     exist_files = []    # place-holder for any fixtures loaded by individual tests
 
@@ -171,7 +177,7 @@ class FaViewsTest(TestCase):
             except ExistDBException:
                 pass
         self.exist_files = []
-     
+
     def test_title_letter_list(self):
         titles_url = reverse('fa:browse-titles')
         response = self.client.get(titles_url)
@@ -180,14 +186,14 @@ class FaViewsTest(TestCase):
                              % (expected, response.status_code, titles_url))
 
         # first letters from 4 test documents
-        for letter in ['A', 'B', 'L', 'R']:        
+        for letter in ['A', 'B', 'L', 'R']:
             self.assertContains(response, 'href="%s"' % \
-                reverse('fa:titles-by-letter', kwargs={'letter':letter}),
+                reverse('fa:titles-by-letter', kwargs={'letter': letter}),
                 msg_prefix="browse titles should link to titles starting with %s    " % letter)
 
         # should not include first letters not present in the data
         self.assertContains(response, 'href="%s"' % \
-                reverse('fa:titles-by-letter', kwargs={'letter':'Z'}), 0,
+                reverse('fa:titles-by-letter', kwargs={'letter': 'Z'}), 0,
                 msg_prefix='browse titles should not link to titles starting with Z')
 
     def test_titles_by_letter(self):
@@ -198,13 +204,13 @@ class FaViewsTest(TestCase):
         self.db.load(ead.serialize(), alphatest_dbpath, overwrite=True)
         self.exist_files.append(alphatest_dbpath)
 
-        a_titles = reverse('fa:titles-by-letter', kwargs={'letter':'A'})
+        a_titles = reverse('fa:titles-by-letter', kwargs={'letter': 'A'})
         response = self.client.get(a_titles)
         session = self.client.session
         expected = 200
-        last_search = session.get("last_search", None) # browse query info stored in the session
+        last_search = session.get("last_search", None)  # browse query info stored in the session
         self.assertTrue(last_search)
-        self.assertEqual("%s?page=1" % (reverse('fa:titles-by-letter', kwargs={'letter':'A'})),
+        self.assertEqual("%s?page=1" % (reverse('fa:titles-by-letter', kwargs={'letter': 'A'})),
             last_search['url'], "session url should match title-by-letter with page number")
 
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
@@ -232,7 +238,8 @@ class FaViewsTest(TestCase):
 
         # format_ead
         # NOTE: these tests are somewhat dependent on whitespace in the xml fixtures
-        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'P'}))
+        response = self.client.get(reverse('fa:titles-by-letter',
+            kwargs={'letter': 'P'}))
         # title
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+> research files''',
             response.content, msg_prefix='title with formatting should be formatted in list view')
@@ -244,20 +251,23 @@ class FaViewsTest(TestCase):
             response.content, msg_prefix='short-record view should include multiple holding repositories')
 
         # no finding aids
-        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'Z'}))
+        response = self.client.get(reverse('fa:titles-by-letter',
+            kwargs={'letter': 'Z'}))
         self.assertPattern('<div>No finding aids found for .*Z.*</div>', response.content,
             msg_prefix="titles by letter 'Z' should return no finding aids")
 
-        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'B'}))
+        response = self.client.get(reverse('fa:titles-by-letter',
+            kwargs={'letter': 'B'}))
 
-        # finding aid with no origination - unit title used as browse title & link   
+        # finding aid with no origination - unit title used as browse title & link
         # - unit title should only be displayed once
         self.assertContains(response, 'Bailey and Thurman families papers', 1,
             msg_prefix="finding aid with no origination should use unit title once as title & link")
-        
+
         # Additional case for doubled title problem -title with formatting
-        response = self.client.get(reverse('fa:titles-by-letter', kwargs={'letter':'P'}))
-        self.assertContains(response, 'Pitts v. Freeman', 2) # Title and abstract
+        response = self.client.get(reverse('fa:titles-by-letter',
+            kwargs={'letter': 'P'}))
+        self.assertContains(response, 'Pitts v. Freeman', 2)  # Title and abstract
         #title within unittitle
         self.assertPattern(r'''Pitts v. Freeman</[-A-Za-z]+> school''', response.content,
             msg_prefix='title within unittitle should be formatted on list view')
@@ -266,7 +276,7 @@ class FaViewsTest(TestCase):
         xml_titles = reverse('fa:all-xml')
         response = self.client.get(xml_titles)
         expected = 200
-        self.assertEqual(response.status_code, expected, 
+        self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s'
                             % (expected, response.status_code, xml_titles))
         # all eads from test fixtures should be listed
@@ -275,10 +285,6 @@ class FaViewsTest(TestCase):
             self.assertContains(response, '%s.xml' % eadid,
                 msg_prefix='eadid %s should be included in all-xml page' % eadid)
             self.assertContains(response, reverse('fa:eadxml', kwargs={'id': eadid}))
-   
-
-
-
 
 # view finding aid main page
 
@@ -286,7 +292,7 @@ class FaViewsTest(TestCase):
         nonexistent_ead = reverse('fa:findingaid', kwargs={'id': 'nonexistent'})
         response = self.client.get(nonexistent_ead)
         expected = 404
-        self.assertEqual(response.status_code, expected, 
+        self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for nonexistent EAD at %s'
                             % (expected, response.status_code, nonexistent_ead))
 
@@ -308,12 +314,12 @@ class FaViewsTest(TestCase):
                 msg_prefix="title from deleted record is displayed in response")
         self.assertContains(response, note, status_code=410,
                 msg_prefix="note from deleted record are displayed in response")
-        
+
         # full_fa (single-page html version of entire Finding Aid, basis for PDF)
         full_url = reverse('fa:full-findingaid', kwargs={'id': id})
         response = self.client.get(full_url)
         expected, got = 410, response.status_code
-        self.assertEqual(expected, got, 
+        self.assertEqual(expected, got,
                 'Expected %s but returned %s for deleted EAD at %s' % \
                  (expected, response.status_code, full_url))
         self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
@@ -339,11 +345,10 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<h1>%s</h1>' % title, status_code=410,
                 msg_prefix="title from deleted record is displayed in response")
 
-
     def test_view_dc_fields(self):
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'abbey244'}))
         # TODO: would be nice to validate the DC output...  (if possible)
-        
+
         #DC.creator
         self.assertContains(response, '<meta name="DC.creator" content="Abbey Theatre." />')
         #DC.publisher
@@ -365,7 +370,7 @@ class FaViewsTest(TestCase):
         #link in header with bookmark rel and ARK
         self.assertContains(response, '<link rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
 
-        response = self.client.get(reverse('fa:findingaid', kwargs = {'id': 'bailey807'}))
+        response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'bailey807'}))
         #title
         self.assertContains(response, '<meta name="DC.title" content="Bailey and Thurman families papers, circa 1882-1995" />')
         #dc_contributors
@@ -373,7 +378,7 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<meta name="DC.contributor" content="Bailey, Susie E., d. 1948." />')
         self.assertContains(response, '<meta name="DC.contributor" content="Thurman, Howard, 1900-1981." />')
         self.assertContains(response, '<meta name="DC.contributor" content="Thurman, Sue Bailey." />')
-       
+
     def test_view_simple(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'leverette135'})
         response = self.client.get(fa_url)
@@ -432,7 +437,7 @@ class FaViewsTest(TestCase):
                     response.content, "control access - form/genre")
         self.assertPattern('<h3>Occupation</h3>.*Educator\..*Journalist',
                     response.content, "control access - occupation")
-                    
+
         # controlaccess terms link to subject search
         search_url = reverse('fa:search')
         self.assertContains(response, '''href='%s?subject="%s"''' % (search_url,
@@ -462,14 +467,20 @@ class FaViewsTest(TestCase):
 
         # title with formatting
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
-        self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''', response.content) # title
+        self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''',
+            response.content)  # title
         # Title appears twice, we need to check both locations, 'EAD title' and 'Descriptive Summary'
-        self.assertPattern(r'''<h1[^>]*>.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # EAD title
-        self.assertPattern(r'''<table id="descriptive_summary">.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''', response.content) # Descriptive Summary title
+        self.assertPattern(r'''<h1[^>]*>.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''',
+            response.content)  # EAD title
+        self.assertPattern(r'''<table id="descriptive_summary">.*\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn''',
+            response.content)  # Descriptive Summary title
 
-        self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''', response.content) # abstract
-        self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''', response.content) # admin_info
-        self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''', response.content) # collection description
+        self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''',
+            response.content)  # abstract
+        self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''',
+            response.content)  # admin_info
+        self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''',
+            response.content)  # collection description
 
         # only descriptive information that is present
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'bailey807'}))
@@ -499,7 +510,6 @@ class FaViewsTest(TestCase):
             response.content, "admin info - arrangement")
         self.assertPattern(r'4 linear ft..*; .*(8 boxes)', response.content,
             msg_prefix='findingaid view should handle multiple physdesc elements')
-
 
         # series instead of container list
         self.assertPattern('<h2>.*Description of Series.*</h2>', response.content,
@@ -571,7 +581,7 @@ class FaViewsTest(TestCase):
             msg_prefix='main finding aid page should link to second index page')
 
         # first index - on a separate page
-        
+
         response = self.client.get(index_url)
         # ead title, table of contents
         self.assertContains(response, 'Raoul family papers',
@@ -663,7 +673,6 @@ class FaViewsTest(TestCase):
         self.assertContains(response, 'Description of Series', 1,
             msg_prefix="'Description of Series' should only occur once on main finding aid page")
 
-
         # series contents
         self.assertPattern('1.*1.*I\. G\. Bailey, 1882-1901', response.content,
             "first content of series 1")
@@ -680,7 +689,6 @@ class FaViewsTest(TestCase):
             'single finding aid feedback options should be set in response context')
         self.assertContains(response, reverse('content:feedback'),
             msg_prefix='url to feedback form should be included in response')
-
 
         # series breadcrumb for ead with tag in unittitle
         series_url = reverse('fa:series-or-index', kwargs={'id': 'pomerantz890',
@@ -711,7 +719,7 @@ class FaViewsTest(TestCase):
         self.assertPattern('<h1[^>]*>.*<a href="%s" rel="contents">\s*RAOUL FAMILY.*Raoul family papers' % \
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             response.content, "finding aid title displayed, links to main record page")
-            
+
         # series nav
         self.assertPattern('<li>.*<a href="%s".*rel="start">.*Series 1:.*Letters and personal papers,.*1865-1982.*</a>.*</li>' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's1'}),
@@ -751,7 +759,6 @@ class FaViewsTest(TestCase):
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 'index2'}),
             msg_prefix='subseries ToC links to second index')
 
-
     def test_view_subsubseries__raoul_series4_1a(self):
         # NOTE: raoul series 4 broken into sub-sub-series for testing, is not in original finding aid
         subsubseries_url = reverse('fa:series3', kwargs={'id': 'raoul548',
@@ -762,7 +769,7 @@ class FaViewsTest(TestCase):
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, subsubseries_url))
-        
+
         # - sub-subseries title
         self.assertPattern('<h2>.*Subseries 4\.1a.*Genealogy.*(?!None).*</h2>',
             response.content, "sub-subseries title displayed, no physdesc")
@@ -788,7 +795,6 @@ class FaViewsTest(TestCase):
         self.assertPattern('46.*2.*Gaston Cesar Raoul', response.content,
             "last content of sub-subseries 4.1a")
 
-
         # series with <head>less scopecontent
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',
             'series_id': 's4', 'series2_id': 'subseries2.1'})
@@ -802,7 +808,6 @@ class FaViewsTest(TestCase):
         self.assertContains(response, '<a href="%s">Miscellaneous' % \
             reverse('fa:series-or-index', kwargs={'id': 'raoul548', 'series_id': 's4'}),
             1, msg_prefix='should only contain 1 instance of series linked title(breadcrumb)')
-
 
     def test_preview_mode(self):
         # test preview mode of all main finding aid views
@@ -826,9 +831,8 @@ class FaViewsTest(TestCase):
                         'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, fa_url))
 
-        ead_url = reverse('fa-admin:preview:eadxml', kwargs={'id':'raoul548'})
+        ead_url = reverse('fa-admin:preview:eadxml', kwargs={'id': 'raoul548'})
         self.assertContains(response, 'href="%s"' % ead_url)
-
 
         series_url = reverse('fa-admin:preview:series-or-index',
                         kwargs={'id': 'raoul548', 'series_id': 's1'})
@@ -859,8 +863,6 @@ class FaViewsTest(TestCase):
         # clean up
         self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
 
-
-
 # **** tests for helper functions for creating series url, list of series/subseries for display in templates
 
     def test__series_url(self):
@@ -877,9 +879,9 @@ class FaViewsTest(TestCase):
         # subseries links for a top-level series that has subseries
         fa = FindingAid.objects.get(eadid='raoul548')
         links = _subseries_links(fa.dsc, url_ids=[fa.eadid])
-        
+
         self.assert_("Series 1: Letters and personal papers" in links[0])
-        self.assert_("href='%s'" %  reverse('fa:series-or-index',
+        self.assert_("href='%s'" % reverse('fa:series-or-index',
             kwargs={'id': 'raoul548', 'series_id': 's1'})
             in links[0])
         # nested list for subseries
@@ -887,7 +889,7 @@ class FaViewsTest(TestCase):
         self.assert_("Subseries 1.1: William Greene" in links[1][0])
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
-            'series2_id': 's1.1'})    in links[1][0])
+            'series2_id': 's1.1'}) in links[1][0])
 
         # second-to-last entry - series 4
         self.assert_("Series 4: Misc" in links[-2])
@@ -901,16 +903,16 @@ class FaViewsTest(TestCase):
         self.assert_("Subseries 4.1a:" in links[-1][1][0])
 
         # url params to add to url (e.g., keyword search terms)
-        links = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_params='?keywords=search+me')
-        self.assert_("?keywords=search+me'" in links[0]) # series url
-        self.assert_("?keywords=search+me'" in links[1][0]) # subseries url
-
+        links = _subseries_links(fa.dsc, url_ids=[fa.eadid],
+            url_params='?keywords=search+me')
+        self.assert_("?keywords=search+me'" in links[0])  # series url
+        self.assert_("?keywords=search+me'" in links[1][0])  # subseries url
 
     def test__subseries_links(self):
         # subseries links for a top-level series that has subseries
         series = Series.objects.also('ead__eadid').get(id='raoul548_s1')
         links = _subseries_links(series)
-        
+
         self.assertEqual(13, len(links))  # raoul series has subseries 1-13
         self.assert_("href='%s'" % reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1',
@@ -936,7 +938,6 @@ class FaViewsTest(TestCase):
         # should get exception when top-level ead id is not available
         self.assertRaises(Exception, _subseries_links, series)
 
-
     def test__subseries_links_nested(self):
         # subseries links for a top-level series that has subseries with sub-subseries (nested list)
         series = Series.objects.also('ead__eadid').get(id='raoul548_s4')
@@ -955,7 +956,6 @@ class FaViewsTest(TestCase):
         self.assert_("href='%s'" % reverse('fa:series3',
             kwargs={'id': 'raoul548', 'series_id': 's4',
             'series2_id': '4.1', 'series3_id': '4.1b'}) in links[1][1])
-        
 
     def test__subseries_links_c02(self):
         # subseries links when not starting at c01 level
@@ -1001,7 +1001,8 @@ class FaViewsTest(TestCase):
         self.assert_("href='#s1.1'" in links[1][0])
         self.assert_("rel='subsection'" in links[1][0])
 
-
+    # skip the printable test if XSLFO is not configured (i.e., if FOP cannot be installed)
+    @unittest.skipIf(not settings.XSLFO_PROCESSOR, 'XSL-FO processor not set')
     def test_printable_fa(self):
         # using 'full' html version of pdf for easier testing
         fullfa_url = reverse('fa:full-findingaid', kwargs={'id': 'raoul548'})
@@ -1087,16 +1088,16 @@ class FaViewsTest(TestCase):
     def test_content_negotiation(self):
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
 
-        # normal request 
+        # normal request
         response = self.client.get(url)
         self.assertEqual(response['Content-Type'], "text/html; charset=utf-8", "Should return html")
 
         # request application/xml
-        response = self.client.get(url, HTTP_ACCEPT = "application/xml")
+        response = self.client.get(url, HTTP_ACCEPT="application/xml")
         self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
 
-        # request text/xml 
-        response = self.client.get(url, HTTP_ACCEPT = "text/xml")
+        # request text/xml
+        response = self.client.get(url, HTTP_ACCEPT="text/xml")
         self.assertEqual(response['Content-Type'], "application/xml", "Should return xml")
 
     def test_return_to_search_or_browse(self):
@@ -1110,12 +1111,11 @@ class FaViewsTest(TestCase):
                          "Cache-Control should not be set since there are no session variables set")
         self.assertNotContains(response, 'Return to Browse',
                                msg_prefix="No return to browse link should appear since there are no session variables set")
-        
 
         #With last_search set in search
         #Calling search view first to set session info to simulate a user searching
         search_url = reverse('fa:search')
-        self.client.get(search_url, { 'keywords' : 'raoul'})
+        self.client.get(search_url, {'keywords': 'raoul'})
 
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
         response = self.client.get(url)
@@ -1123,16 +1123,18 @@ class FaViewsTest(TestCase):
         last_search = session.get("last_search", None)
         self.assertTrue(last_search)
         self.assertEqual(last_search['txt'], "Return to Search Results", 'test to make sure the search view set the session')
-        
-        self.assertTrue(response['Cache-Control'], "Cache-Control should be set since there are session variables set")
-        self.assertEqual(response['Cache-Control'], "private", "value should be private")
-        self.assertContains(response, '<a href="%s?keywords=raoul&amp;page=1">Return to Search Results</a>' %(reverse('fa:search')), msg_prefix="retun to search link should exist")
-                
 
-        #With last_search set in browse
-        #Calling title-by-letter view first to set session info to simulate a user
+        self.assertTrue(response['Cache-Control'],
+            "Cache-Control should be set since there are session variables set")
+        self.assertEqual(response['Cache-Control'], "private",
+            "value should be private")
+        self.assertContains(response, '<a href="%s?keywords=raoul&amp;page=1">Return to Search Results</a>' \
+            % (reverse('fa:search')), msg_prefix="retun to search link should exist")
+
+        # With last_search set in browse
+        # Calling title-by-letter view first to set session info to simulate a user
         letter = "R"
-        browse_url = reverse('fa:titles-by-letter', kwargs={'letter':letter})
+        browse_url = reverse('fa:titles-by-letter', kwargs={'letter': letter})
         self.client.get(browse_url)
 
         url = reverse('fa:findingaid', kwargs={'id': 'raoul548'})
@@ -1141,10 +1143,12 @@ class FaViewsTest(TestCase):
         last_search = session.get("last_search", None)
         self.assertTrue(last_search)
         self.assertEqual(last_search['txt'], "Return to Browse Results", 'test to make sure the browse view set the session')
-        
+
         self.assertTrue(response['Cache-Control'], "Cache-Control should be set since there are session variables set")
         self.assertEqual(response['Cache-Control'], "private", "value should be private")
-        self.assertContains(response, '<a href="%s?page=1">Return to Browse Results</a>' % (reverse('fa:titles-by-letter', kwargs={'letter':letter})), msg_prefix="retun to browse link should exist")
+        self.assertContains(response, '<a href="%s?page=1">Return to Browse Results</a>' \
+            % (reverse('fa:titles-by-letter', kwargs={'letter': letter})),
+            msg_prefix="retun to browse link should exist")
 
     def test_short_ids(self):
         # urls for series/index should use short-form ids (tested above, throughout)
@@ -1200,7 +1204,7 @@ class FaViewsTest(TestCase):
         self.assertEqual(expected, got, 'Expected %s but returned %s for %s' % \
                         (expected, got, invalid_id_url))
 
-        
+
 class UtilsTest(TestCase):
     exist_fixtures = {'files': [
             path.join(exist_fixture_path, 'abbey244.xml'),
@@ -1242,7 +1246,7 @@ class UtilsTest(TestCase):
                 self.title = title
         titles = ['Abigail', 'Abner', 'Adam', 'Allen', 'Amy', 'Andy', 'Annabelle', 'Anne', 'Azad']
         items = [item(t) for t in titles]
-        paginator = Paginator(items, per_page=2)        
+        paginator = Paginator(items, per_page=2)
         labels = alpha_pagelabels(paginator, items, label_attribute='title')
         self.assertEqual('Abi - Abn', labels[1])
         self.assertEqual('Ad - Al', labels[2])
@@ -1267,13 +1271,13 @@ class UtilsTest(TestCase):
         # preview document - load fixture to preview collection
         fullpath = path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
         db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml',
-                overwrite=True)        
+                overwrite=True)
         preview_modified = ead_lastmodified('rqst', 'raoul548', preview=True)
         self.assert_(isinstance(preview_modified, datetime),
                      "ead_lastmodified should return a datetime object")
         # clean up
         db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
-        
+
     def test_ead_etag(self):
         checksum = ead_etag('rqst', 'abbey244')
         self.assert_(re.match('[0-9a-f]{40}$', checksum),
@@ -1285,14 +1289,14 @@ class UtilsTest(TestCase):
         modified = collection_lastmodified('rqst')
         self.assert_(isinstance(modified, datetime),
                      "collection_lastmodified should return a datetime object")
-       
+
         # should equal last modified of abbey244 (last document loaded)
         fa = FindingAid.objects.only('last_modified').get(eadid='abbey244')
         self.assertEqual(exist_datetime_with_timezone(fa.last_modified), modified,
             'collection last modified should be datetime of most recently modified document in collection')
 
         # delete something after eXist document last-modified
-        sleep(1) # ensure deleted record is picked up as most recent
+        sleep(1)  # ensure deleted record is picked up as most recent
         Deleted(eadid='eadid', title='test deleted record', date=datetime.now()).save()
         record = Deleted.objects.get(eadid='eadid')     # retrieve datetime from DB
         modified = collection_lastmodified('rqst')
@@ -1317,14 +1321,15 @@ class UtilsTest(TestCase):
 
         settings.EXISTDB_ROOT_COLLECTION = real_collection
 
+
 class FullTextFaViewsTest(TestCase):
     # test for views that require eXist full-text index
-    exist_fixtures = { 'index' : exist_index_path,
-                       'directory' : exist_fixture_path }
+    exist_fixtures = {'index': exist_index_path,
+                       'directory': exist_fixture_path}
 
     def test_search(self):
         search_url = reverse('fa:search')
-        response = self.client.get(search_url, { 'keywords' : 'raoul'})
+        response = self.client.get(search_url, {'keywords': 'raoul'})
         session = self.client.session
         expected = 200
         self.assertEqual(response.status_code, expected,
@@ -1348,7 +1353,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="search results page includes robots directives - noindex, nofollow")
 
-        response = self.client.get(search_url, { 'keywords' : 'family papers'})
+        response = self.client.get(search_url, {'keywords': 'family papers'})
         expected = 200
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s' % \
@@ -1371,7 +1376,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, '%s?keywords=family+papers' % reverse('fa:findingaid', kwargs={'id': 'leverette135'}),
             msg_prefix='link to finding aid includes search terms')
 
-        response = self.client.get(search_url, { 'keywords' : 'nonexistentshouldmatchnothing'})
+        response = self.client.get(search_url, {'keywords': 'nonexistentshouldmatchnothing'})
         expected = 200
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s' % \
@@ -1382,9 +1387,9 @@ class FullTextFaViewsTest(TestCase):
     def test_search__exact_phrase(self):
         search_url = reverse('fa:search')
         response = self.client.get(search_url,
-                        { 'keywords' : '"georgia'}) # missing close quote - query syntax error
+                        {'keywords': '"georgia'})  # missing close quote - query syntax error
 
-        messages = [ str(msg) for msg in response.context['messages'] ]
+        messages = [str(msg) for msg in response.context['messages']]
         # expected http status code ?
         self.assert_("search query could not be parsed" in messages[0],
                 "query parse error message present in response context")
@@ -1395,7 +1400,7 @@ class FullTextFaViewsTest(TestCase):
 
         # exact phrase
         response = self.client.get(search_url,
-                        { 'keywords' : '"Abbey Theatre organized in 1904"'})
+                        {'keywords': '"Abbey Theatre organized in 1904"'})
         self.assertContains(response, 'Abbey Theatre collection',
             msg_prefix='search results include Abbey Theatre for exact phrase from Abbey Theatre bioghist')
         self.assertContains(response, '1 finding aid found',
@@ -1404,7 +1409,7 @@ class FullTextFaViewsTest(TestCase):
     def test_search__wildcard(self):
         search_url = reverse('fa:search')
         # wildcard search
-        response = self.client.get(search_url, { 'keywords' : 'Abb?y Theat*'})
+        response = self.client.get(search_url, {'keywords': 'Abb?y Theat*'})
 
         self.assertContains(response, 'Abbey Theatre collection',
             msg_prefix='search results include Abbey Theatre for wildcard search "Abb?y Theat*"')
@@ -1413,7 +1418,7 @@ class FullTextFaViewsTest(TestCase):
 
     def test_subject_search(self):
         search_url = reverse('fa:search')
-        response = self.client.get(search_url, { 'subject' : 'Scripts.'})
+        response = self.client.get(search_url, {'subject': 'Scripts.'})
         session = self.client.session
 
         last_search = session.get("last_search", None)
@@ -1430,12 +1435,12 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search for subject only does not include relevance indicator')
 
         # keyword now optional - no search terms should be an invalid form
-        response = self.client.get(search_url, { 'subject' : '', 'keywords': ''})
+        response = self.client.get(search_url, {'subject': '', 'keywords': ''})
         self.assertContains(response, 'Please enter search terms or choose a repository.')
 
     def test_repository_search(self):
         search_url = reverse('fa:search')
-        response = self.client.get(search_url, { 'keywords' : 'papers',
+        response = self.client.get(search_url, {'keywords': 'papers',
                             'repository': '"University Archives"'})
         session = self.client.session
 
@@ -1454,65 +1459,67 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='search for "papers" & repository "University Archives" does not include non-UA finding aid')
 
         #Attempting to demonstrate the the repo only search returns sorted  results
-        response = self.client.get(search_url, { 'repository': '"Manuscript, Archives, and Rare Book Library"'})
+        response = self.client.get(search_url, {'repository': '"Manuscript, Archives, and Rare Book Library"'})
         self.assertPattern("Abbey Theatre\..*Adams.*Leverette.*Pitts.*Pomerantz.*Raoul", response.content,
             msg_prefix='repository search returns results in alphabetical order')
-        
+
     def test_search__boolean(self):
         search_url = reverse('fa:search')
 
         #incorrect use of boolean
-        response = self.client.get(search_url, { 'keywords' : 'AND Abbey'})
+        response = self.client.get(search_url, {'keywords': 'AND Abbey'})
         self.assertContains(response, "Your search query could not be parsed.  Please revise your search and try again.", status_code=400)
 
         #OR operator
-        response = self.client.get(search_url, { 'keywords' : 'Abbey or raoul'})
-        self.assertContains(response, "<b>Abbey OR raoul</b>") # converted or to OR
-        self.assertContains(response, "Raoul family.") # Raoul record
-        self.assertContains(response, "Abbey Theatre.") # Abby record
+        response = self.client.get(search_url, {'keywords': 'Abbey or raoul'})
+        self.assertContains(response, "<b>Abbey OR raoul</b>")  # converted or to OR
+        self.assertContains(response, "Raoul family.")  # Raoul record
+        self.assertContains(response, "Abbey Theatre.")  # Abby record
 
         #NOT operator
-        response = self.client.get(search_url, { 'keywords' : 'Emory'})
-        self.assertContains(response, "7 finding aids found") # not using NOT yet
-        self.assertContains(response, "Abbey Theatre.") # Theatre record
-        
-        response = self.client.get(search_url, { 'keywords' : 'Emory not Theatre'})
-        self.assertContains(response, "<b>Emory NOT Theatre</b>") # converted not to NOT
-        self.assertContains(response, "5 finding aids found") #using NOT
-        self.assertNotContains(response, "Abbey Theatre") # Theatre record not in results
+        response = self.client.get(search_url, {'keywords': 'Emory'})
+        self.assertContains(response, "7 finding aids found")  # not using NOT yet
+        self.assertContains(response, "Abbey Theatre.")  # Theatre record
 
+        response = self.client.get(search_url, {'keywords': 'Emory not Theatre'})
+        self.assertContains(response, "<b>Emory NOT Theatre</b>")  # converted not to NOT
+        self.assertContains(response, "5 finding aids found")  # using NOT
+        self.assertNotContains(response, "Abbey Theatre")  # Theatre record not in results
 
-        #AND operator
-        response = self.client.get(search_url, { 'keywords' : 'Bailey and Theatre'})
-        self.assertContains(response, "<b>Bailey AND Theatre</b>") # converted and to AND
-        self.assertContains(response, "1 finding aid found") #using AND
-        self.assertContains(response, "Bailey and Thurman families papers, circa 1882-1995") # Bailey record in resulsts
-
+        # AND operator
+        response = self.client.get(search_url, {'keywords': 'Bailey and Theatre'})
+        self.assertContains(response, "<b>Bailey AND Theatre</b>")  # converted and to AND
+        self.assertContains(response, "1 finding aid found")  # using AND
+        self.assertContains(response,
+            "Bailey and Thurman families papers, circa 1882-1995")  # Bailey record in resulsts
 
     def test_search__grouping(self):
         search_url = reverse('fa:search')
 
-        #missing parentheses
-        response = self.client.get(search_url, { 'keywords' : '(Abbey'})
-        self.assertContains(response, "Your search query could not be parsed.  Please revise your search and try again.", status_code=400)
+        # missing parentheses
+        response = self.client.get(search_url, {'keywords': '(Abbey'})
+        self.assertContains(response,
+            "Your search query could not be parsed.  Please revise your search and try again.",
+            status_code=400)
 
         #missing quote
-        response = self.client.get(search_url, { 'keywords' : 'Abbey"'})
-        self.assertContains(response, "Your search query could not be parsed.  Please revise your search and try again.", status_code=400)
+        response = self.client.get(search_url, {'keywords': 'Abbey"'})
+        self.assertContains(response,
+            "Your search query could not be parsed.  Please revise your search and try again.",
+            status_code=400)
 
-        #use grouping to narrow search results
-        response = self.client.get(search_url, { 'keywords' : 'Emory or scripts'})
-        self.assertContains(response, "<b>Emory OR scripts</b>") # converted or to OR
+        # use grouping to narrow search results
+        response = self.client.get(search_url, {'keywords': 'Emory or scripts'})
+        self.assertContains(response, "<b>Emory OR scripts</b>")  # converted or to OR
         self.assertContains(response, "7 finding aids found")
-        self.assertContains(response, "Pitts v. Freeman") # Should be returned before search is narrowed
-        self.assertContains(response, "Raoul family.") # Should be returned before search is narrowed
+        self.assertContains(response, "Pitts v. Freeman")  # Should be returned before search is narrowed
+        self.assertContains(response, "Raoul family.")  # Should be returned before search is narrowed
 
-        response = self.client.get(search_url, { 'keywords' : '(Emory or scripts) not (files and school)'})
-        self.assertContains(response, "<b>(Emory OR scripts) NOT (files AND school)</b>") # converted or and not to OR AND NOT
+        response = self.client.get(search_url, {'keywords': '(Emory or scripts) not (files and school)'})
+        self.assertContains(response, "<b>(Emory OR scripts) NOT (files AND school)</b>")  # converted or and not to OR AND NOT
         self.assertContains(response, "5 finding aids found")
-        self.assertNotContains(response, "Pitts v. Freeman") # Should not be returned after search is narrowed
-        self.assertNotContains(response, "Raoul family.") # Should not be returned after search is narrowed
-      
+        self.assertNotContains(response, "Pitts v. Freeman")  # Should not be returned after search is narrowed
+        self.assertNotContains(response, "Raoul family.")  # Should not be returned after search is narrowed
 
     def test_view_highlighted_fa(self):
         # view a finding aid with search-term highlighting
@@ -1528,7 +1535,7 @@ class FullTextFaViewsTest(TestCase):
                 % reverse('fa:series-or-index',  kwargs={'id': 'raoul548', 'series_id': 'index1'}),
                 msg_prefix="index link includes search terms")
         self.assertContains(response, '%s?keywords=raoul+georgia' \
-                %  reverse('fa:series2', kwargs={'id': 'raoul548', 'series_id': 's1',
+                % reverse('fa:series2', kwargs={'id': 'raoul548', 'series_id': 's1',
                         'series2_id': 's1.3'}),
                 msg_prefix="subseries link includes search terms")
 
@@ -1557,7 +1564,6 @@ class FullTextFaViewsTest(TestCase):
         self.assertPattern(r'<li>.*Container List.*1 match.*</li>', response.content,
                 msg_prefix="container list has match count in ToC")
 
-
     def test_view_highlighted_series(self):
         # single series in a finding aid, with search-term highlighting
         # NOTE: series, subseries, and index all use the same view
@@ -1574,9 +1580,9 @@ class FullTextFaViewsTest(TestCase):
                 % reverse('fa:series-or-index',  kwargs={'id': 'raoul548', 'series_id': 'index1'}),
                 msg_prefix="index link includes search terms")
         self.assertContains(response, '%s?keywords=raoul+georgia' \
-                %  reverse('fa:series2', kwargs={'id': 'raoul548', 'series_id': 's4',
+                % reverse('fa:series2', kwargs={'id': 'raoul548', 'series_id': 's4',
                         'series2_id': '4.1'}),
-                msg_prefix="subseries link includes search terms")      
+                msg_prefix="subseries link includes search terms")
 
         self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="highlighted finding aid series includes robots directives - noindex, nofollow")
@@ -1596,11 +1602,11 @@ class FullTextFaViewsTest(TestCase):
                 msg_prefix="collection description has match count in ToC")
         self.assertPattern(r'<li>.*Selected Search Terms.*30 matches.*</li>', response.content,
                 msg_prefix="selected search terms has match count in ToC")
-                
+
         # series 3 - box/folder/content
         series_url = reverse('fa:series-or-index',
                     kwargs={'id': 'raoul548', 'series_id': 's3'})
-        response = self.client.get(series_url, {'keywords': 'raoul georgia'})          
+        response = self.client.get(series_url, {'keywords': 'raoul georgia'})
         self.assertContains(response, 'W. G. <span class="exist-match">Raoul</span> estate papers',
             msg_prefix="search terms in box/folder section headings are highlighted")
         self.assertContains(response, '<span class="exist-match">Raoul</span> Heirs, Inc.',
@@ -1629,7 +1635,6 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, 'Photographs',
             msg_prefix="subseries without search terms is still returned normally")
 
-
     def test_view_highlighted_index(self):
         # single index in a finding aid, with search-term highlighting
         index_url = reverse('fa:series-or-index',
@@ -1651,12 +1656,12 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix="index without search terms is still returned normally")
 
     def test_document_search(self):
-        search_url = reverse('fa:singledoc-search', kwargs={'id':'raoul548'})
-        response = self.client.get(search_url, { 'keywords' : 'correspondence'})
+        search_url = reverse('fa:singledoc-search', kwargs={'id': 'raoul548'})
+        response = self.client.get(search_url, {'keywords': 'correspondence'})
 
         self.assertContains(response, "Search results for : <b>correspondence</b>",
             msg_prefix='search results include search term')
-        self.assertContains(response, "22 matches found",  # 22 ? 44 ? 45 ? 
+        self.assertContains(response, "22 matches found",  # 22 ? 44 ? 45 ?
             msg_prefix='search for "correspondence" in raoul548 matches 44 items')
         # box/folder/contents headings should display once for each series
         self.assertContains(response, "Box", 4,
@@ -1703,7 +1708,7 @@ class FullTextFaViewsTest(TestCase):
 
         self.assertContains(response, reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             msg_prefix='search within raoul48 includes link to main finding aid page')
-        
+
         self.assertContains(response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="single-document search results page includes robots directives - noindex, nofollow")
 
@@ -1713,33 +1718,36 @@ class FullTextFaViewsTest(TestCase):
             msg_prefix='links to finding aid series include search terms')
 
         # no matches
-        response = self.client.get(search_url, { 'keywords' : 'bogus'})
+        response = self.client.get(search_url, {'keywords': 'bogus'})
         self.assertContains(response, "No matches found",
             msg_prefix='search for "bogus" in raoul548 displays no matches')
 
         # bad query
-        response = self.client.get(search_url, { 'keywords' : '"incomplete phrase'})
+        #   NOTE: patching localsettings; if the timeout is set to low here, we
+        #   get a timeout error instead of the expected unparsable query error
+        with patch.object(settings, 'EXISTDB_TIMEOUT', new=30):
+            response = self.client.get(search_url, {'keywords': '"incomplete phrase'})
         # sets status code to 400 bad request
         self.assertContains(response, "No matches found", status_code=400,
             msg_prefix='unparse-able search in raoul548 displays no matches')
-        messages = [ str(msg) for msg in response.context['messages'] ]
+        messages = [str(msg) for msg in response.context['messages']]
         self.assert_('search query could not be parsed.' in messages[0],
             'user sees a message about error parsing query')
         self.assertNotContains(response, '?keywords="incomplete phrase', status_code=400,
             msg_prefix='links do not include invalid query')
 
         # no query
-        response = self.client.get(search_url, { 'keywords' : ''})
+        response = self.client.get(search_url, {'keywords': ''})
         self.assertContains(response, "No matches found",
             msg_prefix='No matches found when form is submitted with no search terms')
-        messages = [ str(msg) for msg in response.context['messages'] ]
+        messages = [str(msg) for msg in response.context['messages']]
         self.assert_('Please enter a search term' in messages[0],
             'user sees a message requesting them to enter a search term when ' + \
             'form is submitted with no search terms')
 
         # invalid eadid should 404
-        search_url = reverse('fa:singledoc-search', kwargs={'id':'bogus-ead'})
-        response = self.client.get(search_url, { 'keywords' : 'nothing'})
+        search_url = reverse('fa:singledoc-search', kwargs={'id': 'bogus-ead'})
+        response = self.client.get(search_url, {'keywords': 'nothing'})
         expected, got = 404, response.status_code
         self.assertEqual(expected, got,
             "expected status code %s for %s with bogus eadid, got %s" %\
@@ -1747,7 +1755,7 @@ class FullTextFaViewsTest(TestCase):
 
         # simple document with no series/subseries
         search_url = reverse('fa:singledoc-search', kwargs={'id': 'leverette135'})
-        response = self.client.get(search_url, { 'keywords' : 'photos'})
+        response = self.client.get(search_url, {'keywords': 'photos'})
         # response should return without an error
         self.assertContains(response, "Search results for : <b>photos</b>",
             msg_prefix='single-document search returns normally for simple finding aid with no series')
@@ -1766,7 +1774,7 @@ class FullTextFaViewsTest(TestCase):
         series = Series.objects.also('ead__eadid').filter(highlight='champmanoir').get(id='raoul548_s4')
         links = _subseries_links(series)
         self.assertPattern(".*class='exist-match'.*2 matches", links[0])  # 2 matches in series 4.1
-        self.assertPattern(".*class='exist-match'.*1 match", links[1][0]) # 1 match in series 4.1a
+        self.assertPattern(".*class='exist-match'.*1 match", links[1][0])  # 1 match in series 4.1a
         self.assertPattern("^((?!class='exist-match').)*$", links[-1])   # NO matches in last subseries
 
 
@@ -1777,7 +1785,7 @@ class FormatEadTestCase(DjangoTestCase):
     BOLD = """<titleproper xmlns="%s"><emph render="bold">Pitts v. Freeman</emph> school desegregation case files,
 1969-1993</titleproper>""" % EAD_NAMESPACE
     TITLE = """<abstract xmlns="%s">A submission for the magazine <title>The Smart Set</title> from
-    Irish writer Oliver St. John Gogarty to author Ernest Augustus Boyd.</abstract>"""  % EAD_NAMESPACE
+    Irish writer Oliver St. John Gogarty to author Ernest Augustus Boyd.</abstract>""" % EAD_NAMESPACE
     TITLE_EMPH = """<bibref xmlns="%s"><emph>Biographical source:</emph> "Shaw, George Bernard."
     <title>Contemporary Authors Online</title>, Gale, 2003</bibref>""" % EAD_NAMESPACE
     NESTED = """<abstract xmlns="%s">magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>""" % EAD_NAMESPACE
@@ -1787,7 +1795,7 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
 
     def setUp(self):
         self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
-        
+
     def test_italics(self):
         self.content.node = etree.fromstring(self.ITALICS)
         format = format_ead(self.content)
@@ -1801,7 +1809,7 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
             "render bold converted correctly to span class ead-bold")
 
     def test_title(self):
-        self.content.node  = etree.fromstring(self.TITLE)
+        self.content.node = etree.fromstring(self.TITLE)
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The Smart Set</span> from' in format,
             "title tag converted correctly to span class ead-title")
@@ -1819,7 +1827,7 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The "Smart" Set</span>...' in format,
             "nested format rendered correctly")
-        
+
     def test_notrans(self):
         self.content.node = etree.fromstring(self.NOTRANS)
         format = format_ead(self.content)
@@ -1831,15 +1839,15 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
         format = format_ead(self.content)
         self.assert_('Pitts v. <span class="exist-match">Freeman</span>'
             in format, 'exist:match tag converted to span for highlighting')
-        
-        
+
+
 # test custom template tag ifurl
 class IfUrlTestCase(DjangoTestCase):
 
     def test_ifurl(self):
         template = Template("{% load ifurl %}{% ifurl preview fa:full-findingaid fa:findingaid id=id %}")
         urlopts = {'id': 'docid'}
-        context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})        
+        context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})
         url = template.render(context)
         self.assertEqual(reverse('fa:findingaid', kwargs=urlopts), url,
             "when condition is false, url is generated from second named url")
@@ -1868,9 +1876,10 @@ class BooleanToUpperTest(TestCase):
         result = boolean_to_upper(input)
         self.assertEqual(result, expected)
 
+
 class AdvancedSearchFormTest(TestCase):
     # load fixtures so we have repo choices
-    exist_fixtures = {'directory' : exist_fixture_path }
+    exist_fixtures = {'directory': exist_fixture_path}
 
     def test_validation(self):
         # no data - not valid
@@ -1891,4 +1900,3 @@ class AdvancedSearchFormTest(TestCase):
         form = AdvancedSearchForm(data={'repository': '"University Archives"'})
         self.assertTrue(form.is_valid(),
             'advanced search form is valid when only repository is specified')
-
