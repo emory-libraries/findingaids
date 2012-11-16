@@ -864,9 +864,12 @@ class UtilsTest(TestCase):
         self.assert_("attribute 'invalid': The attribute 'invalid' is not allowed"
                      in errors[0])   # validation error message
 
+        for e in errors:
+            print e
         # NOTE: somewhere between lxml 2.3.1 and 3.0.1 we started getting
         # duplicate validation errors. work around it for now.
-        if errors[0] == errors[1]:
+        # (errors seem to be aggregating instead of clearing out....)
+        while errors[0] == errors[1]:
             errors.pop(0)
         self.assert_("Line 2" in errors[0], "validation error includes line number")   # validation error message
         self.assert_("eadid 'hartsfield558.xml' does not match expected value" in errors[1])

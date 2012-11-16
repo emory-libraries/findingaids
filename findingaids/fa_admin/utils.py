@@ -78,6 +78,7 @@ def check_ead(filename, dbpath, xml=None):
         # NOTE: somewhere between lxml 2.3.1 and 3.0.1 this started
         # returning duplicate validation errors (possibly an issue in eulxml?)
         # Would be good to uniquify (better to fix in eulxml, if possible)
+        # (errors seem to be aggregating instead of clearing out....)
 
     # eadid is expected to match filename without .xml extension
     expected_eadid = os.path.basename(filename).replace('.xml', '')
