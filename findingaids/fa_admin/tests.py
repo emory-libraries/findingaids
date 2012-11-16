@@ -864,8 +864,6 @@ class UtilsTest(TestCase):
         self.assert_("attribute 'invalid': The attribute 'invalid' is not allowed"
                      in errors[0])   # validation error message
 
-        for e in errors:
-            print e
         # NOTE: somewhere between lxml 2.3.1 and 3.0.1 we started getting
         # duplicate validation errors. work around it for now.
         # (errors seem to be aggregating instead of clearing out....)
