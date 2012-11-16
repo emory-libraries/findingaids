@@ -1,14 +1,17 @@
-Django>=1.3
-eulxml>=0.17.1
-eulexistdb
+Django==1.3.1
+eulxml>=0.18.0
+eulexistdb>=0.15.3
 eulcommon
 http://waterhouse.library.emory.edu:8080/hudson/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.17.0-dev.tar.gz
 http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x/11/artifact/pidmanclient/dist/pidservices-1.1.1.tar.gz
 python-dateutil
 python-ldap
-django-celery
 zc.icp
-feedparser==4.1
 recaptcha-client
 mimeparse
-beautifulsoup
+BeautifulSoup
+# NOTE: keeping older versions of celery for now
+# newer versions will require code update & rabbitmq upgrade
+celery==2.3.3
+kombu==1.4.1
+django-celery==2.3.3
