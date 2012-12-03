@@ -1,5 +1,5 @@
 # file findingaids/settings.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,8 +29,8 @@ BASE_DIR = path.dirname(path.abspath(__file__))
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.load_template_source',
-#     'django.template.loaders.eggs.load_template_source',
+    'django.template.loaders.app_directories.Loader',
+#     'django.template.loaders.eggs.Loader',
 )
 
 DEBUG = True
@@ -54,7 +54,7 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # although not all choices may be available on all operating systems.
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
-TIME_ZONE = 'America/Chicago'
+TIME_ZONE = 'America/New_York'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -80,9 +80,6 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 'ha=7$wd7wq7n)8!#h&qn_%0*rul!ez*h-xm#v)l$wg&5nkjk%7'
-
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -93,6 +90,9 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'findingaids.urls'
+
+# Python dotted path to the WSGI application used by Django's runserver.
+WSGI_APPLICATION = 'findingaids.wsgi.application'
 
 TEMPLATE_DIRS = [
     path.join(BASE_DIR, 'templates'),
@@ -116,20 +116,20 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     "django.core.context_processors.media",
     "django.contrib.messages.context_processors.messages",
     # additional context processors
-    "django.core.context_processors.request", # always include request in render context
+    "django.core.context_processors.request",  # always include request in render context
     "findingaids.fa.context_processors.searchform",  # search form on every page
     "findingaids.fa.context_processors.version",     # software version on every page
 )
 
 # Enable additional backends.
 # Enable this for LDAP and see ReadMe for install dependencies.
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend', 
+AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
                            'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
 
 AUTH_PROFILE_MODULE = 'emory_ldap.EmoryLDAPUserProfile'
 
-LOGIN_URL="/admin/accounts/login/"
-LOGIN_REDIRECT_URL="/admin/"
+LOGIN_URL = "/admin/accounts/login/"
+LOGIN_REDIRECT_URL = "/admin/"
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
@@ -162,11 +162,14 @@ EXTENSION_DIRS = (
 
 EXISTDB_INDEX_CONFIGFILE = path.join(BASE_DIR, "exist_index.xconf")
 
+# explicitly set to false to simplify patching value for tests
+CELERY_ALWAYS_EAGER = False
+
 import sys
 try:
     sys.path.extend(EXTENSION_DIRS)
 except NameError:
-    pass # EXTENSION_DIRS not defined. This is OK; we just won't use it.
+    pass  # EXTENSION_DIRS not defined. This is OK; we just won't use it.
 del sys
 
 try:
