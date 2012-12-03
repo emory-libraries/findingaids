@@ -1,5 +1,5 @@
 # file findingaids/fa/utils.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +32,7 @@ from django.shortcuts import get_object_or_404
 
 from django.template import RequestContext
 
-from eulexistdb.db import ExistDB
-from eulexistdb.exceptions import DoesNotExist # ReturnedMultiple needed also ?
+from eulexistdb.exceptions import DoesNotExist  # ReturnedMultiple needed also ?
 
 from findingaids.fa.models import FindingAid, Deleted
 
@@ -43,7 +42,7 @@ logger = logging.getLogger(__name__)
 xhtml_xslfo_xslt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 'xhtml_to_xslfo.xsl')
 XHTML_TO_XSLFO = etree.XSLT(etree.parse(xhtml_xslfo_xslt))
- 
+
 def render_to_pdf(template_src, context_dict, filename=None):
     """Generate and return a PDF response.
 
@@ -93,14 +92,14 @@ log4j.appender.CONSOLE.layout.ConversionPattern=%-5p %3x - %m%n
         # temporary files are automatically deleted when closed
         xslfo_file.close()
         # can get an OSError if the PDF file does not exist, e.g. if fop failed
-        try:            
-            pdf_file.close()            
+        try:
+            pdf_file.close()
         except OSError, e:
             logger.error("Failed to delete temporary PDF file: %s" % e)
         finally:
             # dir should be empty now, so we can delete it
             os.rmdir(tmpdir)
-         
+
     # if nothing was returned by now, there was an error generating the pdf
     raise Exception("There was an error generating the PDF")
 
@@ -128,7 +127,7 @@ def pages_to_show(paginator, page, page_labels={}):
     :param page: number of the current page
     :param page_labels: optional dictionary of page labels, keyed on page number
     :rtype: dictionary
-    """    
+    """
     show_pages = {}
     if page != 1:
         before = 3      # default number of pages to show before the current page
@@ -164,7 +163,7 @@ def alpha_pagelabels(paginator, objects, label_attribute):
     if paginator.count <= 1:
         # if there is not enough content to paginate, bail out
         return page_labels
-    
+
     # get all labels for start and end objects on each page
     for i in range(paginator.num_pages):
         page = paginator.page(i+1)  # page is 1-based
@@ -173,7 +172,7 @@ def alpha_pagelabels(paginator, objects, label_attribute):
         # don't go beyond the end of the actual number of objects
         end_index = min(page.end_index()-1, paginator.count)
         # add end label only if not the same as first (e.g., page of a single item)
-        if page.start_index() - 1 != end_index:            
+        if page.start_index() - 1 != end_index:
             labels.append(unicode(getattr(objects[end_index], label_attribute)))
 
     # abbreviate labels so they are as short as possible but distinct from
@@ -214,7 +213,7 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
         filter=None):
     """Retrieve a  :class:`~findingaids.fa.models.FindingAid` (or
     :class:`~findingaids.fa.models.FindingAid`  :class:`eulcore.django.existdb.manager.Manager`)
-    from eXist by eadid, with any query options specified.  Raises a 
+    from eXist by eadid, with any query options specified.  Raises a
     :class:`django.http.Http404` if the requested document is not found in eXist.
 
     Handles switching to preview collection and then switching back when
@@ -338,7 +337,7 @@ def ead_gone_or_404(view_method):
         try:
             return view_method(request, id, *args, **kwargs)
         except http.Http404:
-            # not found in eXist - check for a deleted record 
+            # not found in eXist - check for a deleted record
             deleted = get_object_or_404(Deleted, eadid=id)
             t = get_template('findingaids/deleted.html')
             return http.HttpResponseGone(t.render(RequestContext(request,
@@ -349,10 +348,10 @@ def exist_datetime_with_timezone(dt):
     """Convert an 'offset-naive' datetime object into an 'offset-aware' datetime
     using a configured timezone.
 
-    The current version of xmlrpclib ignores timezones, which messes up dates 
+    The current version of xmlrpclib ignores timezones, which messes up dates
     (e.g., when used for last-modified header).  This function uses a configured
     timezone from django settings to convert a datetime to offset-aware.
-    """    
+    """
     tz = settings.EXISTDB_SERVER_TIMEZONE
     # use the exist time and configured timezone to create a timezone-aware datetime
     return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute,
