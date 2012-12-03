@@ -10,6 +10,7 @@ zc.icp
 recaptcha-client
 mimeparse
 BeautifulSoup
+feedparser
 # NOTE: keeping older versions of celery for now
 # newer versions will require code update & rabbitmq upgrade
 celery==2.3.3
