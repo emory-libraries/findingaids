@@ -8,6 +8,16 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.1
+---
+
+.. NOTE:
+
+  This codebase has been upgraded to Django 1.4, which means that ``manage.py`` is now
+  in the top-level directory rather than included in the ``findingaids`` app
+  directory.
+
+
 1.0 micro releases
 ------------------
 
