@@ -1,4 +1,4 @@
-Django=>1.4
+Django>=1.4
 eulxml>=0.18.0
 eulexistdb>=0.15.3
 eulcommon
