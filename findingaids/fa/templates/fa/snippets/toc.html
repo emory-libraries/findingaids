@@ -10,20 +10,20 @@
     <ul>
          <li>
              <a href="{{ ead_url }}{{ url_params }}#descriptive_summary">Descriptive Summary</a>
-             {% with ead.archdesc.did.match_count as count %}{% include "findingaids/snippets/matches.html" %}{% endwith %}
+             {% with ead.archdesc.did.match_count as count %}{% include "fa/snippets/matches.html" %}{% endwith %}
          </li>
          <li>
              <a href="{{ ead_url }}{{ url_params }}#administrative_information">Administrative Information</a>
-             {% with ead.admin_info_matches as count %}{% include "findingaids/snippets/matches.html" %}{% endwith %}
+             {% with ead.admin_info_matches as count %}{% include "fa/snippets/matches.html" %}{% endwith %}
          </li>
          <li>
              <a href="{{ ead_url }}{{ url_params }}#collection_description">Collection Description</a>
-             {% with ead.coll_desc_matches as count %}{% include "findingaids/snippets/matches.html" %}{% endwith %}
+             {% with ead.coll_desc_matches as count %}{% include "fa/snippets/matches.html" %}{% endwith %}
          </li>
          {% if ead.archdesc.controlaccess.head %}
            <li>
                 <a href="{{ ead_url }}{{ url_params }}#control_access">{{ ead.archdesc.controlaccess.head }}</a>
-                {% with ead.archdesc.controlaccess.match_count as count %}{% include "findingaids/snippets/matches.html" %}{% endwith %}
+                {% with ead.archdesc.controlaccess.match_count as count %}{% include "fa/snippets/matches.html" %}{% endwith %}
            </li>
          {% endif %}
          {% if ead.dsc %}   {# display series or container list, if any #}
@@ -31,7 +31,7 @@
              {% if not ead.dsc.hasSeries and not ead.dsc.head|cut:' ' = 'DescriptionofSeries' %}
                 <li> {# on series/index page, hasSeries cannot correctly detect series; using series label as fallback #}
                     <a href="{{ ead_url }}{{ url_params }}#dsc">{{ ead.dsc.head }}</a>
-                    {% with ead.dsc.match_count as count %}{% include "findingaids/snippets/matches.html" %}{% endwith %}
+                    {% with ead.dsc.match_count as count %}{% include "fa/snippets/matches.html" %}{% endwith %}
                 </li>
              {% endif %}
          {% endif %}

@@ -21,8 +21,8 @@
     {% endfor %}
     {% endwith %}
 </div>
-<hr/> 
-{% include "findingaids/snippets/description.html" %}
+<hr/>
+{% include "fa/snippets/description.html" %}
 
 {# NOTE: contol access section is not included in the PDF #}
 
@@ -41,7 +41,7 @@
   <div class="nextpage">
   <hr/>
     <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
-    {% include "findingaids/snippets/containerlist.html" %}
+    {% include "fa/snippets/containerlist.html" %}
   </div>
   {% endwith %}
 {% endif %}
@@ -51,7 +51,7 @@
     {% for c01_series in ead.dsc.c %}
         <div class="nextpage">
             {% with c01_series as series %}
-                {% include "findingaids/snippets/series.html" %}
+                {% include "fa/snippets/series.html" %}
             {% endwith %}
         </div>
         {# container list is handled in series template; display subseries, if any #}
@@ -60,7 +60,7 @@
             {% for c02_series in c01_series.c %}
                 <div class="nextpage">
                     {% with c02_series as series %}
-                        {% include "findingaids/snippets/series.html" %}
+                        {% include "fa/snippets/series.html" %}
                     {% endwith %}
                 </div>
                 {% if c02_series.hasSubseries %}
@@ -68,24 +68,24 @@
                     {% for c03_series in c02_series.c %}
                         <div class="nextpage">
                             {% with c03_series as series %}
-                                {% include "findingaids/snippets/series.html" %}
+                                {% include "fa/snippets/series.html" %}
                             {% endwith %}
                         </div>
                     {% endfor %} {# end looping through c03s #}
                 </div>
-                {% endif %} {# c02 has subseries #}                
+                {% endif %} {# c02 has subseries #}
             {% endfor %} {# end looping through c02s #}
         </div>
         {% endif %} {# c01 has subseries #}
     {% endfor %} {# end looping through c01s #}
- <hr/> 
+ <hr/>
 {% else %} {# simple finding aid - no series at all, just a container list #}
 <hr/>
-{% include "findingaids/snippets/containerlist.html" %}
+{% include "fa/snippets/containerlist.html" %}
 {% endif %}
 
 {% for index in ead.archdesc.index %}
-    {% include "findingaids/snippets/indexentry.html" %}
+    {% include "fa/snippets/indexentry.html" %}
 {% endfor %}
 
 </div> {# end div.fa #}

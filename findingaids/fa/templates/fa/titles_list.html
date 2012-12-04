@@ -7,7 +7,7 @@
 {% block content-body %}
 
 {% if letters %}
-  {% include "findingaids/browse_letters.html" %}
+  {% include "fa/browse_letters.html" %}
 {% endif %}
 
 {% if findingaids.paginator.count %}
@@ -21,7 +21,7 @@
 <hr/>
 
 {% for fa in findingaids.object_list %}
-    {% include "findingaids/snippets/listview.html" %}
+    {% include "fa/snippets/listview.html" %}
 {% empty %}
  <div>No finding aids found for <b>{{current_letter}}</b>.</div>
 {% endfor %}

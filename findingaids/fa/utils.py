@@ -339,7 +339,7 @@ def ead_gone_or_404(view_method):
         except http.Http404:
             # not found in eXist - check for a deleted record
             deleted = get_object_or_404(Deleted, eadid=id)
-            t = get_template('findingaids/deleted.html')
+            t = get_template('fa/deleted.html')
             return http.HttpResponseGone(t.render(RequestContext(request,
                                                         {'deleted' : deleted})))
     return decorator
