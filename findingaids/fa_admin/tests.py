@@ -26,8 +26,8 @@ from time import sleep
 
 from django.test import Client
 from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.management.base import BaseCommand, CommandError
 from django.core.urlresolvers import reverse
 from django.http import HttpRequest
@@ -124,7 +124,13 @@ class BaseAdminViewsTest(TestCase):
         MockDjangoPidmanClient.search_result = MockDjangoPidmanClient.search_result_nomatches
         views.utils.DjangoPidmanRestClient = self._django_pid_client
 
+
 class AdminViewsTest(BaseAdminViewsTest):
+
+    def setUp(self):
+        # avoid testing difficulties with cached prep-eadxml view
+        cache.clear()
+        super(AdminViewsTest, self).setUp()
 
     def test_index(self):
         admin_index = reverse('fa-admin:index')
@@ -441,12 +447,10 @@ class AdminViewsTest(BaseAdminViewsTest):
             'Expected %s but returned %s for %s (prep ead, ARK generation error)' % \
             (expected, response.status_code, prep_xml))
 
-    def test_prep_ark_messages(self):
+    @patch('findingaids.fa_admin.utils.DjangoPidmanRestClient')
+    def test_prep_ark_messages(self, mockpidclient):
         # test that ARK generation messages are displayed to user
-        # NOTE: calling the view directly so the pid client result can be mocked
-        _real_pid_client = views.utils.DjangoPidmanRestClient
-        views.utils.DjangoPidmanRestClient = MockDjangoPidmanClient
-        MockDjangoPidmanClient.search_result = {
+        mockpidclient.return_value.search_pids.return_value = {
             'results_count': 2,
             'results': [
                 {
@@ -457,23 +461,20 @@ class AdminViewsTest(BaseAdminViewsTest):
         }
         # use django test client to login and setup session
         self.client.login(**self.credentials['admin'])
-        request = HttpRequest()
-        request.user = User.objects.get(username=self.credentials['admin']['username'])
-        request.session = self.client.session
 
         # use a fixture that does not have an ARK
         filename = 'bailey807.xml'
         settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
-        views.prepared_eadxml(request, filename)  # response object not used
+        prep_url = reverse('fa-admin:prep-ead-about', kwargs={'filename': filename})
+        #expire_view_cache(reverse('fa-admin:prep-ead', kwargs={'filename': filename}))
+        response = self.client.get(prep_url)
         # retrieve messages from the request
-        msgs = messages.get_messages(request)
+        msgs = [unicode(m) for m in response.context['messages']
+            if m is not None]
         self.assert_('Found 2 ARKs when searching' in msgs[0],
             'multiple ARK warning is set in messages')
         self.assert_('Using existing ARK' in msgs[1],
             'using existing ARK info is set in messages ')
-
-        # restore non-mock pid client
-        views.utils.DjangoPidmanRestClient = _real_pid_client
 
     def test_prep_badlyformedxml(self):
         # use fixture directory to test publication
@@ -631,6 +632,7 @@ class Mock_reload_pdf:
         return result
 
 
+@patch.object(settings, 'CELERY_ALWAYS_EAGER', new=True)
 class CeleryAdminViewsTest(BaseAdminViewsTest):
 
     def setUp(self):
@@ -1193,6 +1195,7 @@ def _celerytest_tearDown(testcase):
             settings.SITE_BASE_URL = testcase.site_base_url
 
 
+@patch.object(settings, 'CELERY_ALWAYS_EAGER', new=True)
 class ReloadCachedPdfTestCase(TestCase):
 
     def setUp(self):

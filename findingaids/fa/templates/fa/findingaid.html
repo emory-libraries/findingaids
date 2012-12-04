@@ -1,4 +1,4 @@
-{% extends "findingaids/base.html" %}
+{% extends "fa/base.html" %}
 {% load ead %}   {% load ifurl %}
 
 {% block page-head %}
@@ -12,7 +12,7 @@
   {% if ead.eadid.url %}<link rel="bookmark" href="{{ ead.eadid.url }}" /> {% endif %}
   {# embed Dublin Core metadata for this finding aid in the html header #}
   {% with ead.dc_fields as dc_fields %}
-    {% include "findingaids/snippets/dc_meta.html" %}
+    {% include "fa/snippets/dc_meta.html" %}
   {% endwith %}
 {% endblock %}
 
@@ -39,8 +39,8 @@
 
 {# main display page for a single finding aid; links to series & subseries, if any #}
 <div id="toc_series">
-    {% include "findingaids/snippets/toc.html" %}
-    
+    {% include "fa/snippets/toc.html" %}
+
 {% if ead.dsc.hasSeries %} {# top-level series list #}
 <div id="series">
 <h2><a href="#dsc">{{ ead.dsc.head}}</a></h2>
@@ -59,9 +59,9 @@
 
 <div class="fa">
 <hr/>
-{% include "findingaids/snippets/description.html" %}
+{% include "fa/snippets/description.html" %}
 <hr/>
-{% include "findingaids/snippets/controlaccess.html" %}
+{% include "fa/snippets/controlaccess.html" %}
 <hr/>
 
 {# container list or series/subseries listing #}
@@ -74,7 +74,7 @@
     </ul>
 {% else %}
   {% with ead.dsc as series %}
-    {% include "findingaids/snippets/containerlist.html" %}
+    {% include "fa/snippets/containerlist.html" %}
   {% endwith %}
 {% endif %}
 

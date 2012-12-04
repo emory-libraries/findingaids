@@ -8,6 +8,24 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.1
+---
+
+* Updated to Django 1.4.2
+* Updates to follow team best practices for Django project code organization:
+
+  * Moved media directory to top-level sitemedia directory
+  * Moved templates directory to top-level and moved app-specific templates
+    into their respective apps.
+  * Renamed localsettings.py example from ``localsettings-sample.py`` to
+    ``localsettings.py.dist``
+
+.. NOTE:
+
+  Due to the upgrade to Django 1.4, ``manage.py`` is now in the top-level directory rather
+  than included in the ``findingaids`` app directory.
+
+
 1.0 micro releases
 ------------------
 

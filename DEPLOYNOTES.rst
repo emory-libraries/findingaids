@@ -194,7 +194,7 @@ for installation paths and IP addresses.
 
 Configuration
 ^^^^^^^^^^^^^
-Configure the application settings by copying localsettings-sample.py to
+Configure the application settings by copying localsettings.py.dist to
 localsettings.py and editing settings for local database, LDAP, fedora, PID
 manager, eXist-DB and key configuration.
 

@@ -317,7 +317,7 @@ def preview(request):
 
 
 @login_required
-@cache_page(15)        # cache this view and use it as source for prep diff/summary views
+@cache_page(5)  # cache this view and use it as source for prep diff/summary views
 def prepared_eadxml(request, filename):
     """Serve out a prepared version of the EAD file in the configured EAD source
     directory.  Response header is set so the user should be prompted to download
@@ -370,6 +370,7 @@ def prepared_ead(request, filename, mode):
     fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
     changes = []
 
+    # TODO: expire cache if file has changed since prepped eadxml was cached
     prep_ead = prepared_eadxml(request, filename)
 
     if prep_ead.status_code == 200:
