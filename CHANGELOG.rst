@@ -12,8 +12,13 @@ recent version first.  Upgrade or deployment notes should be found in
 ---
 
 * Updated to Django 1.4.2
-* Renamed localsettings.py example from ``localsettings-sample.py`` to
-  ``localsettings.py.dist``
+* Updates to follow team best practices for Django project code organization:
+
+  * Moved media directory to top-level sitemedia directory
+  * Moved templates directory to top-level and moved app-specific templates
+    into their respective apps.
+  * Renamed localsettings.py example from ``localsettings-sample.py`` to
+    ``localsettings.py.dist``
 
 .. NOTE:
 
