@@ -199,7 +199,7 @@ try:
 except ImportError:
     import sys
     print >>sys.stderr, 'No local settings. Trying to start, but if ' + \
-        'stuff blows up, try copying localsettings-sample.py to ' + \
+        'stuff blows up, try copying localsettings.py.dist to ' + \
         'localsettings.py and setting appropriately for your environment.'
     pass
 

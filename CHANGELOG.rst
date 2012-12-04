@@ -11,11 +11,14 @@ recent version first.  Upgrade or deployment notes should be found in
 1.1
 ---
 
+* Updated to Django 1.4.2
+* Renamed localsettings.py example from ``localsettings-sample.py`` to
+  ``localsettings.py.dist``
+
 .. NOTE:
 
-  This codebase has been upgraded to Django 1.4, which means that ``manage.py`` is now
-  in the top-level directory rather than included in the ``findingaids`` app
-  directory.
+  Due to the upgrade to Django 1.4, ``manage.py`` is now in the top-level directory rather
+  than included in the ``findingaids`` app directory.
 
 
 1.0 micro releases
