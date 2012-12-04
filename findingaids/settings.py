@@ -61,8 +61,7 @@ USE_I18N = True
 
 # Absolute path to media directory
 # Example: "/home/media/media.lawrence.com/"
-#MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'sitemedia')  # TODO
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'sitemedia')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -89,8 +88,7 @@ STATICFILES_DIRS = [
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    #os.path.join(BASE_DIR, '..', 'sitemedia'),  # TODO
-    path.join(BASE_DIR, 'media'),
+    os.path.join(BASE_DIR, '..', 'sitemedia'),
 ]
 if 'VIRTUAL_ENV' in os.environ:
     STATICFILES_DIRS.append(os.path.join(os.environ['VIRTUAL_ENV'], 'themes', 'genlib'))
