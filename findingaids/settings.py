@@ -166,7 +166,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djcelery',
-    #'eulcore', # https://svn.library.emory.edu/svn/python-eulcore/
+    'django_nose',
     'eullocal.django.emory_ldap',
     'eullocal.django.taskresult',
     'eullocal.django.util',
@@ -203,15 +203,10 @@ except ImportError:
         'localsettings.py and setting appropriately for your environment.'
     pass
 
-TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
 
-try:
-    # use xmlrunner if it's installed; default runner otherwise. download
-    # it from http://github.com/danielfm/unittest-xml-reporting/ to output
-    # test results in JUnit-compatible XML.
-    import xmlrunner
-    TEST_RUNNER = 'eulexistdb.testutil.ExistDBXmlTestSuiteRunner'
-    TEST_OUTPUT_DIR='test-results'
-except ImportError:
-    pass
-
+NOSE_PLUGINS = [
+    'eulexistdb.testutil.ExistDBSetUp',
+    # ...
+]
+NOSE_ARGS = ['--with-existdbsetup']
