@@ -510,6 +510,8 @@ class FaViewsTest(TestCase):
             response.content, "admin info - arrangement")
         self.assertPattern(r'4 linear ft..*; .*(8 boxes)', response.content,
             msg_prefix='findingaid view should handle multiple physdesc elements')
+      #   self.assertContains(response, '<head>Processing</head>'
+      # '<p>Processed by Susan Potts McDonald, 2000.</p>', html=true)
 
         # series instead of container list
         self.assertPattern('<h2>.*Description of Series.*</h2>', response.content,

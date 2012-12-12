@@ -23,7 +23,7 @@ from django.db import models
 from eulxml import xmlmap
 from eulxml.xmlmap.eadmap import EncodedArchivalDescription, Component, \
         SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
-        UnitTitle
+        UnitTitle, Section
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
@@ -89,6 +89,9 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     boostfields = xmlmap.StringField('.//e:titleproper | .//e:origination | \
         .//e:abstract | .//e:bioghist | .//e:scopecontent | .//e:controlaccess')
 
+    # temporary manual mapping for processinfo, will be incorporated into a release of eulxml
+    process_info = xmlmap.NodeField("e:archdesc/e:processinfo", Section)
+
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
     _admin_info = ['userestrict', 'altformavail', 'relatedmaterial', 'separatedmaterial',
@@ -148,6 +151,8 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
             info.append(self.archdesc.custodial_history)
         if self.archdesc.preferred_citation:
             info.append(self.archdesc.preferred_citation)
+        if self.process_info:
+            info.append(self.process_info)
         return info
 
     def collection_description(self):
