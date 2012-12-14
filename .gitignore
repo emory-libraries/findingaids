@@ -3,4 +3,8 @@ localsettings.py
 test-results
 doc/build
 static
-
+.coverage
+coverage.xml
+nosetests.xml
+build
+dist
