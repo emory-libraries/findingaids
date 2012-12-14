@@ -157,7 +157,13 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # NOTE: using memory cache for now for simplicity
 CACHE_BACKEND = 'locmem://'
 
-INSTALLED_APPS = (
+django_nose = None
+try:
+    import django_nose
+except ImportError:
+    pass
+
+INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -166,7 +172,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'djcelery',
-    'django_nose',
     'eullocal.django.emory_ldap',
     'eullocal.django.taskresult',
     'eullocal.django.util',
@@ -175,7 +180,8 @@ INSTALLED_APPS = (
     'findingaids.fa',
     'findingaids.fa_admin',
     'findingaids.content',
-)
+]
+
 
 EXTENSION_DIRS = (
     #path.join(BASE_DIR, '../external/django-modules'),
@@ -203,10 +209,18 @@ except ImportError:
         'localsettings.py and setting appropriately for your environment.'
     pass
 
-TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
-
-NOSE_PLUGINS = [
+# django_nose configurations
+# - only if django_nose is installed, so it is only required for development
+if django_nose is not None:
+    INSTALLED_APPS.append('django_nose')
+    TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+    NOSE_PLUGINS = [
     'eulexistdb.testutil.ExistDBSetUp',
-    # ...
-]
-NOSE_ARGS = ['--with-existdbsetup']
+        # ...
+    ]
+    NOSE_ARGS = ['--with-existdbsetup']
+
+# as a fall-back, use existdb test runner to avoid running tests
+# against non-test configured existdb collection
+else:
+    TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
