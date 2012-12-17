@@ -31,26 +31,13 @@ from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
 from django.test import TestCase as DjangoTestCase
 
-
 from eulexistdb.db import ExistDB, ExistDBException
 from eulexistdb.testutil import TestCase
 from eulxml.xmlmap import load_xmlobject_from_file, \
     load_xmlobject_from_string, XmlObject
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
-    LocalComponent, Deleted, EadRepository
-from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
-from datetime import datetime
-from os import path
-
-# from django.http import Http404, HttpRequest
-# from django.test import TestCase as DjangoTestCase
-
-# from eulexistdb.testutil import TestCase
-# from eulxml.xmlmap.eadmap import EAD_NAMESPACE
-# from eulexistdb.db import ExistDB, ExistDBException
-
+from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
@@ -164,21 +151,17 @@ class UtilsTest(TestCase):
 
         # last-modified should not cause an error when there are no documents in eXist
         # - temporarily change collection so no documents will be found
-        real_collection = settings.EXISTDB_ROOT_COLLECTION
-        settings.EXISTDB_ROOT_COLLECTION = '/db/missing'
-        # no exist data, but deleted record - should not cause any errors
-        modified = collection_lastmodified('rqst')
-        self.assertEqual(exist_datetime_with_timezone(record.date), modified,
-            'collection last-modified should return most recently deleted document when no data is in eXist')
-        # no exist data, no deleted records
-        record = Deleted.objects.get(eadid='eadid')     # retrieve datetime from DB
-        record.delete()
-        modified = collection_lastmodified('rqst')
-        self.assertEqual(None, modified,
-            'collection last-modified should return None when no data is in eXist or deleted')
-
-        settings.EXISTDB_ROOT_COLLECTION = real_collection
-
+        with patch.object(settings, 'EXISTDB_ROOT_COLLECTION', new='/db/missing'):
+            # no exist data, but deleted record - should not cause any errors
+            modified = collection_lastmodified('rqst')
+            self.assertEqual(exist_datetime_with_timezone(record.date), modified,
+                'collection last-modified should return most recently deleted document when no data is in eXist')
+            # no exist data, no deleted records
+            record = Deleted.objects.get(eadid='eadid')     # retrieve datetime from DB
+            record.delete()
+            modified = collection_lastmodified('rqst')
+            self.assertEqual(None, modified,
+                'collection last-modified should return None when no data is in eXist or deleted')
 
 
 

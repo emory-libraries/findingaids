@@ -17,6 +17,7 @@
 from mock import patch
 import os
 import tempfile
+from shutil import rmtree
 from time import sleep
 
 from django.test import Client
@@ -611,6 +612,31 @@ class AdminViewsTest(BaseAdminViewsTest):
 
 # unit tests for views that make use of celery tasks (additional setup required)
 
+def _celerytest_setUp(testcase):
+    # FIXME: duplicated in fa_admin.tests.utils
+
+    # ensure required settings are available for testing
+    if hasattr(settings, 'PROXY_HOST'):
+        testcase.proxy_host = settings.PROXY_HOST
+        setattr(settings, 'PROXY_HOST', 'myproxy:10101')
+    if hasattr(settings, 'SITE_BASE_URL'):
+        testcase.site_base_url = settings.SITE_BASE_URL
+        setattr(settings, 'SITE_BASE_URL', 'http://findingaids.test.edu')
+
+    # OK, this is a little weird: swap out the real httplib in tasks with
+    # the mock httplib object defined above
+    # testcase.real_httplib = tasks.httplib
+    # testcase.mock_httplib = MockHttplib()
+    # tasks.httplib = testcase.mock_httplib
+
+
+def _celerytest_tearDown(testcase):
+        if testcase.proxy_host:
+            settings.PROXY_HOST = testcase.proxy_host
+        if testcase.site_base_url:
+            settings.SITE_BASE_URL = testcase.site_base_url
+
+
 # in test mode, celery task returns an EagerResult with no task id
 # intercept the result from the real task and add a task id for testing
 class Mock_reload_pdf:
@@ -638,7 +664,10 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # restore the real celery task
         views.reload_cached_pdf = self.real_reload
 
+    # use fixture directory to test publication
+    @patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures'))
     def test_publish(self):
+        self.assertEqual(2, 3, 'this is an intentional error')
         publish_url = reverse('fa-admin:publish-ead')
         self.client.login(**self.credentials['admin'])
         # GET should just list files available to be published
@@ -700,38 +729,37 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
 
         # exist save errors should be caught & handled gracefully
         # - force an exist save error by setting collection to a non-existent collection
-        settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
-        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
-        self.assertContains(response, "Could not publish",
+        with patch.object(settings, 'EXISTDB_ROOT_COLLECTION', new='/bogus/doesntexist'):
+            #settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
+            response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
+            self.assertContains(response, "Could not publish",
                 msg_prefix="exist save error on publish displays error to user")
-        self.assertContains(response,
+            self.assertContains(response,
                 "Collection %s not found" % settings.EXISTDB_ROOT_COLLECTION,
                 msg_prefix="specific exist save error displayed to user")
-        self.assertContains(response, "Database Error",
+            self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
 
         # simulate incorrect eXist permissions by not specifying username/password
-        settings.EXISTDB_ROOT_COLLECTION = self.real_collection  # restore
-        # ensure guest account cannot update
+                # ensure guest account cannot update
         self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+        with patch.object(settings, 'EXISTDB_SERVER_USER', new=None):
+            with patch.object(settings, 'EXISTDB_SERVER_PASSWORD', new=None):
 
-        settings.EXISTDB_SERVER_USER = None
-        settings.EXISTDB_SERVER_PASSWORD = None
-
-        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
-        self.assertContains(response, "Could not publish")
-        self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "update is not allowed",
-                msg_prefix="error page displays specific exist permissions message")
+                response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
+                self.assertContains(response, "Could not publish")
+                self.assertContains(response, "Database Error",
+                    msg_prefix="error page displays explanation and instructions to user")
+                self.assertContains(response, "update is not allowed",
+                    msg_prefix="error page displays specific exist permissions message")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
-        settings.EXISTDB_SERVER_URL = 'http://localhost:9191/not-exist'
-        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
-        self.assertContains(response, "Could not publish")
-        self.assertContains(response, "Database Error",
+        with patch.object(settings, 'EXISTDB_SERVER_URL', new='http://localhost:9191/not-exist'):
+            response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
+            self.assertContains(response, "Could not publish")
+            self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "I/O Error: Connection refused",
+            self.assertContains(response, "I/O Error: Connection refused",
                 msg_prefix="error page displays specific connection error message")
 
     def test_publish_from_preview(self):

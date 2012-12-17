@@ -111,7 +111,9 @@ class FaViewsTest(TestCase):
             msg_prefix='browse pagination uses first letters of titles instead of numbers')
 
         # test current letter
-        self.assertPattern("<a *class='current'[^>]*>A<", response.content,
+        self.assertContains(response,
+            "<a class='current' href='%s'>A</a>" % reverse('fa:titles-by-letter', kwargs={'letter': 'A'}),
+            html=True,
             msg_prefix='browse by letter A should mark A as current letter')
 
         # format_ead
