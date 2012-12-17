@@ -24,6 +24,16 @@
 {% block admin-url %}{% url fa-admin:index %}{% endblock %}
 
 {% block sidebar-left %}
+
+  {# give admin users an easy way back to main admin page once they are logged in #}
+  {% if user.is_authenticated %}
+    {% url fa-admin:index as admin_url %}
+    {% if request.path != admin_url %}
+      <p><a href="{{ admin_url }}" class="form-submit">Manage Finding Aids</a></p>
+    {% endif %}
+  {% endif %}
+
+
   {% if kwsearch_form %}
   <div id="search" class="sidebar-search">
       Search EmoryFindingAids
