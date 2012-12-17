@@ -1,5 +1,5 @@
 # file findingaids/content/views.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,6 +24,7 @@ from findingaids.content.forms import FeedbackForm, RequestMaterialsForm
 from findingaids.fa.models import title_letters
 from findingaids.fa.utils import get_findingaid
 
+
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
 
@@ -42,6 +43,7 @@ def site_index(request):
                 'about': ContentFeed().get_entry('about'),
             }, context_instance=RequestContext(request))
 
+
 def content_page(request, page):
     'Display content based on an item in the configured RSS feed.'
     content = ContentFeed()
@@ -51,6 +53,7 @@ def content_page(request, page):
     return render_to_response('content/page.html', {
                 'page': page,
             }, context_instance=RequestContext(request))
+
 
 def feedback(request):
     '''Feedback form. On GET, displays the form; on POST, processes the submitted
@@ -69,7 +72,7 @@ def feedback(request):
                 err = ex
                 email_ok = False
             # display a success/thank you page
-            response = render_to_response ('content/feedback.html', {
+            response = render_to_response('content/feedback.html', {
                     'email_sent': email_ok,
                     'err': err,
                 }, context_instance=RequestContext(request))
@@ -98,6 +101,7 @@ def feedback(request):
                 'captcha_theme': captcha_theme,
             }, context_instance=RequestContext(request))
 
+
 def request_materials(request):
     if request.method == 'POST':
         form = RequestMaterialsForm(request.POST)
@@ -111,7 +115,7 @@ def request_materials(request):
                 email_ok = False
             # TODO: use separate result page for request materials
             # display a success/thank you page
-            response = render_to_response ('content/request-materials.html', {
+            response = render_to_response('content/request-materials.html', {
                     'email_sent': email_ok,
                     'err': err,
                 }, context_instance=RequestContext(request))

@@ -136,7 +136,7 @@ class CachedFeedTest(TestCase):
         <a href="%(base_url)s#same-page">link1</a>
         <a href="%(base_url)s#not-same-page">link2</a>
         <a name="same-page">text</a>
-        </html>''' % {'base_url': base_url }
+        </html>''' % {'base_url': base_url}
         self.mockfeedparser.entries = [entry]
         cached_feed = feedparser.FeedParserDict({
             'feed': feedparser.FeedParserDict({

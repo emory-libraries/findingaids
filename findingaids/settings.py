@@ -171,6 +171,7 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     'djcelery',
     'eullocal.django.emory_ldap',
     'eullocal.django.taskresult',

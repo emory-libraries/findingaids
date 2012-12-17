@@ -20,6 +20,9 @@ from django.views.generic.simple import direct_to_template
 from django.views.generic.base import RedirectView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from findingaids.fa.sitemaps import FindingAidSitemap
+from findingaids.content.sitemaps import ContentSitemap
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -33,6 +36,16 @@ urlpatterns = patterns('',
    url(r'^content/', include('findingaids.content.urls', namespace='content')),
    # everything else should fall through to the main app
    url(r'^', include('findingaids.fa.urls', namespace='fa')),
+)
+
+# xml sitemaps for search-engine discovery
+sitemaps = {
+    'findingaids': FindingAidSitemap,
+    'content': ContentSitemap
+}
+urlpatterns += patterns('django.contrib.sitemaps.views',
+    (r'^sitemap\.xml$', 'index', {'sitemaps': sitemaps}),
+    (r'^sitemap-(?P<section>.+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
 )
 
 # enable serving static files for development (DEBUG mode only)
