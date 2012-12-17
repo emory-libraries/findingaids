@@ -27,7 +27,7 @@ from django.core.urlresolvers import reverse
 from eulexistdb.db import ExistDB, ExistDBException
 from eulexistdb.testutil import TestCase
 from eulxml.xmlmap import load_xmlobject_from_file, \
-    load_xmlobject_from_string, XmlObject
+    load_xmlobject_from_string
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
     Deleted
