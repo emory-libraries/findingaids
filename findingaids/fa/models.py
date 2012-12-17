@@ -475,7 +475,7 @@ class FileComponent(XmlModel, Component):
     series2 = xmlmap.NodeField("ancestor::e:c02", Series)
     ":class:`findingaids.fa.models.Series` c02 series this file belongs to, if any."
 
-    objects = Manager('''(//e:c01|//e:c02|//e:c03|//e:c04)[@level="file"]''')
+    objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c-series file objects
         in eXist.

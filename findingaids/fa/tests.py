@@ -1665,16 +1665,15 @@ class FullTextFaViewsTest(TestCase):
         # (two copies of fixture document loaded?)
         # TODO: revise document search to use document(...) instead of collection()
         # - should be faster, and will probably also help this
-        x = 2
 
         self.assertContains(response, "Search results for : <b>correspondence</b>",
             msg_prefix='search results include search term')
-        self.assertContains(response, "%d matches found" % (22 * x),  # 22 ? 44 ? 45 ?
+        self.assertContains(response, "22 matches found",
             msg_prefix='search for "correspondence" in raoul548 matches 44 items')
         # box/folder/contents headings should display once for each series
-        self.assertContains(response, "Box", 4 * x,  # 4? 8?
+        self.assertContains(response, "Box", 4,
             msg_prefix='"Box" heading appears once for each series match')
-        self.assertContains(response, "Folder", 4 * x,
+        self.assertContains(response, "Folder", 4,
             msg_prefix='"Folder" heading appears once for each series match')
 
         # series from fixture with matches:  s1.1, 4, 4.1b
@@ -1689,7 +1688,7 @@ class FullTextFaViewsTest(TestCase):
         # - subseries url & label
         self.assertContains(response, reverse('fa:series2',
             kwargs={'id': 'raoul548', 'series_id': 's1', 'series2_id': 's1.1'}),
-            count=1 * x, msg_prefix='link to subseries with matches (1.1) occurs once')
+            count=1, msg_prefix='link to subseries with matches (1.1) occurs once')
         self.assertContains(response, 'Subseries 1.1: William Greene',
             msg_prefix='label for series with matches (1.1) is displayed')
         # - label for subseries items includes series
@@ -1704,7 +1703,7 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(response, reverse('fa:series3',
             kwargs={'id': 'raoul548', 'series_id': 's4',
                 'series2_id': '4.1', 'series3_id': '4.1b'}),
-            count=1 * x, msg_prefix='link to sub-subseries with matches (4.1b) occurs once')
+            count=1, msg_prefix='link to sub-subseries with matches (4.1b) occurs once')
         self.assertContains(response, 'Subseries 4.1b: Genealogy part 2',
             msg_prefix='label for subseries with matches (4.1b) is displayed')
         # - label for sub-subseries includes subseries

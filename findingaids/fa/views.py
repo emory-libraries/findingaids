@@ -557,16 +557,19 @@ def document_search(request, id):
 
     form = KeywordSearchForm(request.GET)
     query_error = False
-    ead = get_findingaid(id, only=['eadid', 'title'])   # will 404 if not found
+    # get the findingaid - will 404 if not found
+    ead = get_findingaid(id, only=['eadid', 'title',
+        'document_name', 'collection_name'])   # info to generate document path
     if form.is_valid():
         search_terms = form.cleaned_data['keywords']
         try:
             # do a full-text search at the file level
             # include parent series information and enough ancestor series ids
             # in order to generate link to containing series at any level (c01-c03)
-            # NOTE: filter by parent ead id first, then by keyword
-            # (this is significantly faster for common keywords in large findingaids)
-            files = FileComponent.objects.filter(ead__eadid=id) \
+
+            # use path to restrict query to a single document (much faster)
+            path = '%s/%s' % (ead.collection_name, ead.document_name)
+            files = FileComponent.objects.filter(document_path=path) \
                         .filter(fulltext_terms=search_terms) \
                         .also('parent__id', 'parent__did',
                               'series1__id', 'series1__did', 'series2__id', 'series2__did')
