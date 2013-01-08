@@ -157,12 +157,6 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 # NOTE: using memory cache for now for simplicity
 CACHE_BACKEND = 'locmem://'
 
-django_nose = None
-try:
-    import django_nose
-except ImportError:
-    pass
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -211,6 +205,15 @@ except ImportError:
     pass
 
 # django_nose configurations
+
+django_nose = None
+try:
+    # NOTE: errors if DATABASES is not configured (in some cases),
+    # so this must be done after importing localsettings
+    import django_nose
+except ImportError:
+    pass
+
 # - only if django_nose is installed, so it is only required for development
 if django_nose is not None:
     INSTALLED_APPS.append('django_nose')
