@@ -29,7 +29,8 @@ from eullocal.django.forms.tests import MockCaptcha
 from findingaids.content import models, forms
 
 # re-using finding aid fixtures from main fa app
-exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..', 'fa', 'fixtures')
+exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..',
+    'fa', 'tests', 'fixtures')
 
 class MockFeedParser:
     entries = []
