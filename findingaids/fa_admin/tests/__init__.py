@@ -14,5 +14,5 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from findingaids.fa.tests.views import *
-from findingaids.fa.tests.utils import *
+from findingaids.fa_admin.tests.views import *
+from findingaids.fa_admin.tests.utils import *
