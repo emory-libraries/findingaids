@@ -216,7 +216,7 @@ class UtilsTest(TestCase):
 
         # make sure we handle quirky document with a <title> at the beginning of the <unittitle>
         eadfile = os.path.join(settings.BASE_DIR, 'fa',
-            'fixtures', 'pittsfreeman1036.xml')
+            'tests', 'fixtures', 'pittsfreeman1036.xml')
         ead_nested_title = load_xmlobject_from_file(eadfile, FindingAid)
         errors = utils.check_eadxml(ead_nested_title)
         self.assert_(all('list title' not in err for err in errors),
@@ -239,14 +239,16 @@ class UtilsTest(TestCase):
         self.assert_(MockDjangoPidmanClient.test_ark.endswith(ead.eadid.identifier))
 
         # ead with no series
-        eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
+        eadfile = os.path.join(settings.BASE_DIR, 'fa', 'tests',
+            'fixtures', 'pittsfreeman1036.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = utils.prep_ead(ead, eadfile)
         self.assert_(isinstance(ead, FindingAid), "prep_ead should return an instance of FindingAid")
         self.assertEqual(u'pittsfreeman1036', ead.eadid.value)
 
         # series with no unitid
-        eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'raoul548.xml')
+        eadfile = os.path.join(settings.BASE_DIR, 'fa', 'tests',
+            'fixtures', 'raoul548.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = utils.prep_ead(ead, eadfile)
         self.assertEqual(u'raoul548_series3', ead.dsc.c[2].id)
@@ -279,7 +281,8 @@ class UtilsTest(TestCase):
             "only 3 errors (duplicate origination, 3 containers in a did, 1 container in a did) should be left in invalid test fixture after cleaning")
 
         # special case - unittitle begins with a <title>
-        eadfile = os.path.join(settings.BASE_DIR, 'fa', 'fixtures', 'pittsfreeman1036.xml')
+        eadfile = os.path.join(settings.BASE_DIR, 'fa', 'tests',
+            'fixtures', 'pittsfreeman1036.xml')
         ead = load_xmlobject_from_file(eadfile, FindingAid)
         ead = utils.prep_ead(ead, eadfile)
         self.assertFalse(unicode(ead.list_title).startswith('None'),

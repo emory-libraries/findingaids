@@ -397,7 +397,8 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # prep an ead that doesn't need any changes
         filename = 'abbey244.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa',
+            'tests', 'fixtures')
 
         prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
         response = self.client.get(prep_summary, follow=True)
@@ -453,7 +454,8 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # use a fixture that does not have an ARK
         filename = 'bailey807.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa', 'fixtures')
+        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa',
+            'tests', 'fixtures')
         prep_url = reverse('fa-admin:prep-ead-about', kwargs={'filename': filename})
         #expire_view_cache(reverse('fa-admin:prep-ead', kwargs={'filename': filename}))
         response = self.client.get(prep_url)
@@ -667,7 +669,6 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
     # use fixture directory to test publication
     @patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures'))
     def test_publish(self):
-        self.assertEqual(2, 3, 'this is an intentional error')
         publish_url = reverse('fa-admin:publish-ead')
         self.client.login(**self.credentials['admin'])
         # GET should just list files available to be published
