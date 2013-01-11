@@ -669,29 +669,33 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
     # use fixture directory to test publication
     @patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures'))
     def test_publish(self):
-        publish_url = reverse('fa-admin:publish-ead')
-        self.client.login(**self.credentials['admin'])
-        # GET should just list files available to be published
-        response = self.client.get(publish_url)
+
+        # first test only uses temp dir & files created in setup
+        with patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=self.tmpdir):
+            publish_url = reverse('fa-admin:publish-ead')
+            self.client.login(**self.credentials['admin'])
+            # GET should just list files available to be published
+            response = self.client.get(publish_url)
+
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
-                             % (expected, code, publish_url))
+         % (expected, code, publish_url))
         self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
 
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
         # use fixture directory to test publication
         filename = 'hartsfield558.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
         response = self.client.post(publish_url, {'filename': filename}, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
-                             % (expected, code, publish_url))
+            % (expected, code, publish_url))
         (redirect_url, code) = response.redirect_chain[0]
         self.assert_(reverse('fa-admin:index') in redirect_url)
         expected = 303      # redirect
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
-                             % (expected, code, publish_url))
+            % (expected, code, publish_url))
 
         # convert messages into an easier format to test
         msgs = [str(msg) for msg in response.context['messages']]
@@ -719,7 +723,8 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         self.assertEqual({}, docinfo)   # invalid document not loaded to exist
 
         # attempt to publish non-well-formed xml - display errors
-        response = self.client.post(publish_url, {'filename': 'badlyformed.xml'})
+        with patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=fixture_dir):
+            response = self.client.post(publish_url, {'filename': 'badlyformed.xml'})
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, not well-formed xml) as admin user'
@@ -731,7 +736,6 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # exist save errors should be caught & handled gracefully
         # - force an exist save error by setting collection to a non-existent collection
         with patch.object(settings, 'EXISTDB_ROOT_COLLECTION', new='/bogus/doesntexist'):
-            #settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
             response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
             self.assertContains(response, "Could not publish",
                 msg_prefix="exist save error on publish displays error to user")
