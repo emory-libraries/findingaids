@@ -22,6 +22,7 @@ import unittest
 from urllib import quote as urlquote
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
 from eulexistdb.db import ExistDB, ExistDBException
@@ -57,6 +58,9 @@ class FaViewsTest(TestCase):
         self.exist_files = []
 
     def test_title_letter_list(self):
+        # clear out any cached title letters from previous tests
+        cache.set('browse-title-letters', None)
+
         titles_url = reverse('fa:browse-titles')
         response = self.client.get(titles_url)
         expected = 200
