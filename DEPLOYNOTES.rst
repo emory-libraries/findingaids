@@ -87,8 +87,6 @@ Known Issues
 
 -----
 
-Known Issues
-""""""""""""
 
 * As of 04/2011, installing **python-eulcore** from SVN via pip does not
   install the eulcore template themes correctly.  The easiest way to fix
@@ -117,12 +115,6 @@ following python libraries:
    ``easy_install beautifulsoup``
  * PIDmanager REST client - http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x
  * eulxml, eulexistdb, eulcommon, and eullocal
-
-
-Note that :mod:`eulcore` and :mod:`pidservices` are currently included with the
-source code (as subversion externals).  See :ref:`eulcore dependencies <eulcore-deps>`
-for per-module dependencies in eulcore. To see an up-to-date list of eulcore
-modules in use by FindingAids, check the **INSTALLED_APPS** in settings.py.
 
 
 System Dependencies
