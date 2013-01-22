@@ -26,11 +26,6 @@ CELERY_ROUTES = {
     'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': 'findingaids'}
 }
 
-#os.environ['CELERY_LOADER'] = 'django'
-# use a differently-named default queue to keep separate from other projects using celery
-#CELERY_DEFAULT_QUEUE = 'findingaids'
-
-
 # Get the directory of this file for relative dir paths.
 # Django sets too many absolute paths.
 BASE_DIR = path.dirname(path.abspath(__file__))
@@ -224,6 +219,7 @@ try:
 except ImportError:
     pass
 
+
 # - only if django_nose is installed, so it is only required for development
 if django_nose is not None:
     INSTALLED_APPS.append('django_nose')
@@ -238,3 +234,6 @@ if django_nose is not None:
 # against non-test configured existdb collection
 else:
     TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
+
+# disable south migrations in unit tests
+SOUTH_TESTS_MIGRATE = False
