@@ -409,6 +409,53 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.1
+~~~~
+
+.. NOTE:
+
+  Due to the upgrade to Django 1.4, ``manage.py`` is now in the top-level directory rather
+  than in the ``findingaids`` application subdirectory, and the default WSGI file has been
+  moved to ``findingaids/wsgi.py``
+
+* If Apache is configured to use the included wsgi script, update the **WSGIScriptAlias**
+  to the new location (``findingaids/wsgi.py``).
+
+* Static files to be served out by Apache have been consolidated to a single
+  directory; apache configuration files should be updated to serve out
+  the ``static`` directory as ``/static`` and other references to the media directories
+  should be removed.
+
+* Update site and database to work with celery 3.0.
+
+  * Add database tables for :mod:`south` migrations and update the database
+    for the newest version of :mod:`celery`.
+
+    * python manage.py syncdb
+    * python manage.py migrate djcelery 0001 --fake
+    * python manage.py migrate djcelery
+
+  * Celery broker should now be configured using **BROKER_URL** instead of
+    individual **BROKER_** settings; see ``localsettings.py.dist`` for
+    an example.
+
+  * The celery worker should now be started via::
+
+     ``python manage.py celery worker -Q findingaids``
+
+    Be sure to update any cron jobs or init scripts that use the old
+    ``celeryd`` syntax.
+
+  * If not using the WSGI script included with the source code, add the
+    following to your wsgi script::
+
+      import djcelery
+      djcelery.setup_loader()
+
+* Recommended: update emory_ldap database tables for :mod:`south` migrations
+  using ``python manage.py migrate emory_ldap``.  If you get an error on the last
+  migration, it is fine to fake it using ``python manage.py migrate emory_ldap 0004 --fake``
+
 1.0.9
 ~~~~~
 

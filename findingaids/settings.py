@@ -17,9 +17,18 @@
 from os import path
 
 import os
-os.environ['CELERY_LOADER'] = 'django'
+
+import djcelery
+djcelery.setup_loader()
+
+# explicitly set celery task to findingaids queue (let celery create the queue)
+CELERY_ROUTES = {
+    'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': 'findingaids'}
+}
+
+#os.environ['CELERY_LOADER'] = 'django'
 # use a differently-named default queue to keep separate from other projects using celery
-CELERY_DEFAULT_QUEUE = 'findingaids'
+#CELERY_DEFAULT_QUEUE = 'findingaids'
 
 
 # Get the directory of this file for relative dir paths.
@@ -167,6 +176,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sitemaps',
     'djcelery',
+    'south',
     'eullocal.django.emory_ldap',
     'eullocal.django.taskresult',
     'eullocal.django.util',

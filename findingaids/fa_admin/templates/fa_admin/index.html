@@ -10,6 +10,8 @@
 
 {% block sidebar-left %}
   {{ block.super }}
+
+  {# FIXME: task status display should probably be updated for celery 3.0 #}
   <div id="task-results">
       <h3>Task Results</h3>
       <ul>
@@ -27,6 +29,7 @@
       {% endfor %}
       </ul>
   </div>
+
 {% endblock %}
 
 {% block content-body %} {# no permissions to do any finding aid tasks #}

@@ -104,11 +104,7 @@ SITE_BASE_URL = 'http://findingaids.library.emory.edu'
 PROXY_ICP_PORT = 3130       # ICP port for checking status of objects in cache
 
 # settings for celery & rabbit-mq for asynchronous task handling
-BROKER_HOST = '127.0.0.1'
-BROKER_PORT = 5672
-BROKER_VHOST = '/'
-BROKER_USER = 'guest'
-BROKER_PASSWORD = 'guest'
+BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672/'
 
 # URLS for RSS feeds to populate site content pages
 CONTENT_RSS_FEEDS = {
