@@ -50,9 +50,15 @@ DATABASES = {
     }
 }
 
-#Specify Session Engine
-CACHE_BACKEND = 'file:///tmp/findingaids_cache?timeout=1800'
+# Specify Session Engine
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': '/tmp/findingaids_cache',
+        'TIMEOUT': 1800,
+    }
+}
 
 #Exist DB Settings
 EXISTDB_SERVER_USER     = 'user'
