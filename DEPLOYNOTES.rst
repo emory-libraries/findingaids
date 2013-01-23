@@ -424,7 +424,7 @@ Upgrade Notes
     for the newest version of :mod:`celery`.
 
     * python manage.py syncdb
-    * python manage.py migrate djcelery 0001 --fake
+    * python manage.py migrate djcelery --fake 0001
     * python manage.py migrate djcelery
 
   * Celery broker should now be configured using **BROKER_URL** instead of
@@ -433,10 +433,9 @@ Upgrade Notes
 
   * The celery worker should now be started via::
 
-     ``python manage.py celery worker -Q findingaids``
+      python manage.py celery worker -Q findingaids
 
-    Be sure to update any cron jobs or init scripts that use the old
-    ``celeryd`` syntax.
+    Be sure to update any init scripts that use the old ``celeryd`` syntax.
 
   * If not using the WSGI script included with the source code, add the
     following to your wsgi script::
