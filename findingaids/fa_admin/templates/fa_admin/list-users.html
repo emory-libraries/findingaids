@@ -17,19 +17,19 @@
         <tr>
             <td>{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>
-            <td>{{ user.username }}</td>            
+            <td>{{ user.username }}</td>
             <td>{% if user.password == "!" %}LDAP{% else %}Local{% endif %}</td> {# FIXME: better way to do this? #}
             <td>{% for g in user.groups.all %}{{g}}{% if not forloop.last %},{% endif %} {% endfor %}</td>
             <td>
               {% if user.is_superuser %}
-                <img src="{{ MEDIA_URL }}/admin/true.gif" alt="Yes" style="border:0px solid" />
+                <img src="{{ STATIC_URL }}admin/true.gif" alt="Yes" style="border:0px solid" />
               {% else %}
-                <img src="{{ MEDIA_URL }}/admin/false.gif" alt="No" style="border:0px solid" />
+                <img src="{{ STATIC_URL }}admin/false.gif" alt="No" style="border:0px solid" />
             {% endif %}
             </td>
             <td>
                 <a href="{% url fa-admin:edit-user user.id %}" style="text-decoration:none">
-                <img src="{{ MEDIA_URL }}/admin/edit.gif" alt="" style="border:0px" />edit</a>
+                <img src="{{ STATIC_URL }}admin/edit.gif" alt="" style="border:0px" />edit</a>
             </td>
         </tr>
     {% endfor %}

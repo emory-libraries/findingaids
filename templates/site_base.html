@@ -5,11 +5,11 @@
 {% block style %}
     {{ block.super }}
     {% comment %}Place Local changes, modifications and overrisdes in your local.css file.{% endcomment %}
-    <link rel="stylesheet" type="text/css" media="all" href="{{ MEDIA_URL }}/style/local.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}style/local.css" />
 {% endblock %}
 
 {% block site-name %}
-<img src="{{ MEDIA_URL}}/images/EmoryFindingAids-logo.png" alt="EmoryFindingAids"/>
+<img src="{{ STATIC_URL}}images/EmoryFindingAids-logo.png" alt="EmoryFindingAids"/>
 {% endblock %}
 
 {% block navbar %}   {# override the whole block #}
