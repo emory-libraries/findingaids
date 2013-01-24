@@ -28,7 +28,8 @@
             {% endif %}
             </td>
             <td>
-                <a href="{% url fa-admin:edit-user user.id %}" style="text-decoration:none">
+                {# <a href="{% url fa-admin:edit-user user.id %}" style="text-decoration:none"> #}
+                <a href="{% url admin:auth_user_change user.id %}" style="text-decoration:none">
                 <img src="{{ STATIC_URL }}admin/edit.gif" alt="" style="border:0px" />edit</a>
             </td>
         </tr>

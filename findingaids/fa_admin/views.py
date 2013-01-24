@@ -42,7 +42,7 @@ from eulexistdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
-from findingaids.fa_admin.forms import FAUserChangeForm, DeleteForm
+from findingaids.fa_admin.forms import DeleteForm
 from findingaids.fa_admin.models import EadFile
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
@@ -107,31 +107,6 @@ def list_staff(request):
     """
     users = User.objects.all()
     return render_to_response('fa_admin/list-users.html', {'users': users},
-                              context_instance=RequestContext(request))
-
-
-@permission_required_with_403('auth.user.can_change')
-def edit_user(request, user_id):
-    """Display and process a form for editing a user account.
-
-    On GET, display the edit form. On POST, process the form.
-    """
-    user = User.objects.get(id=user_id)
-    if request.method == 'POST':  # If the form has been submitted...
-        userForm = FAUserChangeForm(request.POST, instance=user)  # A form bound to the POST data
-        if userForm.is_valid():  # form is valid - save data
-            userForm.save()
-            messages.success(request, "Changes to user '%s' have been saved." \
-                            % user.username)
-            return HttpResponseRedirect(reverse('fa-admin:index'))
-        else:
-            # form validation errors -- allow to fall through to render form
-            pass
-    else:   # GET - display the form
-        userForm = FAUserChangeForm(instance=user)
-
-    return render_to_response('fa_admin/account-management.html',
-                              {'form': userForm, 'user_id': user_id},
                               context_instance=RequestContext(request))
 
 

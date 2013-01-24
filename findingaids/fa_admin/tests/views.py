@@ -331,16 +331,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "marbl")
         self.assertContains(response, "peon")
 
-    def test_edit_user(self):
-        edit_user = reverse('fa-admin:edit-user', args=[2])  # edit 2nd user fixture
-        # Test as an admin with permission to edit users
-        self.client.login(**self.credentials['superuser'])
-        user = User.objects.create_user('test', 'test@emory.edu', 'testpassword')
-        user.is_staff = True
-        user.save()
-        response = self.client.get(edit_user)
-        self.assertContains(response, "Edit the user account")
-
     def test_prep_ead(self):
          # use fixture directory to test publication
         filename = 'hartsfield558.xml'
