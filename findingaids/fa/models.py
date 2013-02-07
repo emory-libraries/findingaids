@@ -186,7 +186,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         Generate a dictionary of Dublin Core fields from an EAD.
         Dictionary key: base name of a Dublin Core field (e.g., creator, title)
         Dictionary value: a list of values corresponding to the DC field.
-                    Note that some keys may have empty lists as their values.
+        Note that some keys may have empty lists as their values.
 
         :rtype: dict
         """
