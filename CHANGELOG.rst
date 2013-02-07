@@ -11,6 +11,12 @@ recent version first.  Upgrade or deployment notes should be found in
 1.1
 ---
 
+* When an admin is logged in, they will see a link to the admin page at
+  the top of the left sidebar, so that they can always get back to the
+  main admin page.
+* A researcher viewing the HTML or PDF version of a finding aid can see
+  the processing information from the EAD, so that they know who is responsible
+  for the content.
 * Updated to Django 1.4.2
 * Updates to follow team best practices for Django project code organization:
 
