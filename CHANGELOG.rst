@@ -8,6 +8,30 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.1
+---
+
+* When an admin is logged in, they will see a link to the admin page at
+  the top of the left sidebar, so that they can always get back to the
+  main admin page.
+* A researcher viewing the HTML or PDF version of a finding aid can see
+  the processing information from the EAD, so that they know who is responsible
+  for the content.
+* Updated to Django 1.4.2
+* Updates to follow team best practices for Django project code organization:
+
+  * Moved media directory to top-level sitemedia directory
+  * Moved templates directory to top-level and moved app-specific templates
+    into their respective apps.
+  * Renamed localsettings.py example from ``localsettings-sample.py`` to
+    ``localsettings.py.dist``
+
+.. NOTE:
+
+  Due to the upgrade to Django 1.4, ``manage.py`` is now in the top-level directory rather
+  than included in the ``findingaids`` app directory.
+
+
 1.0 micro releases
 ------------------
 

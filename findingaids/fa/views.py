@@ -51,13 +51,13 @@ fa_listfields = ['eadid', 'list_title', 'archdesc__did']
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
-    return render_to_response('findingaids/index.html', {'letters': title_letters()},
+    return render_to_response('fa/index.html', {'letters': title_letters()},
                                                           context_instance=RequestContext(request))
 
 
 def browse_titles(request):
     "List all first letters in finding aid list title, with a link to browse by letter."
-    return render_to_response('findingaids/browse_letters.html',
+    return render_to_response('fa/browse_letters.html',
                               {'letters': title_letters()},
                               context_instance=RequestContext(request))
 
@@ -97,7 +97,7 @@ def titles_by_letter(request, letter):
 
     # no special first/last page label is required, since we are displaying all labels (not limiting to 9)
 
-    return render_to_response('findingaids/titles_list.html',
+    return render_to_response('fa/titles_list.html',
         response_context, context_instance=RequestContext(request))
 
 
@@ -113,7 +113,7 @@ def xml_titles(request):
         'findingaids': fa,
     }
 
-    return render_to_response('findingaids/xml.html',
+    return render_to_response('fa/xml.html',
         response_context, context_instance=RequestContext(request))
 
 
@@ -151,7 +151,7 @@ def findingaid(request, id, preview=False):
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
         url_params=url_params)
 
-    response = render_to_response('findingaids/findingaid.html', {
+    response = render_to_response('fa/findingaid.html', {
         'ead': fa,
         'series': series,
         'all_indexes': fa.archdesc.index,
@@ -182,7 +182,7 @@ def full_findingaid(request, id, mode, preview=False):
     fa = get_findingaid(id, preview=preview)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], url_callback=_series_anchor, preview=preview)
 
-    template = 'findingaids/full.html'
+    template = 'fa/full.html'
     template_args = {'ead': fa, 'series': series,
                     'mode': mode, 'preview': preview, 'request': request}
     if mode == 'html':
@@ -343,7 +343,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         render_opts['series'] = result
         render_opts['subseries'] = _subseries_links(result, preview=preview_mode, url_params=url_params)
 
-    response = render_to_response('findingaids/series_or_index.html',
+    response = render_to_response('fa/series_or_index.html',
                             render_opts, context_instance=RequestContext(request))
 
     #Cache-Control to private when there is a last_search
@@ -523,7 +523,7 @@ def search(request):
                 response_context['first_page_label'] = page_labels[1]
                 response_context['last_page_label'] = page_labels[paginator.num_pages]
 
-            return render_to_response('findingaids/search_results.html',
+            return render_to_response('fa/search_results.html',
                     response_context, context_instance=RequestContext(request))
 
         except ExistDBException, e:
@@ -543,7 +543,7 @@ def search(request):
         form = AdvancedSearchForm()
 
     # if form is invalid (no search terms) or there was an error, display search form
-    response = render_to_response('findingaids/search_form.html',
+    response = render_to_response('fa/search_form.html',
                     {'form': form, 'request': request},
                     context_instance=RequestContext(request))
     # if query could not be parsed, set a 'Bad Request' status code on the response
@@ -557,21 +557,24 @@ def document_search(request, id):
 
     form = KeywordSearchForm(request.GET)
     query_error = False
-    ead = get_findingaid(id, only=['eadid', 'title'])   # will 404 if not found
+    # get the findingaid - will 404 if not found
+    ead = get_findingaid(id, only=['eadid', 'title',
+        'document_name', 'collection_name'])   # info to generate document path
     if form.is_valid():
         search_terms = form.cleaned_data['keywords']
         try:
             # do a full-text search at the file level
             # include parent series information and enough ancestor series ids
             # in order to generate link to containing series at any level (c01-c03)
-            # NOTE: filter by parent ead id first, then by keyword
-            # (this is significantly faster for common keywords in large findingaids)
-            files = FileComponent.objects.filter(ead__eadid=id) \
+
+            # use path to restrict query to a single document (much faster)
+            path = '%s/%s' % (ead.collection_name, ead.document_name)
+            files = FileComponent.objects.filter(document_path=path) \
                         .filter(fulltext_terms=search_terms) \
                         .also('parent__id', 'parent__did',
                               'series1__id', 'series1__did', 'series2__id', 'series2__did')
 
-            return render_to_response('findingaids/document_search.html', {
+            return render_to_response('fa/document_search.html', {
                     'files': files,
                     'ead': ead,
                     'querytime': [files.queryTime(), ead.queryTime()],
@@ -599,7 +602,7 @@ def document_search(request, id):
         # invalid form
         messages.error(request, 'Please enter a search term.')
     # display empty search results
-    response = render_to_response('findingaids/document_search.html', {
+    response = render_to_response('fa/document_search.html', {
                     'files': [],
                     'ead': ead,
                     'docsearch_form': KeywordSearchForm(),

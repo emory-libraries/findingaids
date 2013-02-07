@@ -29,7 +29,8 @@ from eullocal.django.forms.tests import MockCaptcha
 from findingaids.content import models, forms
 
 # re-using finding aid fixtures from main fa app
-exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..', 'fa', 'fixtures')
+exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..',
+    'fa', 'tests', 'fixtures')
 
 class MockFeedParser:
     entries = []
@@ -136,7 +137,7 @@ class CachedFeedTest(TestCase):
         <a href="%(base_url)s#same-page">link1</a>
         <a href="%(base_url)s#not-same-page">link2</a>
         <a name="same-page">text</a>
-        </html>''' % {'base_url': base_url }
+        </html>''' % {'base_url': base_url}
         self.mockfeedparser.entries = [entry]
         cached_feed = feedparser.FeedParserDict({
             'feed': feedparser.FeedParserDict({

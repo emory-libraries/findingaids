@@ -1,5 +1,5 @@
 # file findingaids/urls.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,13 @@
 #   limitations under the License.
 
 from django.conf.urls.defaults import *
-from django.conf import settings
 from django.contrib import admin
 from django.views.generic.simple import direct_to_template
 from django.views.generic.base import RedirectView
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
+from findingaids.fa.sitemaps import FindingAidSitemap
+from findingaids.content.sitemaps import ContentSitemap
 
 admin.autodiscover()
 
@@ -26,7 +29,7 @@ urlpatterns = patterns('',
    url(r'^robots\.txt$', direct_to_template, {'template': 'robots.txt', 'mimetype': 'text/plain'}),
    # embedded url on non-library Emory sites that gets picked up by search bots
    url(r'^-Libraries-EmoryFindingAids$', RedirectView.as_view(url='/', permanent=True)),
-                       
+
    url(r'^db-admin/', include(admin.site.urls)),
    url(r'^admin/', include('findingaids.fa_admin.urls', namespace='fa-admin')),
    url(r'^$', 'findingaids.content.views.site_index', name='site-index'),
@@ -35,25 +38,16 @@ urlpatterns = patterns('',
    url(r'^', include('findingaids.fa.urls', namespace='fa')),
 )
 
+# xml sitemaps for search-engine discovery
+sitemaps = {
+    'findingaids': FindingAidSitemap,
+    'content': ContentSitemap
+}
+urlpatterns += patterns('django.contrib.sitemaps.views',
+    (r'^sitemap\.xml$', 'index', {'sitemaps': sitemaps}),
+    (r'^sitemap-(?P<section>.+)\.xml$', 'sitemap', {'sitemaps': sitemaps}),
+)
 
-# DISABLE THIS IN PRODUCTION
-if settings.DEV_ENV:
-    import os
-    # if there's not a genlib_media dir/link in the media directory, then
-    # look for it in the virtualenv themes.
-    if not os.path.exists(os.path.join(settings.MEDIA_ROOT, 'genlib_media')) and \
-            'VIRTUAL_ENV' in os.environ:
-        genlib_media_root = os.path.join(os.environ['VIRTUAL_ENV'],
-                                         'themes', 'genlib', 'genlib_media')
-        urlpatterns += patterns('',
-            (r'^static/genlib_media/(?P<path>.*)$', 'django.views.static.serve', {
-                'document_root': genlib_media_root,
-                }),
-        )
-
-    urlpatterns += patterns('',
-        (r'^static/(?P<path>.*)$', 'django.views.static.serve', {
-            'document_root': settings.MEDIA_ROOT,
-            }),
-    )
+# enable serving static files for development (DEBUG mode only)
+urlpatterns += staticfiles_urlpatterns()
 

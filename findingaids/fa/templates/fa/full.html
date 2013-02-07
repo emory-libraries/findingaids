@@ -1,0 +1,111 @@
+{% load ead %}
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+        <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
+    </head>
+    <body>
+<div class="fa">
+<h1>
+    <a name="{{ ead.eadid }}">
+    {% if ead.archdesc.origination %}{{ ead.archdesc.origination|upper }}<br/>{% endif %}
+    {{ ead.unittitle|format_ead }}
+    </a>
+</h1>
+
+<div id="publication_statement" class="no-margin">
+    {% with ead.file_desc.publication as publication %}
+    <p>{{ publication.publisher }}</p>
+    {% for line in publication.address.lines %}
+        <p>{{ line }}</p>
+    {% endfor %}
+    {% endwith %}
+</div>
+<hr/>
+{% include "fa/snippets/description.html" %}
+
+{# NOTE: contol access section is not included in the PDF #}
+
+{# container list or series/subseries listing #}
+{% if ead.dsc.hasSeries %}       {# list series/subseries here,   display on separate page #}
+  <div class="nextpage">
+    <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
+    <ul>
+       {% autoescape off %}
+           {{ series|unordered_list }}
+       {% endautoescape %}
+    </ul>
+  </div>
+{% else %}
+  {% with ead.dsc as series %}
+  <div class="nextpage">
+  <hr/>
+    <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
+    {% include "fa/snippets/containerlist.html" %}
+  </div>
+  {% endwith %}
+{% endif %}
+
+
+{% if ead.dsc.hasSeries %}
+    {% for c01_series in ead.dsc.c %}
+        <div class="nextpage">
+            {% with c01_series as series %}
+                {% include "fa/snippets/series.html" %}
+            {% endwith %}
+        </div>
+        {# container list is handled in series template; display subseries, if any #}
+        {% if c01_series.hasSubseries %}
+        <div class="subseries">
+            {% for c02_series in c01_series.c %}
+                <div class="nextpage">
+                    {% with c02_series as series %}
+                        {% include "fa/snippets/series.html" %}
+                    {% endwith %}
+                </div>
+                {% if c02_series.hasSubseries %}
+                <div class="subseries">
+                    {% for c03_series in c02_series.c %}
+                        <div class="nextpage">
+                            {% with c03_series as series %}
+                                {% include "fa/snippets/series.html" %}
+                            {% endwith %}
+                        </div>
+                    {% endfor %} {# end looping through c03s #}
+                </div>
+                {% endif %} {# c02 has subseries #}
+            {% endfor %} {# end looping through c02s #}
+        </div>
+        {% endif %} {# c01 has subseries #}
+    {% endfor %} {# end looping through c01s #}
+ <hr/>
+{% else %} {# simple finding aid - no series at all, just a container list #}
+<hr/>
+{% include "fa/snippets/containerlist.html" %}
+{% endif %}
+
+{% for index in ead.archdesc.index %}
+    {% include "fa/snippets/indexentry.html" %}
+{% endfor %}
+
+</div> {# end div.fa #}
+
+{# header and footer contents #}
+<div id="firstpage-footer">
+  Emory Libraries provides copies of its finding aids for use only in research
+  and private study.  Copies supplied may not be copied for others or
+  otherwise distributed without prior consent of the holding repository.</div>
+{# <div id="footer"> </div> #}
+<div id="header">
+    <table>
+        <col width="65%" valign="top" align="left"/>    {# column width needed for XSL-FO/PDF #}
+        <col width="45%" valign="top" align="right"/>
+        <tr>
+            <td style="text-align:left">{{ ead.title|format_ead }}</td>
+            <td style="text-align:right">{{ ead.archdesc.unitid }}</td>
+        </tr>
+    </table>
+</div>
+
+</body>
+</html>

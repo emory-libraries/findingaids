@@ -87,8 +87,6 @@ Known Issues
 
 -----
 
-Known Issues
-""""""""""""
 
 * As of 04/2011, installing **python-eulcore** from SVN via pip does not
   install the eulcore template themes correctly.  The easiest way to fix
@@ -117,12 +115,6 @@ following python libraries:
    ``easy_install beautifulsoup``
  * PIDmanager REST client - http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x
  * eulxml, eulexistdb, eulcommon, and eullocal
-
-
-Note that :mod:`eulcore` and :mod:`pidservices` are currently included with the
-source code (as subversion externals).  See :ref:`eulcore dependencies <eulcore-deps>`
-for per-module dependencies in eulcore. To see an up-to-date list of eulcore
-modules in use by FindingAids, check the **INSTALLED_APPS** in settings.py.
 
 
 System Dependencies
@@ -194,7 +186,7 @@ for installation paths and IP addresses.
 
 Configuration
 ^^^^^^^^^^^^^
-Configure the application settings by copying localsettings-sample.py to
+Configure the application settings by copying localsettings.py.dist to
 localsettings.py and editing settings for local database, LDAP, fedora, PID
 manager, eXist-DB and key configuration.
 
@@ -408,6 +400,52 @@ on configuring celery to run as a daemon.
 
 Upgrade Notes
 -------------
+
+1.1
+~~~~
+
+.. NOTE:
+
+  Due to the upgrade to Django 1.4, ``manage.py`` is now in the top-level directory rather
+  than in the ``findingaids`` application subdirectory, and the default WSGI file has been
+  moved to ``findingaids/wsgi.py``
+
+* If Apache is configured to use the included wsgi script, update the **WSGIScriptAlias**
+  to the new location (``findingaids/wsgi.py``).
+
+* Static files to be served out by Apache have been consolidated to a single
+  directory; apache configuration files should be updated to serve out
+  the ``static`` directory as ``/static`` and other references to the media directories
+  should be removed.
+
+* Update site and database to work with celery 3.0.
+
+  * Add database tables for :mod:`south` migrations and update the database
+    for the newest version of :mod:`celery`.
+
+    * python manage.py syncdb
+    * python manage.py migrate djcelery --fake 0001
+    * python manage.py migrate djcelery
+
+  * Celery broker should now be configured using **BROKER_URL** instead of
+    individual **BROKER_** settings; see ``localsettings.py.dist`` for
+    an example.
+
+  * The celery worker should now be started via::
+
+      python manage.py celery worker -Q findingaids
+
+    Be sure to update any init scripts that use the old ``celeryd`` syntax.
+
+  * If not using the WSGI script included with the source code, add the
+    following to your wsgi script::
+
+      import djcelery
+      djcelery.setup_loader()
+
+* Recommended: update emory_ldap database tables for :mod:`south` migrations
+  using ``python manage.py migrate emory_ldap``.  If you get an error on the last
+  migration, it is fine to fake it using ``python manage.py migrate emory_ldap 0004 --fake``
 
 1.0.9
 ~~~~~

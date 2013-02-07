@@ -1,0 +1,55 @@
+{# descriptive summary, admin info, collection description #}
+{# expects FindingAid object as ead #}
+{% load ead %}
+<h2><a name="descriptive_summary">Descriptive Summary</a></h2>
+<table id="descriptive_summary">    {#  display the following fields, in this specific order  #}
+    <col width="20%" valign="top" align="left"/>
+    <col width="80%" valign="top" align="left"/>
+  {% if ead.archdesc.origination %}
+      <tr><th>Creator:</th><td>{{ ead.archdesc.origination }}</td></tr>
+   {% endif %}
+   {% if ead.unittitle|format_ead %}
+      <tr><th>Title:</th><td> {{ ead.unittitle|format_ead }} </td></tr>
+   {% endif %}
+   {% if ead.archdesc.unitid %}
+      <tr><th>Call Number:</th><td>{{ ead.archdesc.unitid }}</td></tr>
+   {% endif %}
+   {% if ead.archdesc.extent %}
+      <tr><th>Extent:</th><td>{{ ead.physical_descriptions|join:'; ' }}</td></tr>
+   {% endif %}
+   {% if ead.archdesc.location %}
+      <tr><th>Location:</th><td>{{ ead.archdesc.location }}</td></tr>
+   {% endif %}
+   {% if ead.abstract %}
+      <tr><th>Abstract:</th><td>{{ ead.abstract|format_ead }}</td></tr>
+   {% endif %}
+   {% if ead.archdesc.langmaterial %}
+      <tr><th>Language:</th><td>{{ ead.archdesc.langmaterial }} </td></tr>
+   {% endif %}
+  </table>
+
+<hr/>
+
+<h2><a name="administrative_information">Administrative Information</a></h2>
+ {% for section in ead.admin_info %}
+   {% if section.head and section.content %}
+   <div>
+   	<h3>{{ section.head|default:"" }}</h3>
+	{% for para in section.content %}
+	    <p>{{ para|format_ead }}</p>
+	{% endfor %}
+   </div>
+   {% endif %}
+ {% endfor %}
+<hr/>
+
+<h2><a name="collection_description">Collection Description</a></h2>
+ {% for section in ead.collection_description %}
+   <div>
+   	<h3>{{ section.head|default:'' }}</h3>
+	{% for para in section.content %}
+	    <p>{{ para|format_ead }}</p>
+	{% endfor %}
+   </div>
+ {% endfor %}
+

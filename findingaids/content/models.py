@@ -162,6 +162,15 @@ class ContentFeed(CachedFeed):
     url = settings.CONTENT_RSS_FEEDS[id]
     separator = '-'
 
+    def get_items(self):
+        # return a dictionary of items in this feed
+        # Key is page id used in content page url, value is item entry
+        items = {}
+        for entry in self.items:
+            prefix, sep, remainder = entry.link.partition(self.separator)
+            items[remainder] = entry
+        return items
+
     def get_entry(self, id):
         '''Get a single entry in the feed by a page identifier.  The identifier
         should match the portion of the item link after the first delimeter
@@ -176,4 +185,3 @@ class ContentFeed(CachedFeed):
                 # convert same-page anchor links before returning
                 self.convert_same_page_links(entry)
                 return entry
-

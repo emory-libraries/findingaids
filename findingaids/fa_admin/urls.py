@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/urls.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,6 @@ from findingaids.fa.urls import EADID_URL_REGEX, findingaid_urlpatterns
 urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^$', 'main', name="index"),
     url(r'^accounts/$', 'list_staff', name="list-staff"),
-    url(r'^accounts/user/(?P<user_id>[0-9.]+)/$', 'edit_user', name="edit-user"),
     url(r'^accounts/logout$', 'logout', name="logout"),
     url(r'^publish/$', 'publish', name="publish-ead"),
     url(r'^preview/$', 'preview', name="preview-ead"),
@@ -36,7 +35,7 @@ urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^documents/%s/delete/$' % EADID_URL_REGEX, 'delete_ead', name="delete-ead"),
 )
 
-# contrib views 
+# contrib views
 urlpatterns += patterns('django.contrib.auth.views',
     url(r'^accounts/login/$', 'login', name='login'),
     # note: could use contrib logout; custom view simply adds a message

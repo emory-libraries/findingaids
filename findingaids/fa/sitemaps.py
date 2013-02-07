@@ -1,4 +1,4 @@
-# file findingaids/__init__.py
+# file findingaids/fa/sitemaps.py
 #
 #   Copyright 2012 Emory University Library
 #
@@ -14,9 +14,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__version_info__ = (1, 1, 0, None)
+from django.contrib.sitemaps import Sitemap
+from django.core.urlresolvers import reverse
 
-# Dot-connect all but the last. Last is dash-connected if not None.
-__version__ = '.'.join(str(i) for i in __version_info__[:-1])
-if __version_info__[-1] is not None:
-    __version__ += ('-%s' % (__version_info__[-1],))
+from findingaids.fa.models import FindingAid
+
+class FindingAidSitemap(Sitemap):
+
+    def items(self):
+        return FindingAid.objects.only('eadid', 'last_modified')
+
+    def location(self, obj):
+        return reverse('fa:findingaid', kwargs={'id': obj.eadid})
+
+    def lastmod(self, obj):
+        return obj.last_modified

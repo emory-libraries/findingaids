@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: http://findingaids.library.emory.edu/sitemap.xml

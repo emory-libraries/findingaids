@@ -1,5 +1,5 @@
 # file findingaids/fa/models.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,7 @@ from django.db import models
 from eulxml import xmlmap
 from eulxml.xmlmap.eadmap import EncodedArchivalDescription, Component, \
         SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
-        UnitTitle
+        UnitTitle, Section
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
@@ -31,6 +31,7 @@ from eulexistdb.models import XmlModel
 # finding aid models
 
 ID_DELIMITER = '_'
+
 
 class FindingAid(XmlModel, EncodedArchivalDescription):
     """
@@ -67,14 +68,14 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     first_letter = xmlmap.StringField("substring(normalize-space(%s),1,1)" % list_title_xpath)
     "First letter of list title"
 
-    dc_subjects = xmlmap.StringListField ('e:archdesc//e:controlaccess/e:subject[@encodinganalog = "650"] | \
+    dc_subjects = xmlmap.StringListField('e:archdesc//e:controlaccess/e:subject[@encodinganalog = "650"] | \
             e:archdesc//e:controlaccess/e:persname[@encodinganalog = "600"] | \
             e:archdesc//e:controlaccess/e:corpname[@encodinganalog = "610"] | \
             e:archdesc//e:controlaccess/e:corpname[@encodinganalog = "611"] | \
             e:archdesc//e:controlaccess/e:geogname[@encodinganalog = "651"]', normalize=True)
     "control access fields that should be mapped to Dublin Core subject, based on encodinganalog attribute"
 
-    dc_contributors = xmlmap.StringListField ('e:archdesc//e:controlaccess/e:persname[@encodinganalog = "700"] | \
+    dc_contributors = xmlmap.StringListField('e:archdesc//e:controlaccess/e:persname[@encodinganalog = "700"] | \
         e:archdesc//e:controlaccess/e:corpname[@encodinganalog = "710"]', normalize=True)
     "control access fields that should be mapped to Dublin Core contributor, based on encodinganalog attribute"
 
@@ -88,12 +89,15 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     boostfields = xmlmap.StringField('.//e:titleproper | .//e:origination | \
         .//e:abstract | .//e:bioghist | .//e:scopecontent | .//e:controlaccess')
 
+    # temporary manual mapping for processinfo, will be incorporated into a release of eulxml
+    process_info = xmlmap.NodeField("e:archdesc/e:processinfo", Section)
+
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
     _admin_info = ['userestrict', 'altformavail', 'relatedmaterial', 'separatedmaterial',
         'acqinfo', 'custodhist', 'prefercite']
     # -- map as regular xmlmap field, for use when entire object is returned
-    admin_info_matches = xmlmap.IntegerField('count(./e:archdesc/*[' + 
+    admin_info_matches = xmlmap.IntegerField('count(./e:archdesc/*[' +
         '|'.join(['self::e:%s' % field for field in _admin_info]) + ']//exist:match)')
     # -- eXist-specific xpath for returning count without entire document
     admin_info_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' + \
@@ -101,7 +105,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # - collection description fields
     _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'otherfindaid']
     # -- map as regular xmlmap field, for use when entire object is returned
-    coll_desc_matches =  xmlmap.IntegerField('count(' +
+    coll_desc_matches = xmlmap.IntegerField('count(' +
         '|'.join('./e:archdesc/e:%s//exist:match' % field for field in _coll_desc) + ')')
     # -- eXist-specific xpath for returning count without entire document
     coll_desc_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' +  \
@@ -147,6 +151,8 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
             info.append(self.archdesc.custodial_history)
         if self.archdesc.preferred_citation:
             info.append(self.archdesc.preferred_citation)
+        if self.process_info:
+            info.append(self.process_info)
         return info
 
     def collection_description(self):
@@ -181,7 +187,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         Dictionary key: base name of a Dublin Core field (e.g., creator, title)
         Dictionary value: a list of values corresponding to the DC field.
                     Note that some keys may have empty lists as their values.
-                    
+
         :rtype: dict
         """
         fields = dict()
@@ -193,19 +199,21 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         fields["subject"] = set(self.dc_subjects)
         fields["contributor"] = set(self.dc_contributors)
         fields["identifier"] = set([self.eadid.url])
-        
+
         return fields
+
 
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
-    ROOT_NAMESPACES = {'e': EAD_NAMESPACE }
+    ROOT_NAMESPACES = {'e': EAD_NAMESPACE}
     xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)
     # xpath to use for alpha-browse - using list title xpaths from FindingAid
-    
+
     # first letter of list title field (using generic item field to avoid string() conversion)
     first_letter = xmlmap.ItemField("substring(.,1,1)")
     "First letter of a finding aid list title: use to generate list of first-letters for browse."
     objects = Manager(xpath)
+
 
 def title_letters():
     """Cached list of distinct, sorted first letters present in all Finding Aid titles.
@@ -216,8 +224,9 @@ def title_letters():
         cache.set(cache_key, list(letters))  # use configured cache timeout
     return cache.get(cache_key)
 
+
 class EadRepository(XmlModel):
-    ROOT_NAMESPACES = {'e': EAD_NAMESPACE }
+    ROOT_NAMESPACES = {'e': EAD_NAMESPACE}
     normalized = xmlmap.StringField('normalize-space(.)')
     objects = Manager('//e:subarea')
 
@@ -230,6 +239,7 @@ class EadRepository(XmlModel):
             repos = EadRepository.objects.only('normalized').distinct()
             cache.set(cache_key, list(repos))  # use configured default cache timeout
         return cache.get(cache_key)
+
 
 class LocalComponent(Component):
     '''Extend default :class:`eulcore.xmlmap.eadmap.Component` class to add a
@@ -266,7 +276,7 @@ class Series(XmlModel, LocalComponent):
 
     objects = Manager('//e:c01')
     # NOTE: this element should not be restricted by level=series because eXist full-text indexing
-    # is more efficient if the queried element matches the indexed element 
+    # is more efficient if the queried element matches the indexed element
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c01 series objects
         in eXist.
@@ -280,7 +290,7 @@ class Series(XmlModel, LocalComponent):
     def series_info(self):
         """"
         Generate a list of sereies information fields.
-        Only includes MARBL-designated fields to be displayed as part of series 
+        Only includes MARBL-designated fields to be displayed as part of series
         description, in a specified order.  Any fields not present in the finding
         aid will not be included in the list returned.
 
@@ -290,7 +300,7 @@ class Series(XmlModel, LocalComponent):
         bibliography
 
         :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
-        """        
+        """
         fields = []
         if self.biography_history:
             fields.append(self.biography_history)
@@ -318,6 +328,7 @@ class Series(XmlModel, LocalComponent):
         return ': '.join([unicode(u) for u in [self.did.unitid, self.did.unittitle] if u])
 
     _short_id = None
+
     @property
     def short_id(self):
         "Short-form id (without eadid prefix) for use in external urls."
@@ -347,7 +358,7 @@ def shortform_id(id, eadid=None):
     # if eadid is available, use that (should be the most reliable way to shorten id)
     if eadid:
         id = id.replace('%s_' % eadid, '')
-        
+
     # if eadid is not available, split on _ and return latter portion
     elif ID_DELIMITER in id:
         eadid, id = id.split(ID_DELIMITER)
@@ -356,6 +367,7 @@ def shortform_id(id, eadid=None):
     else:
         raise Exception("Cannot calculate short id for %s" % id)
     return id
+
 
 class Series2(Series):
     """
@@ -390,6 +402,7 @@ class Series3(Series):
         Configured to use *//c03* as base search path.
     """
 
+
 class Index(XmlModel, EadIndex):
     """
       EAD Index, with index entries.
@@ -418,6 +431,7 @@ class Index(XmlModel, EadIndex):
     match_count = xmlmap.IntegerField("count(.//exist:match)")
 
     _short_id = None
+
     @property
     def short_id(self):
         "Short-form id (without eadid prefix) for use in external urls."
@@ -457,17 +471,18 @@ class FileComponent(XmlModel, Component):
 
     series1 = xmlmap.NodeField("ancestor::e:c01", Series)
     ":class:`findingaids.fa.models.Series` c01 series this file belongs to."
-    
+
     series2 = xmlmap.NodeField("ancestor::e:c02", Series)
     ":class:`findingaids.fa.models.Series` c02 series this file belongs to, if any."
 
-    objects = Manager('''(//e:c01|//e:c02|//e:c03|//e:c04)[@level="file"]''')
+    objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c-series file objects
         in eXist.
 
         Configured to find any c-series (1-4) with a level of file.
     """
+
 
 class Deleted(models.Model):
     """
@@ -482,13 +497,15 @@ class Deleted(models.Model):
                       "aid bookmarked and returns after it is gone.")
     class Meta:
         verbose_name = 'Deleted Record'
-        
+
     def __unicode__(self):
         return self.eadid
 
+
 class DeletedAdmin(admin.ModelAdmin):
     list_display = ('eadid', 'title', 'date', 'note')
-    list_filter  = ('date',)
+    list_filter = ('date',)
+
     # don't allow creating deleted records via admin site
     def has_add_permission(self, request):
         return False
