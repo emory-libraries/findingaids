@@ -320,6 +320,8 @@ class Series(XmlModel, LocalComponent):
             fields.append(self.originals_location)
         if self.bibliography:
             fields.append(self.bibliography)
+        if self.related_material:
+            fields.append(self.related_material)
 
         return fields
 
