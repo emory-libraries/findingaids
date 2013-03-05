@@ -14,18 +14,15 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from datetime import datetime
-from time import mktime
-
 from django.contrib.sitemaps import Sitemap
 from django.core.urlresolvers import reverse
 
-
 from findingaids.content.models import ContentFeed
 
+
+class ContentPage(object):
 # simple object to wrap around feed-based content and local
 # django content pages
-class ContentPage(object):
 
     def __init__(self, url):
         self.url = url
@@ -45,8 +42,9 @@ class ContentSitemap(Sitemap):
             items.append(ContentPage(
                 url=reverse('content:page', kwargs={'page': entry_id})
             ))
-            # NOTE: feed entry includes publication date, but this
-            # is probably different from modification date
+            # NOTE: feed entry includes publication date, but not
+            # including here because we can't rely on publication
+            # date being the same as last modification date
 
         # two special cases (non-feed content pages)
         items.extend([
@@ -55,5 +53,3 @@ class ContentSitemap(Sitemap):
         ])
 
         return items
-
-
