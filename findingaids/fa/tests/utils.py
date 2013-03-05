@@ -179,6 +179,8 @@ class FormatEadTestCase(DjangoTestCase):
     NOTRANS = """<abstract xmlns="%s">magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>""" % EAD_NAMESPACE
     EXIST_MATCH = """<abstract xmlns="%s">Pitts v. <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">Freeman</exist:match>
 school desegregation case files</abstract>""" % EAD_NAMESPACE
+    EXT_REF = '''<p xmlns="%s">Belfast Group sheets may also be found in the
+    <extref xlink:href="http://pid.emory.edu/ark:/25593/8zgst">Irish Literary Miscellany</extref>.</p>''' % EAD_NAMESPACE
 
     def setUp(self):
         self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
