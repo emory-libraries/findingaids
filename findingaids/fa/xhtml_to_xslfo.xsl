@@ -11,62 +11,62 @@
   otherwise distributed without prior consent of MARBL.
   </xsl:variable>
 
-  <!-- width of inner page (content portion), in inches 
+  <!-- width of inner page (content portion), in inches
        (used to calculate table column sizes)   -->
   <xsl:variable name="pagewidth">6.5</xsl:variable>
 
   <xsl:template match="/">
     <fo:root xmlns:fo="http://www.w3.org/1999/XSL/Format">
-      
+
       <fo:layout-master-set>
-        
+
         <!-- first page (no header) -->
         <fo:simple-page-master master-name="first"
-          page-height="11in" 
+          page-height="11in"
           page-width="8.5in"
-          margin-top="0.2in" 
+          margin-top="0.2in"
           margin-bottom="0.5in"
-          margin-left="0.5in" 
+          margin-left="0.5in"
           margin-right="0.5in">
-          <fo:region-body margin-bottom="0.7in" 
-            column-gap="0.25in" 
-            margin-left="0.5in" 
-            margin-right="0.5in" 
+          <fo:region-body margin-bottom="0.7in"
+            column-gap="0.25in"
+            margin-left="0.5in"
+            margin-right="0.5in"
             margin-top="0.5in"/>
           <fo:region-before extent="1.0in"/>
           <fo:region-after extent="0.5in" region-name="firstpage-footer"/>
         </fo:simple-page-master>
 
         <fo:simple-page-master master-name="basic"
-          page-height="11in" 
+          page-height="11in"
           page-width="8.5in"
-          margin-top="0.2in" 
+          margin-top="0.2in"
           margin-bottom="0.5in"
-          margin-left="0.5in" 
+          margin-left="0.5in"
           margin-right="0.5in">
-          <fo:region-body margin-bottom="0.7in" 
-            column-gap="0.25in" 
-            margin-left="0.5in" 
-            margin-right="0.5in" 
+          <fo:region-body margin-bottom="0.7in"
+            column-gap="0.25in"
+            margin-left="0.5in"
+            margin-right="0.5in"
             margin-top="0.5in"/>
           <!-- named header region; to keep from displaying on first page -->
           <fo:region-before extent="1.0in" region-name="header"/>
           <fo:region-after extent="0.5in" region-name="footer"/>
         </fo:simple-page-master>
-        
+
         <!-- one first page, followed by as many basic pages as necessary -->
         <fo:page-sequence-master master-name="all-pages">
           <fo:single-page-master-reference master-reference="first"/>
           <fo:repeatable-page-master-reference master-reference="basic"/>
         </fo:page-sequence-master>
-        
-      </fo:layout-master-set> 	
-      
+
+      </fo:layout-master-set>
+
       <!-- generate bookmarks -->
       <fo:bookmark-tree>
         <xsl:apply-templates select="//h1[a/@name]" mode="bookmark"/>
-      </fo:bookmark-tree> 
-      
+      </fo:bookmark-tree>
+
       <fo:page-sequence master-reference="all-pages">
 
         <!-- display div with id 'header' at top of all pages after the first -->
@@ -90,17 +90,17 @@
           <fo:page-number/>
         </fo:block>
       </fo:static-content>
-      
+
       <fo:flow flow-name="xsl-region-body">
-        
+
         <fo:block font-family="any">
           <xsl:apply-templates/>
-        </fo:block>		  
-        
+        </fo:block>
+
         </fo:flow>
-        
-      </fo:page-sequence>	
-      
+
+      </fo:page-sequence>
+
     </fo:root>
 
   </xsl:template>
@@ -108,11 +108,11 @@
  <!-- ignore 'special' (header/footer) sections during normal text output -->
  <xsl:template match="div[@id='header'] | div[@id='footer'] | div[@id='firstpage-footer']"/>
 
- <xsl:template match="div[@id='header'] | div[@id='footer'] | div[@id='firstpage-footer']" 
+ <xsl:template match="div[@id='header'] | div[@id='footer'] | div[@id='firstpage-footer']"
    mode="header-footer">
     <xsl:apply-templates/>
  </xsl:template>
- 
+
  <xsl:template match="h1[a/@name]|h2[a/@name]" mode="bookmark">
    <fo:bookmark>
      <xsl:attribute name="internal-destination"><xsl:value-of select="a/@name"/></xsl:attribute>
@@ -200,7 +200,7 @@
      keep-with-next="always"/>
    <fo:block border-bottom-color="black" border-bottom-style="solid"
      border-bottom-width="0.1mm" space-after.optimum="5pt" />
- </xsl:template> 
+ </xsl:template>
 
  <xsl:template match="p">
    <fo:block>
@@ -227,8 +227,8 @@
          <xsl:attribute name="space-after">0pt</xsl:attribute>
        </xsl:when>
        <xsl:otherwise>
-         <xsl:attribute name="space-after">5pt</xsl:attribute> 
-       </xsl:otherwise>       
+         <xsl:attribute name="space-after">5pt</xsl:attribute>
+       </xsl:otherwise>
      </xsl:choose>
      <xsl:apply-templates/>
    </fo:block>
@@ -256,18 +256,18 @@
      <!-- if table has a width, use that; otherwise, specify 100% -->
      <xsl:choose>
        <xsl:when test="@width">
-         <xsl:attribute name="width"><xsl:value-of select="@width"/></xsl:attribute>    
+         <xsl:attribute name="width"><xsl:value-of select="@width"/></xsl:attribute>
        </xsl:when>
        <xsl:otherwise>
          <xsl:attribute name="width">100%</xsl:attribute>
        </xsl:otherwise>
-     </xsl:choose>     
-     <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths --> 
+     </xsl:choose>
+     <!-- NOTE: for apache fop, columns must be specified; html should specify cols with % widths -->
      <xsl:apply-templates select="col"/>
      <xsl:choose>
      <xsl:when test="tr[th and not(td) and position() = 1] and
             ./@class != 'box-folder'"> <!-- special case: suppress running header for box/folder/contents -->
-       <fo:table-header>   
+       <fo:table-header>
          <xsl:apply-templates select="tr[th and not(td) and position() = 1]"/>
        </fo:table-header>
        <fo:table-body>
@@ -307,8 +307,8 @@
      <xsl:attribute name="column-width"><xsl:value-of select="$colwidth"/>in</xsl:attribute>
    </fo:table-column>
  </xsl:template>
- 
- <!-- NOTE: setting keep-together="always" implicitly sets 
+
+ <!-- NOTE: setting keep-together="always" implicitly sets
       keep-together.within-line="always" as of FOP 0.94, which keeps table contents from wrapping.
       Hopefully a keep-together strength of 5 is sufficient for our needs.  -->
  <xsl:template match="tr">
@@ -341,7 +341,7 @@
        <xsl:if test="parent::tr/@class = 'section' or @class = 'section'">
          <xsl:attribute name="font-weight">bold</xsl:attribute>
          <!-- add space if not first row & not *immediately* following another section row -->
-         <xsl:if test="parent::tr/preceding-sibling::tr or 
+         <xsl:if test="parent::tr/preceding-sibling::tr or
                             parent::tr/preceding-sibling::tr[1][not(@class = 'section')]">
             <xsl:attribute name="padding-before">12pt</xsl:attribute>
          </xsl:if>
@@ -396,8 +396,7 @@
          <xsl:attribute name="internal-destination"><xsl:value-of select="substring-after(@href, '#')"/></xsl:attribute>
        </xsl:when>
        <xsl:otherwise>
-         <!-- FIXME -->
-         <!--         <xsl:attribute name="external-destination"><xsl:value-of select="concat('url(\'', @href, '\')')"/></xsl:attribute> -->
+          <xsl:attribute name="external-destination">url('<xsl:value-of select="@href"/>')</xsl:attribute>
        </xsl:otherwise>
      </xsl:choose>
      <xsl:apply-templates/>
