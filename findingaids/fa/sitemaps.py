@@ -31,7 +31,7 @@ class _BaseFindingAidSitemap(Sitemap):
 
     def location(self, obj):
         return reverse(self.view_name,
-                       kwargs=self.url_kwargs(obj))
+                       kwargs=self.url_args(obj))
 
     def lastmod(self, obj):
         return obj.last_modified
