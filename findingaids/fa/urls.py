@@ -1,5 +1,5 @@
 # file findingaids/fa/urls.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +15,16 @@
 #   limitations under the License.
 
 from django.conf.urls.defaults import *
+from findingaids.fa import views as fa_views
 
 TITLE_LETTERS = '[a-zA-Z]'
 
-title_urlpatterns = patterns('findingaids.fa.views',
-    url('^$', 'browse_titles', name='browse-titles'),
-    url(r'^(?P<letter>%s)/$' % TITLE_LETTERS, 'titles_by_letter', name='titles-by-letter'),
-    url(r'^xml/$', 'xml_titles', name='all-xml')
+title_urlpatterns = patterns(
+    '',
+    url('^$', fa_views.browse_titles, name='browse-titles'),
+    url(r'^(?P<letter>%s)/$' % TITLE_LETTERS, fa_views.titles_by_letter,
+        name='titles-by-letter'),
+    url(r'^xml/$', fa_views.xml_titles, name='all-xml')
 )
 
 # patterns for ead document id and series id
@@ -30,30 +33,37 @@ EADID_URL_REGEX = "(?P<id>[-_A-Za-z0-9.]+)"
 series_id = "[a-zA-Z0-9-._]+"
 
 # urls under a single document url (e.g., /documents/abbey244/ )
-findingaid_parts = patterns('findingaids.fa.views',
-    url(r'^$', 'findingaid', name='findingaid'),
-    url(r'^EAD/$', 'eadxml', name='eadxml'),
+findingaid_parts = patterns(
+    '',
+    url(r'^$', fa_views.findingaid, name='findingaid'),
+    url(r'^EAD/$', fa_views.eadxml, name='eadxml'),
     # full finding aid as simple html (html version of pdf, for testing)
-    url(r'^full/$', 'full_findingaid', {'mode': 'html'}, name='full-findingaid'),
+    url(r'^full/$', fa_views.full_findingaid,
+        {'mode': 'html'}, name='full-findingaid'),
     # view access to XSL-FO used to generate pdf (for testing)
-    url(r'^xsl-fo/$', 'full_findingaid', {'mode': 'xsl-fo'}, name='xslfo'),
-    url(r'^printable/$', 'full_findingaid', {'mode': 'pdf'}, name='printable'),
-    url(r'^items/$', 'document_search', name='singledoc-search'),
-    url(r'^(?P<series_id>%s)/$' % series_id, 'series_or_index', name='series-or-index'),
+    url(r'^xsl-fo/$', fa_views.full_findingaid,
+        {'mode': 'xsl-fo'}, name='xslfo'),
+    url(r'^printable/$', fa_views.full_findingaid,
+        {'mode': 'pdf'}, name='printable'),
+    url(r'^items/$', fa_views.document_search, name='singledoc-search'),
+    url(r'^(?P<series_id>%s)/$' % series_id, fa_views.series_or_index,
+        name='series-or-index'),
     # NOTE: django can't reverse url patterns with optional parameters
     # so series, subseries, and sub-subseries urls have to be defined separately
     url(r'^(?P<series_id>%(re)s)/(?P<series2_id>%(re)s)/$' % {'re': series_id},
-        'series_or_index', name='series2'),
-    url(r'^(?P<series_id>%(re)s)/(?P<series2_id>%(re)s)/(?P<series3_id>%(re)s)/$' \
-        % {'re': series_id}, 'series_or_index', name='series3'),
+        fa_views.series_or_index, name='series2'),
+    url(r'^(?P<series_id>%(re)s)/(?P<series2_id>%(re)s)/(?P<series3_id>%(re)s)/$'
+        % {'re': series_id}, fa_views.series_or_index, name='series3'),
 )
 
-findingaid_urlpatterns = patterns('findingaids.fa.views',
+findingaid_urlpatterns = patterns(
+    '',
     (r'^%s/' % EADID_URL_REGEX, include(findingaid_parts)),
 )
 
-urlpatterns = patterns('findingaids.fa.views',
+urlpatterns = patterns(
+    '',
     (r'^titles/', include(title_urlpatterns)),
     (r'^documents/', include(findingaid_urlpatterns)),
-    url(r'^search/', 'search', name='search')
+    url(r'^search/', fa_views.search, name='search')
 )
