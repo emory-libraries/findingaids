@@ -91,7 +91,6 @@ def format_ead_children(value, autoescape=None):
     return mark_safe(result)
 format_ead_children.needs_autoescape = True
 
-#XLINK_NAMESPACE = 'http://www.w3.org/TR/xlink/' ??
 XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink'
 XLINK = '{%s}' % XLINK_NAMESPACE
 
@@ -145,8 +144,11 @@ def _format_node(node, text, contents, tail):
     elif _IS_TITLE(node):
         return _wrap('<span class="ead-title">', text, contents, '</span>', tail)
     elif _IS_EXTREF(node):
-        return _wrap('<a href="%s">' % node.get(XLINK + 'href'),
-                     text, contents, '</a>', tail)
+        url = node.get(XLINK + 'href')
+        href = ''
+        if url is not None:
+            href = ' href="%s"' % url
+        return _wrap('<a%s>' % href, text, contents, '</a>', tail)
     elif _IS_EXIST_MATCH(node):
         return _wrap('<span class="exist-match">', text, contents, '</span>', tail)
     else:
