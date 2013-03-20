@@ -8,7 +8,8 @@
        <ul>
         {# FIXME: where possible, better to use about or mentions and tag as person/org/thing etc #}
        {% for term in ca.terms %}
-            <li property="keywords"><a href='{% url fa:search %}?subject="{{ term|urlencode }}"'>{{ term|format_ead }}</a></li>
+            <li><a href='{% url fa:search %}?subject="{{ term|urlencode }}"'>{{ term|format_ead }}</a>
+            <meta property="schema:keywords" content="{{ term|format_ead }}" /></li>
        {% endfor %}
        </ul>
 {% endfor %}
