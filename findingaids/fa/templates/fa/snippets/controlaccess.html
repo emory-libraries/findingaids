@@ -6,8 +6,9 @@
     {% for ca in ead.archdesc.controlaccess.controlaccess %}
        <h3>{{ ca.head }}</h3>
        <ul>
+        {# FIXME: where possible, better to use about or mentions and tag as person/org/thing etc #}
        {% for term in ca.terms %}
-            <li><a href='{% url fa:search %}?subject="{{ term|urlencode }}"'>{{ term|format_ead }}</a></li>
+            <li itemprop="keywords"><a href='{% url fa:search %}?subject="{{ term|urlencode }}"'>{{ term|format_ead }}</a></li>
        {% endfor %}
        </ul>
 {% endfor %}
