@@ -9,7 +9,7 @@
       <tr><th>Creator:</th><td>{{ ead.archdesc.origination }}</td></tr>
    {% endif %}
    {% if ead.unittitle|format_ead %}
-      <tr><th>Title:</th><td itemprop="name"> {{ ead.unittitle|format_ead }} </td></tr>
+      <tr><th>Title:</th><td property="name"> {{ ead.unittitle|format_ead }} </td></tr>
    {% endif %}
    {% if ead.archdesc.unitid %}
       <tr><th>Call Number:</th><td>{{ ead.archdesc.unitid }}</td></tr>
@@ -21,7 +21,7 @@
       <tr><th>Location:</th><td>{{ ead.archdesc.location }}</td></tr>
    {% endif %}
    {% if ead.abstract %}
-      <tr><th>Abstract:</th><td itemprop="description">{{ ead.abstract|format_ead }}</td></tr>
+      <tr><th>Abstract:</th><td property="description">{{ ead.abstract|format_ead }}</td></tr>
    {% endif %}
    {% if ead.archdesc.langmaterial %}
       <tr><th>Language:</th><td>{{ ead.archdesc.langmaterial }} </td></tr>

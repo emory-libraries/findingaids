@@ -26,14 +26,16 @@
 {% endblock %}
 
 {% block content-body %}
-<div itemscope itemtype="http://schema.org/CreativeWork" itemid="{{ ead.eadid.url }}">
-<meta itemprop="author" content="{{ ead.author }}" />
+<div vocab="http://schema.org/" typeof="CreativeWork" >
+{# TODO: where does itemid go in rdfa? itemid="{{ ead.eadid.url }}" #}
+<meta property="author" content="{{ ead.author }}" />
 {% with ead.file_desc.publication as publication %}
-  <div id="publication-address" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-    <p itemprop="name">{{ publication.publisher }}</p>
+  <div id="publication-address" property="publisher" typeof="Organization">
+    <p property="name">{{ publication.publisher }}</p>
     {# FIXME: should be able to express as postaladdress, but address not broken out in a way that supports that #}
     {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
-    <p>Permanent link: <a itemprop="url" rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
+    {# FIXME:  this url for the findingaid is *inside* the publisher entity #}
+    <p>Permanent link: <a property="url" rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
 
   <div id="sidebar-right">
@@ -41,9 +43,10 @@
   </div>
 
 {% endwith %}
-<meta itemprop="dateCreated" content="{{ ead.profiledesc.date.normalized }}"/>
-<meta itemprop="datePublished" content="{{ ead.file_desc.publication.date.normalized }}"/>
+<meta property="dateCreated" content="{{ ead.profiledesc.date.normalized }}"/>
+<meta property="datePublished" content="{{ ead.file_desc.publication.date.normalized }}"/>
 {# weirdly, last modified not easily accessible from this context #}
+{# also, last modified in eXist database may not correspond to date of last edit #}
 
 {# main display page for a single finding aid; links to series & subseries, if any #}
 <div id="toc_series">
