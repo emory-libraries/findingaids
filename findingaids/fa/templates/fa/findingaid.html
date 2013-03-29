@@ -27,20 +27,21 @@
 {% endblock %}
 
 {% block content-body %}
-<div xmlns:dc="http://purl.org/dc/terms/" xmlns:schema="http://schema.org/">
+<div xmlns:schema="http://schema.org/"> {# NOTE: could also use xmlns:dc="http://purl.org/dc/terms/" #}
 <div typeof="schema:CreativeWork" about="{{ ead.eadid.url }}">
-{# TODO: where does itemid go in rdfa? itemid="{{ ead.eadid.url }}" #}
-<meta property="schema:author dc:author" content="{{ ead.author }}" />
+<meta property="schema:author" content="{{ ead.author }}" />
 {% with ead.file_desc.publication as publication %}
-<div rel="schema:publisher">
-  <div resource="http://marbl.library.emory.edu/" id="publication-address" typeof="schema:Organization">
-    <p property="schema:name dc:title">{{ publication.publisher }}</p>
-    {# FIXME: should be able to express as postaladdress, but address not broken out in a way that supports that #}
-    {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
+<div id="publication-address">
+    <span rel="schema:publisher">
+      <span typeof="schema:Organization">
+        <p property="schema:name">{{ publication.publisher }}</p>
+       {# FIXME: should be able to express as postaladdress, but address not broken out in a way that supports that #}
+       {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
+     </span> {# end organiaztion #}
+   </span> {# end publisher #}
     {# FIXME:  this url for the findingaid is *inside* the publisher entity #}
     <p>Permanent link: <a property="schema:url" rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
-</div>
   <div id="sidebar-right">
       <a class="printable" href="{% ifurl preview fa-admin:preview:printable fa:printable id=ead.eadid %}" rel="alternate">Printable PDF</a>
   </div>
