@@ -8,7 +8,7 @@
   {{block.super}}
   {% if form.eadid.value %}  {# don't index per-item feedback pages, link main feedback as canonical #}
    <meta name="robots" content="noindex,nofollow" />
-   <link rel="canonical" href="{% url content:feedback %}" />
+   <link rel="canonical" href="{% url 'content:feedback' %}" />
   {% endif %}
 {% endblock %}
 
@@ -23,8 +23,8 @@
   <p>Sending feedback about <b>{{ findingaid.title|format_ead }}</b>.</p>
 {% endif %}
 
- <form class="email-form" action="{% url content:feedback %}" method="post">{% csrf_token %}
-    {{ form.non_field_errors }}    
+ <form class="email-form" action="{% url 'content:feedback' %}" method="post">{% csrf_token %}
+    {{ form.non_field_errors }}
     {% with ' <span class="required" title="required">*</span>' as req %}
         {% for field in form.visible_fields %}
             {% include 'content/snippets/form_field.html' %}
@@ -34,7 +34,7 @@
     {% for field in form.hidden_fields %}
       {% if field.name != 'captcha' %} {{ field }} {% endif %}
     {% endfor %}
-    {% include 'content/snippets/captcha.html' %}    
+    {% include 'content/snippets/captcha.html' %}
     <input class="form-submit" type="submit" value="Send"/>
 </form>
 {% else %}
@@ -42,7 +42,7 @@
     {% with 'feedback' as  message_type %}
         {% include 'content/snippets/email_sent.html' %}
     {% endwith %}
-    
+
 {% endif %}
 
 {% endblock %}

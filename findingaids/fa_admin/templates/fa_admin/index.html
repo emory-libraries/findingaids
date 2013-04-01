@@ -19,7 +19,7 @@
       {% include 'taskresult/snippets/display_task.html' %}
       {% comment %}
         <li class="{{r.task.status|lower}}">{{ r.label }}
-            {% if r.eadid %}<a href="{% url fa:findingaid id=r.eadid %}">{{ r.eadid }}</a>{% endif %}:
+            {% if r.eadid %}<a href="{% url 'fa:findingaid' id=r.eadid %}">{{ r.eadid }}</a>{% endif %}:
             <span class="code">{{ r.task.status }}</span>
             {% if r.task_end %}<div class="task_end">ended {{ r.task_end|timesince }} ago</div>{% endif %}
             </li>
@@ -43,8 +43,8 @@ give your account the appropriate permissions.</p>
   <div class="section">
       <h2>Manage users and site</h2>
           <ul>
-            <li><a href="{% url fa-admin:list-staff %}">Manage user accounts</a></li>
-            <li><a href="{% url admin:index %}">Django DB admin site</a></li>
+            <li><a href="{% url 'fa-admin:list-staff' %}">Manage user accounts</a></li>
+            <li><a href="{% url 'admin:index' %}">Django DB admin site</a></li>
           </ul>
   </div>
 {% endif %}
@@ -53,9 +53,9 @@ give your account the appropriate permissions.</p>
  <div class="section">
   <h2>Manage documents</h2>
     <ul>
-      <li><a href="{% url fa-admin:list-published %}">Published documents</a></li>
+      <li><a href="{% url 'fa-admin:list-published' %}">Published documents</a></li>
       {% if perms.fa_admin.can_preview %}
-        <li><a href="{% url fa-admin:preview-ead %}">Documents available for preview</a></li>
+        <li><a href="{% url 'fa-admin:preview-ead' %}">Documents available for preview</a></li>
       {% endif %}
   </ul>
  </div>

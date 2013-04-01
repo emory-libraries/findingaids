@@ -7,7 +7,7 @@
        <h3>{{ ca.head }}</h3>
        <ul>
        {% for term in ca.terms %}
-            <li><a href='{% url fa:search %}?subject="{{ term|urlencode }}"'>{{ term|format_ead }}</a></li>
+            <li><a href='{% url 'fa:search' %}?subject="{{ term|urlencode }}"'>{{ term|format_ead }}</a></li>
        {% endfor %}
        </ul>
 {% endfor %}

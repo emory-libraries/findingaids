@@ -244,7 +244,7 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
 class IfUrlTestCase(DjangoTestCase):
 
     def test_ifurl(self):
-        template = Template("{% load ifurl %}{% ifurl preview fa:full-findingaid fa:findingaid id=id %}")
+        template = Template("{% load ifurl %}{% ifurl preview 'fa:full-findingaid' 'fa:findingaid' id=id %}")
         urlopts = {'id': 'docid'}
         context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})
         url = template.render(context)
@@ -258,7 +258,7 @@ class IfUrlTestCase(DjangoTestCase):
 
     def test_ifurl_asvar(self):
         # store ifurl output in a context variable and then render it for testing
-        template = Template("{% load ifurl %}{% ifurl preview fa:full-findingaid fa:findingaid id=id as myurl %}{{ myurl }}")
+        template = Template("{% load ifurl %}{% ifurl preview 'fa:full-findingaid' 'fa:findingaid' id=id as myurl %}{{ myurl }}")
         urlopts = {'id': 'docid'}
         context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})
         url = template.render(context)
