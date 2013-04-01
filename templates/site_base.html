@@ -13,21 +13,21 @@
 {% endblock %}
 
 {% block navbar %}   {# override the whole block #}
-    <a class="first" href="{% url site-index %}">Home</a>
-    <a href="{% url fa:search %}">Advanced Search</a>
-    <a href="{% url content:request-materials %}">Request Materials</a>
-    <a href="{% url content:page 'institutions' %}">Contributors</a>
-    <a href="{% url content:page 'search-tips' %}">Search Tips</a>
-    <a href="{% url content:page 'faq' %}">FindingAid FAQ</a>
-    <a class="last" href="{% url content:feedback %}">Feedback</a>
+    <a class="first" href="{% url 'site-index' %}">Home</a>
+    <a href="{% url 'fa:search' %}">Advanced Search</a>
+    <a href="{% url 'content:request-materials' %}">Request Materials</a>
+    <a href="{% url 'content:page' 'institutions' %}">Contributors</a>
+    <a href="{% url 'content:page' 'search-tips' %}">Search Tips</a>
+    <a href="{% url 'content:page' 'faq' %}">FindingAid FAQ</a>
+    <a class="last" href="{% url 'content:feedback' %}">Feedback</a>
 {% endblock %}
-{% block admin-url %}{% url fa-admin:index %}{% endblock %}
+{% block admin-url %}{% url 'fa-admin:index' %}{% endblock %}
 
 {% block sidebar-left %}
 
   {# give admin users an easy way back to main admin page once they are logged in #}
   {% if user.is_authenticated %}
-    {% url fa-admin:index as admin_url %}
+    {% url 'fa-admin:index' as admin_url %}
     {% if request.path != admin_url %}
       <p><a href="{{ admin_url }}" class="form-submit">Manage Finding Aids</a></p>
     {% endif %}
@@ -37,7 +37,7 @@
   {% if kwsearch_form %}
   <div id="search" class="sidebar-search">
       Search EmoryFindingAids
-      <form action="{% url fa:search %}" method="get">
+      <form action="{% url 'fa:search' %}" method="get">
         {{kwsearch_form.keywords}}
         <input class="form-submit" type="submit" value="Search" />
       </form>
@@ -88,4 +88,4 @@
 {% endif %}
 {% endblock scripts %}
 
-{% block contact-us-link %}{% url content:feedback %}{% endblock %}
+{% block contact-us-link %}{% url 'content:feedback' %}{% endblock %}

@@ -524,8 +524,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
         # GET - should display delete form with eadid & title from document
         response = self.client.get(delete_url)
-        self.assertContains(response, '<input name="eadid" value="%s"' % eadid)
-        self.assertContains(response, 'id="id_title" value="William Berry Hartsfield papers, circa 1860s-1983"')
+        self.assertEqual(eadid, unicode(response.context['form']['eadid'].value()))
+        self.assertEqual("William Berry Hartsfield papers, circa 1860s-1983",
+                         response.context['form']['title'].value())
 
         # POST form data to trigger a deletion
         title, note = 'William Berry Hartsfield papers', 'Moved to another archive.'
@@ -587,8 +588,9 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # GET: form should display info from existing Deleted record
         response = self.client.get(delete_url)
-        self.assertContains(response, 'id="id_title" value="William Berry Hartsfield papers',
-            msg_prefix="edit form contains title from Finding Aid (overrides title from DB)")
+        self.assert_('William Berry Hartsfield papers' in
+                     response.context['form']['title'].value(),
+                     'edit form contains title from Finding Aid (overrides title from DB)')
         self.assertContains(response, '%s</textarea>' % note,
             msg_prefix="edit form contains notes from previous deletion")
         # POST form data to trigger a deletion and update deleted record

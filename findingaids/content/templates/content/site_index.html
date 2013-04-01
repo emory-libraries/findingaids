@@ -14,7 +14,7 @@
          <h2>{{ about.title|default:"About EmoryFindingAids" }}</h2>
          {% firstof about.summary_detail.value|safe about.summary|safe %}
          <div class="block-links subsection">
-             <a href="{% url content:page 'faq' %}">Learn more</a>
+             <a href="{% url 'content:page' 'faq' %}">Learn more</a>
          </div>
      </div>
 
@@ -34,7 +34,7 @@
  <div class="bottom-half">
         <div id="search" class="left-col">
              <h2>Search FindingAids</h2>
-              <form action="{% url fa:search %}" method="get">
+              <form action="{% url 'fa:search' %}" method="get">
                 {{kwsearch_form.keywords}}
                 <input class="form-submit" type="submit" value="Search" />
 
@@ -43,8 +43,8 @@
               </form>
 
              <div class="block-links">
-                <a href="{% url fa:search %}">Advanced Search</a>
-                <a href="{% url content:page 'search-tips' %}">Search Tips</a>
+                <a href="{% url 'fa:search' %}">Advanced Search</a>
+                <a href="{% url 'content:page' 'search-tips' %}">Search Tips</a>
              </div>
 
 
