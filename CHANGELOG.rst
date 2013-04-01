@@ -8,6 +8,11 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.2
+---
+
+* Updated to Django 1.5.
+
 1.1
 ---
 
