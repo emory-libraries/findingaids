@@ -401,6 +401,13 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.2
+~~~~
+
+* The logging configuration for sending error messages to site admins has been updated
+  for Django 1.5; it is recommended to update the logging configuration in
+  ``localsettings.py`` based on the latest version of ``localsettings.py.dist``
+
 1.1
 ~~~~
 

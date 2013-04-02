@@ -19,10 +19,10 @@
 {% for file in files.object_list %}
     <tr>
         <td>{{ file.filename }}</td>
-        <td><a class="admin-action" href="{% url fa-admin:prep-ead-about file.filename %}">PREP</a></td>
+        <td><a class="admin-action" href="{% url 'fa-admin:prep-ead-about' file.filename %}">PREP</a></td>
         <td>
             {% if perms.fa_admin.can_preview %}
-            <form action="{% url fa-admin:preview-ead %}" method="post">{% csrf_token %}
+            <form action="{% url 'fa-admin:preview-ead' %}" method="post">{% csrf_token %}
                 <button type="submit" name="filename" value="{{ file.filename }}" class="admin-action">PREVIEW</button>
             </form>
             {% endif %}
@@ -30,7 +30,7 @@
 {% comment %} publish temporarily disabled while assessing workflow (publish from preview only)
         <td>
             {% if perms.fa_admin.can_publish %}
-            <form action="{% url fa-admin:publish-ead %}" method="post">{% csrf_token %}
+            <form action="{% url 'fa-admin:publish-ead' %}" method="post">{% csrf_token %}
                 <button type="submit" name="filename" value="{{ file.filename }}" class="admin-action">PUBLISH</button>
             </form>
             {% endif %}
