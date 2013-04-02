@@ -14,3 +14,4 @@ BeautifulSoup
 feedparser
 django-celery>=3.0
 south
+rdflib
