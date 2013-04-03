@@ -15,10 +15,8 @@
 #   limitations under the License.
 
 """
-Custom filters for processing EAD structured fields to HTML.
+Custom template filters for converting EAD tags to HTML.
 """
-
-from lxml import etree
 
 from django import template
 from django.utils.html import conditional_escape
@@ -26,12 +24,44 @@ from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-__all__ = ['format_ead', 'format_ead_children']
+__all__ = ['format_ead']
 
 register = template.Library()
 
+XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink'
+EXIST_NAMESPACE = 'http://exist.sourceforge.net/NS/exist'
 
-@register.filter
+# render attributes which can be converted to simple tags
+# - key is render attribute, value is tuple of start/end tag or
+#   other start/end wrapping strings
+rend_attributes = {
+    'bold': ('<span class="ead-bold">', '</span>'),
+    'italic': ('<span class="ead-italic">', '</span>'),
+    'doublequote': ('"', '"'),
+}
+
+# tag names that can be converted to simple tags
+# - key is tag name (with namespace), value is a tuple of start/end tag
+simple_tags = {
+    '{%s}emph' % EAD_NAMESPACE: ('<em>', '</em>'),
+    '{%s}title' % EAD_NAMESPACE: ('<span class="ead-title">', '</span>'),
+    '{%s}match' % EXIST_NAMESPACE: ('<span class="exist-match">', '</span>'),
+}
+
+
+def format_extref(node):
+    url = node.get('{%s}href' % XLINK_NAMESPACE)
+    href = ' href="%s"' % url if url is not None else ''
+    return ('<a%s>' % href, '</a>')
+
+# more complex tags
+# - key is tag name, value is a callable that takes a node
+other_tags = {
+    '{%s}extref' % EAD_NAMESPACE: format_extref,
+}
+
+
+@register.filter(needs_autoescape=True)
 def format_ead(value, autoescape=None):
     """
     Custom django filter to convert structured fields in EAD objects to
@@ -52,121 +82,56 @@ def format_ead(value, autoescape=None):
       * other elements are stripped
       * text nodes are HTML escaped where the template context calls for it
     """
-    if autoescape:
-        escape = conditional_escape
-    else:
-        escape = lambda x: x
-
-    if value is None:
-        parts = []
-    elif hasattr(value, 'node'):
-        parts = node_parts(value.node, escape, include_tail=False)
-    else:
-        parts = [escape(unicode(value))]
-
-    result = ''.join(parts)
-    return mark_safe(result)
-format_ead.needs_autoescape = True
-
-
-@register.filter
-def format_ead_children(value, autoescape=None):
-    """
-    Custom django filter to convert structured fields in EAD objects to
-    HTML. Follows the same logic as :func:`format_ead`, but processes only
-    the children of the top-level XmlObject, ignoring rendering indicators
-    on the top-level element itself.
-    """
 
     if autoescape:
-        escape = conditional_escape
+        esc = conditional_escape
     else:
-        escape = lambda x: x
+        esc = lambda x: x
 
-    node = getattr(value, 'node', None)
-    children = getattr(node, 'childNodes', ())
-    parts = (part for child in children
-             for part in node_parts(child, escape, include_tail=False))
-    result = ''.join(parts)
+    if hasattr(value, 'node'):
+        result = format_ead_node(value.node, esc)
+    else:
+        result = ''
+
     return mark_safe(result)
-format_ead_children.needs_autoescape = True
-
-XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink'
-XLINK = '{%s}' % XLINK_NAMESPACE
-
-# Precompile XPath expressions for use in node_parts below.
-_RENDER_DOUBLEQUOTE = etree.XPath('@render="doublequote"')
-_RENDER_BOLD = etree.XPath('@render="bold"')
-_RENDER_ITALIC = etree.XPath('@render="italic"')
-_IS_EMPH = etree.XPath('self::e:emph', namespaces={'e': EAD_NAMESPACE})
-_IS_TITLE = etree.XPath('self::e:title', namespaces={'e': EAD_NAMESPACE})
-_IS_EXTREF = etree.XPath('self::e:extref', namespaces={'e': EAD_NAMESPACE})
-# NOTE: exist:match highlighting is not technically part of EAD but result of eXist
-# it might be better to make this logic more modular, less EAD-specific
-_IS_EXIST_MATCH = etree.XPath('self::exist:match',
-                              namespaces={'exist': 'http://exist.sourceforge.net/NS/exist'})
 
 
-def node_parts(node, escape, include_tail):
-    """Recursively convert an xml node to HTML. This function is used
-    internally by :func:`format_ead`. You probably want that function, not
-    this one.
+def format_ead_node(node, escape):
+    '''Recursive method to generate HTML with the text and any
+    formatting for the contents of an EAD node.
 
-    This function returns an iterable over unicode chunks intended for easy
-    joining by :func:`format_ead`.
-    """
+    :param node: lxml element or node to be converted from EAD to HTML
+    :param escape: template escape method to be used on node text content
+    :returns: string with the HTML output
+    '''
 
-    # if current node contains text before the first node, pre-pend to list of parts
-    text = node.text and escape(node.text)
+    # list of strings to be populated
+    result = []
 
-    # if this node contains other nodes, start with a generator expression
-    # to recurse into children, getting the node_parts for each.
-    child_parts = (part for child in node
-                   for part in node_parts(child, escape, include_tail=True))
+    # include any text directly in this node, before the first child
+    if node.text is not None:
+        result.append(escape(node.text))
 
-    tail = include_tail and node.tail and escape(node.tail)
+    for el in node.iterchildren():
+        # check for supported render attributes
+        rend = el.get('render', None)
+        if rend is not None and rend in rend_attributes.keys():
+            start, end = rend_attributes[rend]
 
-    # format the current node, and either wrap child parts in appropriate
-    # fenceposts or return them directly.
-    return _format_node(node, text, child_parts, tail)
+        # simple tags that can be converted to html markup
+        elif el.tag in simple_tags.keys():
+            start, end = simple_tags[el.tag]
 
+        # more complex tags
+        elif el.tag in other_tags.keys():
+            start, end = other_tags[el.tag](el)
 
-def _format_node(node, text, contents, tail):
-    # format a single node, wrapping any contents, and passing any 'tail' text content
-    if _RENDER_DOUBLEQUOTE(node):
-        return _wrap('"', text, contents, '"', tail)
-    elif _RENDER_BOLD(node):
-        return _wrap('<span class="ead-bold">', text, contents, '</span>', tail)
-    elif _RENDER_ITALIC(node):
-        return _wrap('<span class="ead-italic">', text, contents, '</span>', tail)
-    elif _IS_EMPH(node):
-        return _wrap('<em>', text, contents, '</em>', tail)
-    elif _IS_TITLE(node):
-        return _wrap('<span class="ead-title">', text, contents, '</span>', tail)
-    elif _IS_EXTREF(node):
-        url = node.get(XLINK + 'href')
-        href = ''
-        if url is not None:
-            href = ' href="%s"' % url
-        return _wrap('<a%s>' % href, text, contents, '</a>', tail)
-    elif _IS_EXIST_MATCH(node):
-        return _wrap('<span class="exist-match">', text, contents, '</span>', tail)
-    else:
-        return _wrap(None, text, contents, None, tail)
+        # unsupported tags that do not get converted
+        else:
+            start, end = '', ''
 
+        # wrap the node with start/end tags and recurse
+        result.append(''.join([start, format_ead_node(el, escape), end,
+                               escape(el.tail or '')]))
 
-def _wrap(begin, text, parts, end, tail):
-    """Wrap some iterable parts in beginning and ending fenceposts. Simply
-    yields begin, then each part, then end."""
-    if begin:
-        yield begin
-    if text:
-        yield text
-
-    for part in parts:
-        yield part
-
-    if end:
-        yield end
-    if tail:
-        yield tail
+    return ''.join(result)
