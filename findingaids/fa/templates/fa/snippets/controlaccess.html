@@ -10,7 +10,7 @@
        {% for term in ca.terms %}
             <li>
                 <a href='{% url 'fa:search' %}?subject="{{ term|urlencode }}"' rel="tag">{{ term|format_ead }}</a>
-                <meta property="schema:keywords" content="{{ term|format_ead }}" /></li>
+                <meta property="schema:keywords" content="{{ term }}" />
             </li>
        {% endfor %}
        </ul>
