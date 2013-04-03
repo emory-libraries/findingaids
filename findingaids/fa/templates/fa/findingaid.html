@@ -27,8 +27,8 @@
 {% endblock %}
 
 {% block content-body %}
-<div xmlns:schema="http://schema.org/"> {# NOTE: could also use xmlns:dc="http://purl.org/dc/terms/" #}
-<div typeof="schema:CreativeWork" about="{{ ead.eadid.url }}">
+{# <div > #} {# NOTE: could also use xmlns:dc="http://purl.org/dc/terms/" #}
+<div xmlns:schema="http://schema.org/" typeof="schema:CreativeWork" about="{{ ead.eadid.url }}">
 <meta property="schema:author" content="{{ ead.author }}" />
 {% with ead.file_desc.publication as publication %}
 <div id="publication-address">
