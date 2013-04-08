@@ -22,8 +22,8 @@ from django.db import models
 
 from eulxml import xmlmap
 from eulxml.xmlmap.eadmap import EncodedArchivalDescription, Component, \
-        SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
-        UnitTitle, Section
+    SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
+    UnitTitle, Section
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
@@ -31,6 +31,54 @@ from eulexistdb.models import XmlModel
 # finding aid models
 
 ID_DELIMITER = '_'
+
+
+class Name(XmlModel):
+    '''XmlObject for a generic name in an EAD document.  Includes common
+    functionality for persname, famname, corpname, and geogname.
+    '''
+    ROOT_NS = EAD_NAMESPACE
+    ROOT_NAMESPACES = {
+        'e': EAD_NAMESPACE,
+    }
+    source = xmlmap.StringField('@source')
+    authfilenumber = xmlmap.StringField('@authfilenumber')
+    encodinganalog = xmlmap.StringField('@encodinganalog')
+    value = xmlmap.StringField(".", normalize=True)
+    # NOTE: could be persname, corpname, famname
+
+    @property
+    def is_personal_name(self):
+        'boolean indicator if this is a persname tag'
+        return self.tag == "{%s}persname" % EAD_NAMESPACE
+
+    @property
+    def is_corporate_name(self):
+        'boolean indicator if this is a corpname tag'
+        return self.tag == "{%s}corpname" % EAD_NAMESPACE
+
+    @property
+    def is_family_name(self):
+        'boolean indicator if this is a famname tag'
+        return self.tag == "{%s}famname" % EAD_NAMESPACE
+
+    @property
+    def is_geographic_name(self):
+        'boolean indicator if this is a geogname tag'
+        return self.tag == "{%s}geogname" % EAD_NAMESPACE
+
+    @property
+    def uri(self):
+        ''''Generate a URI for this name if possible, based on source and
+        authfilenumber attributes.  Currently supports viaf, geonames,
+        and dbpedia sources.
+        '''
+        if self.source == 'viaf':
+            return 'http://viaf.org/%s/' % self.authfilenumber
+        elif self.source == 'geonames':
+            return 'http://sws.geonames.org/%s/' % self.authfilenumber
+        elif self.source == 'dbpedia':
+            return 'http://dbpedia.org/resource/%s/' % self.authfilenumber
 
 
 class FindingAid(XmlModel, EncodedArchivalDescription):
@@ -95,10 +143,12 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
     _admin_info = ['userestrict', 'altformavail', 'relatedmaterial', 'separatedmaterial',
-        'acqinfo', 'custodhist', 'prefercite']
+                   'acqinfo', 'custodhist', 'prefercite']
     # -- map as regular xmlmap field, for use when entire object is returned
     admin_info_matches = xmlmap.IntegerField('count(./e:archdesc/*[' +
-        '|'.join(['self::e:%s' % field for field in _admin_info]) + ']//exist:match)')
+                                             '|'.join(['self::e:%s' % field
+                                                       for field in _admin_info])
+                                             + ']//exist:match)')
     # -- eXist-specific xpath for returning count without entire document
     admin_info_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' + \
         '|'.join(['e:%s' % field for field in _admin_info]) + '))//exist:match)'
@@ -106,12 +156,17 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'otherfindaid']
     # -- map as regular xmlmap field, for use when entire object is returned
     coll_desc_matches = xmlmap.IntegerField('count(' +
-        '|'.join('./e:archdesc/e:%s//exist:match' % field for field in _coll_desc) + ')')
+                                            '|'.join('./e:archdesc/e:%s//exist:match'
+                                                     % field for field in _coll_desc)
+                                            + ')')
     # -- eXist-specific xpath for returning count without entire document
     coll_desc_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' +  \
         '|'.join('e:%s' % field for field in _coll_desc) + '))//exist:match)'
     # - controlaccess match-count
     controlaccess_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/e:controlaccess)//exist:match)'
+
+    origination_name = xmlmap.NodeField('e:archdesc/e:did/e:origination/e:*', Name)
+    'origination name, as an instance of :class:`Name`'
 
     objects = Manager('/e:ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
