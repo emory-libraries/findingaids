@@ -10,6 +10,9 @@
        {% for term in ca.terms %}
             <li>
                 <a href='{% url 'fa:search' %}?subject="{{ term|urlencode }}"' rel="tag">{{ term|format_ead }}</a>
+                {# use format_ead_names to supply a relation to named entities where possible #}
+                <span style="display:none">{{ term|format_ead_names }}</span>
+                {# include all terms as simple keywords (possibly redundant for person/org/place names) #}
                 <meta property="schema:keywords" content="{{ term }}" />
             </li>
        {% endfor %}
