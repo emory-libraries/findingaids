@@ -43,6 +43,7 @@ xhtml_xslfo_xslt = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                 'xhtml_to_xslfo.xsl')
 XHTML_TO_XSLFO = etree.XSLT(etree.parse(xhtml_xslfo_xslt))
 
+
 def render_to_pdf(template_src, context_dict, filename=None):
     """Generate and return a PDF response.
 
@@ -63,6 +64,7 @@ def render_to_pdf(template_src, context_dict, filename=None):
     tmpdir = tempfile.mkdtemp('findingaids-fop')
     # write xsl-fo to a temporary named file that we can pass to xsl-fo processor
     xslfo_file = tempfile.NamedTemporaryFile(prefix='findingaids-xslfo-', dir=tmpdir)
+    logger.debug("Writing out XSL-FO to %s" % xslfo_file.name)
     xslfo.write(xslfo_file.name, encoding='UTF-8', pretty_print=True, xml_declaration=True)
     # create a temporary file where the PDF should be created
     pdf_file = tempfile.NamedTemporaryFile(prefix='findingaids-pdf-', dir=tmpdir)
@@ -77,8 +79,9 @@ log4j.appender.CONSOLE.layout.ConversionPattern=%-5p %3x - %m%n
         ''')
     try:
         # NOTE: for now, just sending errors to stdout
-        rval = subprocess.call([settings.XSLFO_PROCESSOR, xslfo_file.name, pdf_file.name],
-                cwd=tmpdir)
+        cmd_parts = [settings.XSLFO_PROCESSOR, xslfo_file.name, pdf_file.name]
+        logger.debug("Calling XSL-FO processor: %s" % ' '.join(cmd_parts))
+        rval = subprocess.call(cmd_parts, cwd=tmpdir)
         if rval is 0:       # success!
             response = http.HttpResponse(pdf_file.read(), mimetype='application/pdf')
             if filename:
@@ -103,6 +106,7 @@ log4j.appender.CONSOLE.layout.ConversionPattern=%-5p %3x - %m%n
     # if nothing was returned by now, there was an error generating the pdf
     raise Exception("There was an error generating the PDF")
 
+
 def html_to_xslfo(template_src, context_dict):
     """Takes a template and template arguments, renders the template to get html,
     and then converts from html to XSL-FO.  Any template used with this function
@@ -114,7 +118,7 @@ def html_to_xslfo(template_src, context_dict):
                 :class:`lxml.etree.ElementTree`
     """
     template = get_template(template_src)
-    xhtml  = etree.fromstring(template.render(Context(context_dict)))
+    xhtml = etree.fromstring(template.render(Context(context_dict)))
     return XHTML_TO_XSLFO(xhtml)
 
 

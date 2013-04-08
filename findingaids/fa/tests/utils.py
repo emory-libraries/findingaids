@@ -18,11 +18,8 @@ from datetime import datetime
 from os import path
 import re
 from time import sleep
-from types import ListType
 from lxml import etree
 from mock import patch
-import unittest
-from urllib import quote as urlquote
 
 from django.conf import settings
 from django.core.paginator import Paginator
@@ -31,15 +28,14 @@ from django.http import Http404, HttpRequest
 from django.template import RequestContext, Template
 from django.test import TestCase as DjangoTestCase
 
-from eulexistdb.db import ExistDB, ExistDBException
+from eulexistdb.db import ExistDB
 from eulexistdb.testutil import TestCase
-from eulxml.xmlmap import load_xmlobject_from_file, \
-    load_xmlobject_from_string, XmlObject
+from eulxml.xmlmap import XmlObject
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
-from findingaids.fa.templatetags.ead import format_ead
+from findingaids.fa.templatetags.ead import format_ead, XLINK_NAMESPACE
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
     collection_lastmodified, exist_datetime_with_timezone, alpha_pagelabels
 
@@ -179,6 +175,11 @@ class FormatEadTestCase(DjangoTestCase):
     NOTRANS = """<abstract xmlns="%s">magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>""" % EAD_NAMESPACE
     EXIST_MATCH = """<abstract xmlns="%s">Pitts v. <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">Freeman</exist:match>
 school desegregation case files</abstract>""" % EAD_NAMESPACE
+    EXTREF = '''<p xmlns="%s" xmlns:xlink="%s">Belfast Group sheets may also be found in the
+    <extref xlink:href="http://pid.emory.edu/ark:/25593/8zgst">Irish Literary Miscellany</extref>.</p>''' \
+    % (EAD_NAMESPACE, XLINK_NAMESPACE)
+    EXTREF_NOLINK = '''<p xmlns="%s">Belfast Group sheets may also be found in the
+    <extref>Irish Literary Miscellany</extref>.</p>''' % EAD_NAMESPACE
 
     def setUp(self):
         self.content = XmlObject(etree.fromstring(self.ITALICS))    # place-holder node
@@ -227,12 +228,23 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
         self.assert_('Pitts v. <span class="exist-match">Freeman</span>'
             in format, 'exist:match tag converted to span for highlighting')
 
+    def test_extref(self):
+        self.content.node = etree.fromstring(self.EXTREF)
+        format = format_ead(self.content)
+        self.assert_('<a href="http://pid.emory.edu/ark:/25593/8zgst">Irish Literary Miscellany</a>'
+            in format, 'extref tag converted to a href')
+
+        self.content.node = etree.fromstring(self.EXTREF_NOLINK)
+        format = format_ead(self.content)
+        self.assert_('<a>Irish Literary Miscellany</a>'
+            in format, 'formatter should not fail when extref has no href')
+
 
 # test custom template tag ifurl
 class IfUrlTestCase(DjangoTestCase):
 
     def test_ifurl(self):
-        template = Template("{% load ifurl %}{% ifurl preview fa:full-findingaid fa:findingaid id=id %}")
+        template = Template("{% load ifurl %}{% ifurl preview 'fa:full-findingaid' 'fa:findingaid' id=id %}")
         urlopts = {'id': 'docid'}
         context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})
         url = template.render(context)
@@ -246,7 +258,7 @@ class IfUrlTestCase(DjangoTestCase):
 
     def test_ifurl_asvar(self):
         # store ifurl output in a context variable and then render it for testing
-        template = Template("{% load ifurl %}{% ifurl preview fa:full-findingaid fa:findingaid id=id as myurl %}{{ myurl }}")
+        template = Template("{% load ifurl %}{% ifurl preview 'fa:full-findingaid' 'fa:findingaid' id=id as myurl %}{{ myurl }}")
         urlopts = {'id': 'docid'}
         context = RequestContext(HttpRequest(), {'preview': False, 'id': 'docid'})
         url = template.render(context)

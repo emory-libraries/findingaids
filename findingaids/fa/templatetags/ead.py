@@ -1,5 +1,5 @@
 # file findingaids/fa/templatetags/ead.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,9 +26,10 @@ from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-__all__ = [ 'format_ead', 'format_ead_children' ]
+__all__ = ['format_ead', 'format_ead_children']
 
 register = template.Library()
+
 
 @register.filter
 def format_ead(value, autoescape=None):
@@ -55,17 +56,18 @@ def format_ead(value, autoescape=None):
         escape = conditional_escape
     else:
         escape = lambda x: x
-    
+
     if value is None:
         parts = []
     elif hasattr(value, 'node'):
         parts = node_parts(value.node, escape, include_tail=False)
     else:
-        parts = [ escape(unicode(value)) ]
-    
+        parts = [escape(unicode(value))]
+
     result = ''.join(parts)
     return mark_safe(result)
 format_ead.needs_autoescape = True
+
 
 @register.filter
 def format_ead_children(value, autoescape=None):
@@ -80,14 +82,17 @@ def format_ead_children(value, autoescape=None):
         escape = conditional_escape
     else:
         escape = lambda x: x
-    
+
     node = getattr(value, 'node', None)
     children = getattr(node, 'childNodes', ())
-    parts = ( part for child in children
-                   for part in node_parts(child, escape, include_tail=False) )
+    parts = (part for child in children
+             for part in node_parts(child, escape, include_tail=False))
     result = ''.join(parts)
     return mark_safe(result)
 format_ead_children.needs_autoescape = True
+
+XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink'
+XLINK = '{%s}' % XLINK_NAMESPACE
 
 # Precompile XPath expressions for use in node_parts below.
 _RENDER_DOUBLEQUOTE = etree.XPath('@render="doublequote"')
@@ -95,33 +100,36 @@ _RENDER_BOLD = etree.XPath('@render="bold"')
 _RENDER_ITALIC = etree.XPath('@render="italic"')
 _IS_EMPH = etree.XPath('self::e:emph', namespaces={'e': EAD_NAMESPACE})
 _IS_TITLE = etree.XPath('self::e:title', namespaces={'e': EAD_NAMESPACE})
+_IS_EXTREF = etree.XPath('self::e:extref', namespaces={'e': EAD_NAMESPACE})
 # NOTE: exist:match highlighting is not technically part of EAD but result of eXist
 # it might be better to make this logic more modular, less EAD-specific
 _IS_EXIST_MATCH = etree.XPath('self::exist:match',
-                  namespaces={'exist': 'http://exist.sourceforge.net/NS/exist'})
+                              namespaces={'exist': 'http://exist.sourceforge.net/NS/exist'})
+
 
 def node_parts(node, escape, include_tail):
     """Recursively convert an xml node to HTML. This function is used
     internally by :func:`format_ead`. You probably want that function, not
     this one.
-    
+
     This function returns an iterable over unicode chunks intended for easy
     joining by :func:`format_ead`.
     """
 
     # if current node contains text before the first node, pre-pend to list of parts
     text = node.text and escape(node.text)
-        
+
     # if this node contains other nodes, start with a generator expression
     # to recurse into children, getting the node_parts for each.
-    child_parts = ( part for child in node
-                         for part in node_parts(child, escape, include_tail=True) )
+    child_parts = (part for child in node
+                   for part in node_parts(child, escape, include_tail=True))
 
     tail = include_tail and node.tail and escape(node.tail)
-    
+
     # format the current node, and either wrap child parts in appropriate
     # fenceposts or return them directly.
     return _format_node(node, text, child_parts, tail)
+
 
 def _format_node(node, text, contents, tail):
     # format a single node, wrapping any contents, and passing any 'tail' text content
@@ -135,10 +143,17 @@ def _format_node(node, text, contents, tail):
         return _wrap('<em>', text, contents, '</em>', tail)
     elif _IS_TITLE(node):
         return _wrap('<span class="ead-title">', text, contents, '</span>', tail)
+    elif _IS_EXTREF(node):
+        url = node.get(XLINK + 'href')
+        href = ''
+        if url is not None:
+            href = ' href="%s"' % url
+        return _wrap('<a%s>' % href, text, contents, '</a>', tail)
     elif _IS_EXIST_MATCH(node):
         return _wrap('<span class="exist-match">', text, contents, '</span>', tail)
     else:
         return _wrap(None, text, contents, None, tail)
+
 
 def _wrap(begin, text, parts, end, tail):
     """Wrap some iterable parts in beginning and ending fenceposts. Simply

@@ -125,8 +125,10 @@ class FaViewsTest(TestCase):
         response = self.client.get(reverse('fa:titles-by-letter',
             kwargs={'letter': 'P'}))
         # title
-        self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+> research files''',
-            response.content, msg_prefix='title with formatting should be formatted in list view')
+        self.assertContains(response, '''<p><span class="ead-title">Where Peachtree Meets Sweet Auburn</span>
+            research files and interviews, 1991-1996</p>''',
+            msg_prefix='title with formatting should be formatted in list view',
+            html=True )
         # abstract
         self.assertPattern(r'''book,\s+<[-A-Za-z="' ]+>Where Peachtree Meets Sweet Auburn:''',
             response.content, msg_prefix='abstract with formatting should be formatted in list view')

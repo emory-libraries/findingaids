@@ -4,7 +4,7 @@
 {% load ead %}
 {% load ifurl %}
 {# generate and store url for main finding aid page #}
-{% ifurl preview admin:preview:findingaid fa:findingaid ead.eadid as ead_url %}
+{% ifurl preview 'admin:preview:findingaid' 'fa:findingaid' ead.eadid as ead_url %}
 <div id="toc" {% if collapsed %}class="hover-menu collapsed"{% endif %}>
     <h2>Table of Contents</h2>
     <ul>
@@ -39,7 +39,7 @@
              {% for toc_index in all_indexes %}
                 {% ifequal index.id toc_index.id %}<li>{{ toc_index.head|format_ead }}</li>
                 {% else %} {# if on index page, don't link currently displayed index #}
-                    <li><a href="{% ifurl preview fa-admin:preview:series-or-index fa:series-or-index id=ead.eadid,series_id=toc_index.short_id %}{{ url_params }}">
+                    <li><a href="{% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=toc_index.short_id %}{{ url_params }}">
                             {{ toc_index.head|format_ead }}</a>{% if toc_index.match_count > 0 %} <span class="exist-match">{{toc_index.match_count|floatformat }} match{{toc_index.match_count|pluralize:'es'}}</span>{% endif %}</li>
                 {% endifequal %}
              {% endfor %}

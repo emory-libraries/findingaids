@@ -1,9 +1,10 @@
-Django>=1.4
 eulxml>=0.18.0
 eulexistdb>=0.17.0
 eulcommon
-http://waterhouse.library.emory.edu:8080/hudson/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.17.0-dev.tar.gz
+http://waterhouse.library.emory.edu:8080/hudson/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.18.0-dev.tar.gz
 http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x/11/artifact/pidmanclient/dist/pidservices-1.1.1.tar.gz
+# NOTE: must be after eullocal, because eullocal still wants django < 1.4
+Django>=1.5
 python-dateutil
 python-ldap
 zc.icp

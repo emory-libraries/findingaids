@@ -1,5 +1,5 @@
 # file findingaids/fa/templatetags/ifurl.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,13 @@
 #   limitations under the License.
 
 from django import template
+from django.template.base import TemplateSyntaxError
 from django.template.defaulttags import url, URLNode
 
 register = template.Library()
 
-class IfURLNode(URLNode):    
+
+class IfURLNode(URLNode):
     def __init__(self, condition, viewname_if, viewname_ifnot, args, kwargs, asvar):
         # store condition variable and alternate view
         self.condition = condition
@@ -34,7 +36,8 @@ class IfURLNode(URLNode):
             self.view_name = self.viewname_if
         # let URLNode class do all the real work
         return super(IfURLNode, self).render(context)
-        
+
+
 @register.tag
 def ifurl(parser, token):
     """
@@ -46,16 +49,23 @@ def ifurl(parser, token):
 
     For example::
 
-       {% ifurl preview preview:doc main:doc arg1=foo %}
+       {% ifurl preview 'preview:doc' 'main:doc' arg1=foo %}
 
     When preview is true in the template context, url will be generated as
     preview:doc, otherwise it will be generated as main:doc.
     """
-    parts = token.contents.split()    
+    parts = token.contents.split()
     condition = parts[1]
-    name_if = parts[2]
-    name_ifnot = parts[3]
     remainder = parts[4:]
+
+    # as of django 1.5, view name must be quoted strings
+    try:
+        name_if = parser.compile_filter(parts[2])
+        name_ifnot = parser.compile_filter(parts[3])
+    except TemplateSyntaxError as exc:
+        exc.args = (exc.args[0] + ". "
+                    "The syntax of 'ifurl' update to match 'url' change " +
+                    "in Django 1.5; see the docs."),
 
     # construct a normal-looking url token
     # - allow django url templatetag to do all the argument parsing
@@ -63,5 +73,5 @@ def ifurl(parser, token):
     urlnode = url(parser, token)
     # url returns a URLNode - use arguments set on that node to init custom IfURLNode
     return IfURLNode(condition, name_if, name_ifnot, urlnode.args, urlnode.kwargs,
-            urlnode.asvar)
+                     urlnode.asvar)
 

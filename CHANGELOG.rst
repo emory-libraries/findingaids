@@ -8,6 +8,21 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.2
+---
+
+* Updated to Django 1.5.
+* When a user is viewing web pages for a finding aid with external references (extref tags)
+  in the EAD document, they can see and click on links in order to access
+  external webpages.
+* When a user downloads the PDF for a finding aid with external references
+  in the EAD document, they can click on links in case they want to access
+  related content from the PDF.
+* Automated tools, such as search engine robots or site crawlers, can find
+  machine-readable site maps for findingaids and content pages, in order to
+  improve search engine harvesting of finding aids site content.
+* Bug fix: related material section should be displayed when present at series level
+
 1.1
 ---
 
