@@ -24,7 +24,7 @@ from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-__all__ = ['format_ead']
+__all__ = ['format_ead', 'format_ead_names']
 
 register = template.Library()
 
@@ -60,9 +60,80 @@ other_tags = {
     '{%s}extref' % EAD_NAMESPACE: format_extref,
 }
 
+EAD_PERSNAME = '{%s}persname' % EAD_NAMESPACE
+EAD_CORPNAME = '{%s}corpname' % EAD_NAMESPACE
+EAD_GEOGNAME = '{%s}geogname' % EAD_NAMESPACE
+
+name_tags = {
+    EAD_PERSNAME: 'schema:Person',
+    EAD_CORPNAME: 'schema:Organization',
+    EAD_GEOGNAME: 'schema:Place',
+}
+
+
+def format_nametag(node):
+    rdftype = name_tags.get(node.tag, None)
+
+    # if not a supported type, don't tag at all
+    if rdftype is None:
+        return ('', '')
+
+    about = ''
+    uri = None
+    if node.get('authfilenumber') is not None:
+        authnum = node.get('authfilenumber')
+        if node.get('source') == 'viaf':
+            uri = 'http://viaf.org/%s/' % authnum
+        elif node.get('source') == 'geonames':
+            uri = 'http://sws.geonames.org/%s/' % authnum
+        elif node.get('source') == 'dbpedia':
+            uri = 'http://dbpedia.org/resource/%s/' % authnum
+
+        if uri is not None:
+            about = ' about="%s"' % uri
+
+    start = '<span%s typeof="%s"><span property="schema:name">' % \
+            (about, rdftype)
+    end = '</span></span>'
+
+    # NOTE: *preliminary* role  / relation to context
+    rel = None
+    if node.get('role') is not None:
+        rel = node.get('role')
+        rel = 'schema:' + rel.replace('originator:', '')
+    elif rdftype == 'schema:Organization':
+        # NOTE: this should not be set for control access orgs
+        rel = 'schema:affiliation'
+
+    # special case: for controlaccess, we can infer name from encodinganalog
+    if node.getparent().tag == '{%s}controlaccess' % EAD_NAMESPACE:
+        encodinganalog = node.get('encodinganalog')
+        if node.tag == EAD_PERSNAME and encodinganalog == '700' or \
+           node.tag == EAD_CORPNAME and encodinganalog == '710':
+            rel = 'schema:contributor'
+        elif node.tag == EAD_PERSNAME and encodinganalog == '600' or \
+                node.tag == EAD_CORPNAME and encodinganalog in ['610', '611'] or \
+                node.tag == EAD_GEOGNAME and encodinganalog == '651':
+            rel = 'schema:about'
+
+        # for now, assume about if we can't otherwise determine
+        # *could* soften this to just schema:mentions
+        else:
+            rel = 'schema:about'
+
+    # if nothing else, the document obviously mentions this entity
+    if rel is None:
+        rel = 'schema:mentions'
+
+    if rel is not None:
+        start = '<span rel="%s">%s' % (rel, start)
+        end += '</span>'
+
+    return (start, end)
+
 
 @register.filter(needs_autoescape=True)
-def format_ead(value, autoescape=None):
+def format_ead(value, autoescape=None, names=False):
     """
     Custom django filter to convert structured fields in EAD objects to
     HTML. :class:`~eulcore.xmlmap.XmlObject` values are recursively
@@ -89,14 +160,19 @@ def format_ead(value, autoescape=None):
         esc = lambda x: x
 
     if hasattr(value, 'node'):
-        result = format_ead_node(value.node, esc)
+        result = format_ead_node(value.node, esc, names)
     else:
         result = ''
 
     return mark_safe(result)
 
 
-def format_ead_node(node, escape):
+@register.filter(needs_autoescape=True)
+def format_ead_names(value, autoescape=None):
+    return format_ead(value, autoescape, names=True)
+
+
+def format_ead_node(node, escape, names=False):
     '''Recursive method to generate HTML with the text and any
     formatting for the contents of an EAD node.
 
@@ -104,34 +180,40 @@ def format_ead_node(node, escape):
     :param escape: template escape method to be used on node text content
     :returns: string with the HTML output
     '''
+    # find any start/end tags for the current element
 
-    # list of strings to be populated
-    result = []
+    # check for supported render attributes
+    rend = node.get('render', None)
+    if rend is not None and rend in rend_attributes.keys():
+        start, end = rend_attributes[rend]
 
+    # simple tags that can be converted to html markup
+    elif node.tag in simple_tags.keys():
+        start, end = simple_tags[node.tag]
+
+    # more complex tags
+    elif node.tag in other_tags.keys():
+        start, end = other_tags[node.tag](node)
+
+    # convert names to semantic web / rdfa if requested
+    elif names and node.tag in name_tags.keys():
+        start, end = format_nametag(node)
+
+    # unsupported tags that do not get converted
+    else:
+        start, end = '', ''
+
+    # list of text contents to be compiled
+    contents = [start]  # start tag
     # include any text directly in this node, before the first child
     if node.text is not None:
-        result.append(escape(node.text))
+        contents.append(escape(node.text))
 
-    for el in node.iterchildren():
-        # check for supported render attributes
-        rend = el.get('render', None)
-        if rend is not None and rend in rend_attributes.keys():
-            start, end = rend_attributes[rend]
+    # format any child nodes and add to the list of text
+    contents.extend([format_ead_node(el, escape=escape, names=names)
+                     for el in node.iterchildren()])
 
-        # simple tags that can be converted to html markup
-        elif el.tag in simple_tags.keys():
-            start, end = simple_tags[el.tag]
+    # end tag for this node + any tail text
+    contents.extend([end, escape(node.tail or '')])
 
-        # more complex tags
-        elif el.tag in other_tags.keys():
-            start, end = other_tags[el.tag](el)
-
-        # unsupported tags that do not get converted
-        else:
-            start, end = '', ''
-
-        # wrap the node with start/end tags and recurse
-        result.append(''.join([start, format_ead_node(el, escape), end,
-                               escape(el.tail or '')]))
-
-    return ''.join(result)
+    return ''.join(contents)
