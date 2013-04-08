@@ -626,8 +626,10 @@ class FaViewsTest(TestCase):
             response.content, "subseries biographical note")
         self.assertPattern('<h3>Scope and Content Note</h3>.*<p>.*letters to family.*</p>.*<p>.*earliest letters.*</p>',
             response.content, "subseries scope & content, 2 paragraphs")
-        self.assertPattern('<h3>Arrangement Note</h3>.*<p>Arranged by record type.</p>',
-            response.content, "subseries arrangment note")
+        self.assertContains(
+            response,
+            '<div><h3>Arrangement Note</h3><p>Arranged by record type.</p></div>',
+            html=True)
 
         # subseries contents
         self.assertPattern('20.*1.*1886-1887', response.content,
