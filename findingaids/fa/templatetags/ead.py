@@ -24,7 +24,7 @@ from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-__all__ = ['format_ead', 'format_ead_names']
+__all__ = ['format_ead', 'format_ead_rdfa']
 
 register = template.Library()
 
@@ -168,7 +168,7 @@ def format_ead(value, autoescape=None, names=False):
 
 
 @register.filter(needs_autoescape=True)
-def format_ead_names(value, autoescape=None):
+def format_ead_rdfa(value, autoescape=None):
     return format_ead(value, autoescape, names=True)
 
 

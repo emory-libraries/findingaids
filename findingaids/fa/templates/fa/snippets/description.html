@@ -50,7 +50,7 @@
    <div {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}about="{{ ead.origination_name.uri }}"{% endif %}>
    	<h3>{{ section.head|default:'' }}</h3>
   	{% for para in section.content %}
-      <p>{{ para|format_ead_names }}</p>
+      <p>{{ para|format_ead_rdfa }}</p>
 	  {% endfor %}
 
     {# grab occupation from controlled access #}
