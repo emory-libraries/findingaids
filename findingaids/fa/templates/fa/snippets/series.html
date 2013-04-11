@@ -12,11 +12,22 @@
   </a>
 </h2>
 
+{# TODO: shift some of this semantic logic to the view? case-insensitive comparison ? #}
+{% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
+  <div xmlns:schema="http://schema.org/" xmlns:arch="http://purl.org/archival/vocab/arch#"
+     typeof="schema:Person" about="{{ series.ead.origination_name.uri}}">
+     {# NOTE: type methods like is_personal_name don't seem to work here #}
+{% endif %}
+
 {% for section in series.series_info %}
    <div>
    	<h3>{{ section.head|default:'' }}</h3>
 	{% for para in section.content %}
-	    <p>{{para|format_ead}}</p>
+{% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
+       <p>{{ para|format_ead_rdfa:'schema:knows arch:correspondedWith' }}</p>
+     {% else %}
+    	 <p>{{para|format_ead}}</p>
+     {% endif %}
 	{% endfor %}
    </div>
 {% endfor %}
@@ -33,5 +44,16 @@
         </ul>
     {% endif %}
 {% else %}
-  {% include "fa/snippets/containerlist.html" %}
+{% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
+  {% with rdfa_rel="schema:knows arch:correspondedWith" %}
+    {% include "fa/snippets/containerlist.html" %}
+  {% endwith %}
+{% else %}
+    {% include "fa/snippets/containerlist.html" %}
 {% endif %}
+{% endif %}
+
+{% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
+  </div>
+{% endif %}
+

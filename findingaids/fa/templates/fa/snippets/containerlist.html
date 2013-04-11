@@ -13,8 +13,13 @@
                 <td colspan="3">
                     {{ component.did.unittitle|format_ead }}
                     {{ component.did.physdesc|default:'' }}
-                    {{ component.did.abstract|format_ead|default:'' }}
-                    {{ component.did.note|format_ead|default:'' }}
+                    {% if rdfa_rel %}  {# if an RDFa rel is defined, use rdfa formatting #}
+                      {{ component.did.abstract|format_ead_rdfa:rdfa_rel|default:'' }}
+                      {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
+                    {% else %}
+                      {{ component.did.abstract|format_ead|default:'' }}
+                      {{ component.did.note|format_ead|default:'' }}
+                    {% endif %}
                 </td>
             </tr>
         {% endif %}
@@ -25,7 +30,7 @@
           <tr>
             <th class="bf">Box</th>
              <th class="bf">Folder</th>
-             <th class="content">Content</th>          
+             <th class="content">Content</th>
           </tr>
         {% endif %}
 
@@ -38,10 +43,17 @@
                     </td>
                 {% endfor %}
                 <td class="content">
-                    {{ component.did.unittitle|format_ead }}
-                    {{ component.did.physdesc|default:'' }}
-                    {{ component.did.abstract|format_ead|default:'' }}
-                    {{ component.did.note|format_ead|default:'' }}
+                    {% if rdfa_rel %}  {# if an RDFa rel is defined, use rdfa formatting #}
+                      {{ component.did.unittitle|format_ead_rdfa:rdfa_rel }}
+                      {{ component.did.physdesc|default:'' }}
+                      {{ component.did.abstract|format_ead_rdfa:rdfa_rel|default:'' }}
+                      {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
+                    {% else %}
+                      {{ component.did.unittitle|format_ead }}
+                      {{ component.did.physdesc|default:'' }}
+                      {{ component.did.abstract|format_ead|default:'' }}
+                      {{ component.did.note|format_ead|default:'' }}
+                    {% endif %}
                 </td>
             </tr>
          {% endif %}
