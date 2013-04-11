@@ -362,7 +362,8 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
     """
     # additional fields to be returned
     return_fields = ['ead__eadid', 'ead__title', 'ead__unittitle', 'ead__archdesc__origination',
-        'ead__archdesc__controlaccess__head', 'ead__dsc__head']
+        'ead__archdesc__controlaccess__head', 'ead__dsc__head',
+        'ead__origination_name']
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid': eadid, 'id': series_ids[-1]}
 
