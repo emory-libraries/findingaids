@@ -11,6 +11,7 @@
    <meta name="robots" content="noindex,nofollow" />
    <link rel="canonical" href="{{ canonical_url }}" />
   {% endif %}
+  <link rel="meta" type="application/rdf+xml" href="{{ canonical_url|add:'RDF/' }}" />
 {% endblock %}
 
 {% block content-title %}
