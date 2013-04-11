@@ -50,6 +50,7 @@ simple_tags = {
 
 
 def format_extref(node):
+    'convert an extref node to an html link'
     url = node.get('{%s}href' % XLINK_NAMESPACE)
     href = ' href="%s"' % url if url is not None else ''
     return ('<a%s>' % href, '</a>')
@@ -71,7 +72,9 @@ name_tags = {
 }
 
 
-def format_nametag(node):
+def format_nametag(node, default_role=None):
+    '''Convert a supported name tag into corresponding RDFa.
+    '''
     rdftype = name_tags.get(node.tag, None)
 
     # if not a supported type, don't tag at all
@@ -97,33 +100,35 @@ def format_nametag(node):
     end = '</span></span>'
 
     # NOTE: *preliminary* role  / relation to context
-    rel = None
-    if node.get('role') is not None:
-        rel = node.get('role')
-        rel = 'schema:' + rel.replace('originator:', '')
-    elif rdftype == 'schema:Organization':
-        # NOTE: this should not be set for control access orgs
-        rel = 'schema:affiliation'
-
-    # special case: for controlaccess, we can infer name from encodinganalog
-    if node.getparent().tag == '{%s}controlaccess' % EAD_NAMESPACE:
-        encodinganalog = node.get('encodinganalog')
-        if node.tag == EAD_PERSNAME and encodinganalog == '700' or \
-           node.tag == EAD_CORPNAME and encodinganalog == '710':
-            rel = 'schema:contributor'
-        elif node.tag == EAD_PERSNAME and encodinganalog == '600' or \
-                node.tag == EAD_CORPNAME and encodinganalog in ['610', '611'] or \
-                node.tag == EAD_GEOGNAME and encodinganalog == '651':
-            rel = 'schema:about'
-
-        # for now, assume about if we can't otherwise determine
-        # *could* soften this to just schema:mentions
-        else:
-            rel = 'schema:about'
-
-    # if nothing else, the document obviously mentions this entity
+    rel = default_role
     if rel is None:
-        rel = 'schema:mentions'
+        # NOTE: *preliminary* role  / relation to context
+        if node.get('role') is not None:
+            rel = node.get('role')
+            rel = 'schema:' + rel.replace('originator:', '')
+        elif rdftype == 'schema:Organization':
+            # NOTE: this should not be set for control access orgs
+            rel = 'schema:affiliation'
+
+        # special case: for controlaccess, we can infer name from encodinganalog
+        if node.getparent().tag == '{%s}controlaccess' % EAD_NAMESPACE:
+            encodinganalog = node.get('encodinganalog')
+            if node.tag == EAD_PERSNAME and encodinganalog == '700' or \
+                    node.tag == EAD_CORPNAME and encodinganalog == '710':
+                rel = 'schema:contributor'
+            elif node.tag == EAD_PERSNAME and encodinganalog == '600' or \
+                    node.tag == EAD_CORPNAME and encodinganalog in ['610', '611'] or \
+                    node.tag == EAD_GEOGNAME and encodinganalog == '651':
+                rel = 'schema:about'
+
+            # for now, assume about if we can't otherwise determine
+            # *could* soften this to just schema:mentions
+            else:
+                rel = 'schema:about'
+
+        # if nothing else, the document obviously mentions this entity
+        if rel is None:
+            rel = 'schema:mentions'
 
     if rel is not None:
         start = '<span rel="%s">%s' % (rel, start)
@@ -133,7 +138,7 @@ def format_nametag(node):
 
 
 @register.filter(needs_autoescape=True)
-def format_ead(value, autoescape=None, names=False):
+def format_ead(value, autoescape=None, rdfa=False, default_rel=None):
     """
     Custom django filter to convert structured fields in EAD objects to
     HTML. :class:`~eulcore.xmlmap.XmlObject` values are recursively
@@ -160,7 +165,7 @@ def format_ead(value, autoescape=None, names=False):
         esc = lambda x: x
 
     if hasattr(value, 'node'):
-        result = format_ead_node(value.node, esc, names)
+        result = format_ead_node(value.node, esc, rdfa, default_rel)
     else:
         result = ''
 
@@ -168,11 +173,17 @@ def format_ead(value, autoescape=None, names=False):
 
 
 @register.filter(needs_autoescape=True)
-def format_ead_rdfa(value, autoescape=None):
-    return format_ead(value, autoescape, names=True)
+def format_ead_rdfa(value, default_rel=None, autoescape=None):
+    '''Custom filter to convert EAD to HTML, with support for converting
+    name tags such as persname, corpname, and geogname to RDFa.
+
+    :param default_rel: relationship to use for all entities
+       found under this node
+    '''
+    return format_ead(value, autoescape, rdfa=True, default_rel=default_rel)
 
 
-def format_ead_node(node, escape, names=False):
+def format_ead_node(node, escape, rdfa=False, default_rel=None):
     '''Recursive method to generate HTML with the text and any
     formatting for the contents of an EAD node.
 
@@ -196,8 +207,8 @@ def format_ead_node(node, escape, names=False):
         start, end = other_tags[node.tag](node)
 
     # convert names to semantic web / rdfa if requested
-    elif names and node.tag in name_tags.keys():
-        start, end = format_nametag(node)
+    elif rdfa and node.tag in name_tags.keys():
+        start, end = format_nametag(node, default_rel)
 
     # unsupported tags that do not get converted
     else:
@@ -210,7 +221,8 @@ def format_ead_node(node, escape, names=False):
         contents.append(escape(node.text))
 
     # format any child nodes and add to the list of text
-    contents.extend([format_ead_node(el, escape=escape, names=names)
+    contents.extend([format_ead_node(el, escape=escape, rdfa=rdfa,
+                                     default_rel=default_rel)
                      for el in node.iterchildren()])
 
     # end tag for this node + any tail text
