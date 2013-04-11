@@ -2,9 +2,17 @@
 {% load ead %}
 <div class="nextpage">
 <a name="{{ index.id }}"><h2>{{ index.head|format_ead }}</h2></a>
+{# FIXME: move the correspondence/rdfa detection logic into the view? #}
+{% if 'Selected Correspondents' in index.head|format_ead and index.ead.origination_name.authfilenumber %}
+  <div xmlns:schema="http://schema.org/" xmlns:arch="http://purl.org/archival/vocab/arch#" typeof="schema:Person" about="{{ index.ead.origination_name.uri}}">
+{% endif %}
 {% for entry in  index.entry %}
    <div class="indexentry">
-       <b>{{ entry.name|format_ead }}</b>
+       {% if 'Selected Correspondents' in index.head|format_ead and index.ead.origination_name.authfilenumber %}
+         <b>{{ entry.name|format_ead_rdfa:'schema:knows arch:correspondedWith' }}</b>
+       {% else %}
+          <b>{{ entry.name|format_ead }}</b>
+       {% endif %}
        <ul>
        {% for ref in entry.ptrgroup.ref %}
          <li>{{ ref.value|format_ead }}</li>
@@ -12,4 +20,7 @@
        </ul>
     </div>
 {% endfor %}
+{% if 'Selected Correspondents' in index.head|format_ead and index.ead.origination_name.authfilenumber %}
+  </div>
+{% endif %}
 </div>
