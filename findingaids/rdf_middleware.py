@@ -11,7 +11,7 @@ class RDFaMiddleware(object):
     '''
 
     def process_request(self, request):
-        if request.path.endswith('/rdf/'):
+        if request.path.endswith('/RDF/'):
             # load the html for the non-rdf page
             base_url = request.path[:-4]  # strip off 'rdf/' from end
             view, args, kwargs = resolve(base_url)

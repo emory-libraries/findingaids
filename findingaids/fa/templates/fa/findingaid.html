@@ -9,7 +9,7 @@
   {% endif %}
   <link rel="alternate" type="application/xml" href="{% ifurl preview 'fa-admin:preview:eadxml' 'fa:eadxml' id=ead.eadid %}" />
   <link rel="alternate" media="print" type="application/pdf" href="{% ifurl preview 'fa-admin:preview:printable' 'fa:printable' id=ead.eadid %}" />
-  <link rel="meta" type="application/rdf+xml" href="{% ifurl preview 'fa-admin:preview:findingaid' 'fa:findingaid' id=ead.eadid %}rdf/" />
+  <link rel="meta" type="application/rdf+xml" href="{% ifurl preview 'fa-admin:preview:findingaid' 'fa:findingaid' id=ead.eadid %}RDF/" />
   {% if ead.eadid.url %}<link rel="bookmark" href="{{ ead.eadid.url }}" /> {% endif %}
   {# embed Dublin Core metadata for this finding aid in the html header #}
   {% with ead.dc_fields as dc_fields %}
