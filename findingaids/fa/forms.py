@@ -1,5 +1,5 @@
 # file findingaids/fa/forms.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,44 +18,58 @@ from django import forms
 from findingaids.fa.models import EadRepository
 import re
 
+
 def boolean_to_upper(data):
-    """
-    Converts boolean operators to uppercase
-    """
+    """Convert boolean operators to uppercase"""
     ops = ['and', 'or', 'not']
 
     for op in ops:
-        upper_op = op.upper()
-        data = re.sub(r"\b%s\b" % (op), upper_op, data)
-        
+        data = re.sub(r"\b%s\b" % (op), op.upper(), data)
+
     return data
 
 
 class KeywordSearchForm(forms.Form):
     "Simple keyword search form"
-    keywords = forms.CharField(required=True,
+    keywords = forms.CharField(
+        required=False,
         help_text="one or more terms; will search anywhere in the finding aid")
+    # checkbox to filter on presence of dao tags in a findingaid or file-level item
+    dao = forms.BooleanField(
+        required=False,
+        help_text='only show items with resources available online')
 
     def clean_keywords(self):
         """
         Performs any cleanup / validation specific to keywords field
         """
-        data = self.cleaned_data['keywords']
-        data = boolean_to_upper(data) #convert boolean operators to uppercase
-        return data
+        # convert boolean operators to uppercase
+        return boolean_to_upper(self.cleaned_data['keywords'])
 
+    def clean(self):
+        cleaned_data = super(KeywordSearchForm, self).clean()
+        keywords = cleaned_data.get('keywords')
+        dao = cleaned_data.get("dao")
+
+        # dao filter can be specified with no keywords,
+        # but at least one input is required
+        if not keywords and not dao:
+            raise forms.ValidationError('Please either enter a search term ' +
+                                        'or restrict to resources available online')
+        return cleaned_data
 
 
 class AdvancedSearchForm(KeywordSearchForm):
     "Advanced search form for keyword, subject and repository"
     #redefining keywords because it is optional in the AdvancedSearchForm
     keywords = forms.CharField(required=False)
-    subject = forms.CharField(required=False,
+    subject = forms.CharField(
+        required=False,
         help_text="Controlled subject headings: subject, genre, geography, etc.")
     # delay initializing choices until object init, since they are dynamic
-    repository = forms.ChoiceField(required=False,
-            initial='', help_text="Filter by repository")
-            
+    repository = forms.ChoiceField(
+        required=False, initial='', help_text="Filter by repository")
+
     def __init__(self, *args, **kwargs):
         super(AdvancedSearchForm, self).__init__(*args, **kwargs)
         # generate a list of repository choices
@@ -71,7 +85,7 @@ class AdvancedSearchForm(KeywordSearchForm):
         """Custom form validation.  Keywords and subjects are both optional,
         but at least one of them should contain search terms."""
         cleaned_data = self.cleaned_data
-        
+
         keywords = cleaned_data.get('keywords')
         subject = cleaned_data.get('subject')
         if not keywords and not subject and not cleaned_data.get('repository'):
@@ -80,5 +94,5 @@ class AdvancedSearchForm(KeywordSearchForm):
 
         # TODO: if we can parse out subject:term or subject:"exact phrase"
         # from a keyword search, it would be nice to convert that to a subject search
-        
+
         return cleaned_data
