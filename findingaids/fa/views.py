@@ -32,11 +32,11 @@ from eulexistdb.exceptions import DoesNotExist  # ReturnedMultiple needed also ?
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
-            FileComponent, title_letters, Index, shortform_id
+    FileComponent, title_letters, Index, shortform_id
 from findingaids.fa.forms import KeywordSearchForm, AdvancedSearchForm
 from findingaids.fa.utils import render_to_pdf, get_findingaid, pages_to_show, \
-            ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
-            collection_lastmodified, alpha_pagelabels, html_to_xslfo
+    ead_lastmodified, ead_etag, paginate_queryset, ead_gone_or_404, \
+    collection_lastmodified, alpha_pagelabels, html_to_xslfo
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ fa_listfields = ['eadid', 'list_title', 'archdesc__did']
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
     return render_to_response('fa/index.html', {'letters': title_letters()},
-                                                          context_instance=RequestContext(request))
+                              context_instance=RequestContext(request))
 
 
 def browse_titles(request):
@@ -85,10 +85,10 @@ def titles_by_letter(request, letter):
 
     response_context = {
         'findingaids': fa_subset,
-         'querytime': [fa.queryTime()],
-         'letters': title_letters(),
-         'current_letter': letter,
-         'show_pages': page_labels,
+        'querytime': [fa.queryTime()],
+        'letters': title_letters(),
+        'current_letter': letter,
+        'show_pages': page_labels,
     }
     if page_labels:
         response_context['title_range'] = page_labels[fa_subset.number]
@@ -98,7 +98,8 @@ def titles_by_letter(request, letter):
     # no special first/last page label is required, since we are displaying all labels (not limiting to 9)
 
     return render_to_response('fa/titles_list.html',
-        response_context, context_instance=RequestContext(request))
+                              response_context,
+                              context_instance=RequestContext(request))
 
 
 @condition(last_modified_func=collection_lastmodified)
@@ -114,7 +115,8 @@ def xml_titles(request):
     }
 
     return render_to_response('fa/xml.html',
-        response_context, context_instance=RequestContext(request))
+                              response_context,
+                              context_instance=RequestContext(request))
 
 
 @ead_gone_or_404
@@ -149,7 +151,7 @@ def findingaid(request, id, preview=False):
         filter = {}
     fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
-        url_params=url_params)
+                              url_params=url_params)
 
     response = render_to_response('fa/findingaid.html', {
         'ead': fa,
@@ -160,7 +162,7 @@ def findingaid(request, id, preview=False):
         'docsearch_form': KeywordSearchForm(),
         'last_search': request.session.get('last_search', None),
         'feedback_opts': _get_feedback_options(request, id),
-     },  context_instance=RequestContext(request, current_app='preview'))
+    }, context_instance=RequestContext(request, current_app='preview'))
     # Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
@@ -184,7 +186,7 @@ def full_findingaid(request, id, mode, preview=False):
 
     template = 'fa/full.html'
     template_args = {'ead': fa, 'series': series,
-                    'mode': mode, 'preview': preview, 'request': request}
+                     'mode': mode, 'preview': preview, 'request': request}
     if mode == 'html':
         return render_to_response(template, template_args)
     elif mode == 'pdf':
@@ -254,7 +256,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
             referrer = 'Referrer %s' % request.META['HTTP_REFERER']
         else:
             referrer = ' (referrer not available)'
-        logger.info('''Redirecting from long-form series/index %s url to short-form url. %s''' \
+        logger.info('''Redirecting from long-form series/index %s url to short-form url. %s'''
                     % (request.path, referrer))
         return HttpResponsePermanentRedirect(_series_url(eadid, *redirect_ids))
 
@@ -296,10 +298,11 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                          'dsc__head', 'archdesc__did']
         fa = FindingAid.objects.filter(eadid=eadid).filter(**filter).using(collection)
         # using raw xpaths for exist-specific logic to expand and count matches
-        ead = fa.only(*return_fields).only_raw(coll_desc_matches=FindingAid.coll_desc_matches_xpath,
-            admin_info_matches=FindingAid.admin_info_matches_xpath,
-            archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath,
-            ).using(collection).get()
+        ead = fa.only(*return_fields) \
+                .only_raw(coll_desc_matches=FindingAid.coll_desc_matches_xpath,
+                          admin_info_matches=FindingAid.admin_info_matches_xpath,
+                          archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath) \
+                .using(collection).get()
     else:
         # when no highlighting, use partial ead retrieved with main item
         ead = result.ead
@@ -322,18 +325,19 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     if hasattr(ead, 'queryTime'):
         query_times.append(ead.queryTime())
 
-    render_opts = {'ead': ead,
-                    'all_series': all_series,
-                    'all_indexes': all_indexes,
-                    "querytime": query_times,
-                    'prev': prev,
-                    'next': next,
-                    'url_params': url_params,
-                    'canonical_url': _series_url(eadid, *[shortform_id(id) for id in series_ids]),
-                    'docsearch_form': KeywordSearchForm(),
-                    'last_search': request.session.get('last_search', None),
-                    'feedback_opts': _get_feedback_options(request, eadid),
-                    }
+    render_opts = {
+        'ead': ead,
+        'all_series': all_series,
+        'all_indexes': all_indexes,
+        'querytime': query_times,
+        'prev': prev,
+        'next': next,
+        'url_params': url_params,
+        'canonical_url': _series_url(eadid, *[shortform_id(id) for id in series_ids]),
+        'docsearch_form': KeywordSearchForm(),
+        'last_search': request.session.get('last_search', None),
+        'feedback_opts': _get_feedback_options(request, eadid),
+    }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
@@ -344,7 +348,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         render_opts['subseries'] = _subseries_links(result, preview=preview_mode, url_params=url_params)
 
     response = render_to_response('fa/series_or_index.html',
-                            render_opts, context_instance=RequestContext(request))
+                                  render_opts, context_instance=RequestContext(request))
 
     #Cache-Control to private when there is a last_search
     if "last_search" in request.session:
@@ -361,8 +365,9 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
             the number of ids determines series level to be retrieved
     """
     # additional fields to be returned
-    return_fields = ['ead__eadid', 'ead__title', 'ead__unittitle', 'ead__archdesc__origination',
-        'ead__archdesc__controlaccess__head', 'ead__dsc__head']
+    return_fields = ['ead__eadid', 'ead__title', 'ead__unittitle',
+                     'ead__archdesc__origination',
+                     'ead__archdesc__controlaccess__head', 'ead__dsc__head']
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid': eadid, 'id': series_ids[-1]}
 
@@ -462,19 +467,19 @@ def search(request):
                 # if keywords were specified, do a fulltext search
                 return_fields.append('fulltext_score')
                 findingaids = findingaids.filter(
-                        # first do a full-text search to restrict to relevant documents
-                        fulltext_terms=keywords
-                    ).or_filter(
-                        # do an OR search on boosted fields, so that relevance score
-                        # will be calculated based on boosted field values
-                        fulltext_terms=keywords,
-                        boostfields__fulltext_terms=keywords,
-                        highlight=False,    # disable highlighting in search results list
-                    ).order_by('-fulltext_score')
+                    # first do a full-text search to restrict to relevant documents
+                    fulltext_terms=keywords
+                ).or_filter(
+                    # do an OR search on boosted fields, so that relevance score
+                    # will be calculated based on boosted field values
+                    fulltext_terms=keywords,
+                    boostfields__fulltext_terms=keywords,
+                    highlight=False,    # disable highlighting in search results list
+                ).order_by('-fulltext_score')
 
             findingaids = findingaids.only(*return_fields)
             result_subset, paginator = paginate_queryset(request, findingaids,
-                        per_page=10, orphans=5)
+                                                         per_page=10, orphans=5)
             # when searching by subject only, use alpha pagination
             if subject and not keywords:
                 page_labels = alpha_pagelabels(paginator, findingaids,
@@ -486,7 +491,7 @@ def search(request):
 
             # select non-empty form values for use in template
             search_params = dict((key, value) for key, value in form.cleaned_data.iteritems()
-                                                 if value)
+                                 if value)
 
             #set query and last page in session and set it to expire on browser close
             for key, val in search_params.iteritems():
@@ -512,11 +517,11 @@ def search(request):
 
             response_context = {
                 'findingaids': result_subset,
-                 'search_params': search_params,    # actual search terms, for display
-                 'url_params': url_params,   # url opts for pagination
-                 'highlight_params': highlight_params,  # keyword highlighting
-                 'querytime': [query_times],
-                 'show_pages': show_pages
+                'search_params': search_params,    # actual search terms, for display
+                'url_params': url_params,   # url opts for pagination
+                'highlight_params': highlight_params,  # keyword highlighting
+                'querytime': [query_times],
+                'show_pages': show_pages
             }
             if page_labels:     # if there are page labels to show, add to context
                 # other page labels handled by show_pages, but first & last are special
@@ -524,7 +529,8 @@ def search(request):
                 response_context['last_page_label'] = page_labels[paginator.num_pages]
 
             return render_to_response('fa/search_results.html',
-                    response_context, context_instance=RequestContext(request))
+                                      response_context,
+                                      context_instance=RequestContext(request))
 
         except ExistDBException, e:
             # for an invalid full-text query (e.g., missing close quote), eXist
@@ -533,7 +539,8 @@ def search(request):
             query_error = True
             if 'Cannot parse' in e.message():
                 messages.error(request,
-                    'Your search query could not be parsed.  Please revise your search and try again.')
+                               'Your search query could not be parsed.  ' +
+                               'Please revise your search and try again.')
             else:
                 # generic error message for any other exception
                 messages.error(request, 'There was an error processing your search.')
@@ -544,8 +551,8 @@ def search(request):
 
     # if form is invalid (no search terms) or there was an error, display search form
     response = render_to_response('fa/search_form.html',
-                    {'form': form, 'request': request},
-                    context_instance=RequestContext(request))
+                                  {'form': form, 'request': request},
+                                  context_instance=RequestContext(request))
     # if query could not be parsed, set a 'Bad Request' status code on the response
     if query_error:
         response.status_code = 400
@@ -558,8 +565,9 @@ def document_search(request, id):
     form = KeywordSearchForm(request.GET)
     query_error = False
     # get the findingaid - will 404 if not found
+    # document/collection name required to generate document path
     ead = get_findingaid(id, only=['eadid', 'title',
-        'document_name', 'collection_name'])   # info to generate document path
+                                   'document_name', 'collection_name'])
     if form.is_valid():
         search_terms = form.cleaned_data['keywords']
         try:
@@ -570,18 +578,18 @@ def document_search(request, id):
             # use path to restrict query to a single document (much faster)
             path = '%s/%s' % (ead.collection_name, ead.document_name)
             files = FileComponent.objects.filter(document_path=path) \
-                        .filter(fulltext_terms=search_terms) \
-                        .also('parent__id', 'parent__did',
-                              'series1__id', 'series1__did', 'series2__id', 'series2__did')
+                .filter(fulltext_terms=search_terms) \
+                .also('parent__id', 'parent__did',
+                      'series1__id', 'series1__did', 'series2__id', 'series2__did')
 
             return render_to_response('fa/document_search.html', {
-                    'files': files,
-                    'ead': ead,
-                    'querytime': [files.queryTime(), ead.queryTime()],
-                    'keywords': search_terms,
-                    'url_params': '?' + urlencode({'keywords': search_terms.encode('utf-8')}),
-                    'docsearch_form': KeywordSearchForm(),
-                 }, context_instance=RequestContext(request))
+                'files': files,
+                'ead': ead,
+                'querytime': [files.queryTime(), ead.queryTime()],
+                'keywords': search_terms,
+                'url_params': '?' + urlencode({'keywords': search_terms.encode('utf-8')}),
+                'docsearch_form': KeywordSearchForm(),
+            }, context_instance=RequestContext(request))
         except ExistDBTimeout, e:
             # error for exist db timeout
             messages.error(request, "Your search has resulted in too many hits, \
@@ -594,7 +602,8 @@ def document_search(request, id):
             query_error = True
             if 'Cannot parse' in e.message():
                 messages.error(request,
-                    'Your search query could not be parsed.  Please revise your search and try again.')
+                               'Your search query could not be parsed.  ' +
+                               'Please revise your search and try again.')
             else:
                 # generic error message for any other exception
                 messages.error(request, 'There was an error processing your search.')
@@ -603,10 +612,10 @@ def document_search(request, id):
         messages.error(request, 'Please enter a search term.')
     # display empty search results
     response = render_to_response('fa/document_search.html', {
-                    'files': [],
-                    'ead': ead,
-                    'docsearch_form': KeywordSearchForm(),
-                 }, context_instance=RequestContext(request))
+        'files': [],
+        'ead': ead,
+        'docsearch_form': KeywordSearchForm(),
+    }, context_instance=RequestContext(request))
      # if query could not be parsed, set a 'Bad Request' status code on the response
     if query_error:
         response.status_code = 400
@@ -633,7 +642,7 @@ def _series_url(eadid, series_id, *ids, **extra_opts):
         args['series3_id'] = ids[1]
         view_name = 'series3'
 
-    if 'preview' in extra_opts and extra_opts['preview'] == True:
+    if 'preview' in extra_opts and extra_opts['preview'] is True:
         view_namespace = 'fa-admin:preview'
     else:
         view_namespace = 'fa'
@@ -652,7 +661,7 @@ def _series_anchor(*ids, **extra_opts):
 
 
 def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=False,
-        url_params=''):
+                     url_params=''):
     """
     Recursive function to build a nested list of links to series and subseries
     to simplify template display logic for complicated series.  Note that the list
@@ -680,7 +689,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
     if url_ids is None:
         if not (series.ead and series.ead.eadid):
             raise Exception("Cannot construct subseries links without eadid for %s element %s"
-                        % (series.node.tag, series.id))
+                            % (series.node.tag, series.id))
 
         url_ids = [series.ead.eadid]
 
@@ -691,7 +700,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                 url_ids.append(series.series.short_id)
             else:
                 raise Exception("Cannot construct subseries links without c01 series id for %s element %s"
-                        % (series.node.tag, series.id))
+                                % (series.node.tag, series.id))
 
             if series.node.tag == C03:
                 # if initial series passed in is c03, add c02 series id to url ids before current series id
@@ -699,14 +708,15 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                     url_ids.append(series.series2.short_id)
                 else:
                     raise Exception("Cannot construct subseries links without c02 subseries id for %s element %s"
-                        % (series.node.tag, series.id))
+                                    % (series.node.tag, series.id))
 
         #  current series id
         if series.node.tag in [C01, C02, C03]:
             url_ids.append(series.short_id)
 
     links = []
-    if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or (hasattr(series, 'hasSeries') and series.hasSeries()):
+    if (hasattr(series, 'hasSubseries') and series.hasSubseries()) or \
+       (hasattr(series, 'hasSeries') and series.hasSeries()):
         for component in series.c:
             # get match count for each series / subseries and append it to the link if > 0
             if component.match_count > 0:
@@ -728,6 +738,7 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                  'linktext':  component.display_label(), 'match_count': match_count}
             links.append(text)
             if component.hasSubseries():
-                links.append(_subseries_links(component, url_ids=current_url_ids, \
-                    url_callback=url_callback, preview=preview, url_params=url_params))
+                links.append(_subseries_links(component, url_ids=current_url_ids,
+                                              url_callback=url_callback,
+                                              preview=preview, url_params=url_params))
     return links
