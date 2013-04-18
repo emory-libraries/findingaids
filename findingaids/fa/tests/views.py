@@ -396,6 +396,30 @@ class FaViewsTest(TestCase):
             '<li>.*Container List.*</li>', response.content,
             'container list included in top-level table of contents')
 
+        # dao with audience=external converted to html links
+        self.assertContains(
+            response, '<a href="http://some.url/item/id2">Photo 1</a>',
+            html=True,
+            msg_prefix='dao should be converted to html link using href & attribute')
+        self.assertContains(
+            response, '<a href="http://some.url/item/id3">Photo 2</a>',
+            html=True,
+            msg_prefix='multiple daos in the same did should be converted')
+
+        def_link_text = getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
+                                '[Resource available online]')
+        self.assertContains(
+            response,
+            '<a href="http://some.url/item/id4">%s</a>' % def_link_text,
+            html=True,
+            msg_prefix='dao with no title should use configured default')
+
+        self.assertNotContains(
+            response,
+            '<a href="http://some.url/item/id1">Digitized Content</a>',
+            html=True,
+            msg_prefix='dao with audience=internal should not display to anonymous user')
+
         # title with formatting
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
         self.assertPattern(r'''Sweet Auburn</[-A-Za-z]+>\s*research files''',

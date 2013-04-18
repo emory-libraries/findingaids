@@ -25,7 +25,7 @@
           <tr>
             <th class="bf">Box</th>
              <th class="bf">Folder</th>
-             <th class="content">Content</th>          
+             <th class="content">Content</th>
           </tr>
         {% endif %}
 
@@ -42,9 +42,16 @@
                     {{ component.did.physdesc|default:'' }}
                     {{ component.did.abstract|format_ead|default:'' }}
                     {{ component.did.note|format_ead|default:'' }}
+                    <div>
+                    {% for dao in component.did.dao_list %}
+                      {% if dao.audience != 'internal' %} {# audience = external or unset should be publicly viewable #}
+                        <a href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
+                      {% endif %}
+                    {% endfor %}
+                  </div>
                 </td>
             </tr>
          {% endif %}
     {% endfor %}
   </table>
-{% endif %}
+{% endif %}did

@@ -8,6 +8,14 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.3
+---
+
+* When a researcher is viewing web pages or PDF documents for a finding aid
+  with digital archival object references in the EAD document, they can see and
+  click on links in order to access digital items associated with the
+  collection.
+
 1.2
 ---
 
