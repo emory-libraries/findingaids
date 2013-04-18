@@ -1,7 +1,9 @@
 #eulxml>=0.18.0
 # depend on dev eulxml for dao support until next release
 git+https://github.com/emory-libraries/eulxml.git@develop#egg=eulxml
-eulexistdb>=0.17.0
+#eulexistdb>=0.17.0
+# depend on dev eulexistdb for exists, exclude xquery filters
+git+https://github.com/emory-libraries/eulexistdb.git@develop#egg=eulexistdb
 eulcommon
 http://waterhouse.library.emory.edu:8080/hudson/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.18.0-dev.tar.gz
 http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x/11/artifact/pidmanclient/dist/pidservices-1.1.1.tar.gz
