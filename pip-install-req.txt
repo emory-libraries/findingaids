@@ -1,4 +1,6 @@
-eulxml>=0.18.0
+#eulxml>=0.18.0
+# depend on dev eulxml for dao support until next release
+git+https://github.com/emory-libraries/eulxml.git@develop#egg=eulxml
 eulexistdb>=0.17.0
 eulcommon
 http://waterhouse.library.emory.edu:8080/hudson/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.18.0-dev.tar.gz
