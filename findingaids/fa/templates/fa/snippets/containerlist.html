@@ -46,6 +46,7 @@
                     {% for dao in component.did.dao_list %}
                       {% if dao.audience != 'internal' %} {# audience = external or unset should be publicly viewable #}
                         <a href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
+                        {# NOTE: when we get to internal/admin, not all will have hrefs #}
                       {% endif %}
                     {% endfor %}
                   </div>
@@ -54,4 +55,4 @@
          {% endif %}
     {% endfor %}
   </table>
-{% endif %}did
+{% endif %}
