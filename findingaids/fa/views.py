@@ -577,17 +577,34 @@ def document_search(request, id):
 
             # use path to restrict query to a single document (much faster)
             path = '%s/%s' % (ead.collection_name, ead.document_name)
-            files = FileComponent.objects.filter(document_path=path) \
-                .filter(fulltext_terms=search_terms) \
-                .also('parent__id', 'parent__did',
-                      'series1__id', 'series1__did', 'series2__id', 'series2__did')
+            files = FileComponent.objects.filter(document_path=path)
+
+            # at least one of search terms or dao may be present,
+            # but both are optional
+
+            # filter by keyword if present
+            if search_terms:
+                files = files.filter(fulltext_terms=search_terms)
+
+            # restrict to publicly-accessible dao items, if set
+            if form.cleaned_data['dao']:
+                files = files.filter(did__dao_list__exists=True) \
+                             .exclude(did__dao_list__audience='internal')
+
+            files = files.also('parent__id', 'parent__did',
+                               'series1__id', 'series1__did', 'series2__id', 'series2__did')
+
+            # if there is a keyword search term, pass on for highlighting
+            url_params = ''
+            if search_terms:
+                url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
 
             return render_to_response('fa/document_search.html', {
                 'files': files,
                 'ead': ead,
                 'querytime': [files.queryTime(), ead.queryTime()],
                 'keywords': search_terms,
-                'url_params': '?' + urlencode({'keywords': search_terms.encode('utf-8')}),
+                'url_params': url_params,
                 'docsearch_form': KeywordSearchForm(),
             }, context_instance=RequestContext(request))
         except ExistDBTimeout, e:

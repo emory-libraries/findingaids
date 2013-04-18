@@ -22,8 +22,8 @@ from django.db import models
 
 from eulxml import xmlmap
 from eulxml.xmlmap.eadmap import EncodedArchivalDescription, Component, \
-        SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
-        UnitTitle, Section
+    SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
+    UnitTitle, Section, XLINK_NAMESPACE
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
@@ -414,6 +414,7 @@ class Index(XmlModel, EadIndex):
 
     ROOT_NAMESPACES = {
         'e': EAD_NAMESPACE,
+        'xlink': XLINK_NAMESPACE,
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
@@ -459,6 +460,7 @@ class FileComponent(XmlModel, Component):
 
     ROOT_NAMESPACES = {
         'e': EAD_NAMESPACE,
+        'xlink': XLINK_NAMESPACE,
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
