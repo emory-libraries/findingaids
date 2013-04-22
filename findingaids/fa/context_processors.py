@@ -24,12 +24,15 @@ def searchform(request):
     return {'kwsearch_form': KeywordSearchForm()}
 
 
-def version(request):
-    "Template context processor: add the findingaids software version to context."
-    return {'SW_VERSION': findingaids.__version__}
+def common_settings(request):
+    '''Template context processor to add selected settings to template
+    context for use on any page .'''
 
-
-def default_dao_link(request):
-    "Template context processor: add default DAO link text from localsettings to context."
-    return {'DEFAULT_DAO_LINK_TEXT': getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
-                                             '[Resource available online]')}
+    context_extras = {
+        'SW_VERSION': findingaids.__version__,
+        'ENABLE_BETA_WARNING': getattr(settings, 'ENABLE_BETA_WARNING',
+                                       False),
+        'DEFAULT_DAO_LINK_TEXT': getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
+                                         '[Resource available online]')
+    }
+    return context_extras

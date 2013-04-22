@@ -16,6 +16,9 @@ recent version first.  Upgrade or deployment notes should be found in
   click on links in order to access digital items associated with the
   collection.
 
+* Added support for a beta warning to be displayend in test/staging
+  sites; turn on via **ENABLE_BETA_WARNING** setting.
+
 1.2
 ---
 

@@ -87,6 +87,10 @@
   })();
 </script>
 {% endif %}
+
+  {% if ENABLE_BETA_WARNING %}
+    {% include 'snippets/beta_warning.html' %}
+  {% endif %}
 {% endblock scripts %}
 
 {% block contact-us-link %}{% url 'content:feedback' %}{% endblock %}

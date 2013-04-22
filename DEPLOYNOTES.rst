@@ -408,7 +408,8 @@ Upgrade Notes
   can be used to specify the default link text for digital archival objects referenced
   in the EAD.  See the commented out example in ``localsettings.py.dist``; default
   value should be fine.
-
+* When the code is deployed to staging the **ENABLE_BETA_WARNING** configuration
+  should be set to True on ``localsettings.py```
 
 1.2
 ~~~~
