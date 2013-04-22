@@ -34,6 +34,14 @@ or leave the keyword field blank and choose a repository to browse a complete li
         </tr>
         <tr>
             <th>
+                <label for="{{ form.dao.auto_id }}">{{ form.dao.label }}:</label>
+            </th>
+            <td>
+                {{ form.dao }}<br> {{ form.dao.help_text }}
+            </td>
+        </tr>
+        <tr>
+            <th>
                 <label for="{{ form.repository.auto_id }}">{{ form.repository.label }}:</label>
             </th>
             <td>

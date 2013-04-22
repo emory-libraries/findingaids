@@ -445,6 +445,7 @@ def search(request):
         subject = form.cleaned_data['subject']
         keywords = form.cleaned_data['keywords']
         repository = form.cleaned_data['repository']
+        dao = form.cleaned_data['dao']
         page = request.REQUEST.get('page', 1)
 
         # initialize findingaid queryset - filters will be added based on search terms
@@ -477,6 +478,15 @@ def search(request):
                     highlight=False,    # disable highlighting in search results list
                 ).order_by('-fulltext_score')
 
+            # optional filter: restrict to items with digital archival objects
+            if dao:
+                findingaids = findingaids.filter(daos__exists=True) \
+                                         .filter(public_dao_count__gte=1)
+                # restrict to public daos for now
+                # NOTE: using >= filter to force a where clause because this works
+                # when what seems to be the same filter on the xpath does not
+                # (possibly an indexing issue?)
+
             findingaids = findingaids.only(*return_fields)
             result_subset, paginator = paginate_queryset(request, findingaids,
                                                          per_page=10, orphans=5)
@@ -493,14 +503,18 @@ def search(request):
             search_params = dict((key, value) for key, value in form.cleaned_data.iteritems()
                                  if value)
 
-            #set query and last page in session and set it to expire on browser close
+            # set query and last page in session and set it to expire on browser close
             for key, val in search_params.iteritems():
-                search_params[key] = val.encode('utf-8')
+                if key == 'dao':
+                    search_params[key] = val
+                else:
+                    search_params[key] = val.encode('utf-8')
             last_search = search_params.copy()
             # pagination url params should NOT include page
             if 'page' in last_search:
                 del(last_search['page'])
             url_params = urlencode(last_search)
+
             # store the current page (even if not specified in URL) for saved search
             last_search['page'] = page
             last_search = "%s?%s" % (reverse("fa:search"), urlencode(last_search))
@@ -589,7 +603,8 @@ def document_search(request, id):
             # restrict to publicly-accessible dao items, if set
             if form.cleaned_data['dao']:
                 files = files.filter(did__dao_list__exists=True) \
-                             .exclude(did__dao_list__audience='internal')
+                             .or_filter(did__dao_list__audience='external',
+                                        did__dao_list__audience__exists=False)
 
             files = files.also('parent__id', 'parent__did',
                                'series1__id', 'series1__did', 'series2__id', 'series2__did')

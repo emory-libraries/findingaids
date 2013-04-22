@@ -39,6 +39,7 @@
       Search EmoryFindingAids
       <form action="{% url 'fa:search' %}" method="get">
         {{kwsearch_form.keywords}}
+        {{kwsearch_form.dao}} {{kwsearch_form.dao.help_text}}
         <input class="form-submit" type="submit" value="Search" />
       </form>
   </div>

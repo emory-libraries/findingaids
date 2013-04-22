@@ -36,6 +36,7 @@ class KeywordSearchForm(forms.Form):
         help_text="one or more terms; will search anywhere in the finding aid")
     # checkbox to filter on presence of dao tags in a findingaid or file-level item
     dao = forms.BooleanField(
+        label='Available Online',
         required=False,
         help_text='only show items with resources available online')
 
@@ -82,13 +83,15 @@ class AdvancedSearchForm(KeywordSearchForm):
         self.fields['repository'].widget.attrs['size'] = len(repo_choices)
 
     def clean(self):
-        """Custom form validation.  Keywords and subjects are both optional,
-        but at least one of them should contain search terms."""
+        """Custom form validation.  Keywords, dao filter, and subjects
+        are all optional, but at least one of them should contain search terms
+        or be set."""
         cleaned_data = self.cleaned_data
 
         keywords = cleaned_data.get('keywords')
         subject = cleaned_data.get('subject')
-        if not keywords and not subject and not cleaned_data.get('repository'):
+        dao = cleaned_data.get('dao')
+        if not any([keywords, subject, dao, cleaned_data.get('repository')]):
             # for now, repository can only be used as a filter with keywords or subjects
             raise forms.ValidationError('Please enter search terms or choose a repository.')
 
