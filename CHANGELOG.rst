@@ -15,9 +15,14 @@ recent version first.  Upgrade or deployment notes should be found in
   with digital archival object references in the EAD document, they can see and
   click on links in order to access digital items associated with the
   collection.
-
-* Added support for a beta warning to be displayend in test/staging
-  sites; turn on via **ENABLE_BETA_WARNING** setting.
+* A researcher searching within a single finding aid can optionally restrict
+  results to items that include digital objects in order to find digital content
+  by keyword or all digital objects in one finding aid.
+* A researcher searching all finding aids by keyword can optionally restrict
+  results to collections with publicly accessible digital objects in order to make
+  use of archival items available online.
+* Configurable beta warning to be displayend in test/staging sites; turn on
+  via **ENABLE_BETA_WARNING** setting.
 
 1.2
 ---
