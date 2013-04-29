@@ -35,9 +35,9 @@
         <div id="search" class="left-col">
              <h2>Search FindingAids</h2>
               <form action="{% url 'fa:search' %}" method="get">
-                {{kwsearch_form.keywords}}
+                {{ kwsearch_form.keywords }}
                 <input class="form-submit" type="submit" value="Search" />
-
+                <p>{{ kwsearch_form.dao }} <span class="help-text">{{ kwsearch_form.dao.help_text }}</span></p>
                 <p><b>Tip:</b> Exact phrase ("civil war"), Boolean operators (AND, OR, and NOT), and wildcard (theat*)
                 available. </p>
               </form>

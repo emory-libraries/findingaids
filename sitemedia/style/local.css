@@ -247,6 +247,10 @@ form#advanced-search input[type="text"], form#advanced-search select {
    padding: 3px 0px; /* no side-padding (makes input longer than select) */
 }
 
+form .help-text {
+    font-size: 85%;
+}
+
 div.doc-links {
     border: none !important;
     background-color: #ffffff !important;
