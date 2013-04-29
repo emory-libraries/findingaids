@@ -186,7 +186,11 @@ def full_findingaid(request, id, mode, preview=False):
 
     template = 'fa/full.html'
     template_args = {'ead': fa, 'series': series,
-                     'mode': mode, 'preview': preview, 'request': request}
+                     'mode': mode, 'preview': preview, 'request': request,
+                     # normally supplied by context processor
+                     'DEFAULT_DAO_LINK_TEXT': getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
+                                                      '[Resource available online]')
+                     }
     if mode == 'html':
         return render_to_response(template, template_args)
     elif mode == 'pdf':
