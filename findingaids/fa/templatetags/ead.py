@@ -53,7 +53,13 @@ def format_extref(node):
     'convert an extref node to an html link'
     url = node.get('{%s}href' % XLINK_NAMESPACE)
     href = ' href="%s"' % url if url is not None else ''
-    return ('<a%s>' % href, '</a>')
+    rel = ''
+    # special case: links in separated/related material should be relatedLink
+    if node.xpath('ancestor::e:separatedmaterial or ancestor::e:relatedmaterial',
+                  namespaces={'e': EAD_NAMESPACE}):
+        rel = ' property="schema:relatedLink" '
+
+    return ('<a%s%s>' % (rel, href), '</a>')
 
 # more complex tags
 # - key is tag name, value is a callable that takes a node
