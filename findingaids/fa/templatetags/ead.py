@@ -61,6 +61,18 @@ def format_extref(node):
 
     return ('<a%s%s>' % (rel, href), '</a>')
 
+
+def format_date(node):
+    'display a date node with semantic information, if available'
+    normal = node.get('normal', None)
+    date_type = node.get('type', None)
+    start, end = '', ''
+    # Only display if we have a normalized date and a date type
+    if date_type is not None and normal is not None:
+        start = '<span property="%s" content="%s">' % (date_type, normal)
+        end = '</span>'
+    return (start, end)
+
 # more complex tags
 # - key is tag name, value is a callable that takes a node
 other_tags = {
@@ -75,6 +87,10 @@ name_tags = {
     EAD_PERSNAME: 'schema:Person',
     EAD_CORPNAME: 'schema:Organization',
     EAD_GEOGNAME: 'schema:Place',
+}
+# tags that are not names, but should only be styled for rdfa
+semantic_tags = {
+    '{%s}date' % EAD_NAMESPACE: format_date,
 }
 
 
@@ -214,6 +230,9 @@ def format_ead_node(node, escape, rdfa=False, default_rel=None):
     # convert names to semantic web / rdfa if requested
     elif rdfa and node.tag in name_tags.keys():
         start, end = format_nametag(node, default_rel)
+
+    elif rdfa and node.tag in semantic_tags.keys():
+        start, end = semantic_tags[node.tag](node)
 
     # unsupported tags that do not get converted
     else:
