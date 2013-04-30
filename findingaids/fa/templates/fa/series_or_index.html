@@ -3,6 +3,9 @@
 {% extends "fa/base.html" %}
 {% load ead %} {% load ifurl %}
 
+{% block html-extras %}{% for prefix, ns in extra_ns.iteritems %}
+   xmlns:{{ prefix}}="{{ ns }}"{% endfor %} {% endblock %}
+
 {% block page-subtitle %}: {{ ead.title }} : {% firstof series.display_label index.head %}{% endblock %}
 
 {% block page-head %}

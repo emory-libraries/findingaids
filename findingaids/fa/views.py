@@ -49,10 +49,17 @@ fa_listfields = ['eadid', 'list_title', 'archdesc__did']
 # and FindingAid.abstract
 
 
+RDFA_NAMESPACES = {
+    'schema': 'http://schema.org/',
+    'dcmitype': 'http://purl.org/dc/dcmitype/',
+    'arch': 'http://purl.org/archival/vocab/arch#'
+}
+
+
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
     return render_to_response('fa/index.html', {'letters': title_letters()},
-                                                          context_instance=RequestContext(request))
+                              context_instance=RequestContext(request))
 
 
 def browse_titles(request):
@@ -151,11 +158,7 @@ def findingaid(request, id, preview=False):
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
                               url_params=url_params)
 
-    extra_ns = {
-        'schema': 'http://schema.org/',
-        'dcmitype': 'http://purl.org/dc/dcmitype/',
-        'arch': 'http://purl.org/archival/vocab/arch#'
-    }
+    extra_ns = RDFA_NAMESPACES.copy()
     # add any non-default namespaces from the EAD document
     extra_ns.update(dict((prefix, ns) for prefix, ns in fa.node.nsmap.iteritems()
                     if prefix is not None))
@@ -332,18 +335,25 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     if hasattr(ead, 'queryTime'):
         query_times.append(ead.queryTime())
 
-    render_opts = {'ead': ead,
-                    'all_series': all_series,
-                    'all_indexes': all_indexes,
-                    "querytime": query_times,
-                    'prev': prev,
-                    'next': next,
-                    'url_params': url_params,
-                    'canonical_url': _series_url(eadid, *[shortform_id(id) for id in series_ids]),
-                    'docsearch_form': KeywordSearchForm(),
-                    'last_search': request.session.get('last_search', None),
-                    'feedback_opts': _get_feedback_options(request, eadid),
-                    }
+    extra_ns = RDFA_NAMESPACES.copy()
+    # add any non-default namespaces from the EAD document
+    extra_ns.update(dict((prefix, ns) for prefix, ns in ead.node.nsmap.iteritems()
+                    if prefix is not None))
+
+    render_opts = {
+        'ead': ead,
+        'all_series': all_series,
+        'all_indexes': all_indexes,
+        "querytime": query_times,
+        'prev': prev,
+        'next': next,
+        'url_params': url_params,
+        'canonical_url': _series_url(eadid, *[shortform_id(id) for id in series_ids]),
+        'docsearch_form': KeywordSearchForm(),
+        'last_search': request.session.get('last_search', None),
+        'feedback_opts': _get_feedback_options(request, eadid),
+        'extra_ns': extra_ns,
+    }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
