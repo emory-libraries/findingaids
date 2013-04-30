@@ -4,7 +4,7 @@
 <a name="{{ index.id }}"><h2>{{ index.head|format_ead }}</h2></a>
 {# FIXME: move the correspondence/rdfa detection logic into the view? #}
 {% if 'Selected Correspondents' in index.head|format_ead and index.ead.origination_name.authfilenumber %}
-  <div xmlns:schema="http://schema.org/" xmlns:arch="http://purl.org/archival/vocab/arch#" typeof="schema:Person" about="{{ index.ead.origination_name.uri}}">
+  <div typeof="schema:Person" about="{{ index.ead.origination_name.uri}}">
 {% endif %}
 {% for entry in  index.entry %}
    <div class="indexentry">

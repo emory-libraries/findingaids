@@ -5,8 +5,9 @@
 <table id="descriptive_summary">    {#  display the following fields, in this specific order  #}
     <col width="20%" valign="top" align="left"/>
     <col width="80%" valign="top" align="left"/>
-  {% if ead.archdesc.origination %}
-      <tr><th>Creator:</th><td>{{ ead.archdesc.origination }}</td></tr>
+  {% if ead.origination_name %}
+      <tr><th>Creator:</th><td>{{ ead.origination_name|format_ead_rdfa:"schema:creator" }}</td></tr>
+      {# NOTE: could be contributor in some cases #}
    {% endif %}
    {% if ead.unittitle|format_ead %}
       <tr><th>Title:</th><td property="schema:name"> {{ ead.unittitle|format_ead }} </td></tr>
@@ -45,7 +46,7 @@
 
 <h2><a name="collection_description">Collection Description</a></h2>
  {% for section in ead.collection_description %}
-  {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}<div rel="schema:about">{% endif %}  {# or rel=creator ? #}
+{#} {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}<div rel="schema:about">{% endif %}  {# or rel=creator ? #}
   {# NOTE: schema is about origination of a person or org (or MAYBE a family.) #}
    <div {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}about="{{ ead.origination_name.uri }}"{% endif %}>
    	<h3>{{ section.head|default:'' }}</h3>
@@ -55,12 +56,14 @@
 
     {# grab occupation from controlled access #}
     {# NOTE: in local encoding practice, any controlled access occupation refers to origination/main entry person #}
-    {% for ca in ead.archdesc.controlaccess.controlaccess %}
-       {% for occupation in ca.occupation %}
-          <meta property="schema:jobTitle" content="{{ occupation|cut:'.' }}" />
+     {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}
+       {% for ca in ead.archdesc.controlaccess.controlaccess %}
+          {% for occupation in ca.occupation %}
+            <meta property="schema:jobTitle" content="{{ occupation|cut:'.' }}" />
+          {% endfor %}
        {% endfor %}
-    {% endfor %}
+     {% endif %}
    </div>
-   {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}</div>{% endif %}
+{#}   {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}</div>{% endif %} #}
  {% endfor %}
 
