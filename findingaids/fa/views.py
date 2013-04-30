@@ -149,7 +149,16 @@ def findingaid(request, id, preview=False):
         filter = {}
     fa = get_findingaid(id, preview=preview, filter=filter)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
-        url_params=url_params)
+                              url_params=url_params)
+
+    extra_ns = {
+        'schema': 'http://schema.org/',
+        'dcmitype': 'http://purl.org/dc/dcmitype/',
+        'arch': 'http://purl.org/archival/vocab/arch#'
+    }
+    # add any non-default namespaces from the EAD document
+    extra_ns.update(dict((prefix, ns) for prefix, ns in fa.node.nsmap.iteritems()
+                    if prefix is not None))
 
     response = render_to_response('fa/findingaid.html', {
         'ead': fa,
@@ -160,7 +169,8 @@ def findingaid(request, id, preview=False):
         'docsearch_form': KeywordSearchForm(),
         'last_search': request.session.get('last_search', None),
         'feedback_opts': _get_feedback_options(request, id),
-     },  context_instance=RequestContext(request, current_app='preview'))
+        'extra_ns': extra_ns,
+    },  context_instance=RequestContext(request, current_app='preview'))
     # Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'

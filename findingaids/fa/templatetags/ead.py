@@ -111,10 +111,9 @@ def format_nametag(node, default_role=None):
         # NOTE: *preliminary* role  / relation to context
         if node.get('role') is not None:
             rel = node.get('role')
-            rel = 'schema:' + rel.replace('originator:', '')
-        elif rdftype == 'schema:Organization':
-            # NOTE: this should not be set for control access orgs
-            rel = 'schema:affiliation'
+        # elif rdftype == 'schema:Organization':
+        #     # NOTE: this should not be set for control access orgs
+        #     rel = 'schema:affiliation'
 
         # special case: for controlaccess, we can infer name from encodinganalog
         if node.getparent().tag == '{%s}controlaccess' % EAD_NAMESPACE:

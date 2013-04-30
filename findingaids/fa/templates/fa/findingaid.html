@@ -1,11 +1,9 @@
 {% extends "fa/base.html" %}
 {% load ead %}   {% load ifurl %}
 
-{% block html-extras %}
-  xmlns:schema="http://schema.org/"
-  xmlns:dcmitype="http://purl.org/dc/dcmitype/"
-  xmlns:arch="http://purl.org/archival/vocab/arch#"
-{% endblock %}    {# NOTE: may also want to use xmlns:dc="http://purl.org/dc/terms/" #}
+{# additional namespaces (primarly for semantic web/RDFa) #}
+{% block html-extras %}{% for prefix, ns in extra_ns.iteritems %}
+   xmlns:{{ prefix}}="{{ ns }}"{% endfor %} {% endblock %}
 
 {% block page-head %}
   {{block.super}}
@@ -25,6 +23,8 @@
 
 {% block page-subtitle %}: {{ ead.title }}{% endblock %}
 
+{% block body-extras %}typeof="schema:WebPage dcmitype:Text" about="{{ ead.eadid.url }}"{% endblock %}
+
 {% block content-title %}
 <div class="fa-title">
     {% if ead.archdesc.origination %}{{ ead.archdesc.origination|upper }}<br/>{% endif %}
@@ -33,7 +33,6 @@
 {% endblock %}
 
 {% block content-body %}
-<div typeof="schema:WebPage dcmitype:Text" about="{{ ead.eadid.url }}">
 <meta property="schema:author" content="{{ ead.author }}" />
 <meta property="schema:name" content="{{ ead.title }}" />
 {% if ead.origination_name.authfilenumber %}
@@ -84,7 +83,7 @@
 </div>
 
 <div rel="schema:about"> {# the finding aid document is *about* the archival collection #}
-<div class="fa" typeof="schema:CreativeWork arch:Collection dcmitype:Collection">
+ <div class="fa" typeof="schema:CreativeWork arch:Collection dcmitype:Collection">
      {# NOTE: currently no URI to signify the collection (document url is for the finding aid document) #}
 <hr/>
 {% include "fa/snippets/description.html" %}
@@ -108,8 +107,8 @@
 
 {# indexes (if any) displayed on their own pages #}
 
-</div>
-</div>
+ </div> {# end collection item #}
+</div> {# end about #}
 
-</div> {# end itemscope #}
+
 {% endblock %}
