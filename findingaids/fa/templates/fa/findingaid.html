@@ -49,7 +49,6 @@
        {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
      </span> {# end organiaztion #}
    </span> {# end publisher #}
-    {# FIXME:  this url for the findingaid is *inside* the publisher entity #}
     <p>Permanent link: <a property="schema:url" rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
   <div id="sidebar-right">
