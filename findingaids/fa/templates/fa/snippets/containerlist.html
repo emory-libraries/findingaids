@@ -48,6 +48,15 @@
                       {{ component.did.physdesc|default:'' }}
                       {{ component.did.abstract|format_ead_rdfa:rdfa_rel|default:'' }}
                       {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
+                    {% elif component.unittitle_name %}
+                    {# if unittitle has a name, containers may have semantic info also #}
+                    <span rel="schema:mentions"><span type="bibo:Manuscript">
+                      {# NOTE: assuming manuscript type for now; should be refined for other types of content #}
+                      {{ component.did.unittitle|format_ead_rdfa }}
+                      {{ component.did.physdesc|default:'' }}
+                      {{ component.did.abstract|format_ead_rdfa|default:'' }}
+                      {{ component.did.note|format_ead_rdfa|default:'' }}
+                    </span></span>
                     {% else %}
                       {{ component.did.unittitle|format_ead }}
                       {{ component.did.physdesc|default:'' }}
