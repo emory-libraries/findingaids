@@ -50,22 +50,22 @@ class Name(XmlModel):
     @property
     def is_personal_name(self):
         'boolean indicator if this is a persname tag'
-        return self.tag == "{%s}persname" % EAD_NAMESPACE
+        return self.node.tag == "{%s}persname" % EAD_NAMESPACE
 
     @property
     def is_corporate_name(self):
         'boolean indicator if this is a corpname tag'
-        return self.tag == "{%s}corpname" % EAD_NAMESPACE
+        return self.node.tag == "{%s}corpname" % EAD_NAMESPACE
 
     @property
     def is_family_name(self):
         'boolean indicator if this is a famname tag'
-        return self.tag == "{%s}famname" % EAD_NAMESPACE
+        return self.node.tag == "{%s}famname" % EAD_NAMESPACE
 
     @property
     def is_geographic_name(self):
         'boolean indicator if this is a geogname tag'
-        return self.tag == "{%s}geogname" % EAD_NAMESPACE
+        return self.node.tag == "{%s}geogname" % EAD_NAMESPACE
 
     @property
     def uri(self):
@@ -341,6 +341,11 @@ class Series(XmlModel, LocalComponent):
 
     match_count = xmlmap.IntegerField("count(.//exist:match)")
     ":class:`findingaids.fa.models.FindingAid` number of keyword matchs"
+
+    _unittitle_name_xpath = '|'.join('e:did/e:unittitle/e:%s' % t
+                                     for t in ['persname', 'corpname', 'geogname'])
+    unittitle_name = xmlmap.NodeField(_unittitle_name_xpath, Name)
+    'name in the unittitle, as an instance of :class:`Name`'
 
     def series_info(self):
         """"
