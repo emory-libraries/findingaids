@@ -24,7 +24,7 @@ from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-__all__ = ['format_ead', 'format_ead_rdfa']
+__all__ = ['format_ead', 'format_ead_rdfa', 'series_section_rdfa']
 
 register = template.Library()
 
@@ -65,13 +65,36 @@ def format_extref(node):
 def format_date(node):
     'display a date node with semantic information, if available'
     normal = node.get('normal', None)
-    date_type = node.get('type', None)
+    # default to dc:date property as a generic date
+    date_type = node.get('type', 'dc:date')
     start, end = '', ''
-    # Only display if we have a normalized date and a date type
-    if date_type is not None and normal is not None:
+    # display if we have a normalized date
+    if normal is not None:
         start = '<span property="%s" content="%s">' % (date_type, normal)
         end = '</span>'
     return (start, end)
+
+
+def format_title(node):
+    'display a title node as semantic information'
+    title_type = node.get('type', None)
+    start, end = '<span property="dc:title">', '</span>'
+    # Only add semantic information if there is a type (?)
+    if title_type is not None:
+        start = '<span typeof="%s">%s' % (title_type, start)
+        end = end + '</span>'
+        # FIXME: other relations?
+        if title_type.endswith('DocumentPart'):
+            rel = 'dcterms:hasPart'
+            start = '<span rel="%s">%s' % (rel, start)
+            end = end + '</span>'
+    return (start, end)
+
+
+def format_occupation(node):
+    'display an occupation node with semantic information'
+    return ('<span property="schema:jobTitle">', '</span>')
+
 
 # more complex tags
 # - key is tag name, value is a callable that takes a node
@@ -91,6 +114,8 @@ name_tags = {
 # tags that are not names, but should only be styled for rdfa
 semantic_tags = {
     '{%s}date' % EAD_NAMESPACE: format_date,
+    '{%s}title' % EAD_NAMESPACE: format_title,
+    '{%s}occupation' % EAD_NAMESPACE: format_occupation,
 }
 
 
@@ -216,8 +241,24 @@ def format_ead_node(node, escape, rdfa=False, default_rel=None):
 
     # check for supported render attributes
     rend = node.get('render', None)
+
+    rdfa_start, rdfa_end = '', ''
+
+    # convert names to semantic web / rdfa if requested
+    if rdfa and node.tag in name_tags.keys():
+        rdfa_start, rdfa_end = format_nametag(node, default_rel)
+
+    elif rdfa and node.tag in semantic_tags.keys():
+        rdfa_start, rdfa_end = semantic_tags[node.tag](node)
+
+    # convert display/formatting
+    # NOTE: a few semantic tags also have formatting conversion
+
+    start, end = '', ''
     if rend is not None and rend in rend_attributes.keys():
-        start, end = rend_attributes[rend]
+        s, e = rend_attributes[rend]
+        start += s
+        end = e + end
 
     # simple tags that can be converted to html markup
     elif node.tag in simple_tags.keys():
@@ -227,16 +268,12 @@ def format_ead_node(node, escape, rdfa=False, default_rel=None):
     elif node.tag in other_tags.keys():
         start, end = other_tags[node.tag](node)
 
-    # convert names to semantic web / rdfa if requested
-    elif rdfa and node.tag in name_tags.keys():
-        start, end = format_nametag(node, default_rel)
-
-    elif rdfa and node.tag in semantic_tags.keys():
-        start, end = semantic_tags[node.tag](node)
-
     # unsupported tags that do not get converted
     else:
         start, end = '', ''
+
+    start += rdfa_start
+    end = rdfa_end + end
 
     # list of text contents to be compiled
     contents = [start]  # start tag
@@ -253,3 +290,51 @@ def format_ead_node(node, escape, rdfa=False, default_rel=None):
     contents.extend([end, escape(node.tail or '')])
 
     return ''.join(contents)
+
+EAD_SCOPECONTENT = '{%s}scopecontent' % EAD_NAMESPACE
+EAD_BIOGHIST = '{%s}bioghist' % EAD_NAMESPACE
+
+
+@register.assignment_tag(takes_context=True)
+def series_section_rdfa(context, series, section):
+    # determine rdf wrapping info for a series info section
+    # - if we have an origination name or series name,
+    #   assumes bioghits or scopecontent is *about*
+    #   the person or organization
+    name = series.unittitle_name or \
+        series.ead.origination_name or None
+    type = 'schema:Person'  # assume for now (but wrong)
+
+    rdfa = False
+    default_rel = None
+
+    # sections at series level we want to treat as *about*
+    # the name
+    if name is not None and type is not None \
+       and section.node.tag in [EAD_SCOPECONTENT, EAD_BIOGHIST]:
+               # FIXME: do we need to check that the name has a URI ?
+        rdfa = True
+
+    # is section is scopecontent or bioghist, then assume it is about
+    # closest named person/organization
+
+    if rdfa and 'correspondence' in unicode(series.did.unittitle).lower():
+        default_rel = 'schema:knows arch:correspondedWith'
+
+    # if there is semantic information to display, the web page
+    # is *about* the person/org; use
+
+    if rdfa:
+        start = '''<div rel="schema:about">
+            <div typeof="%s" about="%s">
+        ''' % (type, name.uri)
+        end = '</div></div>'
+
+        context['use_rdfa'] = True
+    else:
+        start = '<div>'
+        end = '</div>'
+
+    context.update({'use_rdfa': rdfa, 'default_rel': default_rel})
+
+    return {'start': mark_safe(start), 'end': mark_safe(end)}
