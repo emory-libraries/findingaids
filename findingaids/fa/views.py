@@ -52,7 +52,8 @@ fa_listfields = ['eadid', 'list_title', 'archdesc__did']
 RDFA_NAMESPACES = {
     'schema': 'http://schema.org/',
     'dcmitype': 'http://purl.org/dc/dcmitype/',
-    'arch': 'http://purl.org/archival/vocab/arch#'
+    'arch': 'http://purl.org/archival/vocab/arch#',
+    'bibo': 'http://purl.org/ontology/bibo/',
 }
 
 
@@ -267,7 +268,8 @@ def _view_series(request, eadid, *series_ids, **kwargs):
             referrer = 'Referrer %s' % request.META['HTTP_REFERER']
         else:
             referrer = ' (referrer not available)'
-        logger.info('''Redirecting from long-form series/index %s url to short-form url. %s''' \
+
+        logger.info('''Redirecting from long-form series/index %s url to short-form url. %s'''
                     % (request.path, referrer))
         return HttpResponsePermanentRedirect(_series_url(eadid, *redirect_ids))
 
@@ -309,10 +311,11 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                          'dsc__head', 'archdesc__did']
         fa = FindingAid.objects.filter(eadid=eadid).filter(**filter).using(collection)
         # using raw xpaths for exist-specific logic to expand and count matches
-        ead = fa.only(*return_fields).only_raw(coll_desc_matches=FindingAid.coll_desc_matches_xpath,
-            admin_info_matches=FindingAid.admin_info_matches_xpath,
-            archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath,
-            ).using(collection).get()
+        ead = fa.only(*return_fields) \
+                .only_raw(coll_desc_matches=FindingAid.coll_desc_matches_xpath,
+                          admin_info_matches=FindingAid.admin_info_matches_xpath,
+                          archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath,
+                          ).using(collection).get()
     else:
         # when no highlighting, use partial ead retrieved with main item
         ead = result.ead
@@ -340,6 +343,8 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     extra_ns.update(dict((prefix, ns) for prefix, ns in ead.node.nsmap.iteritems()
                     if prefix is not None))
 
+
+
     render_opts = {
         'ead': ead,
         'all_series': all_series,
@@ -364,7 +369,8 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         render_opts['subseries'] = _subseries_links(result, preview=preview_mode, url_params=url_params)
 
     response = render_to_response('fa/series_or_index.html',
-                            render_opts, context_instance=RequestContext(request))
+                                  render_opts,
+                                  context_instance=RequestContext(request))
 
     #Cache-Control to private when there is a last_search
     if "last_search" in request.session:
