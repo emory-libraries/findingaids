@@ -44,8 +44,10 @@
   </div>
 {% endblock %}
 
-
 {% block content-body %}
+{% if last_modified %} {# include last modified  in RDFa when we can, so harvested data will include the date #}
+  <meta property="schema:dateModified" content="{{ last_modified|date:'Y-m-d' }}" />
+{% endif %}
 <div id="toc_series" class="short-toc">
 {% with 1 as collapsed %}{% include "fa/snippets/toc.html" %}{% endwith %}
 

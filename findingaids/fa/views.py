@@ -156,6 +156,7 @@ def findingaid(request, id, preview=False):
         url_params = ''
         filter = {}
     fa = get_findingaid(id, preview=preview, filter=filter)
+    last_modified = ead_lastmodified(request, id, preview)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
                               url_params=url_params)
 
@@ -174,6 +175,7 @@ def findingaid(request, id, preview=False):
         'last_search': request.session.get('last_search', None),
         'feedback_opts': _get_feedback_options(request, id),
         'extra_ns': extra_ns,
+        'last_modified': last_modified,
     },  context_instance=RequestContext(request, current_app='preview'))
     # Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
@@ -198,7 +200,7 @@ def full_findingaid(request, id, mode, preview=False):
 
     template = 'fa/full.html'
     template_args = {'ead': fa, 'series': series,
-                    'mode': mode, 'preview': preview, 'request': request}
+                     'mode': mode, 'preview': preview, 'request': request}
     if mode == 'html':
         return render_to_response(template, template_args)
     elif mode == 'pdf':
@@ -343,8 +345,6 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     extra_ns.update(dict((prefix, ns) for prefix, ns in ead.node.nsmap.iteritems()
                     if prefix is not None))
 
-
-
     render_opts = {
         'ead': ead,
         'all_series': all_series,
@@ -358,6 +358,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         'last_search': request.session.get('last_search', None),
         'feedback_opts': _get_feedback_options(request, eadid),
         'extra_ns': extra_ns,
+        'last_modified': ead_lastmodified(request, eadid, preview_mode)
     }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)

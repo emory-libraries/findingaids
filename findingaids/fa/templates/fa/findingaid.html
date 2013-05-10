@@ -6,7 +6,7 @@
    xmlns:{{ prefix}}="{{ ns }}"{% endfor %} {% endblock %}
 
 {% block page-head %}
-  {{block.super}}
+  {{ block.super }}
   {% if url_params %}  {# don't index highlighted pages, link non-highlighted page as canonical #}
    <meta name="robots" content="noindex,nofollow" />
    <link rel="canonical" href="{% ifurl preview 'fa-admin:preview:findingaid' 'fa:findingaid' id=ead.eadid %}" />
@@ -33,6 +33,10 @@
 {% endblock %}
 
 {% block content-body %}
+<a property="owl:sameAs" href="{{ request.build_absolute_uri }}" />
+{% if last_modified %} {# include last modified when we can, so harvested data will include the date #}
+  <meta property="schema:dateModified" content="{{ last_modified|date:'Y-m-d' }}" />
+{% endif %}
 <meta property="schema:author" content="{{ ead.author }}" />
 <meta property="schema:name" content="{{ ead.title }}" />
 {% if ead.origination_name.authfilenumber %}
@@ -70,7 +74,7 @@
 <h2><a href="#dsc">{{ ead.dsc.head}}</a></h2>
 <ul>
     {% for component in ead.dsc.c %}
-    <li><a href="{% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id %}{{ url_params }}" rel="section">
+    <li><a href="{% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id %}{{ url_params }}" rel="section dcterms:hasPart"> {# FIXME: relative link for RDF rel? #}
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
     {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count}} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
      </li>
