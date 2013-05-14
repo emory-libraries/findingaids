@@ -746,9 +746,9 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
             current_url_ids = url_ids + [component.short_id]
             #set c01 rel attrib to 'section' c02 and c03 to 'subsection'
             if (component.node.tag == C01):
-                rel = 'section'
+                rel = 'section dcterms:hasPart'
             elif (component.node.tag in [C02, C03]):
-                rel = 'subsection'
+                rel = 'subsection dcterms:hasPart'
             text = "<a href='%(url)s%(url_params)s' rel='%(rel)s'>%(linktext)s</a> %(match_count)s" % \
                 {'url': url_callback(preview=preview, *current_url_ids),
                  'url_params': url_params,
