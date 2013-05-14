@@ -78,16 +78,23 @@ def format_date(node):
 def format_title(node):
     'display a title node as semantic information'
     title_type = node.get('type', None)
-    start, end = '<span property="dc:title">', '</span>'
-    # Only add semantic information if there is a type (?)
-    if title_type is not None:
-        start = '<span typeof="%s">%s' % (title_type, start)
-        end = end + '</span>'
-        # FIXME: other relations?
-        if title_type.endswith('DocumentPart'):
-            rel = 'dcterms:hasPart'
-            start = '<span rel="%s">%s' % (rel, start)
+
+    start, end = '', ''
+    # Only add semantic information if there is a title type OR
+    # if title occurs in a file-level unittitle.
+    # (in that case, we assume it is title of the item in the container)
+    if node.xpath('parent::e:unittitle and ancestor::e:*[@level="file"]',
+                  namespaces={'e': EAD_NAMESPACE}) or title_type is not NOne:
+        start, end = '<span property="dc:title">', '</span>'
+        # Only add semantic information if there is a type (?)
+        if title_type is not None:
+            start = '<span typeof="%s">%s' % (title_type, start)
             end = end + '</span>'
+            # FIXME: other relations?
+            if title_type.endswith('DocumentPart'):
+                rel = 'dcterms:hasPart'
+                start = '<span rel="%s">%s' % (rel, start)
+                end = end + '</span>'
     return (start, end)
 
 
