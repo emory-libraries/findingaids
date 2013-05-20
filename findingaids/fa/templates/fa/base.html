@@ -27,7 +27,9 @@
       Search for items in the container list of <b>{{ ead.title }}</b>
       <form action="{% url 'fa:singledoc-search' ead.eadid %}" method="get">
         {{ docsearch_form.keywords }}
-        {{ docsearch_form.dao }} <span class="help-text">{{ docsearch_form.dao.help_text}}</span>
+        {{ docsearch_form.dao }}
+        {# NOTE: not using form help text because single-doc text slightly different #}
+        <span class="help-text">digital resources only</span>
         <input class="form-submit" type="submit" value="Search this Finding Aid" />
       </form>
   </div>
