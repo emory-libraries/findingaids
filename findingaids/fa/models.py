@@ -128,6 +128,12 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         Configured to use */ead* as base search path.
     """
 
+    @property
+    def has_digital_content(self):
+        'boolean to indicate whether or not this EAD includes public digital content'
+        return self.public_dao_count != 0
+        # NOTE: if using partial xml return, requires that public_dao_count is included
+
     def admin_info(self):
         """
         Generate a list of administrative information fields from the archive description.
@@ -276,8 +282,10 @@ class Series(XmlModel, LocalComponent):
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
-    ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
+    ead = xmlmap.NodeField("ancestor::e:ead[1]", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
+    # NOTE: using [1] to get closest ancestor; in case of existdb 'also'
+    # return result, possible to have nested ead elements.
 
     parent = xmlmap.NodeField("parent::node()", "self")
 
@@ -425,7 +433,7 @@ class Index(XmlModel, eadmap.Index):
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
-    ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
+    ead = xmlmap.NodeField("ancestor::e:ead[1]", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
     parent = xmlmap.NodeField("parent::node()", "self")
