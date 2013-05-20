@@ -33,7 +33,7 @@
 {% endblock %}
 
 {% block content-body %}
-<a property="owl:sameAs" href="{{ request.build_absolute_uri }}" />
+<a property="owl:sameAs" href="{{ request.build_absolute_uri }}" > </a>
 {% if last_modified %} {# include last modified when we can, so harvested data will include the date #}
   <meta property="schema:dateModified" content="{{ last_modified|date:'Y-m-d' }}" />
 {% endif %}
