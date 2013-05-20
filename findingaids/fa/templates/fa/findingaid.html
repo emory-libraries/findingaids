@@ -1,5 +1,5 @@
 {% extends "fa/base.html" %}
-{% load ead %}   {% load ifurl %} {% load static %}
+{% load ead %}   {% load ifurl %}
 
 {% block page-head %}
   {{block.super}}
@@ -31,13 +31,7 @@
     {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
     <p>Permanent link: <a rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
-  {% if ead.has_digital_content %}
-  <div id="digital-materials">
-    <img src="{% static 'images/computer.png' %}"/>
-    <p>Digital Material Available in this Collection</p>
-    <p class="detail">Click 'online resource' within the Finding Aid</p>
-  </div>
-  {% endif %}
+  {% include "fa/snippets/digital-content.html" %}
   <div id="sidebar-right">
       <a class="printable" href="{% ifurl preview 'fa-admin:preview:printable' 'fa:printable' id=ead.eadid %}" rel="alternate">Printable PDF</a>
   </div>

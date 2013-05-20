@@ -131,7 +131,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     @property
     def has_digital_content(self):
         'boolean to indicate whether or not this EAD includes public digital content'
-        return self.public_dao_count != 0
+        return self.public_dao_count >= 1
         # NOTE: if using partial xml return, requires that public_dao_count is included
 
     def admin_info(self):
