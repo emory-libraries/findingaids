@@ -282,7 +282,7 @@ class Series(XmlModel, LocalComponent):
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
-    ead = xmlmap.NodeField("ancestor::e:ead[1]", FindingAid)
+    ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
     # NOTE: using [1] to get closest ancestor; in case of existdb 'also'
     # return result, possible to have nested ead elements.
