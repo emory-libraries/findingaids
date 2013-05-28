@@ -5,6 +5,10 @@
 
   <xsl:output method="xml"/>
 
+  <xsl:param name="STATIC_ROOT" />
+  <xsl:param name="STATIC_URL" />
+  <xsl:param name="link_color" value="blue" />
+
   <xsl:variable name="disclaimer">
   MARBL provides copies of its finding aids for use only in research
   and private study.  Copies supplied may not be copied for others or
@@ -390,7 +394,8 @@
  </xsl:template>
 
  <xsl:template match="a[@href]">
-   <fo:basic-link>
+   <fo:basic-link text-decoration="underline">
+    <xsl:attribute name="color"><xsl:value-of select="$link_color" /></xsl:attribute>
      <xsl:choose>
        <xsl:when test="starts-with(@href, '#')">
          <xsl:attribute name="internal-destination"><xsl:value-of select="substring-after(@href, '#')"/></xsl:attribute>
@@ -422,5 +427,37 @@
  </xsl:template>
 
  <xsl:template match="style"/>
+
+ <xsl:template match="img">
+  <fo:external-graphic>
+    <xsl:attribute name="src">file:<xsl:value-of select="concat($STATIC_ROOT, substring-after(@src, $STATIC_URL))"/></xsl:attribute>
+  </fo:external-graphic>
+</xsl:template>
+
+<!-- special case: digital materials banner -->
+<xsl:template match="div[@id='digital-materials']">
+   <xsl:variable name="banner_width">5</xsl:variable>
+
+  <fo:block-container width="5in" height="0.6in" background-color="#002878" color="white"
+    margin="auto">
+    <xsl:attribute name="width"><xsl:value-of select="concat($banner_width, 'in')"/></xsl:attribute>
+    <!-- calculate indent relative to page width so banner is centered -->
+    <xsl:attribute name="start-indent"><xsl:value-of select="concat(($pagewidth - $banner_width) div 2, 'in')"/></xsl:attribute>
+    <!-- NOTE: requires extra layout work here because fop doesn't support float -->
+    <fo:block-container position="absolute" top="3px" left="15px" width="0.5in" start-indent="0px">
+      <fo:block>
+        <xsl:apply-templates select="img"/>
+      </fo:block>
+    </fo:block-container>
+    <fo:block-container position="absolute" top="5px" left="75px" start-indent="0px">
+       <fo:block font-size="14pt">
+         <xsl:apply-templates select="p[1]"/>
+       </fo:block>
+       <fo:block font-size="12pt">
+          <xsl:apply-templates select="p[2]"/>
+        </fo:block>
+    </fo:block-container>
+  </fo:block-container>
+</xsl:template>
 
 </xsl:stylesheet>

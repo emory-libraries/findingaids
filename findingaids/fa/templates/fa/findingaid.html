@@ -31,6 +31,7 @@
     {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
     <p>Permanent link: <a rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
+  {% include "fa/snippets/digital-content.html" %}
   <div id="sidebar-right">
       <a class="printable" href="{% ifurl preview 'fa-admin:preview:printable' 'fa:printable' id=ead.eadid %}" rel="alternate">Printable PDF</a>
   </div>

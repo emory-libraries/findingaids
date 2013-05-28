@@ -25,26 +25,13 @@
           <tr>
             <th class="bf">Box</th>
              <th class="bf">Folder</th>
-             <th class="content">Content</th>          
+             <th class="content">Content</th>
           </tr>
         {% endif %}
 
         {% if component.did.container %}    {# container list item #}
-            <tr>
-                {% for container in component.did.container %}
-                    {# formatting assumes 2 containers; if only one, add a column span #}
-                    <td class="bf" {% if component.did.container|length = 1 %}colspan="2"{% endif%}>
-                        {{ container }}
-                    </td>
-                {% endfor %}
-                <td class="content">
-                    {{ component.did.unittitle|format_ead }}
-                    {{ component.did.physdesc|default:'' }}
-                    {{ component.did.abstract|format_ead|default:'' }}
-                    {{ component.did.note|format_ead|default:'' }}
-                </td>
-            </tr>
-         {% endif %}
+            {% include "fa/snippets/file_item.html" %}
+        {% endif %}
     {% endfor %}
   </table>
 {% endif %}
