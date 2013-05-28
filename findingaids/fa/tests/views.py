@@ -1095,7 +1095,7 @@ class FaViewsTest(TestCase):
         self.assertEqual(response['Content-Type'], expected,
                          "Expected '%s' but returned '%s' for %s mimetype" %
                          (expected, response['Content-Type'], pdf_url))
-        expected = 'attachment; filename=raoul548.pdf'
+        expected = 'inline; filename=raoul548.pdf'
         self.assertEqual(response['Content-Disposition'], expected,
                          "Expected '%s' but returned '%s' for %s content-disposition" %
                          (expected, response['Content-Disposition'], pdf_url))
