@@ -433,7 +433,7 @@ class Index(XmlModel, eadmap.Index):
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
-    ead = xmlmap.NodeField("ancestor::e:ead[1]", FindingAid)
+    ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
 
     parent = xmlmap.NodeField("parent::node()", "self")
