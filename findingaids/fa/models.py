@@ -74,7 +74,7 @@ class Name(XmlModel):
         and dbpedia sources.
         '''
         if self.source == 'viaf':
-            return 'http://viaf.org/%s/' % self.authfilenumber
+            return 'http://viaf.org/viaf/%s/' % self.authfilenumber
         elif self.source == 'geonames':
             return 'http://sws.geonames.org/%s/' % self.authfilenumber
         elif self.source == 'dbpedia':
