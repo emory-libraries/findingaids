@@ -10,7 +10,8 @@ https://wilson.library.emory.edu/jenkins/job/pidman-rest-client_1.1.x/lastSucces
 # NOTE: must be after eullocal, because eullocal still wants django < 1.4
 Django>=1.5
 python-dateutil
-python-ldap
+# pin ldap to 2.4.10 because 2.4.11 is causing errors
+python-ldap==2.4.10
 zc.icp
 recaptcha-client
 mimeparse
