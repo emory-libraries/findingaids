@@ -140,7 +140,7 @@ def format_nametag(node, default_role=None):
     if node.get('authfilenumber') is not None:
         authnum = node.get('authfilenumber')
         if node.get('source') == 'viaf':
-            uri = 'http://viaf.org/%s/' % authnum
+            uri = 'http://viaf.org/viaf/%s/' % authnum
         elif node.get('source') == 'geonames':
             uri = 'http://sws.geonames.org/%s/' % authnum
         elif node.get('source') == 'dbpedia':
