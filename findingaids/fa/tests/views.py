@@ -888,10 +888,10 @@ class FaViewsTest(TestCase):
 
         self.assert_("Series 1: Letters and personal papers" in links[0])
         self.assert_("href='#s1'" in links[0])
-        self.assert_("rel='section'" in links[0])
+        self.assert_("rel='section dcterms:hasPart'" in links[0])
         # subseries
         self.assert_("href='#s1.1'" in links[1][0])
-        self.assert_("rel='subsection'" in links[1][0])
+        self.assert_("rel='subsection dcterms:hasPart'" in links[1][0])
 
     # skip the printable test if XSLFO is not configured (i.e., if FOP cannot be installed)
     @unittest.skipIf(not settings.XSLFO_PROCESSOR, 'XSL-FO processor not set')
@@ -917,7 +917,7 @@ class FaViewsTest(TestCase):
         # series list, and all series down to c03 level
         self.assertContains(response, "Description of Series")
         # series links are anchors in the same page
-        self.assertPattern('<a href=\'#s1\.10\' rel=\'subsection\'>Subseries 1.10', response.content)
+        self.assertPattern('<a href=\'#s1\.10\' rel=\'subsection dcterms:hasPart\'>Subseries 1.10', response.content)
         self.assertPattern('<h2 class="series">.*Series 1 .*Letters and personal papers,.* 1865-1982.*</h2>', response.content)
         self.assertPattern('<h2 class="subseries">.*Subseries 1.2 .*Mary Wadley Raoul papers,.* 1865-1936.*</h2>', response.content)
         # index
