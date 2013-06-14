@@ -138,7 +138,9 @@ def format_nametag(node, default_role=None):
     about = ''
     uri = None
     if node.get('authfilenumber') is not None:
-        authnum = node.get('authfilenumber')
+        # get authfilenumber attribute, stripping any whitespace to avoid
+        # generating invalid URIs
+        authnum = node.get('authfilenumber').trim()
         if node.get('source') == 'viaf':
             uri = 'http://viaf.org/viaf/%s/' % authnum
         elif node.get('source') == 'geonames':
