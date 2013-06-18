@@ -65,7 +65,7 @@
                 {# next prev and start rel attributes are calculated in the view #}
                 {% else %}
                    <a href="{% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id %}{{ url_params }}"
-                   {% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% if forloop.first %}rel="start"{% endif %}>
+                   {% if forloop.first %}rel="start"{% else %}{% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% endif %}>
                     {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
                         {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count|floatformat }} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
                 {% endifequal %}
