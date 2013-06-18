@@ -694,6 +694,8 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "Subseries 2.1")
         self.assertContains(response, "Additional drafts and notes")
         # missing section head should not be displayed as "none"
+        # FIXME: this is generating a None in the RDFa for some non-obvious reason
+        # This only seems to be happening in the unit tests...
         self.assertContains(response, "None", 0,
             msg_prefix="series with a section with no head does not display 'None' for heading")
         # breadcrumb link
