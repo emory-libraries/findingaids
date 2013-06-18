@@ -86,15 +86,26 @@ def format_title(node):
     if node.xpath('parent::e:unittitle and ancestor::e:*[@level="file"]',
                   namespaces={'e': EAD_NAMESPACE}) or title_type is not None:
         start, end = '<span property="dc:title">', '</span>'
-        # Only add semantic information if there is a type (?)
+
+        # use title type if set
         if title_type is not None:
+            # if there is a type, wrap with a type declaration
             start = '<span typeof="%s">%s' % (title_type, start)
             end = end + '</span>'
-            # FIXME: other relations?
+
+            # infer a relation to context based on type
+            # FIXME/TODO: support other relations?
             if title_type.endswith('DocumentPart'):
                 rel = 'dcterms:hasPart'
                 start = '<span rel="%s">%s' % (rel, start)
                 end = end + '</span>'
+
+        # if no title type and there are multiple titles,
+        # use RDFa list notation to generate a sequence
+        elif node.xpath('count(parent::e:unittitle/e:title)',
+                        namespaces={'e': EAD_NAMESPACE}) > 1:
+            start = '<span inlist="inlist" property="dc:title">'
+
     return (start, end)
 
 
@@ -140,7 +151,7 @@ def format_nametag(node, default_role=None):
     if node.get('authfilenumber') is not None:
         # get authfilenumber attribute, stripping any whitespace to avoid
         # generating invalid URIs
-        authnum = node.get('authfilenumber').trim()
+        authnum = node.get('authfilenumber').strip()
         if node.get('source') == 'viaf':
             uri = 'http://viaf.org/viaf/%s/' % authnum
         elif node.get('source') == 'geonames':
