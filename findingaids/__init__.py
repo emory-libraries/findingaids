@@ -14,7 +14,8 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__version_info__ = (1, 3, 0, 'dev-rdfa')
+__version_info__ = (1, 4, 0, 'dev-rdfa')
+
 
 # Dot-connect all but the last. Last is dash-connected if not None.
 __version__ = '.'.join(str(i) for i in __version_info__[:-1])

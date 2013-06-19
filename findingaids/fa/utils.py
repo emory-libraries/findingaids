@@ -85,7 +85,7 @@ log4j.appender.CONSOLE.layout.ConversionPattern=%-5p %3x - %m%n
         if rval is 0:       # success!
             response = http.HttpResponse(pdf_file.read(), mimetype='application/pdf')
             if filename:
-                response['Content-Disposition'] = "attachment; filename=%s" % filename
+                response['Content-Disposition'] = "inline; filename=%s" % filename
             return response
     except OSError, e:
         logger.error("Apache Fop execution failed: %s" % e)
@@ -119,7 +119,17 @@ def html_to_xslfo(template_src, context_dict):
     """
     template = get_template(template_src)
     xhtml = etree.fromstring(template.render(Context(context_dict)))
-    return XHTML_TO_XSLFO(xhtml)
+    xsl_params = {
+        'STATIC_ROOT': settings.STATIC_ROOT,
+        'STATIC_URL': settings.STATIC_URL,
+        'link_color': '#2e5299',   # match CSS for site
+    }
+    if not xsl_params['STATIC_ROOT'].endswith('/'):
+        xsl_params['STATIC_ROOT'] += '/'
+    # string values need to be quoted to pass as xsl params
+    for k, v in xsl_params.iteritems():
+        xsl_params[k] = "'%s'" % v
+    return XHTML_TO_XSLFO(xhtml, **xsl_params)
 
 
 def pages_to_show(paginator, page, page_labels={}):

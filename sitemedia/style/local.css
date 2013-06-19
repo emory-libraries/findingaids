@@ -247,6 +247,10 @@ form#advanced-search input[type="text"], form#advanced-search select {
    padding: 3px 0px; /* no side-padding (makes input longer than select) */
 }
 
+form .help-text {
+    font-size: 85%;
+}
+
 div.doc-links {
     border: none !important;
     background-color: #ffffff !important;
@@ -479,3 +483,31 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
 #feedback p {
     margin: 0px 0px 5px;
 }
+.clearfix {
+    clear: both;
+}
+
+#digital-materials {
+  background-color: #002878;
+  color: white;
+  width: 5in;
+  height: 0.5in;
+  text-align: center;
+  margin: auto;
+}
+#digital-materials img {
+    float: left;
+    padding-left: 15px;
+    padding-top: 5px;
+    border: 0px;
+}
+#digital-materials p {
+    font-size: 12pt;
+    margin: 5px 0px 0px;
+    padding-top: 5px;
+}
+#digital-materials p.detail {
+    font-size: 10pt;
+    padding-top: 2px;
+}
+

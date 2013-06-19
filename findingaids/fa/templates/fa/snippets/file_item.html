@@ -1,0 +1,43 @@
+{# display a single file-level container list item #}
+{% load ead %}
+<tr{% if not component.did.container %} class="section" {% endif %}>
+  {% spaceless %}
+    {% for container in component.did.container %}
+    {# formatting assumes 2 containers; if only one, add a column span #}
+    <td class="bf" {% if component.did.container|length = 1 %}colspan="2"{% endif%}>
+        {{ container }}
+    </td>
+    {% endfor %}
+    {# component with no container currently indicates a section heading #}
+    <td{% if not component.did.container %} colspan="3" {% else %} class="content" {% endif %}>
+        {% if rdfa_rel %}  {# if an RDFa rel is defined, use rdfa formatting #}
+          {{ component.did.unittitle|format_ead_rdfa:rdfa_rel }}
+          {{ component.did.physdesc|default:'' }}
+          {{ component.did.abstract|format_ead_rdfa:rdfa_rel|default:'' }}
+          {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
+        {% elif component.unittitle_name %}
+        {# if unittitle has a name, containers may have semantic info also #}
+        <span rel="schema:mentions"><span typeof="bibo:Manuscript">
+          {# NOTE: assuming manuscript type for now; should be refined for other types of content #}
+          {{ component.did.unittitle|format_ead_rdfa }}
+          {{ component.did.physdesc|default:'' }}
+          {{ component.did.abstract|format_ead_rdfa|default:'' }}
+          {{ component.did.note|format_ead_rdfa|default:'' }}
+        </span></span>
+        {% else %}
+          {{ component.did.unittitle|format_ead }}
+          {{ component.did.physdesc|default:'' }}
+          {{ component.did.abstract|format_ead|default:'' }}
+          {{ component.did.note|format_ead|default:'' }}
+        {% endif %}
+        <div>
+            {% for dao in component.did.dao_list %}
+              {% if dao.audience != 'internal' %} {# audience = external or unset should be publicly viewable #}
+              <a href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
+              {# NOTE: when we get to internal/admin, not all will have hrefs #}
+              {% endif %}
+            {% endfor %}
+        </div>
+    </td>
+    {% endspaceless %}
+</tr>
