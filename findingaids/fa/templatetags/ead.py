@@ -153,11 +153,11 @@ def format_nametag(node, default_role=None):
         # generating invalid URIs
         authnum = node.get('authfilenumber').strip()
         if node.get('source') == 'viaf':
-            uri = 'http://viaf.org/viaf/%s/' % authnum
+            uri = 'http://viaf.org/viaf/%s' % authnum
         elif node.get('source') == 'geonames':
             uri = 'http://sws.geonames.org/%s/' % authnum
         elif node.get('source') == 'dbpedia':
-            uri = 'http://dbpedia.org/resource/%s/' % authnum
+            uri = 'http://dbpedia.org/resource/%s' % authnum
 
         if uri is not None:
             about = ' about="%s"' % uri
