@@ -23,7 +23,7 @@
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa|default:'' }}
           {{ component.did.note|format_ead_rdfa|default:'' }}
-        </span></span>
+
         {% else %}
           {{ component.did.unittitle|format_ead }}
           {{ component.did.physdesc|default:'' }}
@@ -33,11 +33,15 @@
         <div>
             {% for dao in component.did.dao_list %}
               {% if dao.audience != 'internal' %} {# audience = external or unset should be publicly viewable #}
-              <a href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
+              <a {% if component.unittitle_name %}property="schema:URL" {% endif %}
+                 href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
               {# NOTE: when we get to internal/admin, not all will have hrefs #}
               {% endif %}
             {% endfor %}
         </div>
+        {% if component.unittitle_name %}
+         </span></span>  {# end mentions, manuscript #}
+        {% endif %}
     </td>
     {% endspaceless %}
 </tr>
