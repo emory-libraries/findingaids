@@ -39,7 +39,7 @@
               {% endif %}
             {% endfor %}
         </div>
-        {% if component.unittitle_name %}
+        {% if not rdfa_rel and component.unittitle_name %}
          </span></span>  {# end mentions, manuscript #}
         {% endif %}
     </td>
