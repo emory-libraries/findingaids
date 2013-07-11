@@ -5,7 +5,7 @@ from django.http import Http404, HttpResponse
 
 class RDFaMiddleware(object):
     '''Middleware to display embedded RDFa for an HTML page as
-    RDF XML.  Simply add ``rdf/`` to the end of any Django site
+    RDF XML.  Simply add ``RDF/`` to the end of any Django site
     URL to see the RDF XML version of RDFa embedded in the page.
 
     '''
