@@ -323,7 +323,15 @@ def series_section_rdfa(context, series, section):
     #   the person or organization
     name = series.unittitle_name or \
         series.ead.origination_name or None
-    type = 'schema:Person'  # assume for now (but wrong)
+
+    type = None
+    if name is not None:
+        if name.is_personal_name:
+            type = 'schema:Person'
+        elif name.is_corporate_name:
+            type = 'schema:Organization'
+        elif name.is_geographic_name:
+            type = 'schema:Place'
 
     rdfa = False
     default_rel = None
