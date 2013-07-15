@@ -49,7 +49,7 @@ simple_tags = {
 }
 
 
-def format_extref(node):
+def format_extref(node,):
     'convert an extref node to an html link'
     url = node.get('{%s}href' % XLINK_NAMESPACE)
     href = ' href="%s"' % url if url is not None else ''
@@ -62,7 +62,7 @@ def format_extref(node):
     return ('<a%s%s>' % (rel, href), '</a>')
 
 
-def format_date(node):
+def format_date(node, default_rel):
     'display a date node with semantic information, if available'
     normal = node.get('normal', None)
     # default to dc:date property as a generic date
@@ -75,11 +75,17 @@ def format_date(node):
     return (start, end)
 
 
-def format_title(node):
+def format_title(node, default_rel):
     'display a title node as semantic information'
     title_type = node.get('type', None)
 
     start, end = '', ''
+
+    # for now, ignore titles in correspondence series
+    # (getting associated with the person in appropriately)
+    if default_rel == 'schema:knows arch:correspondedWith':
+        return start, end
+
     # Only add semantic information if there is a title type OR
     # if title occurs in a file-level unittitle.
     # (in that case, we assume it is title of the item in the container)
@@ -109,7 +115,7 @@ def format_title(node):
     return (start, end)
 
 
-def format_occupation(node):
+def format_occupation(node, default_rel):
     'display an occupation node with semantic information'
     return ('<span property="schema:jobTitle">', '</span>')
 
@@ -269,7 +275,7 @@ def format_ead_node(node, escape, rdfa=False, default_rel=None):
         rdfa_start, rdfa_end = format_nametag(node, default_rel)
 
     elif rdfa and node.tag in semantic_tags.keys():
-        rdfa_start, rdfa_end = semantic_tags[node.tag](node)
+        rdfa_start, rdfa_end = semantic_tags[node.tag](node, default_rel)
 
     # convert display/formatting
     # NOTE: a few semantic tags also have formatting conversion
