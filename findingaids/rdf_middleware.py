@@ -1,4 +1,5 @@
 import rdflib
+import re
 from django.core.urlresolvers import resolve
 from django.http import Http404, HttpResponse
 
@@ -9,9 +10,11 @@ class RDFaMiddleware(object):
     URL to see the RDF XML version of RDFa embedded in the page.
 
     '''
+    urlpattern = re.compile('/rdf/$', flags=re.IGNORECASE)
 
     def process_request(self, request):
-        if request.path.endswith('/RDF/'):
+#        if urlpattern.search(request.path).endswith('/RDF/'):
+        if self.urlpattern.search(request.path):
             # load the html for the non-rdf page
             request.path = request.path[:-4]  # strip off 'rdf/' from end
             # NOTE: modifying actual request so anything that relies
