@@ -57,6 +57,12 @@
     {# grab occupation from controlled access #}
     {# NOTE: in local encoding practice, any controlled access occupation refers to origination/main entry person #}
      {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}
+     <div style="display:none" property="schema:description">
+      {% for para in section.content %}
+        <p>{{ para }}</p>
+      {% endfor %}
+    </div>
+
        {% for ca in ead.archdesc.controlaccess.controlaccess %}
           {% for occupation in ca.occupation %}
             <meta property="schema:jobTitle" content="{{ occupation|cut:'.' }}" />
