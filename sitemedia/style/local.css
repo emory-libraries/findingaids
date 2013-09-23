@@ -491,19 +491,21 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
   background-color: #002878;
   color: white;
   width: 5in;
-  height: 0.5in;
+  height: 0.35in;
   text-align: center;
+  vertical-align: middle;
   margin: auto;
 }
 #digital-materials img {
     float: left;
     padding-left: 15px;
     padding-top: 5px;
-    border: 0px;
+    border: 0;
 }
 #digital-materials p {
     font-size: 12pt;
-    margin: 5px 0px 0px;
+    line-height: 0.25in;
+    margin: 5px 0 0;
     padding-top: 5px;
 }
 #digital-materials p.detail {
