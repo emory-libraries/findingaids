@@ -8,6 +8,29 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.3
+---
+
+* When a researcher is viewing web pages or PDF documents for a finding aid
+  with digital archival object references in the EAD document, they can see and
+  click on links in order to access digital items associated with the
+  collection.
+* A researcher searching within a single finding aid can optionally restrict
+  results to items that include digital objects in order to find digital content
+  by keyword or all digital objects in one finding aid.
+* A researcher searching all finding aids by keyword can optionally restrict
+  results to collections with publicly accessible digital objects in order to make
+  use of archival items available online.
+* A researcher viewing the web page or PDF for a finding aid with
+  digital archival object references in the EAD can see that the
+  finding aid includes digital content by a header at the top of the
+  page, so that they are aware some of the materials may be available
+  online.
+* Users can view PDF documents from within a browser so they can view,
+  print, and save the entire finding aid quickly and easily.
+* Configurable beta warning to be displayed in test/staging sites; turn on
+  via **ENABLE_BETA_WARNING** setting.
+
 1.2
 ---
 

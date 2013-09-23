@@ -1,0 +1,8 @@
+{# banner to indicate if this findingaid includes digital content #}
+{% load static %}
+{% if ead.has_digital_content %}
+<div id="digital-materials">
+  <img src="{% static 'images/computer.png' %}"/>
+  <p>Digital Material Available in this Collection</p>
+</div>
+{% endif %}

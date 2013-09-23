@@ -21,9 +21,7 @@ from django.core.cache import cache
 from django.db import models
 
 from eulxml import xmlmap
-from eulxml.xmlmap.eadmap import EncodedArchivalDescription, Component, \
-        SubordinateComponents, Index as EadIndex, ArchivalDescription, EAD_NAMESPACE, \
-        UnitTitle, Section
+from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
@@ -33,14 +31,15 @@ from eulexistdb.models import XmlModel
 ID_DELIMITER = '_'
 
 
-class FindingAid(XmlModel, EncodedArchivalDescription):
+class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     """
     Customized version of :class:`eulxml.EncodedArchivalDescription` EAD object.
 
     Additional fields and methods are used for search, browse, and display.
     """
     ROOT_NAMESPACES = {
-        'e': EAD_NAMESPACE,
+        'e': eadmap.EAD_NAMESPACE,
+        'xlink': eadmap.XLINK_NAMESPACE,
         'exist': 'http://exist.sourceforge.net/NS/exist',
         'util': 'http://exist-db.org/xquery/util',
     }
@@ -49,14 +48,16 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # NOTE: overridding these fields from EncodedArchivalDescription to allow
     # for efficiently retrieving unittitle and abstract in the full document OR
     # in the constructed return object returned from eXist for search/browse
-    unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', UnitTitle)
+    unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', eadmap.UnitTitle)
     abstract = xmlmap.NodeField('.//e:abstract[not(ancestor::e:dsc)]', xmlmap.XmlObject)
     physical_descriptions = xmlmap.StringListField('.//e:physdesc[not(ancestor::e:dsc)]', normalize=True)
 
-    list_title_xpaths = ["e:archdesc/e:did/e:origination/e:corpname",
+    list_title_xpaths = [
+        "e:archdesc/e:did/e:origination/e:corpname",
         "e:archdesc/e:did/e:origination/e:famname",
         "e:archdesc/e:did/e:origination/e:persname",
-        "e:archdesc/e:did[not(e:origination/e:corpname or e:origination/e:famname or e:origination/e:persname)]/e:unittitle"]
+        "e:archdesc/e:did[not(e:origination/e:corpname or e:origination/e:famname or e:origination/e:persname)]/e:unittitle"
+    ]
     list_title_xpath = "|".join("./%s" % xp for xp in list_title_xpaths)
     #./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
 
@@ -90,14 +91,15 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
         .//e:abstract | .//e:bioghist | .//e:scopecontent | .//e:controlaccess')
 
     # temporary manual mapping for processinfo, will be incorporated into a release of eulxml
-    process_info = xmlmap.NodeField("e:archdesc/e:processinfo", Section)
+    process_info = xmlmap.NodeField("e:archdesc/e:processinfo", eadmap.Section)
 
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
     _admin_info = ['userestrict', 'altformavail', 'relatedmaterial', 'separatedmaterial',
-        'acqinfo', 'custodhist', 'prefercite']
+                   'acqinfo', 'custodhist', 'prefercite']
     # -- map as regular xmlmap field, for use when entire object is returned
-    admin_info_matches = xmlmap.IntegerField('count(./e:archdesc/*[' +
+    admin_info_matches = xmlmap.IntegerField(
+        'count(./e:archdesc/*[' +
         '|'.join(['self::e:%s' % field for field in _admin_info]) + ']//exist:match)')
     # -- eXist-specific xpath for returning count without entire document
     admin_info_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' + \
@@ -105,13 +107,18 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
     # - collection description fields
     _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'otherfindaid']
     # -- map as regular xmlmap field, for use when entire object is returned
-    coll_desc_matches = xmlmap.IntegerField('count(' +
-        '|'.join('./e:archdesc/e:%s//exist:match' % field for field in _coll_desc) + ')')
+    coll_desc_matches = xmlmap.IntegerField(
+        'count(' + '|'.join('./e:archdesc/e:%s//exist:match' % field for field in _coll_desc) + ')')
     # -- eXist-specific xpath for returning count without entire document
     coll_desc_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' +  \
         '|'.join('e:%s' % field for field in _coll_desc) + '))//exist:match)'
     # - controlaccess match-count
     controlaccess_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/e:controlaccess)//exist:match)'
+
+    # dao anywhere in the ead, to allow filtering on finding aids with daos
+    daos = xmlmap.NodeListField('.//e:dao', eadmap.DigitalArchivalObject)
+    # count of public dao in a record, to support search filtering
+    public_dao_count = xmlmap.IntegerField('count(.//e:dao[not(@audience) or @audience="external"])')
 
     objects = Manager('/e:ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
@@ -120,6 +127,12 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 
         Configured to use */ead* as base search path.
     """
+
+    @property
+    def has_digital_content(self):
+        'boolean to indicate whether or not this EAD includes public digital content'
+        return self.public_dao_count >= 1
+        # NOTE: if using partial xml return, requires that public_dao_count is included
 
     def admin_info(self):
         """
@@ -205,7 +218,7 @@ class FindingAid(XmlModel, EncodedArchivalDescription):
 
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
-    ROOT_NAMESPACES = {'e': EAD_NAMESPACE}
+    ROOT_NAMESPACES = {'e': eadmap.EAD_NAMESPACE}
     xpath = "|".join("//%s" % xp for xp in FindingAid.list_title_xpaths)
     # xpath to use for alpha-browse - using list title xpaths from FindingAid
 
@@ -226,7 +239,7 @@ def title_letters():
 
 
 class EadRepository(XmlModel):
-    ROOT_NAMESPACES = {'e': EAD_NAMESPACE}
+    ROOT_NAMESPACES = {'e': eadmap.EAD_NAMESPACE}
     normalized = xmlmap.StringField('normalize-space(.)')
     objects = Manager('//e:subarea')
 
@@ -241,12 +254,12 @@ class EadRepository(XmlModel):
         return cache.get(cache_key)
 
 
-class LocalComponent(Component):
+class LocalComponent(eadmap.Component):
     '''Extend default :class:`eulcore.xmlmap.eadmap.Component` class to add a
     method to detect first file-item in a list.  (Needed for container list display
     in templates).'''
     ROOT_NAMESPACES = {
-        'e': EAD_NAMESPACE,
+        'e': eadmap.EAD_NAMESPACE,
     }
     # by local convention, section headers are sibling components with no containers
     preceding_files = xmlmap.NodeListField('preceding-sibling::node()[@level="file"][e:did/e:container]', "self")
@@ -265,12 +278,14 @@ class Series(XmlModel, LocalComponent):
     """
 
     ROOT_NAMESPACES = {
-        'e': EAD_NAMESPACE,
+        'e': eadmap.EAD_NAMESPACE,
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
     ead = xmlmap.NodeField("ancestor::e:ead", FindingAid)
     ":class:`findingaids.fa.models.FindingAid` access to ancestor EAD element"
+    # NOTE: using [1] to get closest ancestor; in case of existdb 'also'
+    # return result, possible to have nested ead elements.
 
     parent = xmlmap.NodeField("parent::node()", "self")
 
@@ -346,8 +361,8 @@ class Series(XmlModel, LocalComponent):
 # override component.c node_class
 # subcomponents need to be initialized as Series to get display_label, series list...
 # FIXME: look for a a better way to do this kind of XmlObject extension
-Component._fields['c'].node_class = Series
-SubordinateComponents._fields['c'].node_class = Series
+eadmap.Component._fields['c'].node_class = Series
+eadmap.SubordinateComponents._fields['c'].node_class = Series
 
 
 def shortform_id(id, eadid=None):
@@ -405,7 +420,7 @@ class Series3(Series):
     """
 
 
-class Index(XmlModel, EadIndex):
+class Index(XmlModel, eadmap.Index):
     """
       EAD Index, with index entries.
 
@@ -413,7 +428,8 @@ class Index(XmlModel, EadIndex):
     """
 
     ROOT_NAMESPACES = {
-        'e': EAD_NAMESPACE,
+        'e': eadmap.EAD_NAMESPACE,
+        'xlink': eadmap.XLINK_NAMESPACE,
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
@@ -448,17 +464,18 @@ class Index(XmlModel, EadIndex):
 
 
 # FIXME: look for a a better way to do this kind of XmlObject extension
-ArchivalDescription._fields['index'].node_class = Index
+eadmap.ArchivalDescription._fields['index'].node_class = Index
 
 
-class FileComponent(XmlModel, Component):
+class FileComponent(XmlModel, eadmap.Component):
     """
     Any EAD component with a level of *file*, with item-level information (box &
     folder contents).
     """
 
     ROOT_NAMESPACES = {
-        'e': EAD_NAMESPACE,
+        'e': eadmap.EAD_NAMESPACE,
+        'xlink': eadmap.XLINK_NAMESPACE,
         'exist': 'http://exist.sourceforge.net/NS/exist'
     }
 
@@ -493,10 +510,12 @@ class Deleted(models.Model):
     eadid = models.CharField('EAD Identifier', max_length=50, unique=True)
     title = models.CharField(max_length=200)
     date = models.DateTimeField('Date removed', default=datetime.now())
-    note = models.CharField(max_length=400, blank=True,
-            help_text="Optional: Enter the reason this document is being deleted. " +
-                      "These comments will be displayed to anyone who had the finding " +
-                      "aid bookmarked and returns after it is gone.")
+    note = models.CharField(
+        max_length=400, blank=True,
+        help_text="Optional: Enter the reason this document is being deleted. " +
+                  "These comments will be displayed to anyone who had the finding " +
+                  "aid bookmarked and returns after it is gone.")
+
     class Meta:
         verbose_name = 'Deleted Record'
 

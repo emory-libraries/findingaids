@@ -19,8 +19,11 @@
 {% if search_params %}
 <p>Search results for
     {% for type, value in search_params.iteritems %}
-        {% if type != 'keywords' %}{{type }}:{% endif %}<b>{{ value }}</b>{% if not forloop.last %}, {% endif %}
+        {% if type != 'dao' %}
+          {% if type != 'keywords' %}{{type }}:{% endif %}<b>{{ value }}</b>{% if not forloop.last %}, {% endif %}
+        {% endif %}
     {% endfor %}
+    {% if search_params.dao %} items available online {% endif %}
 </p>
 {% endif %}
 

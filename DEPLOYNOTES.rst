@@ -401,6 +401,16 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.3
+---
+
+* Adds a new configuration **DEFAULT_DAO_LINK_TEXT** in ``localsettings.py`` which
+  can be used to specify the default link text for digital archival objects referenced
+  in the EAD.  See the commented out example in ``localsettings.py.dist``; default
+  value should be fine.
+* When the code is deployed to staging the **ENABLE_BETA_WARNING** configuration
+  should be set to True on ``localsettings.py```
+
 1.2
 ~~~~
 

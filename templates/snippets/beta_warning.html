@@ -1,0 +1,34 @@
+<style>
+    #beta_warning {
+        background-color: #ff7373;
+        border: 1px solid red;
+        top: 0;
+        width: 100%;
+        height: 50px;
+        z-index: 9000000000;
+        margin-bottom: 2px;
+    }
+    #beta_message {
+        margin-top: 15px;
+        text-align:center;
+        font-weight: bold;
+        font-size: 16px;
+    }
+</style>
+<script type="text/javascript">
+      $(document).ready(function() {
+        var div = $('#beta_warning');
+        var start = $(div).offset().top;
+        $(window).scroll(function() {
+          var p = $(window).scrollTop();
+          $(div).css('position', ((p)>start) ? 'fixed' : 'static');
+          $(div).css('top', ((p)>start) ? '0px' : '');
+        });
+      });
+</script>
+
+    <div id="beta_warning">
+      <div id="beta_message">
+        This is a test site. Content may be changed or deleted without warning.
+      </div>
+    </div>
