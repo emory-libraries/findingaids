@@ -38,7 +38,7 @@ class KeywordSearchForm(forms.Form):
     dao = forms.BooleanField(
         label='Available Online',
         required=False,
-        help_text='collections with digital resources only')
+        help_text='only collections with digital resources')
 
     def clean_keywords(self):
         """
