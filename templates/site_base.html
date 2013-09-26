@@ -23,7 +23,8 @@
 {% endblock %}
 {% block admin-url %}{% url 'fa-admin:index' %}{% endblock %}
 
-{% block body-extras %}typeof="schema:WebPage" about="{{ request.build_absolute_uri }}"{% endblock %}
+{% block body-extras %}typeof="schema:WebPage" about="http://{{ request.get_host }}{{ request.path }}"{% endblock %}
+{# NOTE: not using build_absolute_uri because we do NOT want to include query string #}
 
 {% block sidebar-left %}
 
