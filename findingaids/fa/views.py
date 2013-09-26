@@ -166,8 +166,7 @@ def findingaid(request, id, preview=False):
     # add any non-default namespaces from the EAD document
     extra_ns.update(dict((prefix, ns) for prefix, ns in fa.node.nsmap.iteritems()
                     if prefix is not None))
-
-    response = render_to_response('fa/findingaid.html', {
+    context = {
         'ead': fa,
         'series': series,
         'all_indexes': fa.archdesc.index,
@@ -178,7 +177,14 @@ def findingaid(request, id, preview=False):
         'feedback_opts': _get_feedback_options(request, id),
         'extra_ns': extra_ns,
         'last_modified': last_modified,
-    }, context_instance=RequestContext(request, current_app='preview'))
+    }
+
+    # provide series list without keyword params to use in RDFa uris
+    if url_params and not preview:
+        context['series_noparam'] = _subseries_links(fa.dsc, url_ids=[fa.eadid])
+
+    response = render_to_response('fa/findingaid.html', context,
+        context_instance=RequestContext(request, current_app='preview'))
     # Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
@@ -374,6 +380,11 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     else:
         render_opts['series'] = result
         render_opts['subseries'] = _subseries_links(result, preview=preview_mode, url_params=url_params)
+
+        # provide series list without keyword params to use in RDFa uris
+        if url_params and not preview_mode:
+            render_opts['subseries_noparam'] = _subseries_links(result)
+
 
     response = render_to_response('fa/series_or_index.html',
                                   render_opts,
@@ -790,9 +801,14 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
             current_url_ids = url_ids + [component.short_id]
             #set c01 rel attrib to 'section' c02 and c03 to 'subsection'
             if (component.node.tag == C01):
-                rel = 'section dcterms:hasPart'
+                rel = 'section'
             elif (component.node.tag in [C02, C03]):
-                rel = 'subsection dcterms:hasPart'
+                rel = 'subsection'
+
+            # don't include preview/keyword arg urls in RDFa rel
+            if not url_params and not preview:
+                rel += ' dcterms:hasPart'
+
             text = "<a href='%(url)s%(url_params)s' rel='%(rel)s'>%(linktext)s</a> %(match_count)s" % \
                 {'url': url_callback(preview=preview, *current_url_ids),
                  'url_params': url_params,

@@ -33,7 +33,9 @@
 {% endblock %}
 
 {% block content-body %}
-<a property="owl:sameAs" href="{{ request.build_absolute_uri }}" > </a>
+<a property="owl:sameAs" href="http://{{ request.get_host }}{{ request.path }}"> </a>
+{# NOTE: not using build_absolute_uri because we do NOT want to include query string #}
+
 {% if last_modified %} {# include last modified when we can, so harvested data will include the date #}
   <meta property="schema:dateModified" content="{{ last_modified|date:'Y-m-d' }}" />
 {% endif %}
@@ -75,7 +77,10 @@
 <h2><a href="#dsc">{{ ead.dsc.head}}</a></h2>
 <ul>
     {% for component in ead.dsc.c %}
-    <li><a href="{% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id %}{{ url_params }}" rel="section dcterms:hasPart"> {# FIXME: relative link for RDF rel? #}
+    {% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id  as series_url %}
+    <li>
+      <a property="dcterms:hasPart" href="http://{{ request.get_host }}{{ series_url }}" > </a>
+      <a href="{{ series_url }}{{ url_params }}" rel="section">
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
     {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count}} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
      </li>
@@ -98,21 +103,38 @@
 {# container list or series/subseries listing #}
 <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
 {% if ead.dsc.hasSeries %}       {# list series/subseries here, display on separate page #}
+{# series pages are part of the *document* not collection, so close out collection RDFa item #}
+
+  </div> {# end collection item #}
+</div> {# end about #}
+
     <ul class="series-list">
        {% autoescape off %}
            {{ series|unordered_list }}
        {% endautoescape %}
     </ul>
+
+  {% if series_noparam %} {# urls for RDFa without keyword args #}
+    <ul class="series-list" style="display:none">
+       {% autoescape off %}
+           {{ series_noparam|unordered_list }}
+       {% endautoescape %}
+    </ul>
+  {% endif %}
 {% else %}
+
   {% with ead.dsc as series %}
     {% include "fa/snippets/containerlist.html" %}
   {% endwith %}
+
+  {# container list items should be associated with collection, so close it out *after* #}
+  </div> {# end collection item #}
+</div> {# end about #}
+
 {% endif %}
 
 {# indexes (if any) displayed on their own pages #}
 
- </div> {# end collection item #}
-</div> {# end about #}
 
 
 {% endblock %}
