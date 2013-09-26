@@ -344,7 +344,7 @@ def series_section_rdfa(context, series, section):
 
     # sections at series level we want to treat as *about*
     # the name
-    if name is not None and type is not None \
+    if name is not None and type is not None and name.uri is not None \
        and section.node.tag in [EAD_SCOPECONTENT, EAD_BIOGHIST]:
                # FIXME: do we need to check that the name has a URI ?
         rdfa = True
