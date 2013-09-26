@@ -58,7 +58,7 @@ class Name(XmlModel):
     @property
     def is_family_name(self):
         'boolean indicator if this is a famname tag'
-        return self.node.tag == "{%s}famname" % EAD_NAMESPACE
+        return self.node.tag == "{%s}famname" % eadmap.EAD_NAMESPACE
 
     @property
     def is_geographic_name(self):
