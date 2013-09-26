@@ -51,7 +51,7 @@
   <meta property="schema:dateModified" content="{{ last_modified|date:'Y-m-d' }}" />
 {% endif %}
 <div id="toc_series" class="short-toc">
-{% with 1 as collapsed %}{% include "fa/snippets/toc.html" %}{% endwith %}
+{% with collapsed=1 %}{% include "fa/snippets/toc.html" %}{% endwith %}
 
 {% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
     <div id="series" class="hover-menu collapsed">

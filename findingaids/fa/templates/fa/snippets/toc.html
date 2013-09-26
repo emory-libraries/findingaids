@@ -41,7 +41,10 @@
                 {% else %} {# if on index page, don't link currently displayed index #}
                     <li>
                         {% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=toc_index.short_id as index_url %}
-                        <a property="dcterms:hasPart" href="http://{{ request.get_host }}{{ index_url }}"></a>
+                        {% if request.path in index_url %}
+                          {# ONLY include at findingaid top-level, not series level #}
+                          <a property="dcterms:hasPart" href="http://{{ request.get_host }}{{ index_url }}"></a>
+                        {% endif %}
                         <a href="{{ index_url }}{{ url_params }}" rel="section">
                             {{ toc_index.head|format_ead }}</a>{% if toc_index.match_count > 0 %} <span class="exist-match">{{toc_index.match_count|floatformat }} match{{toc_index.match_count|pluralize:'es'}}</span>{% endif %}
                     </li>
