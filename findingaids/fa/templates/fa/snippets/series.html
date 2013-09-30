@@ -55,12 +55,19 @@
 
     {% endif %}
 {% else %}
+
 {% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
   {% with rdfa_rel="schema:knows arch:correspondedWith" %}
     {% include "fa/snippets/containerlist.html" %}
   {% endwith %}
 {% else %}
-    {% include "fa/snippets/containerlist.html" %}
+  <div rel="schema:about">
+    {# the series description, like the main finding aid document is *about* the archival collection #}
+    <div about="{{ ead.collection_uri }}"> {# typeof="schema:CreativeWork arch:Collection dcmitype:Collection"> #}
+      {# FIXME: are types needed here? or redundant since they are on main findingaid page? #}
+      {% include "fa/snippets/containerlist.html" %}
+    </div>
+  </div>
 {% endif %}
 {% endif %}
 

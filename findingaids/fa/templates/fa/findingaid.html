@@ -92,8 +92,7 @@
 </div>
 
 <div rel="schema:about"> {# the finding aid document is *about* the archival collection #}
- <div class="fa" typeof="schema:CreativeWork arch:Collection dcmitype:Collection">
-     {# NOTE: currently no URI to signify the collection (document url is for the finding aid document) #}
+ <div class="fa" typeof="schema:CreativeWork arch:Collection dcmitype:Collection" about="{{ ead.collection_uri }}">
 <hr/>
 {% include "fa/snippets/description.html" %}
 <hr/>

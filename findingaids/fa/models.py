@@ -267,6 +267,24 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         return fields
 
 
+    collection_id = xmlmap.StringField('e:archdesc/e:did/e:unitid/@identifier')
+
+    def collection_uri(self):
+        # URI to use in RDF for the archival collection, as distinguished
+        # from the findingaid document that describes the collection and
+        # the materials that it includes.
+
+        if self.collection_id is not None and \
+           self.collection_id.startswith('http'):
+            # if collection id is a URL, use that
+            return self.collection_id
+
+        else:
+            # otherwise use findingaid ARK as base for collection URI
+            return '%s#collection' % self.eadid.url
+
+
+
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
     ROOT_NAMESPACES = {'e': eadmap.EAD_NAMESPACE}
