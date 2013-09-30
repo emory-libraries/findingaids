@@ -20,6 +20,7 @@
 {% block content-title %}
 {# set RDFa name based on same value used in HTML title #}
 <meta property="schema:name" content="{{ ead.title }}; {% firstof series.display_label index.head %}" />
+<meta property="dcterms:isPartOf" content="{{ ead.eadid.url }}" />
 <div class="fa-title">
     {# generate and store url for main finding aid page #}
     {% ifurl preview 'fa-admin:preview:findingaid' 'fa:findingaid' id=ead.eadid as ead_url %}
