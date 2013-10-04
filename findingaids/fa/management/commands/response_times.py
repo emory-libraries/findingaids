@@ -31,10 +31,12 @@ class Command(BaseCommand):
 
     In browse mode, tests eXist Finding Aid browse query for all browse letters.
 
+    In pages mode, tests a few pre-specified page urls.
+
     """
     help = __doc__
 
-    _args = ['browse', 'search']
+    _args = ['browse', 'search', 'pages']
     args = ' | '.join(_args)
     option_list = BaseCommand.option_list + (
         make_option('--pages', '-p',
@@ -62,7 +64,18 @@ class Command(BaseCommand):
         'belfast group',
     )
 
-    def handle(self, cmd, *args, **options):
+    test_pages = (
+        '/documents/longley744/',
+        '/documents/longley744/series1/',
+        '/documents/longley744/series8/',
+        '/documents/longley744/index1/',
+        '/documents/longley744/items/?keywords=belfast+group'
+        '/documents/ormsby805/',
+        '/documents/ormsby805/series1/',
+        '/documents/ormsby805/items/?keywords=belfast+group',
+    )
+
+    def handle(self, cmd=None, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
         v_all = 2
@@ -192,6 +205,38 @@ class Command(BaseCommand):
 
                 print "\nMax/Min/Average - all letters, all pages"
                 max_min_avg(query_times.values(), zero=timedelta())
+
+        # PAGES
+        elif cmd == 'pages':
+            client = Client()
+            query_times = {}
+
+            if verbosity == v_all:
+                print 'Testing response times for pre-specified pages'
+
+            query_times = {}
+            for uri in self.test_pages:
+                start_time = datetime.now()
+                response = client.get(uri)
+                end_time = datetime.now()
+                if response.status_code == 200:
+                    duration = end_time - start_time
+                    query_times[uri] = duration
+                    if duration > self.timedelta_threshold:
+                        print "Warning: page load for %s took %s" % \
+                            (uri, duration)
+                    if verbosity == v_all:
+                        print "%s : %s" % (uri, duration)
+
+                # # summarize times for current search
+                # print "\nMax/Min/Average for %s" % uri
+                # max_min_avg(current_times.values(), zero=timedelta())
+                # # add times for current letter to all query times
+                # query_times.update(current_times)
+
+            print "\nMax/Min/Average - all letters, all pages"
+            max_min_avg(query_times.values(), zero=timedelta())
+
 
 def max_min_avg(times, zero=0):
     if not times:
