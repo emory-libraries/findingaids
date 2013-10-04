@@ -10,7 +10,9 @@
         {{ ead.origination_name|format_ead_rdfa:"schema:creator" }}
       {# NOTE: could be contributor in some cases #}
       {# additional mappings: collection is also *about* the creator, and creator should be a keyword #}
-      <meta property="schema:about" content="{{ ead.origination_name.uri }}" />
+      {% if ead.origination_name.authfilenumber and ead.origination_name.uri %}
+        <meta property="schema:about" content="{{ ead.origination_name.uri }}" />
+      {% endif %}
       <meta property="schema:keywords" content="{{ ead.origination_name }}" />
     </td></tr>
    {% endif %}
