@@ -228,12 +228,6 @@ class Command(BaseCommand):
                     if verbosity == v_all:
                         print "%s : %s" % (uri, duration)
 
-                # # summarize times for current search
-                # print "\nMax/Min/Average for %s" % uri
-                # max_min_avg(current_times.values(), zero=timedelta())
-                # # add times for current letter to all query times
-                # query_times.update(current_times)
-
             print "\nMax/Min/Average - all letters, all pages"
             max_min_avg(query_times.values(), zero=timedelta())
 
