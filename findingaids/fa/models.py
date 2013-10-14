@@ -523,13 +523,18 @@ class Deleted(models.Model):
         return self.eadid
 
 
-class DeletedAdmin(admin.ModelAdmin):
-    list_display = ('eadid', 'title', 'date', 'note')
-    list_filter = ('date',)
+class Archive(models.Model):
+    '''Model to define Archives associated with EAD documents, for use with
+    admin user permissions and to identify subversion repositories where
+    content will be published from.'''
+    label = models.CharField(max_length=10,
+        help_text='Short label to identify an archive')
+    code = models.CharField(max_length=10,  # might actually be shorter
+        help_text='repositorycode in EAD to identify finding aids associated with this archive')
+    svn = models.URLField('Subversion Repository',
+        help_text='URL to subversion repository containing EAD for this archive')
 
-    # don't allow creating deleted records via admin site
-    def has_add_permission(self, request):
-        return False
+    def __unicode__(self):
+        return self.label
 
 
-admin.site.register(Deleted, DeletedAdmin)
