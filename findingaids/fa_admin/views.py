@@ -25,7 +25,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
@@ -105,9 +105,13 @@ def list_staff(request):
     Displays a list of user accounts, with summary information about each user
     and a link to edit each user account.
     """
-    users = User.objects.all()
-    return render_to_response('fa_admin/list-users.html', {'users': users},
-                              context_instance=RequestContext(request))
+    users = get_user_model().objects.all()
+    app, model = settings.AUTH_USER_MODEL.lower().split('.')
+    change_url = 'admin:%s_%s_change' % (app, model)
+
+    return render_to_response('fa_admin/list-users.html',
+        {'users': users, 'user_change_url': change_url},
+        context_instance=RequestContext(request))
 
 
 def _prepublication_check(request, filename, mode='publish', xml=None):

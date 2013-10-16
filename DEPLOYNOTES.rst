@@ -401,6 +401,19 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.5 - svn admin release
+-----------------------
+
+* Run ``python manage.py migrate emory_ldap`` to convert the user accounts
+  in the database to the new custom user model.
+* Run ``python manage.py syncdb`` to create new database tables.
+
+
+1.4 - RDFa
+----------
+
+* anything?
+
 1.3
 ---
 

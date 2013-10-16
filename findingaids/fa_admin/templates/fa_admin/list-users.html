@@ -1,4 +1,5 @@
 {% extends "fa_admin/base.html" %}
+{% load admin_urls %}
 {% block page-subtitle %}{{block.super}} : Users {% endblock %}
 {% block content-title %}Current users{% endblock %}
 
@@ -8,8 +9,9 @@
             <th>First Name</th>
             <th>Lastname</th>
             <th>User</th>
-            <th>Account</th>
+            <th>LDAP</th>
             <th>Groups</th>
+            <th>Archives</th>
             <th>Site Admin</th>
             <th/>
         </tr>
@@ -18,8 +20,15 @@
             <td>{{ user.first_name }}</td>
             <td>{{ user.last_name }}</td>
             <td>{{ user.username }}</td>
-            <td>{% if user.password == "!" %}LDAP{% else %}Local{% endif %}</td> {# FIXME: better way to do this? #}
+            <td>{% if user.password == "!" %}
+                <img src="{{ STATIC_URL }}admin/true.gif" alt="Yes" style="border:0px solid" />
+                {% else %}
+                <img src="{{ STATIC_URL }}admin/false.gif" alt="No" style="border:0px solid" />
+                {% endif %}</td>
             <td>{% for g in user.groups.all %}{{g}}{% if not forloop.last %},{% endif %} {% endfor %}</td>
+            <td>{% for arch in user.archivist.archives.all %}
+                {{arch.label}}{% if not forloop.last %}<br/>{% endif %}
+                {% endfor %}</td>
             <td>
               {% if user.is_superuser %}
                 <img src="{{ STATIC_URL }}admin/true.gif" alt="Yes" style="border:0px solid" />
@@ -28,9 +37,8 @@
             {% endif %}
             </td>
             <td>
-                {# <a href="{% url 'fa-admin:edit-user' user.id %}" style="text-decoration:none"> #}
-                <a href="{% url 'admin:auth_user_change' user.id %}" style="text-decoration:none">
-                <img src="{{ STATIC_URL }}admin/edit.gif" alt="" style="border:0px" />edit</a>
+                <a href="{% url user_change_url user.pk %}" style="text-decoration:none">
+                <img src="{{ STATIC_URL }}admin/edit.gif" alt="edit" style="border:0px" /></a>
             </td>
         </tr>
     {% endfor %}

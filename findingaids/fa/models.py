@@ -603,8 +603,8 @@ class Archive(models.Model):
     content will be published from.'''
     label = models.CharField(max_length=10,
         help_text='Short label to identify an archive')
-    code = models.CharField(max_length=10,  # might actually be shorter
-        help_text='repositorycode in EAD to identify finding aids associated with this archive')
+    name = models.CharField(max_length=255,
+        help_text='repository name (subarea) in EAD to identify finding aids associated with this archive')
     svn = models.URLField('Subversion Repository',
         help_text='URL to subversion repository containing EAD for this archive')
 
