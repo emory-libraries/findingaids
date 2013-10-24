@@ -14,5 +14,6 @@ admin.site.register(Deleted, DeletedAdmin)
 
 class ArchiveAdmin(admin.ModelAdmin):
     list_display = ('label', 'name', 'svn')
+    prepopulated_fields = {'slug': ('label',)}
 
 admin.site.register(Archive, ArchiveAdmin)

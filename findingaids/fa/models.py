@@ -15,10 +15,12 @@
 #   limitations under the License.
 
 from datetime import datetime
+import os
 
-from django.contrib import admin
+from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from django.utils.text import slugify
 
 from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
@@ -607,8 +609,14 @@ class Archive(models.Model):
         help_text='repository name (subarea) in EAD to identify finding aids associated with this archive')
     svn = models.URLField('Subversion Repository',
         help_text='URL to subversion repository containing EAD for this archive')
+    slug = models.SlugField(help_text='''shorthand id
+        (auto-generated from label; do not modify after initial archive definition)''')
 
     def __unicode__(self):
         return self.label
+
+    @property
+    def svn_local_path(self):
+        return os.path.join(settings.SVN_WORKING_DIR, self.slug)
 
 

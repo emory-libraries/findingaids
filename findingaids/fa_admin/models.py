@@ -14,7 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.db import models
@@ -41,12 +41,13 @@ class Archivist(models.Model):
 
 class EadFile:
     """Information about an EAD file available to be published or previewed."""
-    def __init__(self, filename, modified):
+    def __init__(self, filename, modified, archive=None):
         self.filename = filename
         self.mtime = modified
         self.modified = datetime.utcfromtimestamp(modified)
         self._published = None
         self._previewed = None
+        self.archive = archive
 
     @property
     def published(self):

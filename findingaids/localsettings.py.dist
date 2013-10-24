@@ -103,6 +103,11 @@ PIDMAN_USER = ''  # Username for authentication to the pidman app.
 PIDMAN_PASSWORD = ''  # Pasword for username above.
 PIDMAN_DOMAIN = ''      # PID manager domain, in this format: https://pid.emory.edu/domains/1/
 
+# subversion config for admin site (system account with access to EAD svn repos)
+SVN_USERNAME = ''
+SVN_PASSWORD = ''
+SVN_WORKING_DIR = ''
+
 # local, full-path location for finding aids to be loaded to eXist via admin interface
 FINDINGAID_EAD_SOURCE = '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'
 # default text for links to digital archival objects

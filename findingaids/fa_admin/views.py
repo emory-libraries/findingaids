@@ -40,10 +40,11 @@ from eullocal.django.taskresult.models import TaskResult
 from eulxml.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulexistdb.exceptions import DoesNotExist
 
-from findingaids.fa.models import FindingAid, Deleted
+from findingaids.fa.models import FindingAid, Deleted, Archive
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
 from findingaids.fa_admin.forms import DeleteForm
-from findingaids.fa_admin.models import EadFile
+from findingaids.fa_admin.models import EadFile, Archivist
+from findingaids.fa_admin.source import files_to_publish
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
 
@@ -59,17 +60,24 @@ def main(request):
     """
     recent_files = []
     show_pages = []
-    if not hasattr(settings, 'FINDINGAID_EAD_SOURCE'):
-        error = "Please configure EAD source directory in local settings."
-    else:
-        dir = settings.FINDINGAID_EAD_SOURCE
-        if os.access(dir, os.F_OK | os.R_OK):
-            recent_files = _get_recent_xml_files(dir)
-            error = None
-        else:
-            error = "EAD source directory '%s' does not exist or is not readable; please check config file." % dir
 
-    paginator = Paginator(recent_files, 30, orphans=5)
+    # get svn url(s) from logged in user
+    try:
+        archives = request.user.archivist.archives.all()
+    except Archivist.DoesNotExist:
+        archives = []
+
+    error = ''
+    try:
+        files = files_to_publish(archives)
+        # sort by last modified time
+        files = sorted(files, key=lambda file: file.mtime, reverse=True)
+    except Exception as err:
+        raise
+        content = []
+        error = str(err)
+
+    paginator = Paginator(files, 30, orphans=5)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -84,10 +92,10 @@ def main(request):
     # get the 10 most recent task results to display status
     recent_tasks = TaskResult.objects.order_by('-created')[:10]
     return render_to_response('fa_admin/index.html', {'files': recent_files,
-                            'show_pages': show_pages,
-                            'error': error,
-                            'task_results': recent_tasks},
-                            context_instance=RequestContext(request))
+                              'show_pages': show_pages,
+                              'error': error,
+                              'task_results': recent_tasks},
+                               context_instance=RequestContext(request))
 
 
 @login_required
@@ -114,7 +122,8 @@ def list_staff(request):
         context_instance=RequestContext(request))
 
 
-def _prepublication_check(request, filename, mode='publish', xml=None):
+def _prepublication_check(request, filename, mode='publish', xml=None,
+        archive_slug=None):
     """
     Pre-publication check logic common to :meth:`publish` and :meth:`preview`.
 
@@ -135,8 +144,14 @@ def _prepublication_check(request, filename, mode='publish', xml=None):
       - fullpath - full path to the file in the configured source directory
     """
 
+    if archive_slug is not None:
+        base_path = Archive.objects.get(slug=archive_slug).svn_local_path
+    else:
+        # otherwise fallback to single configured directory
+        base_path = settings.FINDINGAID_EAD_SOURCE
+
     # full path to the local file
-    fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+    fullpath = os.path.join(base_path, filename)
     # full path in exist db collection
     dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
     errors = utils.check_ead(fullpath, dbpath, xml)
@@ -259,11 +274,14 @@ def publish(request):
 def preview(request):
     if request.method == 'POST':
         filename = request.POST['filename']
+        archive_slug = request.POST.get('archive', None)
+
         errors = []
 
         try:
             # only load to exist if document passes publication check
-            ok, response, dbpath, fullpath = _prepublication_check(request, filename, mode='preview')
+            ok, response, dbpath, fullpath = _prepublication_check(request, filename, mode='preview',
+                archive_slug=archive_slug)
             if ok is not True:
                 return response
 
@@ -297,7 +315,7 @@ def preview(request):
 
 @login_required
 @cache_page(1)  # cache this view and use it as source for prep diff/summary views
-def prepared_eadxml(request, filename):
+def prepared_eadxml(request, filename, archive_slug=None):
     """Serve out a prepared version of the EAD file in the configured EAD source
     directory.  Response header is set so the user should be prompted to download
     the xml, with a filename matching that of the original document.
@@ -308,7 +326,16 @@ def prepared_eadxml(request, filename):
     :param filename: name of the file to prep; should be base filename only,
         document will be pulled from the configured source directory.
     """
-    fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+    # find relative to svn path if associated with an archive
+    if archive_slug is None:
+        archive_slug = request.GET.get('archive', None)
+    if archive_slug:
+        base_path = Archive.objects.get(slug=archive_slug).svn_local_path
+    else:
+        # otherwise fallback to single configured directory
+        base_path = settings.FINDINGAID_EAD_SOURCE
+
+    fullpath = os.path.join(base_path, filename)
     try:
         ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
     except XMLSyntaxError, e:
@@ -346,11 +373,20 @@ def prepared_ead(request, filename, mode):
     :param mode: one of **diff** or **summary**
 
     """
-    fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+
+    # determine full path based on archive / svn
+    archive_slug = request.GET.get('archive', None)
+    if archive_slug:
+        base_path = Archive.objects.get(slug=archive_slug).svn_local_path
+    else:
+        # otherwise fallback to single configured directory
+        base_path = settings.FINDINGAID_EAD_SOURCE
+
+    fullpath = os.path.join(base_path, filename)
     changes = []
 
     # TODO: expire cache if file has changed since prepped eadxml was cached
-    prep_ead = prepared_eadxml(request, filename)
+    prep_ead = prepared_eadxml(request, filename, archive_slug)
 
     if prep_ead.status_code == 200:
         orig_ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
@@ -383,18 +419,9 @@ def prepared_ead(request, filename, mode):
 
     return render_to_response('fa_admin/prepared.html', {'filename': filename,
                                 'changes': changes, 'errors': errors,
-                                'xml_status': prep_ead.status_code},
+                                'xml_status': prep_ead.status_code,
+                                'archive_slug': archive_slug},
                                 context_instance=RequestContext(request))
-
-
-def _get_recent_xml_files(dir):
-    "Return recently modified xml files from the specified directory."
-    # get all xml files in the specified directory
-    filenames = glob.glob(os.path.join(dir, '*.xml'))
-    # modified time, base name of the file
-    files = [EadFile(os.path.basename(file), os.path.getmtime(file)) for file in filenames]
-    # sort by last modified time
-    return sorted(files, key=lambda file: file.mtime, reverse=True)
 
 
 @login_required
