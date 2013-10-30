@@ -8,6 +8,35 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.4 - RDFa
+----------
+
+* When a search engine accesses the web page for a finding aid, it can
+  harvest semantic information about the finding aid document, so that
+  the document can be related to other embedded semantic content.
+* A system or technical user can view RDF XML based on the embedded RDFa
+  in a finding aid page, in order to harvest RDF in a more standard format
+  or to review the embedded data on the page.
+* When a search engine accesses the web page for a finding aid with names
+  tagged in the EAD, it can harvest semantic information about the originator
+  of the finding aid from the collection description so the embedded data
+  can become useful in another context.
+* When a search engine accesses the Index of Selected Correspondents for
+  a finding aid with names tagged in the EAD, it can harvest semantic
+  information about correspondents with the originator of the finding aid
+  so the embedded data can become useful in another context.
+* When a search engine accesses a finding aid series describing correspondence
+  for a finding aid with names tagged in the EAD, it can harvest semantic
+  information about correspondents with the originator of the finding aid
+  so the embedded data can become useful in another context
+* When a search engine accesses the finding aid series for the Belfast Group
+  Worksheets for a finding aid with names tagged in the EAD, it can harvest
+  semantic information about participants in the group so the embedded data
+  can become useful in another context.
+* When a search engine accesses the finding aid series for the Belfast Group
+  Worksheets for a finding aid with names tagged in the EAD, it can harvest
+  group sheet titles in order so that title sequence can be preserved.
+
 1.3
 ---
 
