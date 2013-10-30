@@ -17,12 +17,22 @@
 import urllib2
 from time import sleep
 from celery import task
+import os.path
+import shutil
+import logging
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from eullocal.django.taskresult.models import TaskResult
 
 from findingaids import __version__ as SW_VERSION
+from findingaids.fa.models import Archive
+from findingaids.fa_admin.svn import svn_client
 
+
+logger = logging.getLogger(__name__)
 
 @task
 def reload_cached_pdf(eadid):
@@ -63,3 +73,41 @@ def reload_cached_pdf(eadid):
 
     else:
         raise Exception("PROXY_HOST and/or SITE_BASE_URL settings not available.  Failed to reload cached PDF.")
+
+
+@task
+def archive_svn_checkout(archive, update=False):
+    client = svn_client()
+
+    # if this is an update, clear out existing svn checkout
+    if update and os.path.isdir(archive.svn_local_path):
+        shutil.rmtree(archive.svn_local_path)
+        logger.info('removing outdated svn directory %s' %
+                    archive.svn_local_path)
+
+    client.checkout(archive.svn, archive.svn_local_path, 'HEAD')
+    # NOTE: could return brief text here to indicate more about what was done
+    # (update / initial checkout), for display in task result list
+
+
+@receiver(post_save, sender=Archive)
+def archive_save_hook(sender, instance, created, raw, using,
+                      update_fields, **kwargs):
+    # check if an svn update or checkout is needed before queuing the task
+    updated = False
+    if not created:
+        # if path already exists, check if the svn url has changed
+        if os.path.isdir(archive.svn_local_path):
+            client = svn_client()
+            svninfo = client.info(archive.svn_local_path, depth=0)
+            current_svn_url = svninfo[svninfo.keys()[0]].url
+            if current_svn_url != svn_url:
+                updated = True
+
+    if created or updated:
+        result = archive_svn_checkout.delay(instance, update=updated)
+        task = TaskResult(label='SVN checkout',
+            object_id=instance.label,  # will be displayed in task result
+            url=reverse('admin:fa_archive_change', args=[instance.pk]), # link in task result
+            task_id=result.task_id)
+        task.save()

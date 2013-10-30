@@ -26,13 +26,14 @@ import tempfile
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB, ExistDBException
 from eulexistdb.testutil import TestCase
 from eulxml.xmlmap.core import load_xmlobject_from_file
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Archive
 from findingaids.fa.urls import TITLE_LETTERS
 from findingaids.fa_admin import tasks, utils
 from findingaids.fa_admin.management.commands import prep_ead as prep_ead_cmd
@@ -490,6 +491,39 @@ class ReloadCachedPdfTestCase(TestCase):
         result = tasks.reload_cached_pdf.delay('eadid')
         self.assertRaises(Exception, result.get,
             "when required settings are missing, task raises an Exception")
+
+
+# test task/signal for archive svn checkout
+@override_settings(CELERY_ALWAYS_EAGER=True)
+@patch('findingaids.fa_admin.tasks.svn_client')
+class ArchiveSvnCheckoutTestCase(TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp(prefix='findingaids-svn-checkout_')
+
+    def tearDown(self):
+        rmtree(self.tmpdir)
+
+    def test_svn_checkout_task(self, mocksvnclient):
+
+        with override_settings(SVN_WORKING_DIR=self.tmpdir):
+            arch = Archive(label='Test', name='Test Archives and Collections',
+                svn='http://svn.example.com/test/trunk', slug='test')
+            # NOTE: not saving because we don't want to actually trigger the signal
+            # (calling task and signal handler manually instead)
+
+            # run as initial checkout
+            tasks.archive_svn_checkout(arch)
+            mocksvnclient.return_value.checkout.assert_called_with(arch.svn,
+                arch.svn_local_path, 'HEAD')
+
+            # run again but specify update and create directory
+            os.mkdir(arch.svn_local_path)
+            tasks.archive_svn_checkout(arch, update=True)
+            # directory should be gone since we are mocking svn checkout
+            self.assertFalse(os.path.isdir(arch.svn_local_path))
+
+    # TODO: test signal handler logic queues the task when and as it should
 
 
 ### unit tests for django-admin manage commands
