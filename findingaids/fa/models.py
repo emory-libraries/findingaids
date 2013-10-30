@@ -20,7 +20,6 @@ import os
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
-from django.utils.text import slugify
 
 from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
@@ -618,5 +617,7 @@ class Archive(models.Model):
     @property
     def svn_local_path(self):
         return os.path.join(settings.SVN_WORKING_DIR, self.slug)
+
+
 
 

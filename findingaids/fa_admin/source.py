@@ -20,7 +20,7 @@ import os
 from django.conf import settings
 
 from findingaids.fa_admin.models import EadFile
-from findingaids.fa_admin.svn import svn_client, svn_remote
+from findingaids.fa_admin.svn import svn_client
 
 '''
 Methods to support identifying and accessing source content to be published

@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django import forms
 from findingaids.fa.models import Deleted, Archive
 
 class DeletedAdmin(admin.ModelAdmin):
@@ -15,5 +16,7 @@ admin.site.register(Deleted, DeletedAdmin)
 class ArchiveAdmin(admin.ModelAdmin):
     list_display = ('label', 'name', 'svn')
     prepopulated_fields = {'slug': ('label',)}
+    # TODO: if possible, we should make the slug field read only
+
 
 admin.site.register(Archive, ArchiveAdmin)

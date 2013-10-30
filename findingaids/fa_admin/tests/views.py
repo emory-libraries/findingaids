@@ -32,7 +32,7 @@ from eulexistdb.testutil import TestCase
 
 from findingaids.fa.models import Deleted
 from findingaids.fa_admin import tasks, views
-from findingaids.fa_admin.views import _get_recent_xml_files
+from findingaids.fa_admin.source import recent_xml_files
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
 
 ### unit tests for findingaids.fa_admin.views
@@ -491,8 +491,8 @@ class AdminViewsTest(BaseAdminViewsTest):
 
     # tests for view helper functions
 
-    def test_get_recent_xml_files(self):
-        recent_xml = _get_recent_xml_files(self.tmpdir)
+    def test_recent_xml_files(self):
+        recent_xml = recent_xml_files(self.tmpdir)
         self.assertEqual(3, len(recent_xml))
         # should be in reverse order - last created first
         self.assertEqual(recent_xml[0].filename, os.path.basename(self.tmpfiles[2].name))
