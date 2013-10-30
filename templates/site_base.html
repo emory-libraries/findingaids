@@ -1,5 +1,5 @@
 {% extends "genlib_templates/bluegray_site_base.xhtml" %}
-
+{% block html-extras %} xmlns:schema="http://schema.org/"{% endblock %}
 {% block page-title %}EmoryFindingAids {% block page-subtitle %}{% endblock %}{% endblock %}
 
 {% block style %}
@@ -22,6 +22,9 @@
     <a class="last" href="{% url 'content:feedback' %}">Feedback</a>
 {% endblock %}
 {% block admin-url %}{% url 'fa-admin:index' %}{% endblock %}
+
+{% block body-extras %}typeof="schema:WebPage" about="http://{{ request.get_host }}{{ request.path }}"{% endblock %}
+{# NOTE: not using build_absolute_uri because we do NOT want to include query string #}
 
 {% block sidebar-left %}
 

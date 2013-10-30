@@ -1,14 +1,19 @@
 {% extends "fa/base.html" %}
 {% load ead %}   {% load ifurl %}
 
+{# additional namespaces (primarly for semantic web/RDFa) #}
+{% block html-extras %}{% for prefix, ns in extra_ns.iteritems %}
+   xmlns:{{ prefix}}="{{ ns }}"{% endfor %} {% endblock %}
+
 {% block page-head %}
-  {{block.super}}
+  {{ block.super }}
   {% if url_params %}  {# don't index highlighted pages, link non-highlighted page as canonical #}
    <meta name="robots" content="noindex,nofollow" />
    <link rel="canonical" href="{% ifurl preview 'fa-admin:preview:findingaid' 'fa:findingaid' id=ead.eadid %}" />
   {% endif %}
   <link rel="alternate" type="application/xml" href="{% ifurl preview 'fa-admin:preview:eadxml' 'fa:eadxml' id=ead.eadid %}" />
   <link rel="alternate" media="print" type="application/pdf" href="{% ifurl preview 'fa-admin:preview:printable' 'fa:printable' id=ead.eadid %}" />
+  <link rel="meta" type="application/rdf+xml" href="{% ifurl preview 'fa-admin:preview:findingaid' 'fa:findingaid' id=ead.eadid %}RDF/" />
   {% if ead.eadid.url %}<link rel="bookmark" href="{{ ead.eadid.url }}" /> {% endif %}
   {# embed Dublin Core metadata for this finding aid in the html header #}
   {% with ead.dc_fields as dc_fields %}
@@ -17,6 +22,9 @@
 {% endblock %}
 
 {% block page-subtitle %}: {{ ead.title }}{% endblock %}
+
+{% block body-extras %}typeof="schema:WebPage dcmitype:Text" about="{{ ead.eadid.url }}"{% endblock %}
+
 {% block content-title %}
 <div class="fa-title">
     {% if ead.archdesc.origination %}{{ ead.archdesc.origination|upper }}<br/>{% endif %}
@@ -25,11 +33,29 @@
 {% endblock %}
 
 {% block content-body %}
+<a property="owl:sameAs" href="http://{{ request.get_host }}{{ request.path }}"> </a>
+{# NOTE: not using build_absolute_uri because we do NOT want to include query string #}
+
+{% if last_modified %} {# include last modified when we can, so harvested data will include the date #}
+  <meta property="schema:dateModified" content="{{ last_modified|date:'Y-m-d' }}" />
+{% endif %}
+<meta property="schema:author" content="{{ ead.author }}" />
+<meta property="schema:name" content="{{ ead.title }}" />
+{% if ead.origination_name.authfilenumber %}
+  {# the collection is by the originator, but the document is about the originator #}
+  <meta property="schema:about" content="{{ ead.origination_name.uri }}" />
+{% endif %}
+
 {% with ead.file_desc.publication as publication %}
-  <div id="publication-address">
-    <p>{{ publication.publisher }}</p>
-    {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
-    <p>Permanent link: <a rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
+<div id="publication-address">
+    <span rel="schema:publisher">
+      <span typeof="schema:Organization">
+        <p property="schema:name">{{ publication.publisher }}</p>
+       {# FIXME: should be able to express as postaladdress, but address not broken out in a way that supports that #}
+       {% for line in publication.address.lines %}<p>{{ line }}</p>{% endfor %}
+     </span> {# end organiaztion #}
+   </span> {# end publisher #}
+    <p>Permanent link: <a property="schema:url" rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
   {% include "fa/snippets/digital-content.html" %}
   <div id="sidebar-right">
@@ -37,6 +63,10 @@
   </div>
 
 {% endwith %}
+<meta property="schema:dateCreated" content="{{ ead.profiledesc.date.normalized }}"/>
+<meta property="schema:datePublished" content="{{ ead.file_desc.publication.date.normalized }}"/>
+{# weirdly, last modified not easily accessible from this context #}
+{# also, last modified in eXist database may not correspond to date of last edit #}
 
 {# main display page for a single finding aid; links to series & subseries, if any #}
 <div id="toc_series">
@@ -47,7 +77,10 @@
 <h2><a href="#dsc">{{ ead.dsc.head}}</a></h2>
 <ul>
     {% for component in ead.dsc.c %}
-    <li><a href="{% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id %}{{ url_params }}" rel="section">
+    {% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id  as series_url %}
+    <li>
+      <a property="dcterms:hasPart" href="http://{{ request.get_host }}{{ series_url }}" > </a>
+      <a href="{{ series_url }}{{ url_params }}" rel="section">
 	{% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
     {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count}} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
      </li>
@@ -58,7 +91,8 @@
 <br class="clear"/>
 </div>
 
-<div class="fa">
+<div rel="schema:about"> {# the finding aid document is *about* the archival collection #}
+ <div class="fa" typeof="schema:CreativeWork arch:Collection dcmitype:Collection" about="{{ ead.collection_uri }}">
 <hr/>
 {% include "fa/snippets/description.html" %}
 <hr/>
@@ -68,18 +102,38 @@
 {# container list or series/subseries listing #}
 <h2><a name="dsc">{{ ead.dsc.head }}</a></h2>
 {% if ead.dsc.hasSeries %}       {# list series/subseries here, display on separate page #}
+{# series pages are part of the *document* not collection, so close out collection RDFa item #}
+
+  </div> {# end collection item #}
+</div> {# end about #}
+
     <ul class="series-list">
        {% autoescape off %}
            {{ series|unordered_list }}
        {% endautoescape %}
     </ul>
+
+  {% if series_noparam %} {# urls for RDFa without keyword args #}
+    <ul class="series-list" style="display:none">
+       {% autoescape off %}
+           {{ series_noparam|unordered_list }}
+       {% endautoescape %}
+    </ul>
+  {% endif %}
 {% else %}
+
   {% with ead.dsc as series %}
     {% include "fa/snippets/containerlist.html" %}
   {% endwith %}
+
+  {# container list items should be associated with collection, so close it out *after* #}
+  </div> {# end collection item #}
+</div> {# end about #}
+
 {% endif %}
 
 {# indexes (if any) displayed on their own pages #}
 
-</div>
+
+
 {% endblock %}

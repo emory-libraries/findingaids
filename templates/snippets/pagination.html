@@ -9,17 +9,17 @@ Expects the following variables:
 {% if items.paginator.count %} {# to suppress if only one page, check items.paginator.num_pages > 1 #}
 <div class="pagination">Pages:
 {# always link to the first page, even if it is not listed in pages to be shown #}
-{% if 1 not in show_pages %}<a href="?{% if url_params %}{{url_params}}&{% endif %}page=1">{% firstof first_page_label 1 %}</a> {% endif %}
+{% if 1 not in show_pages %}<a href="?{% if url_params %}{{url_params}}&amp;{% endif %}page=1">{% firstof first_page_label 1 %}</a> {% endif %}
 {% for page, label in show_pages.items %}
     {% if forloop.first and page > 2 %} ... {% endif %} {# gap before page 1 #}
     {% ifequal page items.number %} {% firstof label page %}
-    {% else %}<a href="?{% if url_params %}{{url_params}}&{% endif %}page={{ page }}">{% firstof label page %}</a>
+    {% else %}<a href="?{% if url_params %}{{url_params}}&amp;{% endif %}page={{ page }}">{% firstof label page %}</a>
     {% endifequal %}
     {%if forloop.last and page|add:1 < items.paginator.num_pages %} ... {% endif %} {# gap before last page #}
 {% endfor %}
 {# always link to the last page, even if it is not listed in pages to be shown #}
 {% if items.paginator.num_pages not in show_pages %}
-  <a href="?{% if url_params %}{{url_params}}&{% endif %}page={{ items.paginator.num_pages }}">{% firstof last_page_label items.paginator.num_pages %}</a>
+  <a href="?{% if url_params %}{{url_params}}&amp;{% endif %}page={{ items.paginator.num_pages }}">{% firstof last_page_label items.paginator.num_pages %}</a>
 {% endif %}
 </div>
 {% endif %}

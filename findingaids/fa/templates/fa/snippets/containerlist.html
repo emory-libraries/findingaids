@@ -13,8 +13,13 @@
                 <td colspan="3">
                     {{ component.did.unittitle|format_ead }}
                     {{ component.did.physdesc|default:'' }}
-                    {{ component.did.abstract|format_ead|default:'' }}
-                    {{ component.did.note|format_ead|default:'' }}
+                    {% if rdfa_rel %}  {# if an RDFa rel is defined, use rdfa formatting #}
+                      {{ component.did.abstract|format_ead_rdfa:rdfa_rel|default:'' }}
+                      {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
+                    {% else %}
+                      {{ component.did.abstract|format_ead|default:'' }}
+                      {{ component.did.note|format_ead|default:'' }}
+                    {% endif %}
                 </td>
             </tr>
         {% endif %}

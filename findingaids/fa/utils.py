@@ -264,6 +264,7 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
         raise http.Http404
     return fa
 
+
 def ead_lastmodified(request, id, preview=False, *args, **kwargs):
     """Get the last modification time for a finding aid in eXist by eadid.
     Used to generate last-modified header for views based on a single EAD document.
@@ -275,6 +276,7 @@ def ead_lastmodified(request, id, preview=False, *args, **kwargs):
     # get document name last modified by eadid
     fa = get_findingaid(id, preview=preview, only=['last_modified'])
     return exist_datetime_with_timezone(fa.last_modified)
+
 
 def ead_etag(request, id, preview=False, *args, **kwargs):
     """Generate an Etag for an ead (specified by eadid) by requesting a SHA-1
