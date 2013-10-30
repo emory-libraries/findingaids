@@ -49,6 +49,9 @@ class EadFile:
         self._previewed = None
         self.archive = archive
 
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__, self.filename)
+
     @property
     def published(self):
         "Date object was modified in eXist, if published"

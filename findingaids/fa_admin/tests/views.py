@@ -22,7 +22,6 @@ from time import sleep
 
 from django.test import Client
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
@@ -32,7 +31,6 @@ from eulexistdb.testutil import TestCase
 
 from findingaids.fa.models import Deleted
 from findingaids.fa_admin import tasks, views
-from findingaids.fa_admin.source import recent_xml_files
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
 
 ### unit tests for findingaids.fa_admin.views
@@ -489,18 +487,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertNotContains(response, 'href="%s"' % prep_xml,
                 msg_prefix="prep summary for badly formed xml should NOT link to xml for download")
 
-    # tests for view helper functions
-
-    def test_recent_xml_files(self):
-        recent_xml = recent_xml_files(self.tmpdir)
-        self.assertEqual(3, len(recent_xml))
-        # should be in reverse order - last created first
-        self.assertEqual(recent_xml[0].filename, os.path.basename(self.tmpfiles[2].name))
-        self.assertEqual(recent_xml[1].filename, os.path.basename(self.tmpfiles[1].name))
-        self.assertEqual(recent_xml[2].filename, os.path.basename(self.tmpfiles[0].name))
-        # non-xml file not included
-        filenames = [eadfile.filename for eadfile in recent_xml]
-        self.assert_(os.path.basename(self.nonxml_tmpfile.name) not in filenames)
 
     def test_list_published(self):
         # login to test admin-only view

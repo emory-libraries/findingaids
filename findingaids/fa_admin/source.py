@@ -15,6 +15,7 @@
 #   limitations under the License.
 
 import glob
+import logging
 import os
 
 from django.conf import settings
@@ -26,6 +27,8 @@ from findingaids.fa_admin.svn import svn_client
 Methods to support identifying and accessing source content to be published
 via the findingaids admin interface.
 '''
+
+logger = logging.getLogger(__name__)
 
 
 def recent_xml_files(dir):
@@ -40,11 +43,10 @@ def recent_xml_files(dir):
     # sort by last modified time
     return sorted(files, key=lambda file: file.mtime, reverse=True)
 
-def svn_xml_files(svn_path, archive):
-    # TODO: local path or svn url ?
+def svn_xml_files(archive):
     svn = svn_client()
     # url, most recent revision, depth 1
-    svn_list = svn.list(svn_path, 'HEAD', 1)
+    svn_list = svn.list(archive.svn_local_path, 'HEAD', 1)
     files = []
     for filename, info in svn_list.iteritems():
         # skip non-xml content
@@ -57,15 +59,18 @@ def svn_xml_files(svn_path, archive):
 
     return files
 
-def files_to_publish(archives):
+def files_to_publish(archives=[]):
 
     if archives:
         # only handle the first archive for now
         archive = archives[0]
-        # TODO: needs to do an svn update first
-        # TODO: still need logic to check out svn working copies to start with
-        # (possibly a setup / manage.py piece?)
-        return svn_xml_files(archive.svn_local_path, archive)
+        svn = svn_client()
+        # update to make sure we have latest version of everything
+        svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
+        # returns a list of revisions
+        # NOTE: might be nice to log current revision if we know it has changed
+        # return list of recent xml files from the svn
+        return svn_xml_files(archive)
 
     # NOTE: trying to preserve fall-back behavior that allows publication
     # from a single configured directory; however, as the admin

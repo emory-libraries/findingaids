@@ -67,14 +67,13 @@ def main(request):
     except Archivist.DoesNotExist:
         archives = []
 
-    error = ''
+    error = None
     try:
         files = files_to_publish(archives)
         # sort by last modified time
         files = sorted(files, key=lambda file: file.mtime, reverse=True)
     except Exception as err:
-        raise
-        content = []
+        files = []
         error = str(err)
 
     paginator = Paginator(files, 30, orphans=5)
