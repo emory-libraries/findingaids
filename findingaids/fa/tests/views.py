@@ -279,8 +279,10 @@ class FaViewsTest(TestCase):
         #DC.identifer
         self.assertContains(response, '<meta name="DC.identifier" content="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
 
-        #Permalink with bookmark rel and ARK
-        self.assertContains(response, '<a rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">http://pidtest.library.emory.edu/ark:/25593/1fx</a>')
+        # Permalink with bookmark rel and ARK
+        self.assertContains(response,
+                            '<a property="schema:url" rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx">http://pidtest.library.emory.edu/ark:/25593/1fx</a>',
+                            html=True)
 
         #link in header with bookmark rel and ARK
         self.assertContains(response, '<link rel="bookmark" href="http://pidtest.library.emory.edu/ark:/25593/1fx" />')
@@ -750,9 +752,10 @@ class FaViewsTest(TestCase):
         self.assertPattern(
             '<h3>Scope and Content Note</h3>.*<p>.*letters to family.*</p>.*<p>.*earliest letters.*</p>',
             response.content, "subseries scope & content, 2 paragraphs")
-        self.assertPattern(
-            '<h3>Arrangement Note</h3>.*<p>Arranged by record type.</p>',
-            response.content, "subseries arrangment note")
+        self.assertContains(
+            response,
+            '<div><h3>Arrangement Note</h3><p>Arranged by record type.</p></div>',
+            html=True)
 
         # subseries contents
         self.assertPattern(
@@ -835,6 +838,8 @@ class FaViewsTest(TestCase):
         self.assertContains(response, "Subseries 2.1")
         self.assertContains(response, "Additional drafts and notes")
         # missing section head should not be displayed as "none"
+        # FIXME: this is generating a None in the RDFa for some non-obvious reason
+        # This only seems to be happening in the unit tests...
         self.assertContains(
             response, "None", 0,
             msg_prefix="series with a section with no head does not display 'None' for heading")
@@ -1043,10 +1048,10 @@ class FaViewsTest(TestCase):
 
         self.assert_("Series 1: Letters and personal papers" in links[0])
         self.assert_("href='#s1'" in links[0])
-        self.assert_("rel='section'" in links[0])
+        self.assert_("rel='section dcterms:hasPart'" in links[0])
         # subseries
         self.assert_("href='#s1.1'" in links[1][0])
-        self.assert_("rel='subsection'" in links[1][0])
+        self.assert_("rel='subsection dcterms:hasPart'" in links[1][0])
 
     # skip the printable test if XSLFO is not configured (i.e., if FOP cannot be installed)
     @unittest.skipIf(not settings.XSLFO_PROCESSOR, 'XSL-FO processor not set')
@@ -1074,7 +1079,7 @@ class FaViewsTest(TestCase):
         # series list, and all series down to c03 level
         self.assertContains(response, "Description of Series")
         # series links are anchors in the same page
-        self.assertPattern('<a href=\'#s1\.10\' rel=\'subsection\'>Subseries 1.10', response.content)
+        self.assertPattern('<a href=\'#s1\.10\' rel=\'subsection dcterms:hasPart\'>Subseries 1.10', response.content)
         self.assertPattern('<h2 class="series">.*Series 1 .*Letters and personal papers,.* 1865-1982.*</h2>', response.content)
         self.assertPattern('<h2 class="subseries">.*Subseries 1.2 .*Mary Wadley Raoul papers,.* 1865-1936.*</h2>', response.content)
         # index

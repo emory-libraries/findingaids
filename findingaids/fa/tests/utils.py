@@ -171,6 +171,8 @@ class FormatEadTestCase(DjangoTestCase):
     Irish writer Oliver St. John Gogarty to author Ernest Augustus Boyd.</abstract>""" % EAD_NAMESPACE
     TITLE_EMPH = """<bibref xmlns="%s"><emph>Biographical source:</emph> "Shaw, George Bernard."
     <title>Contemporary Authors Online</title>, Gale, 2003</bibref>""" % EAD_NAMESPACE
+    TITLE_QUOT = """<unittitle xmlns="%s"><title render="doublequote">Terminus</title></unittitle>""" % EAD_NAMESPACE
+    TITLE_MULTI = """<unittitle xmlns="%s" level="file"><title render="doublequote">Terminus</title>, <title render="doublequote">Saturday</title></unittitle>""" % EAD_NAMESPACE
     NESTED = """<abstract xmlns="%s">magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>""" % EAD_NAMESPACE
     NOTRANS = """<abstract xmlns="%s">magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>""" % EAD_NAMESPACE
     EXIST_MATCH = """<abstract xmlns="%s">Pitts v. <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">Freeman</exist:match>
@@ -200,7 +202,21 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
         self.content.node = etree.fromstring(self.TITLE)
         format = format_ead(self.content)
         self.assert_('magazine <span class="ead-title">The Smart Set</span> from' in format,
-            "title tag converted correctly to span class ead-title")
+                     "title tag converted correctly to span class ead-title")
+
+        # title variants
+        # - doublequotes
+        self.content.node = etree.fromstring(self.TITLE_QUOT)
+        format = format_ead(self.content)
+        self.assertEqual('"Terminus"', format)
+        # - multiple
+        self.content.node = etree.fromstring(self.TITLE_MULTI)
+        format = format_ead(self.content)
+        self.assertEqual('"Terminus", "Saturday"', format)
+        # - multiple titles + RDFa
+        format = format_ead(self.content, rdfa=True)
+        self.assertEqual('"<span inlist="inlist" property="dc:title">Terminus</span>", "<span inlist="inlist" property="dc:title">Saturday</span>"',
+                         format)
 
     def test_title_emph(self):
         self.content.node = etree.fromstring(self.TITLE_EMPH)

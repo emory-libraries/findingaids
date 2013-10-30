@@ -3,6 +3,9 @@
 {% extends "fa/base.html" %}
 {% load ead %} {% load ifurl %}
 
+{% block html-extras %}{% for prefix, ns in extra_ns.iteritems %}
+   xmlns:{{ prefix}}="{{ ns }}"{% endfor %} {% endblock %}
+
 {% block page-subtitle %}: {{ ead.title }} : {% firstof series.display_label index.head %}{% endblock %}
 
 {% block page-head %}
@@ -11,9 +14,13 @@
    <meta name="robots" content="noindex,nofollow" />
    <link rel="canonical" href="{{ canonical_url }}" />
   {% endif %}
+  <link rel="meta" type="application/rdf+xml" href="{{ canonical_url|add:'RDF/' }}" />
 {% endblock %}
 
 {% block content-title %}
+{# set RDFa name based on same value used in HTML title #}
+<meta property="schema:name" content="{{ ead.title }}; {% firstof series.display_label index.head %}" />
+<meta property="dcterms:isPartOf" content="{{ ead.eadid.url }}" />
 <div class="fa-title">
     {# generate and store url for main finding aid page #}
     {% ifurl preview 'fa-admin:preview:findingaid' 'fa:findingaid' id=ead.eadid as ead_url %}
@@ -40,10 +47,12 @@
   </div>
 {% endblock %}
 
-
 {% block content-body %}
+{% if last_modified %} {# include last modified  in RDFa when we can, so harvested data will include the date #}
+  <meta property="schema:dateModified" content="{{ last_modified|date:'Y-m-d' }}" />
+{% endif %}
 <div id="toc_series" class="short-toc">
-{% with 1 as collapsed %}{% include "fa/snippets/toc.html" %}{% endwith %}
+{% with collapsed=1 %}{% include "fa/snippets/toc.html" %}{% endwith %}
 
 {% if all_series.count %} {# only display series if there is one (e.g., ead with index but no series) #}
     <div id="series" class="hover-menu collapsed">
@@ -59,7 +68,7 @@
                 {# next prev and start rel attributes are calculated in the view #}
                 {% else %}
                    <a href="{% ifurl preview 'fa-admin:preview:series-or-index' 'fa:series-or-index' id=ead.eadid series_id=component.short_id %}{{ url_params }}"
-                   {% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% if forloop.first %}rel="start"{% endif %}>
+                   {% if forloop.first %}rel="start"{% else %}{% ifequal forloop.counter0 next %}rel="next"{% endifequal %}{% ifequal forloop.counter0 prev %}rel="prev"{% endifequal %}{% endif %}>
                     {% if component.did.unitid %}{{ component.did.unitid }}: {% endif %}
                         {{ component.did.unittitle|format_ead }}</a>{% if component.match_count > 0 %} <span class="exist-match">{{component.match_count|floatformat }} match{{component.match_count|pluralize:'es'}}</span>{% endif %}
                 {% endifequal %}

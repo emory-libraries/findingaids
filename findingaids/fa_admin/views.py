@@ -292,7 +292,7 @@ def preview(request):
 
 
 @login_required
-@cache_page(5)  # cache this view and use it as source for prep diff/summary views
+@cache_page(1)  # cache this view and use it as source for prep diff/summary views
 def prepared_eadxml(request, filename):
     """Serve out a prepared version of the EAD file in the configured EAD source
     directory.  Response header is set so the user should be prompted to download

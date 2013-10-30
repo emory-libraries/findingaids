@@ -31,6 +31,54 @@ from eulexistdb.models import XmlModel
 ID_DELIMITER = '_'
 
 
+class Name(XmlModel):
+    '''XmlObject for a generic name in an EAD document.  Includes common
+    functionality for persname, famname, corpname, and geogname.
+    '''
+    ROOT_NS = eadmap.EAD_NAMESPACE
+    ROOT_NAMESPACES = {
+        'e': eadmap.EAD_NAMESPACE,
+    }
+    source = xmlmap.StringField('@source')
+    authfilenumber = xmlmap.StringField('@authfilenumber')
+    encodinganalog = xmlmap.StringField('@encodinganalog')
+    value = xmlmap.StringField(".", normalize=True)
+    # NOTE: could be persname, corpname, famname
+
+    @property
+    def is_personal_name(self):
+        'boolean indicator if this is a persname tag'
+        return self.node.tag == "{%s}persname" % eadmap.EAD_NAMESPACE
+
+    @property
+    def is_corporate_name(self):
+        'boolean indicator if this is a corpname tag'
+        return self.node.tag == "{%s}corpname" % eadmap.EAD_NAMESPACE
+
+    @property
+    def is_family_name(self):
+        'boolean indicator if this is a famname tag'
+        return self.node.tag == "{%s}famname" % eadmap.EAD_NAMESPACE
+
+    @property
+    def is_geographic_name(self):
+        'boolean indicator if this is a geogname tag'
+        return self.node.tag == "{%s}geogname" % eadmap.EAD_NAMESPACE
+
+    @property
+    def uri(self):
+        ''''Generate a URI for this name if possible, based on source and
+        authfilenumber attributes.  Currently supports viaf, geonames,
+        and dbpedia sources.
+        '''
+        if self.source == 'viaf':
+            return 'http://viaf.org/viaf/%s' % self.authfilenumber
+        elif self.source == 'geonames':
+            return 'http://sws.geonames.org/%s/' % self.authfilenumber
+        elif self.source == 'dbpedia':
+            return 'http://dbpedia.org/resource/%s' % self.authfilenumber
+
+
 class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     """
     Customized version of :class:`eulxml.EncodedArchivalDescription` EAD object.
@@ -114,6 +162,9 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         '|'.join('e:%s' % field for field in _coll_desc) + '))//exist:match)'
     # - controlaccess match-count
     controlaccess_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/e:controlaccess)//exist:match)'
+
+    origination_name = xmlmap.NodeField('e:archdesc/e:did/e:origination/e:*', Name)
+    'origination name, as an instance of :class:`Name`'
 
     # dao anywhere in the ead, to allow filtering on finding aids with daos
     daos = xmlmap.NodeListField('.//e:dao', eadmap.DigitalArchivalObject)
@@ -216,6 +267,24 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         return fields
 
 
+    collection_id = xmlmap.StringField('e:archdesc/e:did/e:unitid/@identifier')
+
+    def collection_uri(self):
+        # URI to use in RDF for the archival collection, as distinguished
+        # from the findingaid document that describes the collection and
+        # the materials that it includes.
+
+        if self.collection_id is not None and \
+           self.collection_id.startswith('http'):
+            # if collection id is a URL, use that
+            return self.collection_id
+
+        else:
+            # otherwise use findingaid ARK as base for collection URI
+            return '%s#collection' % self.eadid.url
+
+
+
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
     ROOT_NAMESPACES = {'e': eadmap.EAD_NAMESPACE}
@@ -301,6 +370,11 @@ class Series(XmlModel, LocalComponent):
 
     match_count = xmlmap.IntegerField("count(.//exist:match)")
     ":class:`findingaids.fa.models.FindingAid` number of keyword matchs"
+
+    _unittitle_name_xpath = '|'.join('e:did/e:unittitle/e:%s' % t
+                                     for t in ['persname', 'corpname', 'geogname'])
+    unittitle_name = xmlmap.NodeField(_unittitle_name_xpath, Name)
+    'name in the unittitle, as an instance of :class:`Name`'
 
     def series_info(self):
         """"

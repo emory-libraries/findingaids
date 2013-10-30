@@ -1,5 +1,5 @@
 # file findingaids/fa/management/commands/response_times.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,11 +30,13 @@ class Command(BaseCommand):
     database, and warn if any take longer than the current threshold of 5 seconds.
 
     In browse mode, tests eXist Finding Aid browse query for all browse letters.
-    
+
+    In pages mode, tests a few pre-specified page urls.
+
     """
     help = __doc__
 
-    _args = ['browse', 'search']
+    _args = ['browse', 'search', 'pages']
     args = ' | '.join(_args)
     option_list = BaseCommand.option_list + (
         make_option('--pages', '-p',
@@ -59,9 +61,21 @@ class Command(BaseCommand):
         '''Flannery O'Connor''',
         'Segregat* +Georgia',
         '"New York Times" AND journalis*',
+        'belfast group',
     )
 
-    def handle(self, cmd, *args, **options):
+    test_pages = (
+        '/documents/longley744/',
+        '/documents/longley744/series1/',
+        '/documents/longley744/series8/',
+        '/documents/longley744/index1/',
+        '/documents/longley744/items/?keywords=belfast+group'
+        '/documents/ormsby805/',
+        '/documents/ormsby805/series1/',
+        '/documents/ormsby805/items/?keywords=belfast+group',
+    )
+
+    def handle(self, cmd=None, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
         v_all = 2
@@ -104,7 +118,7 @@ class Command(BaseCommand):
                 query_times = {}
                 for letter in first_letters:
                     current_times = {}  # times for the current letter
-                    uri = "/titles/%s" % letter     # FIXME: use reverse here
+                    uri = reverse('fa:titles-by-letter', kwargs={'letter': letter})
                     if verbosity == v_all:
                         print letter
                     for page in range(1,11):
@@ -112,7 +126,7 @@ class Command(BaseCommand):
                         response = client.get(uri, {'page': page})
                         end_time = datetime.now()
                         if response.status_code == 200:
-                            duration = end_time - start_time                            
+                            duration = end_time - start_time
                             current_times['%s %d' % (letter, page)] = duration
                             if duration > self.timedelta_threshold:
                                 print "Warning: page load for page %d of %s (%s) took %s" % \
@@ -138,7 +152,7 @@ class Command(BaseCommand):
             if not options['pages_only']:
                 # get eXist query times without page load
                 if verbosity == v_all:
-                    print 'Testing response times for search xqueries'                
+                    print 'Testing response times for search xqueries'
                 for search_terms in self.test_searches:
                     # NOTE: search syntax duplicated from search view
                     search_fields = fa_listfields
@@ -192,19 +206,41 @@ class Command(BaseCommand):
                 print "\nMax/Min/Average - all letters, all pages"
                 max_min_avg(query_times.values(), zero=timedelta())
 
+        # PAGES
+        elif cmd == 'pages':
+            client = Client()
+            query_times = {}
+
+            if verbosity == v_all:
+                print 'Testing response times for pre-specified pages'
+
+            query_times = {}
+            for uri in self.test_pages:
+                start_time = datetime.now()
+                response = client.get(uri)
+                end_time = datetime.now()
+                if response.status_code == 200:
+                    duration = end_time - start_time
+                    query_times[uri] = duration
+                    if duration > self.timedelta_threshold:
+                        print "Warning: page load for %s took %s" % \
+                            (uri, duration)
+                    if verbosity == v_all:
+                        print "%s : %s" % (uri, duration)
+
+            print "\nMax/Min/Average - all letters, all pages"
+            max_min_avg(query_times.values(), zero=timedelta())
+
+
 def max_min_avg(times, zero=0):
+    if not times:
+        return
     # calculate and display max/min/average
-    max = zero
-    min = None
-    sum = zero
-    for time in times:
-        if time > max:
-            max = time
-        if min is None or time < min:
-            min = time
-        sum += time
-    avg = sum / len(times)
-    
-    print "Longest time: %s" % max
-    print "Shortest time: %s" % min
+    maximum = max(times)
+    minimum = min(times)
+    total = sum(times, zero)
+    avg = total / len(times)
+
+    print "Longest time: %s" % maximum
+    print "Shortest time: %s" % minimum
     print "Average time: %s\n" % avg

@@ -208,17 +208,17 @@ def deploy(path=None, user=None, url_prefix='', remote_proxy=None):
     Parameters:
       path: base deploy directory on remote host; deploy expects a
             localsettings.py file in this directory
-            Default: env.remote_path = /home/httpd/sites/openemory
+            Default: env.remote_path = /home/httpd/sites/findingaids
       user: user on the remote host to run the deploy; ssh user (current or
             specified with -U option) must have sudo permission to run deploy
             tasks as the specified user
-            Default: openemory
+            Default: findingaids
       url_prefix: base url if site is not deployed at /
       remote_proxy: HTTP proxy that can be used for pip/virtualenv
         installation on the remote server (server:port)
 
     Example usage:
-      fab deploy:/home/openemory/,oe -H servername
+      fab deploy:/home/findingaids/,finder -H servername
       fab deploy:user=www-data,url_prefix=/fa -H servername
       fab deploy:remote_proxy=some.proxy.server:3128 -H servername
 

@@ -49,6 +49,14 @@ fa_listfields = ['eadid', 'list_title', 'archdesc__did']
 # and FindingAid.abstract
 
 
+RDFA_NAMESPACES = {
+    'schema': 'http://schema.org/',
+    'dcmitype': 'http://purl.org/dc/dcmitype/',
+    'arch': 'http://purl.org/archival/vocab/arch#',
+    'bibo': 'http://purl.org/ontology/bibo/',
+}
+
+
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
     return render_to_response('fa/index.html', {'letters': title_letters()},
@@ -150,10 +158,15 @@ def findingaid(request, id, preview=False):
         url_params = ''
         filter = {}
     fa = get_findingaid(id, preview=preview, filter=filter)
+    last_modified = ead_lastmodified(request, id, preview)
     series = _subseries_links(fa.dsc, url_ids=[fa.eadid], preview=preview,
                               url_params=url_params)
 
-    response = render_to_response('fa/findingaid.html', {
+    extra_ns = RDFA_NAMESPACES.copy()
+    # add any non-default namespaces from the EAD document
+    extra_ns.update(dict((prefix, ns) for prefix, ns in fa.node.nsmap.iteritems()
+                    if prefix is not None))
+    context = {
         'ead': fa,
         'series': series,
         'all_indexes': fa.archdesc.index,
@@ -162,7 +175,16 @@ def findingaid(request, id, preview=False):
         'docsearch_form': KeywordSearchForm(),
         'last_search': request.session.get('last_search', None),
         'feedback_opts': _get_feedback_options(request, id),
-    }, context_instance=RequestContext(request, current_app='preview'))
+        'extra_ns': extra_ns,
+        'last_modified': last_modified,
+    }
+
+    # provide series list without keyword params to use in RDFa uris
+    if url_params and not preview:
+        context['series_noparam'] = _subseries_links(fa.dsc, url_ids=[fa.eadid])
+
+    response = render_to_response('fa/findingaid.html', context,
+        context_instance=RequestContext(request, current_app='preview'))
     # Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
@@ -260,6 +282,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
             referrer = 'Referrer %s' % request.META['HTTP_REFERER']
         else:
             referrer = ' (referrer not available)'
+
         logger.info('''Redirecting from long-form series/index %s url to short-form url. %s'''
                     % (request.path, referrer))
         return HttpResponsePermanentRedirect(_series_url(eadid, *redirect_ids))
@@ -329,6 +352,11 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     if hasattr(ead, 'queryTime'):
         query_times.append(ead.queryTime())
 
+    extra_ns = RDFA_NAMESPACES.copy()
+    # add any non-default namespaces from the EAD document
+    extra_ns.update(dict((prefix, ns) for prefix, ns in ead.node.nsmap.iteritems()
+                    if prefix is not None))
+
     render_opts = {
         'ead': ead,
         'all_series': all_series,
@@ -341,6 +369,8 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         'docsearch_form': KeywordSearchForm(),
         'last_search': request.session.get('last_search', None),
         'feedback_opts': _get_feedback_options(request, eadid),
+        'extra_ns': extra_ns,
+        'last_modified': ead_lastmodified(request, eadid, preview_mode)
     }
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
@@ -351,8 +381,14 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         render_opts['series'] = result
         render_opts['subseries'] = _subseries_links(result, preview=preview_mode, url_params=url_params)
 
+        # provide series list without keyword params to use in RDFa uris
+        if url_params and not preview_mode:
+            render_opts['subseries_noparam'] = _subseries_links(result)
+
+
     response = render_to_response('fa/series_or_index.html',
-                                  render_opts, context_instance=RequestContext(request))
+                                  render_opts,
+                                  context_instance=RequestContext(request))
 
     #Cache-Control to private when there is a last_search
     if "last_search" in request.session:
@@ -371,7 +407,9 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
     # additional fields to be returned
     return_fields = ['ead__eadid', 'ead__title', 'ead__unittitle',
                      'ead__archdesc__origination',
-                     'ead__archdesc__controlaccess__head', 'ead__dsc__head']
+                     'ead__archdesc__controlaccess__head', 'ead__dsc__head',
+                     'ead__origination_name',
+                     'ead__collection_id']
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid': eadid, 'id': series_ids[-1]}
 
@@ -767,6 +805,11 @@ def _subseries_links(series, url_ids=None, url_callback=_series_url, preview=Fal
                 rel = 'section'
             elif (component.node.tag in [C02, C03]):
                 rel = 'subsection'
+
+            # don't include preview/keyword arg urls in RDFa rel
+            if not url_params and not preview:
+                rel += ' dcterms:hasPart'
+
             text = "<a href='%(url)s%(url_params)s' rel='%(rel)s'>%(linktext)s</a> %(match_count)s" % \
                 {'url': url_callback(preview=preview, *current_url_ids),
                  'url_params': url_params,
