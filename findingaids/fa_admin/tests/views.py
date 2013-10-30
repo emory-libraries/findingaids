@@ -485,7 +485,8 @@ class AdminViewsTest(BaseAdminViewsTest):
                 msg_prefix='xml syntax error displayed')
         self.assertNotContains(response, prep_diff,
                 msg_prefix="prep summary for badly formed xml should NOT link to line-by-line diff")
-        self.assertNotContains(response, prep_xml,
+        # prep xml link is included in about link; check not present as entire link
+        self.assertNotContains(response, 'href="%s"' % prep_xml,
                 msg_prefix="prep summary for badly formed xml should NOT link to xml for download")
 
     # tests for view helper functions
