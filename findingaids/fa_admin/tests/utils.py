@@ -16,7 +16,7 @@
 
 import cStringIO
 import logging
-from mock import patch
+from mock import patch, Mock
 import os
 import re
 from shutil import rmtree, copyfile
@@ -523,8 +523,34 @@ class ArchiveSvnCheckoutTestCase(TestCase):
             # directory should be gone since we are mocking svn checkout
             self.assertFalse(os.path.isdir(arch.svn_local_path))
 
-    # TODO: test signal handler logic queues the task when and as it should
+    def test_archive_save_hook(self, mocksvnclient):
+        # test signal handler queues the task when and as it should
+        arch = Archive(label='Test', name='Test Archives and Collections',
+            svn='http://svn.example.com/test/trunk', slug='test')
 
+        with override_settings(SVN_WORKING_DIR=self.tmpdir):
+            tasks.archive_save_hook('sender', arch, created=True, raw=None, using=None,
+                update_fields=[])
+            # should always checkout if created is true
+            mocksvnclient.return_value.checkout.assert_called_with(arch.svn,
+                arch.svn_local_path, 'HEAD')
+            mocksvnclient.reset_mock()
+
+            # not create and svn checkout not changed
+            mocksvnclient.return_value.info.return_value = {'trunk': Mock(url=arch.svn)}
+            tasks.archive_save_hook('sender', arch, created=False, raw=None, using=None,
+                update_fields=[])
+            mocksvnclient.return_value.checkout.assert_not_called()
+            mocksvnclient.reset_mock()
+
+            # svn checkout changed - should checkout again
+            # - directory exists and svn info doesn't match the archive object svn
+            os.mkdir(arch.svn_local_path)
+            mocksvnclient.return_value.info.return_value = {'trunk': Mock(url='something else')}
+            tasks.archive_save_hook('sender', arch, created=False, raw=None, using=None,
+                update_fields=[])
+            mocksvnclient.return_value.checkout.assert_called_with(arch.svn,
+                arch.svn_local_path, 'HEAD')
 
 ### unit tests for django-admin manage commands
 

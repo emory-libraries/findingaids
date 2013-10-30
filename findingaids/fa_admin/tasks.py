@@ -97,11 +97,11 @@ def archive_save_hook(sender, instance, created, raw, using,
     updated = False
     if not created:
         # if path already exists, check if the svn url has changed
-        if os.path.isdir(archive.svn_local_path):
+        if os.path.isdir(instance.svn_local_path):
             client = svn_client()
-            svninfo = client.info(archive.svn_local_path, depth=0)
+            svninfo = client.info(instance.svn_local_path, depth=0)
             current_svn_url = svninfo[svninfo.keys()[0]].url
-            if current_svn_url != svn_url:
+            if current_svn_url != instance.svn:
                 updated = True
 
     if created or updated:
