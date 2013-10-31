@@ -71,7 +71,7 @@
 {% endif %}
 {% endif %}
 
-{% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
-  </div>
+{% if 'correspondence' in series.did.unittitle|format_ead|slugify and series.ead.origination_name.authfilenumber|default:'' %}
+  </div> <!-- close correspondence about -->
 {% endif %}
 

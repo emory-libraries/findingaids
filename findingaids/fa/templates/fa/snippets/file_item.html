@@ -23,13 +23,13 @@
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa|default:'' }}
           {{ component.did.note|format_ead_rdfa|default:'' }}
-
         {% else %}
           {{ component.did.unittitle|format_ead }}
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead|default:'' }}
           {{ component.did.note|format_ead|default:'' }}
         {% endif %}
+        {% if component.did.dao_list %}
         <div>
             {% for dao in component.did.dao_list %}
               {% if dao.audience != 'internal' %} {# audience = external or unset should be publicly viewable #}
@@ -39,6 +39,7 @@
               {% endif %}
             {% endfor %}
         </div>
+        {% endif %}
         {% if not rdfa_rel and component.unittitle_name %}
          </span></span>  {# end mentions, manuscript #}
         {% endif %}
