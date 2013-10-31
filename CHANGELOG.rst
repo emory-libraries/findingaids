@@ -8,6 +8,12 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.4.1
+-----
+
+* bugfix to correct PDF generation (broken in some cases due to template
+  changes relating to RDFa output)
+
 1.4 - RDFa
 ----------
 
