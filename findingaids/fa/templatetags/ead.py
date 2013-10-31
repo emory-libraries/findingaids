@@ -20,6 +20,7 @@ Custom template filters for converting EAD tags to HTML.
 
 from django import template
 from django.utils.html import conditional_escape
+from django.utils.http import urlquote
 from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
@@ -163,7 +164,9 @@ def format_nametag(node, default_role=None):
         elif node.get('source') == 'geonames':
             uri = 'http://sws.geonames.org/%s/' % authnum
         elif node.get('source') == 'dbpedia':
-            uri = 'http://dbpedia.org/resource/%s' % authnum
+            # escaping here because in some cases,
+            # dbpedia identifiers may include & or similiar (!)
+            uri = 'http://dbpedia.org/resource/%s' % urlquote(authnum)
 
         if uri is not None:
             about = ' about="%s"' % uri
