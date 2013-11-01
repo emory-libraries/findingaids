@@ -10,7 +10,7 @@
  <div id="tabs">
   <ul>
     {% for archive in archives %}
-      <li><a href="{% url 'fa-admin:files' archive.slug %}">{{ archive.label }}</a></li>
+      <li id="{{ archive.slug }}"><a href="{% url 'fa-admin:files' archive.slug %}">{{ archive.label }}</a></li>
     {% endfor %}
   </ul>
  </div>

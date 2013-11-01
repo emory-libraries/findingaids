@@ -35,6 +35,7 @@ class ArchivistTestCase(TestCase):
         theo = Archive(label='Theology', name='Papers', svn='https://svn.co/ead',
             slug='theo')
         theo.save()
+        # NOTE: consider making this a fixture?
 
         # no archives or order = empty list, no errors
         arc = Archivist(user=EmoryLDAPUser.objects.get(username='testadmin'))

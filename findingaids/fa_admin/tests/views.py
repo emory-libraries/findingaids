@@ -26,6 +26,7 @@ from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
 from eulexistdb.db import ExistDB
+from eullocal.django.emory_ldap.models import EmoryLDAPUser
 from eullocal.django.taskresult.models import TaskResult
 from eulexistdb.testutil import TestCase
 
@@ -251,6 +252,54 @@ class AdminViewsTest(BaseAdminViewsTest):
         # response = self.client.get(list_files)
         # self.assert_("check config file" in response.context['error'])
         # self.assertEqual(0, len(response.context['files'].object_list))
+
+    def test_archive_order(self):
+        arch = Archive(label='Manuscripts & Archives', slug='marbl',
+            svn='http://svn.example.com/ead/trunk')
+        arch.save()
+
+        order_url = reverse('fa-admin:archive-order')
+
+        # log in as an admin user
+        self.client.login(**self.credentials['admin'])
+        response = self.client.get(order_url)
+        code = response.status_code
+        expected = 405
+        self.assertEqual(code, expected,
+            'Expected %s (method not allowed) but returned %s for GET on %s'
+            % (expected, code, order_url))
+
+        # post with no data
+        response = self.client.post(order_url)
+        code = response.status_code
+        expected = 400
+        self.assertEqual(code, expected,
+            'Expected %s (bad request) but returned %s for POST on %s with no data'
+            % (expected, code, order_url))
+
+        # create some test archives to test ordering
+        marbl = Archive(label='MARBL', name='Manuscipts', svn='https://svn.co/ead',
+            slug='marbl')
+        marbl.save()
+        eua = Archive(label='EUA', name='Archives', svn='https://svn.co/ead',
+            slug='eua')
+        eua.save()
+        theo = Archive(label='Theology', name='Papers', svn='https://svn.co/ead',
+            slug='theo')
+        theo.save()
+
+        response = self.client.post(order_url, {'ids': '%s,%s' % (eua.slug, theo.slug)})
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected,
+            'Expected %s but returned %s for POST on %s with valid data'
+            % (expected, code, order_url))
+
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        # check that order was stored as expected
+        self.assertEqual('%d,%d' % (eua.id, theo.id), user.archivist.order)
+
+
 
 
     def test_preview(self):

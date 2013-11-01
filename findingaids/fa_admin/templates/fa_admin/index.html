@@ -15,7 +15,9 @@
     <script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script>
   $(function() {
-    $("#tabs").tabs({
+    var tabs = $("#tabs").tabs();
+    var csrftoken = $('input[name=csrfmiddlewaretoken').val();
+    tabs.tabs({
       beforeLoad: function( event, ui ) {
         ui.panel.html('Loading...');
         ui.jqXHR.error(function() {
@@ -23,6 +25,22 @@
         });
       }
     });
+    // make the tabs sortable
+    tabs.find(".ui-tabs-nav").sortable({
+      axis: "x",
+      stop: function() {
+        tabs.tabs( "refresh" );
+        var ids = tabs.find('li').map(function() { return this.id }).get();
+
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'fa-admin:archive-order' %}",
+          data: {'ids': ids.join()},
+          headers: {'X-CSRFTOKEN': csrftoken}
+        });
+      }
+    });
+
   });
 
   </script>
@@ -43,7 +61,6 @@
       {% endfor %}
       </ul>
   </div>
-
 {% endblock %}
 
 {% block content-body %} {# no permissions to do any finding aid tasks #}
@@ -65,6 +82,7 @@ give your account the appropriate permissions.</p>
 {% endif %}
 
 {% if perms.fa_admin.can_delete or perms.fa_admin.can_preview %}
+{% csrf_token %} {# make available for jquery post #}
  <div class="section">
   <h2>Manage documents</h2>
     <ul>

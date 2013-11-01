@@ -20,17 +20,21 @@ import difflib
 import logging
 from lxml.etree import XMLSyntaxError
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
+from django.http import HttpResponse, HttpResponseRedirect, \
+    HttpResponseServerError, Http404, HttpResponseBadRequest
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
+from django.views.decorators.http import require_POST
+
 
 from eulcommon.djangoextras.auth import permission_required_with_403
 from eulexistdb.db import ExistDB, ExistDBException
@@ -58,13 +62,14 @@ def main(request):
     most recently modified) to be previewed, published, or prepared for
     preview/publish.
     """
-    # get archive list based on user
-    if request.user.is_superuser:
-        archives = Archive.objects.all()
-    else:
-        try:
-            archives = request.user.archivist.archives.all()
-        except Archivist.DoesNotExist:
+    # get sorted archive list for this user
+    try:
+        archives = request.user.archivist.sorted_archives()
+    except ObjectDoesNotExist:
+        # i.e. no user -> archivist association
+        if request.user.is_superuser:
+            archives = Archive.objects.all()
+        else:
             archives = []
 
     # files for publication now loaded in jquery ui tab via ajax
@@ -89,8 +94,7 @@ def list_files(request, archive_id):
     files = files_to_publish(archive)
     # sort by last modified time
     files = sorted(files, key=lambda file: file.mtime, reverse=True)
-    paginator = Paginator(files, 10, orphans=5)
-    # paginator = Paginator(files, 30, orphans=5)
+    paginator = Paginator(files, 30, orphans=5)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -106,8 +110,33 @@ def list_files(request, archive_id):
         'files': recent_files,
         'show_pages': show_pages})
 
+@login_required
+@require_POST
+def archive_order(request):
+    # expect a comma-separated list of archive slugs
+    ids = request.POST.get('ids', None)
+    if not ids:
+        return HttpResponseBadRequest()
 
+    slugs = ids.split(',')
+    # find all archives matching any of the slugs passed in
+    archives = Archive.objects.filter(slug__in=slugs)
+    # re-sort according to the order in the request
+    archives = sorted(archives, key=lambda arch: slugs.index(arch.slug))
 
+    # save order to user account
+    try:
+        arc = request.user.archivist
+    except ObjectDoesNotExist:
+        # if for some reason user model does not have an archivist,
+        # create one so we can store the order preference
+        arc = Archivist()
+        request.user.archivist = arc
+
+    arc.order = ','.join([str(a.id) for a in archives])
+    request.user.archivist.save()
+
+    return HttpResponse('Updated order')
 
 
 @login_required
