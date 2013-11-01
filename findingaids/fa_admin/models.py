@@ -37,7 +37,7 @@ class Findingaids(models.Model):
 
 class Archivist(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    archives = models.ManyToManyField(Archive)
+    archives = models.ManyToManyField(Archive, blank=True, null=True)
 
 class EadFile:
     """Information about an EAD file available to be published or previewed."""

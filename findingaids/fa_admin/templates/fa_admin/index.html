@@ -5,8 +5,29 @@
 
 {% block style %}
   {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/style/redmond/jquery-ui-1.10.3.custom.min.css" />
    {% include 'taskresult/snippets/task_styles.html' %}
 {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script>
+  $(function() {
+    $("#tabs").tabs({
+      beforeLoad: function( event, ui ) {
+        ui.panel.html('Loading...');
+        ui.jqXHR.error(function() {
+          ui.panel.html('There was an error loading this content.');
+        });
+      }
+    });
+  });
+
+  </script>
+{% endblock %}
+
 
 {% block sidebar-left %}
   {{ block.super }}
@@ -17,13 +38,6 @@
       <ul>
       {% for r in task_results %}
       {% include 'taskresult/snippets/display_task.html' %}
-      {% comment %}
-        <li class="{{r.task.status|lower}}">{{ r.label }}
-            {% if r.eadid %}<a href="{% url 'fa:findingaid' id=r.eadid %}">{{ r.eadid }}</a>{% endif %}:
-            <span class="code">{{ r.task.status }}</span>
-            {% if r.task_end %}<div class="task_end">ended {{ r.task_end|timesince }} ago</div>{% endif %}
-            </li>
-            {% endcomment %}
       {% empty %}
         <li>No recent tasks.</li>
       {% endfor %}
@@ -33,7 +47,7 @@
 {% endblock %}
 
 {% block content-body %} {# no permissions to do any finding aid tasks #}
-{% if not perms.fa_admin.can_publish and not perms.fa_admin.can_preview and not perms.fa_admin.can_preview %}
+{% if not perms.fa_admin.can_publish and not perms.fa_admin.can_preview and not perms.fa_admin.can_preview or not archives%}
 <p>You don't have permission to do anything yet.  If you don't have the permissions
 you require to do your work, please contact a site administrator and ask them to
 give your account the appropriate permissions.</p>

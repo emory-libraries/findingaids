@@ -96,8 +96,11 @@ def archive_save_hook(sender, instance, created, raw, using,
     # check if an svn update or checkout is needed before queuing the task
     updated = False
     if not created:
+        # if directory doesn't exist, check it out
+        if not os.path.isdir(instance.svn_local_path):
+            updated = True
         # if path already exists, check if the svn url has changed
-        if os.path.isdir(instance.svn_local_path):
+        else:
             client = svn_client()
             svninfo = client.info(instance.svn_local_path, depth=0)
             current_svn_url = svninfo[svninfo.keys()[0]].url

@@ -18,7 +18,7 @@ from mock import patch
 import os
 import tempfile
 from shutil import rmtree
-from time import sleep
+import time
 
 from django.test import Client
 from django.conf import settings
@@ -29,8 +29,9 @@ from eulexistdb.db import ExistDB
 from eullocal.django.taskresult.models import TaskResult
 from eulexistdb.testutil import TestCase
 
-from findingaids.fa.models import Deleted
+from findingaids.fa.models import Deleted, Archive
 from findingaids.fa_admin import tasks, views
+from findingaids.fa_admin.models import EadFile
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
 
 ### unit tests for findingaids.fa_admin.views
@@ -62,7 +63,7 @@ class BaseAdminViewsTest(TestCase):
         for num in ['first', 'second', 'third']:
             self.tmpfiles.append(tempfile.NamedTemporaryFile(suffix='.xml',
                     prefix=num + '_', dir=self.tmpdir, delete=False))
-            sleep(1)        # ensure modification times are different
+            time.sleep(1)        # ensure modification times are different
         # add a non-xml file
         self.nonxml_tmpfile = tempfile.NamedTemporaryFile(suffix='.txt',
                     prefix='nonxml', dir=self.tmpdir, delete=False)
@@ -180,37 +181,77 @@ class AdminViewsTest(BaseAdminViewsTest):
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin'
                              % (expected, code, admin_index))
-        self.assertEqual(3, len(response.context['files'].object_list))
+
+        # file list now loaded in tabs via ajax
+
+    @patch('findingaids.fa_admin.views.files_to_publish')
+    def test_list_files(self, mockfilestopub):
+        # list of files is specific to an archive, so create a test one
+        arch = Archive(label='Manuscripts & Archives', slug='marbl',
+            svn='http://svn.example.com/ead/trunk')
+        arch.save()
+
+        list_files = reverse('fa-admin:files', kwargs={'archive_id': arch.slug})
+
+        # not logged in
+        response = self.client.get(list_files)
+        code = response.status_code
+        expected = 302
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as AnonymousUser'
+                             % (expected, code, list_files))
+
+        # log in as an admin user
+        self.client.login(**self.credentials['admin'])
+
+        # nonexistent archive should 404
+        bogus_list_files = reverse('fa-admin:files', kwargs={'archive_id': 'nonarchive'})
+        response = self.client.get(bogus_list_files)
+        self.assertEqual(response.status_code, 404)
+
+        # test actual results
+        now = time.time()
+        mockfiles = [
+            EadFile(filename='ead1.xml', modified=now, archive=arch),
+            EadFile(filename='ead2.xml', modified=now, archive=arch),
+            EadFile(filename='ead3.xml', modified=now, archive=arch),
+        ]
+        mockfilestopub.return_value = mockfiles
+        response = self.client.get(list_files)
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin'
+                             % (expected, code, list_files))
+        self.assertEqual(len(mockfiles), len(response.context['files'].object_list))
         self.assert_(response.context['show_pages'], "file list view includes list of pages to show")
-        self.assertEqual(None, response.context['error'],
-                "correctly configured file list view has no error messages")
-        self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
-        self.assertContains(response, os.path.basename(self.tmpfiles[2].name))
-        # file list contains buttons to publish documents
-        # TEMPORARY: suppressing publish on list documents to assess workflow
-        #publish_url = reverse('fa-admin:publish-ead')
-        #self.assertContains(response, '<form action="%s" method="post"' % publish_url)
-        #self.assertContains(response, '<button type="submit" name="filename" value="%s" '
-        #        % os.path.basename(self.tmpfiles[0].name))
         # file list contains buttons to preview documents
         preview_url = reverse('fa-admin:preview-ead')
         self.assertContains(response, '<form action="%s" method="post"' % preview_url)
-        self.assertContains(response, '<button type="submit" name="filename" value="%s" '
-                % os.path.basename(self.tmpfiles[0].name), 1)
-        # file list contains link to prep documents
-        prep_url = reverse('fa-admin:prep-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
-        self.assertContains(response, 'href="%s">PREP</a>' % prep_url)
+
+        for f in mockfiles:
+            # filename is listed
+            self.assertContains(response, f.filename)
+            # preview button is present
+            self.assertContains(response, '<button type="submit" name="filename" value="%s" '
+                % f.filename, 1)
+            # file list contains link to prep documents
+            prep_url = reverse('fa-admin:prep-ead-about',
+                args=[os.path.basename(f.filename)])
+            self.assertContains(response, 'href="%s?archive=%s">PREP</a>' %
+                (prep_url, f.archive.slug))
+
         # contains pagination
         self.assertPattern('Pages:\s*1', response.content)
 
         # TODO: test last published date / preview load date?
         # This will require eXist fixtures that match the temp files
 
-        # simulate configuration error
-        settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
-        response = self.client.get(admin_index)
-        self.assert_("check config file" in response.context['error'])
-        self.assertEqual(0, len(response.context['files'].object_list))
+        # # simulate configuration error
+        # settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
+        # response = self.client.get(list_files)
+        # self.assert_("check config file" in response.context['error'])
+        # self.assertEqual(0, len(response.context['files'].object_list))
+
 
     def test_preview(self):
         preview_url = reverse('fa-admin:preview-ead')
@@ -659,8 +700,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
-         % (expected, code, publish_url))
-        self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
+            % (expected, code, publish_url))
 
         fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
         # use fixture directory to test publication

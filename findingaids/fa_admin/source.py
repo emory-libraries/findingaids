@@ -59,11 +59,9 @@ def svn_xml_files(archive):
 
     return files
 
-def files_to_publish(archives=[]):
+def files_to_publish(archive=None):
 
-    if archives:
-        # only handle the first archive for now
-        archive = archives[0]
+    if archive:
         svn = svn_client()
         # update to make sure we have latest version of everything
         svn.update(str(archive.svn_local_path))   # apparently can't handle unicode

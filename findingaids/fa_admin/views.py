@@ -28,7 +28,7 @@ from django.contrib.auth.views import logout_then_login
 from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
+from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 
@@ -58,25 +58,39 @@ def main(request):
     most recently modified) to be previewed, published, or prepared for
     preview/publish.
     """
-    recent_files = []
-    show_pages = []
+    # get archive list based on user
+    if request.user.is_superuser:
+        archives = Archive.objects.all()
+    else:
+        try:
+            archives = request.user.archivist.archives.all()
+        except Archivist.DoesNotExist:
+            archives = []
 
-    # get svn url(s) from logged in user
-    try:
-        archives = request.user.archivist.archives.all()
-    except Archivist.DoesNotExist:
-        archives = []
+    # files for publication now loaded in jquery ui tab via ajax
 
-    error = None
-    try:
-        files = files_to_publish(archives)
-        # sort by last modified time
-        files = sorted(files, key=lambda file: file.mtime, reverse=True)
-    except Exception as err:
-        files = []
-        error = str(err)
+    # get the 10 most recent task results to display status
+    recent_tasks = TaskResult.objects.order_by('-created')[:10]
 
-    paginator = Paginator(files, 30, orphans=5)
+    return render(request, 'fa_admin/index.html', {
+        'archives': archives,
+        'task_results': recent_tasks})
+
+
+# TODO: require user associated with archive
+@login_required
+def list_files(request, archive_id):
+    '''List files associated with an archive to be prepped and previewed
+    for publication.  Expected to be retrieved via ajax and loaded in a
+    jquery ui tab, so only returns a partial html page without site theme.
+    '''
+    archive = get_object_or_404(Archive, slug=archive_id)
+
+    files = files_to_publish(archive)
+    # sort by last modified time
+    files = sorted(files, key=lambda file: file.mtime, reverse=True)
+    paginator = Paginator(files, 10, orphans=5)
+    # paginator = Paginator(files, 30, orphans=5)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -88,13 +102,12 @@ def main(request):
     except (EmptyPage, InvalidPage):
         recent_files = paginator.page(paginator.num_pages)
 
-    # get the 10 most recent task results to display status
-    recent_tasks = TaskResult.objects.order_by('-created')[:10]
-    return render_to_response('fa_admin/index.html', {'files': recent_files,
-                              'show_pages': show_pages,
-                              'error': error,
-                              'task_results': recent_tasks},
-                               context_instance=RequestContext(request))
+    return render(request, 'fa_admin/snippets/list_files_tab.html', {
+        'files': recent_files,
+        'show_pages': show_pages})
+
+
+
 
 
 @login_required
@@ -116,9 +129,8 @@ def list_staff(request):
     app, model = settings.AUTH_USER_MODEL.lower().split('.')
     change_url = 'admin:%s_%s_change' % (app, model)
 
-    return render_to_response('fa_admin/list-users.html',
-        {'users': users, 'user_change_url': change_url},
-        context_instance=RequestContext(request))
+    return render(request, 'fa_admin/list-users.html',
+        {'users': users, 'user_change_url': change_url})
 
 
 def _prepublication_check(request, filename, mode='publish', xml=None,
@@ -156,9 +168,8 @@ def _prepublication_check(request, filename, mode='publish', xml=None,
     errors = utils.check_ead(fullpath, dbpath, xml)
     if errors:
         ok = False
-        response = render_to_response('fa_admin/publish-errors.html',
-                {'errors': errors, 'filename': filename, 'mode': mode},
-                context_instance=RequestContext(request))
+        response = render(request, 'fa_admin/publish-errors.html',
+                {'errors': errors, 'filename': filename, 'mode': mode})
     else:
         ok = True
         response = None
@@ -260,9 +271,8 @@ def publish(request):
             # redirect to main admin page and display messages
             return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
         else:
-            return render_to_response('fa_admin/publish-errors.html',
-                {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e},
-                context_instance=RequestContext(request))
+            return render(request, 'fa_admin/publish-errors.html',
+                {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e})
     else:
         # if not POST, display list of files available for publication
         # for now, just using main admin page
@@ -300,15 +310,13 @@ def preview(request):
             # redirect to document preview page with code 303 (See Other)
             return HttpResponseSeeOtherRedirect(reverse('fa-admin:preview:findingaid', kwargs={'id': ead.eadid}))
         else:
-            return render_to_response('fa_admin/publish-errors.html',
-                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e},
-                    context_instance=RequestContext(request))
+            return render(request, 'fa_admin/publish-errors.html',
+                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e})
     else:
         fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
                             order_by='last_modified')
-        return render_to_response('fa_admin/preview_list.html',
-                {'findingaids': fa, 'querytime': [fa.queryTime()]},
-                context_instance=RequestContext(request))
+        return render(request, 'fa_admin/preview_list.html',
+                {'findingaids': fa, 'querytime': [fa.queryTime()]})
         return HttpResponse('preview placeholder- list of files to be added here')
 
 
@@ -416,11 +424,11 @@ def prepared_ead(request, filename, mode):
         errors = ['Something went wrong trying to load the specified document.',
                   prep_ead.content]     # pass along the output in case it is useful?
 
-    return render_to_response('fa_admin/prepared.html', {'filename': filename,
-                                'changes': changes, 'errors': errors,
-                                'xml_status': prep_ead.status_code,
-                                'archive_slug': archive_slug},
-                                context_instance=RequestContext(request))
+    return render(request, 'fa_admin/prepared.html', {
+        'filename': filename,
+        'changes': changes, 'errors': errors,
+        'xml_status': prep_ead.status_code,
+        'archive_slug': archive_slug})
 
 
 @login_required
@@ -430,9 +438,8 @@ def list_published(request):
     fa_subset, paginator = paginate_queryset(request, fa, per_page=30, orphans=5)
     show_pages = pages_to_show(paginator, fa_subset.number)
 
-    return render_to_response('fa_admin/published_list.html', {'findingaids': fa_subset,
-                              'querytime': [fa.queryTime()], 'show_pages': show_pages},
-                              context_instance=RequestContext(request))
+    return render(request, 'fa_admin/published_list.html', {'findingaids': fa_subset,
+        'querytime': [fa.queryTime()], 'show_pages': show_pages})
 
 
 @permission_required_with_403('fa_admin.can_delete')
@@ -482,9 +489,8 @@ def delete_ead(request, id):
                 render_form = True
 
         if render_form:
-            return render_to_response('fa_admin/delete.html',
-                                    {'fa': fa, 'form': delete_form},
-                                    context_instance=RequestContext(request))
+            return render(request, 'fa_admin/delete.html',
+                {'fa': fa, 'form': delete_form})
     except DoesNotExist:
         # requested finding aid was not found (on either GET or POST)
         messages.error(request, "Error: could not retrieve <b>%s</b> for deletion." % id)
