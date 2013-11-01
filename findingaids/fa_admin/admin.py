@@ -12,6 +12,7 @@ class ArchivistInline(admin.StackedInline):
     model = Archivist
     can_delete = False
     verbose_name_plural = 'archivist'
+    fields = ('archives', )
 
 # Define a new User admin
 class UserAdmin(EmoryLDAPUserAdmin):

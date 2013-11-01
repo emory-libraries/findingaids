@@ -38,6 +38,24 @@ class Findingaids(models.Model):
 class Archivist(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
     archives = models.ManyToManyField(Archive, blank=True, null=True)
+    order = models.CommaSeparatedIntegerField(max_length=255, blank=True,
+        null=True)
+
+    def sorted_archives(self):
+        '''List of archives this user is associated with, in order if
+        they have specified any order preference.'''
+        archives = self.archives.all()
+        # if no archives are explicitly defined and this is a superuser,
+        # give them access to all
+        if not archives and self.user.is_superuser:
+            archives = Archive.objects.all()
+        if self.order:
+            id_order = [int(id) for id in self.order.split(',')]
+            # if id is not present (e.g., new archive), sort to the end
+            return sorted(archives,
+                key=lambda a: id_order.index(a.id) if a.id in id_order else 50)
+
+        return archives
 
 class EadFile:
     """Information about an EAD file available to be published or previewed."""
