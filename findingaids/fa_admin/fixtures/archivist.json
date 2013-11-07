@@ -1,0 +1,16 @@
+[
+{
+  "pk": 1,
+  "model": "fa_admin.archivist",
+  "fields": {
+    "user": [
+      "marbl"
+    ],
+    "archives": [
+      1,
+      3
+    ],
+    "order": "3,1"
+  }
+}
+]

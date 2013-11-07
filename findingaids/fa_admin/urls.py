@@ -19,7 +19,7 @@ from findingaids.fa.urls import EADID_URL_REGEX, findingaid_urlpatterns
 
 urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^$', 'main', name="index"),
-    url(r'^files/(?P<archive_id>[a-z0-9]+)/', 'list_files', name='files'),
+    url(r'^files/(?P<archive>[a-z0-9]+)/', 'list_files', name='files'),
     url(r'^archives/order/', 'archive_order', name='archive-order'),
     url(r'^accounts/$', 'list_staff', name="list-staff"),
     url(r'^accounts/logout$', 'logout', name="logout"),

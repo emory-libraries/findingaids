@@ -26,7 +26,10 @@ import tempfile
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.core.urlresolvers import reverse
+from django.http import HttpRequest
 from django.test.utils import override_settings
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import AnonymousUser
 
 from eulexistdb.db import ExistDB, ExistDBException
 from eulexistdb.testutil import TestCase
@@ -35,7 +38,8 @@ from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
 from findingaids.fa.models import FindingAid, Archive
 from findingaids.fa.urls import TITLE_LETTERS
-from findingaids.fa_admin import tasks, utils
+from findingaids.fa_admin import tasks, utils, auth
+from findingaids.fa_admin.models import Archivist
 from findingaids.fa_admin.management.commands import prep_ead as prep_ead_cmd
 from findingaids.fa_admin.management.commands import unitid_identifier
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
@@ -748,3 +752,38 @@ class UnitidIdentifierCommandTest(TestCase):
         self.assertEqual(self.file_sizes['badlyformed.xml'],
                         os.path.getsize(self.files['badlyformed.xml']),
                     'file with errors not modified by unitid_identifier script')
+
+
+## tests for auth decorator
+
+class ArchiveAccessTest(TestCase):
+    fixtures = ['user', 'archives', 'archivist']
+
+    def test_access(self):
+
+        # anonymous - always denied
+        anon = AnonymousUser()
+        self.assertFalse(auth.archive_access(anon, 'marbl'))
+
+        # superuser - always allowed
+        testadmin = authenticate(username='testadmin', password='secret')
+        self.assertTrue(auth.archive_access(testadmin, 'marbl'))
+
+        # no associated archives
+        peon = authenticate(username='peon', password='peon')
+        self.assertFalse(auth.archive_access(peon, 'marbl'))
+
+        # associated with an archive
+        marbl = authenticate(username='marbl', password='marbl')
+        self.assertTrue(auth.archive_access(marbl, 'marbl'))
+        self.assertFalse(auth.archive_access(marbl, 'eua'))
+
+        # archive id from request
+        req = HttpRequest()
+        req.GET = {'archive': 'marbl'}
+        self.assertTrue(auth.archive_access(marbl, request=req))
+
+        # should raise an exception when archive is not specified as
+        # param or request param
+        self.assertRaises(Exception, auth.archive_access, marbl)
+

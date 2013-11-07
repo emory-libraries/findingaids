@@ -15,28 +15,27 @@
 #   limitations under the License.
 
 import os
-import glob
 import difflib
 import logging
 from lxml.etree import XMLSyntaxError
 
-from django.http import HttpResponse, HttpResponseRedirect, \
-    HttpResponseServerError, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseServerError, Http404, \
+    HttpResponseBadRequest
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
 from django.shortcuts import render, get_object_or_404
-from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_POST
 
 
-from eulcommon.djangoextras.auth import permission_required_with_403
+from eulcommon.djangoextras.auth import permission_required_with_403, \
+   login_required_with_ajax, user_passes_test_with_ajax
 from eulexistdb.db import ExistDB, ExistDBException
 from eulcommon.djangoextras.http import HttpResponseSeeOtherRedirect
 from eullocal.django.log import message_logging
@@ -46,8 +45,9 @@ from eulexistdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Deleted, Archive
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
+from findingaids.fa_admin.auth import archive_access
 from findingaids.fa_admin.forms import DeleteForm
-from findingaids.fa_admin.models import EadFile, Archivist
+from findingaids.fa_admin.models import Archivist
 from findingaids.fa_admin.source import files_to_publish
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
@@ -82,14 +82,16 @@ def main(request):
         'task_results': recent_tasks})
 
 
-# TODO: require user associated with archive
-@login_required
-def list_files(request, archive_id):
+# NOTE: viewing the file list sort of implies prep/preview/publish permissions
+# but currently does not actually *require* them
+@user_passes_test_with_ajax(archive_access)
+@login_required_with_ajax()
+def list_files(request, archive):
     '''List files associated with an archive to be prepped and previewed
     for publication.  Expected to be retrieved via ajax and loaded in a
     jquery ui tab, so only returns a partial html page without site theme.
     '''
-    archive = get_object_or_404(Archive, slug=archive_id)
+    archive = get_object_or_404(Archive, slug=archive)
 
     files = files_to_publish(archive)
     # sort by last modified time
@@ -110,10 +112,10 @@ def list_files(request, archive_id):
         'files': recent_files,
         'show_pages': show_pages})
 
-@login_required
 @require_POST
+@login_required_with_ajax()
 def archive_order(request):
-    # expect a comma-separated list of archive slugs
+    # expects a comma-separated list of archive slugs
     ids = request.POST.get('ids', None)
     if not ids:
         return HttpResponseBadRequest()
@@ -204,7 +206,7 @@ def _prepublication_check(request, filename, mode='publish', xml=None,
         response = None
     return [ok, response, dbpath, fullpath]
 
-
+# TODO: create variant decorator to check archive perms?
 @permission_required_with_403('fa_admin.can_publish')
 def publish(request):
     """
@@ -307,8 +309,8 @@ def publish(request):
         # for now, just using main admin page
         return main(request)
 
-
 @permission_required_with_403('fa_admin.can_preview')
+@user_passes_test_with_ajax(archive_access)
 def preview(request):
     if request.method == 'POST':
         filename = request.POST['filename']
@@ -351,7 +353,8 @@ def preview(request):
 
 @login_required
 @cache_page(1)  # cache this view and use it as source for prep diff/summary views
-def prepared_eadxml(request, filename, archive_slug=None):
+@user_passes_test_with_ajax(archive_access)
+def prepared_eadxml(request, filename, archive=None):
     """Serve out a prepared version of the EAD file in the configured EAD source
     directory.  Response header is set so the user should be prompted to download
     the xml, with a filename matching that of the original document.
@@ -363,10 +366,10 @@ def prepared_eadxml(request, filename, archive_slug=None):
         document will be pulled from the configured source directory.
     """
     # find relative to svn path if associated with an archive
-    if archive_slug is None:
-        archive_slug = request.GET.get('archive', None)
-    if archive_slug:
-        base_path = Archive.objects.get(slug=archive_slug).svn_local_path
+    if archive is None:
+        archive = request.GET.get('archive', None)
+    if archive:
+        base_path = Archive.objects.get(slug=archive).svn_local_path
     else:
         # otherwise fallback to single configured directory
         base_path = settings.FINDINGAID_EAD_SOURCE
@@ -391,8 +394,8 @@ def prepared_eadxml(request, filename, archive_slug=None):
     response['Content-Disposition'] = "attachment; filename=%s" % filename
     return response
 
-
 @login_required
+@user_passes_test_with_ajax(archive_access)
 def prepared_ead(request, filename, mode):
     """Display information about changes made by preparing an EAD file for
     publication.  If no changes are made, user will be redirected to main admin

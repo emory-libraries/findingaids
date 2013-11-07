@@ -1,0 +1,32 @@
+[
+{
+  "pk": 1,
+  "model": "fa.archive",
+  "fields": {
+    "svn": "https://svn.example.edu/svn/ead-marbl/trunk",
+    "slug": "marbl",
+    "name": "Manuscript, Archives, and Rare Book Library",
+    "label": "MARBL"
+  }
+},
+{
+  "pk": 2,
+  "model": "fa.archive",
+  "fields": {
+    "svn": "https://svn.example.edu/svn/ead-eua/trunk",
+    "slug": "eua",
+    "name": "Emory University Archives",
+    "label": "EUA"
+  }
+},
+{
+  "pk": 3,
+  "model": "fa.archive",
+  "fields": {
+    "svn": "https://svn.example.edu/svn/ead-pitts/trunk",
+    "slug": "pitts",
+    "name": "Pitts Theology Library",
+    "label": "Pitts"
+  }
+}
+]
