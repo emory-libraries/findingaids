@@ -84,8 +84,8 @@ def main(request):
 
 # NOTE: viewing the file list sort of implies prep/preview/publish permissions
 # but currently does not actually *require* them
-@user_passes_test_with_ajax(archive_access)
 @login_required_with_ajax()
+@user_passes_test_with_ajax(archive_access)
 def list_files(request, archive):
     '''List files associated with an archive to be prepped and previewed
     for publication.  Expected to be retrieved via ajax and loaded in a
@@ -343,6 +343,8 @@ def preview(request):
         else:
             return render(request, 'fa_admin/publish-errors.html',
                     {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e})
+
+    # TODO: preview list needs to either go away (not currently used) or be filtered by archive
     else:
         fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
                             order_by='last_modified')
