@@ -29,6 +29,16 @@ def archive_access(user, archive=None, *args, **kwargs):
     :returns: true if access is allowed, false if not
     :rtype: bool
     '''
+    # always false if user is not logged in
+    if not user.is_authenticated():
+        return False
+
+    # always allowed if user is superuser
+    # NOTE: even if archive is not specified or does not exist-
+    # allow, and let the view handle that logic
+    if user.is_superuser:
+        return True
+
     # check for request in kwargs in case we need it for archive info
     request = kwargs.get('request', None)
 
@@ -43,17 +53,9 @@ def archive_access(user, archive=None, *args, **kwargs):
     if archive is None:
         raise Exception('Archive not specified')
 
-    if not user.is_authenticated():
-        print '%s is anonymous' % user
-        return False
-
-    if user.is_superuser:
-        return True
-
     try:
         arc = user.archivist
     except ObjectDoesNotExist:
-        print '%s has no archives' % user
         return False
 
     if arc.archives.filter(slug=archive).count():
