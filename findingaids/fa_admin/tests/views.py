@@ -111,6 +111,15 @@ class BaseAdminViewsTest(TestCase):
 
 
 class AdminViewsTest(BaseAdminViewsTest):
+    # test for views that require eXist full-text index
+    exist_fixtures = {
+        'files': [
+            os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
+            ],
+        'index': settings.EXISTDB_INDEX_CONFIGFILE
+        # NOTE: full-text index required for published documents by archive
+        # could split out full-text specific tests if it gets too slow
+    }
 
     def setUp(self):
         # avoid testing difficulties with cached prep-eadxml view
@@ -138,8 +147,15 @@ class AdminViewsTest(BaseAdminViewsTest):
         # user with limited permissions - in findingaid group, associated with first archive
         self.client.login(**self.credentials['admin'])
         response = self.client.get(admin_index)
-        self.assertContains(response, reverse('fa-admin:list-published'),
-            msg_prefix='response for FA admin includes link to published docs')
+        self.assertNotContains(response, reverse('fa-admin:list-published'),
+            msg_prefix='response for non-superuser FA admin does not link to all published docs')
+
+        # archive-specific published lists only
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        for archive in user.archivist.archives.all():
+            self.assertContains(response, reverse('fa-admin:published-by-archive',
+                kwargs={'archive': archive.slug}),
+               msg_prefix='response for FA admin includes link to published docs for %s' % archive.slug)
         # TODO: resolve preview list view (going away? archive specific)
         # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}),
         #     msg_prefix='response for FA admin includes link to preview docs')
@@ -155,6 +171,8 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix='response for superuser includes link to list/edit staff')
         self.assertContains(response, reverse('admin:index'),
             msg_prefix='response for superuser includes link to django db admin')
+        self.assertContains(response, reverse('fa-admin:list-published'),
+            msg_prefix='response for superuser links to list of all published docs')
 
     def test_recent_files(self):
         admin_index = reverse('fa-admin:index')
@@ -256,7 +274,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         # self.assertEqual(0, len(response.context['files'].object_list))
 
     def test_archive_order(self):
-        arch = Archive.objects.get(slug='marbl')
         order_url = reverse('fa-admin:archive-order')
 
         # log in as an admin user
@@ -617,6 +634,25 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertPattern('Pages:\s*1', response.content,
             "response contains pagination")
 
+    def test_published_by_archive(self):
+        self.client.login(**self.credentials['admin'])
+
+        archive = Archive.objects.get(slug='marbl')
+        arch_published_url = reverse('fa-admin:published-by-archive',
+            kwargs={'archive': archive.slug})
+        response = self.client.get(arch_published_url)
+        self.assertContains(response, "Published Finding Aids for %s" % archive.name)
+
+        print response
+        fa = response.context['findingaids']
+
+        self.assert_(fa, "findingaids result is set in response context")
+        self.assertEqual(fa.object_list[0].eadid.value, 'hartsfield558',
+            "fixture document is included in findingaids object list")
+        self.assertPattern('Pages:\s*1', response.content,
+            "response contains pagination")
+
+
     def test_delete_ead(self):
         # login as admin to test admin-only feature
         self.client.login(**self.credentials['admin'])
@@ -631,6 +667,25 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # POST form data to trigger a deletion
         title, note = 'William Berry Hartsfield papers', 'Moved to another archive.'
+
+        # temporarily remove access to archive to test permission logic
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        marbl = Archive.objects.get(slug='marbl')
+        user.archivist.archives.remove(marbl)
+        user.save()
+        response = self.client.post(delete_url, {'eadid': eadid, 'title': title,
+                                    'note': note, 'date': '2010-07-01 15:01:20'}, follow=False)
+        code = response.status_code
+        expected = 302   # permission denied - currently redirects to login form (even if logged in)
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s for user without archive access'
+                         % (expected, code, delete_url))
+        # - the document should NOT have been removed from eXist
+        self.assertTrue(self.db.hasDocument('%s/%s.xml' % (settings.EXISTDB_TEST_COLLECTION, eadid)),
+            "document should be present in eXist collection when user has insufficient access for delete_ead")
+
+        # restore access
+        user.archivist.archives.add(marbl)
+        user.save()
         response = self.client.post(delete_url, {'eadid': eadid, 'title': title,
                                     'note': note, 'date': '2010-07-01 15:01:20'}, follow=True)
         # on success:
@@ -654,6 +709,9 @@ class AdminViewsTest(BaseAdminViewsTest):
                 "delete success message is set in response context")
 
         # test for expected failures for a non-existent eadid
+        # NOTE: logging in as superuser, because non-super admin will be denied
+        # based on lack of archive information
+        self.client.login(**self.credentials['superuser'])
         eadid = 'bogus-id'
         delete_nonexistent = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
         # GET - attempt to load form to delete an ead not present in eXist db

@@ -86,7 +86,16 @@ give your account the appropriate permissions.</p>
  <div class="section">
   <h2>Manage documents</h2>
     <ul>
-      <li><a href="{% url 'fa-admin:list-published' %}">Published documents</a></li>
+      <li><b>Published documents by archive:</b>
+          {% for archive in archives %}
+          <a href="{% url 'fa-admin:published-by-archive' archive.slug %}">{{ archive.label }}</a>
+          {% if not forloop.last %} | {% endif %}
+          {% endfor %}
+      </li>
+      {% if user.is_superuser %} {# others are allowed to see this list, but can't delete so probably not useful #}
+        <li><a href="{% url 'fa-admin:list-published' %}">all published documents</a>
+      {% endif %}
+
       {% if perms.fa_admin.can_preview %}
       {# FIXME: disabled until we can resolve what should be done with it #}
         {# <li><a href="{% url 'fa-admin:preview-ead' %}">Documents available for preview</a></li> #}

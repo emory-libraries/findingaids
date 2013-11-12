@@ -372,3 +372,9 @@ def exist_datetime_with_timezone(dt):
     # use the exist time and configured timezone to create a timezone-aware datetime
     return datetime(dt.year, dt.month, dt.day, dt.hour, dt.minute,
                     dt.second, dt.microsecond, tz)
+
+_normalize_ws_re = re.compile(r'\s+')
+
+
+def normalize_whitespace(txt):
+    return re.sub(_normalize_ws_re, ' ', txt)

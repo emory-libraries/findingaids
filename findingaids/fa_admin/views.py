@@ -45,7 +45,7 @@ from eulexistdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Deleted, Archive
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
-from findingaids.fa_admin.auth import archive_access
+from findingaids.fa_admin.auth import archive_access, archive_access_by_ead
 from findingaids.fa_admin.forms import DeleteForm
 from findingaids.fa_admin.models import Archivist
 from findingaids.fa_admin.source import files_to_publish
@@ -464,17 +464,23 @@ def prepared_ead(request, archive, filename, mode):
 
 
 @login_required
-def list_published(request):
-    """List all published EADs."""
+def list_published(request, archive=None):
+    """List all published EADs, optionally restricted to a single archive."""
     fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')
+    arch = None
+    if archive is not None:
+        arch = get_object_or_404(Archive, slug=archive)
+        # fa = fa.filter(repository=arch.name)
+        fa = fa.filter(repository__fulltext_terms='"%s"' % arch.name)
+
     fa_subset, paginator = paginate_queryset(request, fa, per_page=30, orphans=5)
     show_pages = pages_to_show(paginator, fa_subset.number)
 
     return render(request, 'fa_admin/published_list.html', {'findingaids': fa_subset,
-        'querytime': [fa.queryTime()], 'show_pages': show_pages})
-
+        'querytime': [fa.queryTime()], 'show_pages': show_pages, 'archive': arch})
 
 @permission_required_with_403('fa_admin.can_delete')
+@user_passes_test_with_ajax(archive_access_by_ead)
 def delete_ead(request, id):
     """ Delete a published EAD.
 

@@ -16,6 +16,11 @@
 
 from django.core.exceptions import ObjectDoesNotExist
 
+from eulexistdb.exceptions import DoesNotExist
+
+from findingaids.fa.models import FindingAid, Archive
+from findingaids.fa.utils import normalize_whitespace
+
 
 def archive_access(user, archive=None, *args, **kwargs):
     '''Check if a user has permission to take action (e.g., prep, preview, publish)
@@ -62,3 +67,30 @@ def archive_access(user, archive=None, *args, **kwargs):
         return True
 
     return False
+
+def archive_access_by_ead(user, id, *args, **kwargs):
+    '''Check if a user has permissions for a specific archive based on an
+    EAD document.  Expects an eadid, which will be used to determine what
+    Archive the document is associated with; then hands off
+    to :meth:`archive_access`.
+    '''
+    archive = None
+
+    try:
+        ead = FindingAid.objects.only('repository').get(eadid=id)
+
+        if ead.repository:
+            # NOTE: for some reason the partial return doesn't get normalized
+            # normalize it here to ensure we get a match
+            archive_name = normalize_whitespace(ead.repository[0])
+            try:
+                archive = Archive.objects.get(name=archive_name).slug
+            except ObjectDoesNotExist:
+                pass
+
+    except DoesNotExist:
+        pass
+
+    # hand off even if archive couldn't be determined - logic for non-admin
+    # and superuser will still be accurate & useful
+    return archive_access(user, archive, *args, **kwargs)
