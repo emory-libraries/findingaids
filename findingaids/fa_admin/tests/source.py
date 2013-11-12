@@ -110,16 +110,4 @@ class FilesToPublishTest(TestCase):
         mocksvnfiles.assert_called_with(arch)
         self.assertEqual(mocksvnfiles.return_value, result)
 
-        # fallback logic
-        # NOTE: not sure how to simulate setting not present with override/patch
-        with override_settings(FINDINGAID_EAD_SOURCE='/tmp/not/really/there'):
-            self.assertRaises(Exception, files_to_publish)
-
-        with override_settings(FINDINGAID_EAD_SOURCE=self.tmpdir):
-            with patch('findingaids.fa_admin.source.recent_xml_files') as mockrecent:
-                mockrecent.return_value = ['one', 'two', 'three']
-                result = files_to_publish()
-                self.assertEqual(result, mockrecent.return_value)
-                mockrecent.assert_called_with(self.tmpdir)
-
 

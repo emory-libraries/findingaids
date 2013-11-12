@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/management/commands/prep_ead.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,8 +25,9 @@ from django.conf import settings
 from eulexistdb.db import ExistDB
 from eulxml.xmlmap.core import load_xmlobject_from_file
 
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Archive
 from findingaids.fa_admin import utils
+from findingaids.fa_admin.svn import svn_client
 
 class Command(BaseCommand):
     """Prepare all or specified EAD xml files in the configured source directory.
@@ -36,44 +37,43 @@ to be published, verifies that the resulting EAD is valid and passes all
 checks, and if so, updates the original file with the new, prepared EAD xml.
 
 If filenames are specified as arguments, only those files will be prepared.
-Files should be specified by basename only (assumed to be in the configured
-EAD source directory). Otherwise, all .xml files in the configured EAD source
-directory will be prepared."""
+Files should be specified by full path. Otherwise, all .xml files in each of
+the defined Archives will be prepared."""
     help = __doc__
 
     args = '[<filename filename ... >]'
-    
+
     # django default verbosity level options --  1 = normal, 0 = minimal, 2 = all
     v_normal = 1
     v_all = 2
 
     def handle(self, *args, **options):
-        verbosity = int(options['verbosity'])        
+        verbosity = int(options['verbosity'])
 
         self._setup_logging(verbosity)
-       
+
         # check for required settings
         if not hasattr(settings, 'EXISTDB_ROOT_COLLECTION') or not settings.EXISTDB_ROOT_COLLECTION:
             raise CommandError("EXISTDB_ROOT_COLLECTION setting is missing")
             return
-        if not hasattr(settings, 'FINDINGAID_EAD_SOURCE') or not settings.FINDINGAID_EAD_SOURCE:
-            raise CommandError("FINDINGAID_EAD_SOURCE setting is missing")
-            return
+
 
         if verbosity == self.v_all:
-            print "Preparing documents from configured EAD source directory: %s" \
-                    % settings.FINDINGAID_EAD_SOURCE
+            print "Preparing documents from all defined Archives"
 
         updated = 0
         unchanged = 0
         errored = 0
 
         if len(args):
-            files = [os.path.join(settings.FINDINGAID_EAD_SOURCE, name) for name in args]
+            files = args
         else:
-            files = glob.iglob(os.path.join(settings.FINDINGAID_EAD_SOURCE, '*.xml'))
-            self.db = ExistDB()
-
+            files = set()
+            svn = svn_client()
+            for archive in Archive.objects.all():
+                # update to make sure we have latest version of everything
+                svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
+                files.update(set(glob.iglob(os.path.join(archive.svn_local_path, '*.xml'))))
 
         for file in files:
             try:
@@ -122,7 +122,7 @@ directory will be prepared."""
 
         # remove the local log handler
         self.logger.removeHandler(self._sh)
-            
+
 
     def _setup_logging(self, verbosity):
         # generate ark method logs warnings & info if existing ARKs are found

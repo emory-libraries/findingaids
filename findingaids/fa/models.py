@@ -133,7 +133,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     subject = xmlmap.StringField('.//e:controlaccess')
 
     # local repository *subarea* - e.g., MARBL, University Archives
-    repository = xmlmap.StringListField('.//e:subarea')
+    repository = xmlmap.StringListField('.//e:subarea', normalize=True)
 
     # boosted fields in the index: must be searched to get proper relevance score
     boostfields = xmlmap.StringField('.//e:titleproper | .//e:origination | \

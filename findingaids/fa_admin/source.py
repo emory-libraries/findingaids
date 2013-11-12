@@ -59,28 +59,12 @@ def svn_xml_files(archive):
 
     return files
 
-def files_to_publish(archive=None):
+def files_to_publish(archive):
 
-    if archive:
-        svn = svn_client()
-        # update to make sure we have latest version of everything
-        svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
-        # returns a list of revisions
-        # NOTE: might be nice to log current revision if we know it has changed
-        # return list of recent xml files from the svn
-        return svn_xml_files(archive)
-
-    # NOTE: trying to preserve fall-back behavior that allows publication
-    # from a single configured directory; however, as the admin
-    # page changes this may be difficult to maintain
-
-    if not hasattr(settings, 'FINDINGAID_EAD_SOURCE'):
-        raise Exception('Please configure EAD source directory in local settings.')
-    else:
-        dir = settings.FINDINGAID_EAD_SOURCE
-        if os.access(dir, os.F_OK | os.R_OK):
-            return recent_xml_files(dir)
-        else:
-            msg = '''EAD source directory '%s' does not exist or is
-            not readable; please check config file.''' % dir
-            raise Exception(msg)
+    svn = svn_client()
+    # update to make sure we have latest version of everything
+    svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
+    # returns a list of revisions
+    # NOTE: might be nice to log current revision if we know it has changed
+    # return list of recent xml files from the svn
+    return svn_xml_files(archive)

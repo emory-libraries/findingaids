@@ -15,7 +15,7 @@
 {% endif %}
 
 {% if xml_status == 200 %} {# only display diffs / download if prep xml can be generated #}
-<p><a href="{% url 'fa-admin:prep-ead-diff' filename %}" target="_blank">View file differences line by line.</a></p>
+<p><a href="{% url 'fa-admin:prep-ead-diff' archive_slug filename %}" target="_blank">View file differences line by line.</a></p>
 
 <div class="diff">
 {% for c in changes %}
@@ -24,7 +24,7 @@
 </div>
 
 <hr/> {# provide a link to prep xml after differences have been reviewed #}
-<p><a href="{% url 'fa-admin:prep-ead' filename %}{% if archive_slug %}?archive={{ archive_slug }}{% endif %}"
+<p><a href="{% url 'fa-admin:prep-ead' archive_slug filename %}"
       class="admin-action">DOWNLOAD</a></p>
 
 <p>Download and save the prepared version of {{ filename }}.<br/>

@@ -412,6 +412,7 @@ Upgrade Notes
   on debian/ubuntu systems).
 * Configure subversion admin user and base working directory in localsettings.py
   with **SVN_USERNAME**, **SVN_PASSWORD**, and **SVN_WORKING_DIR**
+* Remove **FINDINGAID_EAD_SOURCE** from localsettings since it is no longer used.
 * Celery daemons should be restarted to pick up a newly added celery task.
 
 

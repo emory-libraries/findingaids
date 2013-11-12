@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/management/commands/unitid_identifier.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,8 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
 from eulxml.xmlmap.core import load_xmlobject_from_file
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Archive
+from findingaids.fa_admin.svn import svn_client
 
 class Command(BaseCommand):
     """Populate the top-level unitid identifier attribute with a machine-readable
@@ -36,7 +37,7 @@ directory will be prepared."""
     help = __doc__
 
     args = '[<filename filename ... >]'
-    
+
     help = __doc__
 
     # text unitid looks something like this:
@@ -48,23 +49,22 @@ directory will be prepared."""
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
 
-        # check for required settings
-        if not hasattr(settings, 'FINDINGAID_EAD_SOURCE') or not settings.FINDINGAID_EAD_SOURCE:
-            raise CommandError("FINDINGAID_EAD_SOURCE setting is missing")
-            return
-
         if verbosity > v_normal:
-            print "Preparing documents from configured EAD source directory: %s" \
-                    % settings.FINDINGAID_EAD_SOURCE
+            print "Preparing documents from all defined Archives"
 
         updated = 0
         unchanged = 0
         errored = 0
 
         if len(args):
-            files = [os.path.join(settings.FINDINGAID_EAD_SOURCE, name) for name in args]
+            files = args
         else:
-            files = glob.iglob(os.path.join(settings.FINDINGAID_EAD_SOURCE, '*.xml'))
+            files = set()
+            svn = svn_client()
+            for archive in Archive.objects.all():
+                # update to make sure we have latest version of everything
+                svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
+                files.update(set(glob.iglob(os.path.join(archive.svn_local_path, '*.xml'))))
 
         for file in files:
             try:
@@ -76,7 +76,7 @@ directory will be prepared."""
                 if not match:
                     raise Exception('Could not determine collection number for %s - %s' % \
                             (file, unitid))
-                            
+
                 collection_num = match.group('number')
                 if verbosity > v_normal:
                     print "Identifier for %s is %s (%s)" % (file, collection_num, unitid)

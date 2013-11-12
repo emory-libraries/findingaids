@@ -88,7 +88,8 @@ give your account the appropriate permissions.</p>
     <ul>
       <li><a href="{% url 'fa-admin:list-published' %}">Published documents</a></li>
       {% if perms.fa_admin.can_preview %}
-        <li><a href="{% url 'fa-admin:preview-ead' %}">Documents available for preview</a></li>
+      {# FIXME: disabled until we can resolve what should be done with it #}
+        {# <li><a href="{% url 'fa-admin:preview-ead' %}">Documents available for preview</a></li> #}
       {% endif %}
   </ul>
  </div>

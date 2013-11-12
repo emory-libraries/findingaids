@@ -108,8 +108,6 @@ SVN_USERNAME = ''
 SVN_PASSWORD = ''
 SVN_WORKING_DIR = ''
 
-# local, full-path location for finding aids to be loaded to eXist via admin interface
-FINDINGAID_EAD_SOURCE = '/mnt/entity/staff/Special Collections/EADXML/FinishedMARBL'
 # default text for links to digital archival objects
 #DEFAULT_DAO_LINK_TEXT = '[Resource available online]'
 

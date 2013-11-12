@@ -164,8 +164,7 @@ def list_staff(request):
         {'users': users, 'user_change_url': change_url})
 
 
-def _prepublication_check(request, filename, mode='publish', xml=None,
-        archive_slug=None):
+def _prepublication_check(request, filename, archive, mode='publish', xml=None):
     """
     Pre-publication check logic common to :meth:`publish` and :meth:`preview`.
 
@@ -177,7 +176,10 @@ def _prepublication_check(request, filename, mode='publish', xml=None,
 
     :param request: request object passed into the view (for generating error response)
     :param filename: base filename of the ead file to be checked
+    :param archive: :class:`~findingaids.fa.models.Archive`, used to locate
+        the file on disk
     :param mode: optional mode, for display on error page (defaults to publish)
+
     :rtype: list
     :returns: list of the following:
       - boolean ok (if True, all checks passed)
@@ -186,14 +188,8 @@ def _prepublication_check(request, filename, mode='publish', xml=None,
       - fullpath - full path to the file in the configured source directory
     """
 
-    if archive_slug is not None:
-        base_path = Archive.objects.get(slug=archive_slug).svn_local_path
-    else:
-        # otherwise fallback to single configured directory
-        base_path = settings.FINDINGAID_EAD_SOURCE
-
     # full path to the local file
-    fullpath = os.path.join(base_path, filename)
+    fullpath = os.path.join(archive.svn_local_path, filename)
     # full path in exist db collection
     dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
     errors = utils.check_ead(fullpath, dbpath, xml)
@@ -237,22 +233,39 @@ def publish(request):
         ead_docname = get_findingaid(id, preview=True, only=['document_name'])
         filename = ead_docname.document_name
     except Http404:     # not found in exist
-        ead = None
         messages.error(request,
             "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
 
-    if ead is None:
         # if ead could not be retrieved from preview mode, skip processing
         return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
+    # determine archive this ead is associated with
+
     xml = ead.serialize()
+    archive = None
+    if not ead.repository:
+        messages.error(request,
+            '''Publish failed. Could not determine which archive <b>%s</b> belongs to.
+            Please update subarea, reload, and try again.''' % id)
+    else:
+        archive_name = ead.repository[0]
+        try:
+            archive = Archive.objects.get(name=archive_name)
+        except ObjectDoesNotExist:
+            messages.error(request,
+            '''Publish failed. Could not find archive <b>%s</b>.''' % archive_name)
+
+    # bail out if archive could not be identified
+    if archive is None:
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
+
 
     # TODO: check that user is allowed to publish the document
     # - will have to be based on subarea
 
     errors = []
     try:
-        ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
+        ok, response, dbpath, fullpath = _prepublication_check(request, filename, archive, xml=xml)
         if ok is not True:
             # publication check failed - do not publish
             return response
@@ -299,17 +312,18 @@ def publish(request):
 
 @permission_required_with_403('fa_admin.can_preview')
 @user_passes_test_with_ajax(archive_access)
-def preview(request):
+def preview(request, archive):
     if request.method == 'POST':
+
+        archive = get_object_or_404(Archive, slug=archive)
         filename = request.POST['filename']
-        archive_slug = request.POST.get('archive', None)
 
         errors = []
 
         try:
             # only load to exist if document passes publication check
-            ok, response, dbpath, fullpath = _prepublication_check(request, filename, mode='preview',
-                archive_slug=archive_slug)
+            ok, response, dbpath, fullpath = _prepublication_check(request, filename,
+                archive, mode='preview')
             if ok is not True:
                 return response
 
@@ -345,7 +359,7 @@ def preview(request):
 @login_required
 @cache_page(1)  # cache this view and use it as source for prep diff/summary views
 @user_passes_test_with_ajax(archive_access)
-def prepared_eadxml(request, filename, archive=None):
+def prepared_eadxml(request, archive, filename):
     """Serve out a prepared version of the EAD file in the configured EAD source
     directory.  Response header is set so the user should be prompted to download
     the xml, with a filename matching that of the original document.
@@ -357,15 +371,8 @@ def prepared_eadxml(request, filename, archive=None):
         document will be pulled from the configured source directory.
     """
     # find relative to svn path if associated with an archive
-    if archive is None:
-        archive = request.GET.get('archive', None)
-    if archive:
-        base_path = Archive.objects.get(slug=archive).svn_local_path
-    else:
-        # otherwise fallback to single configured directory
-        base_path = settings.FINDINGAID_EAD_SOURCE
-
-    fullpath = os.path.join(base_path, filename)
+    arch = get_object_or_404(Archive, slug=archive)
+    fullpath = os.path.join(arch.svn_local_path, filename)
     try:
         ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
     except XMLSyntaxError, e:
@@ -387,7 +394,7 @@ def prepared_eadxml(request, filename, archive=None):
 
 @login_required
 @user_passes_test_with_ajax(archive_access)
-def prepared_ead(request, filename, mode):
+def prepared_ead(request, archive, filename, mode):
     """Display information about changes made by preparing an EAD file for
     publication.  If no changes are made, user will be redirected to main admin
     page with a message to that effect.
@@ -405,18 +412,13 @@ def prepared_ead(request, filename, mode):
     """
 
     # determine full path based on archive / svn
-    archive_slug = request.GET.get('archive', None)
-    if archive_slug:
-        base_path = Archive.objects.get(slug=archive_slug).svn_local_path
-    else:
-        # otherwise fallback to single configured directory
-        base_path = settings.FINDINGAID_EAD_SOURCE
-
-    fullpath = os.path.join(base_path, filename)
+    arch = Archive.objects.get(slug=archive)
+    # arch = get_object_or_404(Archive, slug=archive)
+    fullpath = os.path.join(arch.svn_local_path, filename)
     changes = []
 
     # TODO: expire cache if file has changed since prepped eadxml was cached
-    prep_ead = prepared_eadxml(request, filename, archive_slug)
+    prep_ead = prepared_eadxml(request, arch.slug, filename)
 
     if prep_ead.status_code == 200:
         orig_ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
@@ -451,7 +453,7 @@ def prepared_ead(request, filename, mode):
         'filename': filename,
         'changes': changes, 'errors': errors,
         'xml_status': prep_ead.status_code,
-        'archive_slug': archive_slug})
+        'archive_slug': arch.slug})
 
 
 @login_required

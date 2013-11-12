@@ -592,21 +592,16 @@ class TestCommand(BaseCommand):
 class PrepEadTestCommand(prep_ead_cmd.Command, TestCommand):
     pass
 
-
+@override_settings(PIDMAN_PASSWORD='this-better-not-be-a-real-password')
 class PrepEadCommandTest(TestCase):
+    fixtures = ['archives']
+
     def setUp(self):
         self.command = PrepEadTestCommand()
-        # store settings that may be changed/removed by tests
-        self._ead_src = settings.FINDINGAID_EAD_SOURCE
-        self._existdb_root = settings.EXISTDB_ROOT_COLLECTION
-        self._pidman_pwd = settings.PIDMAN_PASSWORD
-
         self.tmpdir = tempfile.mkdtemp(prefix='findingaids-prep_ead-test')
-        settings.FINDINGAID_EAD_SOURCE = self.tmpdir
-
-        settings.PIDMAN_PASSWORD = 'this-better-not-be-a-real-password'
 
         # temporarily replace pid client with mock for testing
+        # TODO: use mock/patch instead
         self._django_pid_client = prep_ead_cmd.utils.DjangoPidmanRestClient
         prep_ead_cmd.utils.DjangoPidmanRestClient = MockDjangoPidmanClient
 
@@ -619,32 +614,28 @@ class PrepEadCommandTest(TestCase):
             copyfile(os.path.join(fixture_dir, file), self.files[file])
             self.file_sizes[file] = os.path.getsize(self.files[file])
 
+        # grab an arbitrary archive from the fixture
+        self.archive = Archive.objects.all()[0]
+
     def tearDown(self):
         # remove any files created in temporary test staging dir
         rmtree(self.tmpdir)
-        # restore real settings
-        settings.FINDINGAID_EAD_SOURCE = self._ead_src
-        settings.EXISTDB_ROOT_COLLECTION = self._existdb_root
-        settings.PIDMAN_PASSWORD = self._pidman_pwd
 
         MockDjangoPidmanClient.search_result = MockDjangoPidmanClient.search_result_nomatches
         prep_ead_cmd.utils.DjangoPidmanRestClient = self._django_pid_client
 
-    def test_missing_ead_source_setting(self):
-        del(settings.FINDINGAID_EAD_SOURCE)
-        self.assertRaises(CommandError, self.command.handle, verbosity=0)
-
     def test_missing_existdb_setting(self):
-        del(settings.EXISTDB_ROOT_COLLECTION)
-        self.assertRaises(CommandError, self.command.handle, verbosity=0)
+        with override_settings(EXISTDB_ROOT_COLLECTION=None):
+            self.assertRaises(CommandError, self.command.handle, verbosity=0)
 
     def test_prep_all(self):
         # force ark generation error
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
 
         # with no filenames - should process all files
-        self.command.run_command('-v', '2')
-        output = self.command.output
+        with patch('findingaids.fa.models.Archive.svn_local_path', self.tmpdir):
+            self.command.run_command('-v', '2')
+            output = self.command.output
 
         # badly-formed xml - should be reported
         self.assert_(re.search(r'^Error.*badlyformed.xml.*not well-formed.*$', output, re.MULTILINE),
@@ -669,10 +660,12 @@ class PrepEadCommandTest(TestCase):
         copyfile(os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
                  hfield_copy)
         self.file_sizes['hartsfield558-2.xml'] = os.path.getsize(hfield_copy)
+        filename = os.path.join(self.tmpdir, 'hartsfield558.xml')
 
         # process a single file
-        self.command.run_command('hartsfield558.xml')
-        output = self.command.output
+        with patch('findingaids.fa.models.Archive.svn_local_path', self.tmpdir):
+            self.command.run_command(filename)
+            output = self.command.output
 
         self.assert_('1 document updated' in output)
         self.assert_('0 documents unchanged' in output)
@@ -698,9 +691,10 @@ class PrepEadCommandTest(TestCase):
         }
 
         # run on a single file where ark generation will be attempted
-        self.command.run_command('hartsfield558_invalid.xml')
+        filename = os.path.join(self.tmpdir, 'hartsfield558_invalid.xml')
+        with patch('findingaids.fa.models.Archive.svn_local_path', self.tmpdir):
+            self.command.run_command(filename)
         output = self.command.output
-
         self.assert_('WARNING: Found 2 ARKs' in output)
         self.assert_('INFO: Using existing ARK' in output)
 
@@ -710,13 +704,11 @@ class UnitidIdentifierTestCommand(unitid_identifier.Command, TestCommand):
 
 
 class UnitidIdentifierCommandTest(TestCase):
+    fixtures = ['archives']
+
     def setUp(self):
         self.command = UnitidIdentifierTestCommand()
-        # store settings that may be changed/removed by tests
-        self._ead_src = settings.FINDINGAID_EAD_SOURCE
-
         self.tmpdir = tempfile.mkdtemp(prefix='findingaids-unitid_identifier-test')
-        settings.FINDINGAID_EAD_SOURCE = self.tmpdir
 
         self.files = {}
         self.file_sizes = {}    # store file sizes to check modification
@@ -727,16 +719,18 @@ class UnitidIdentifierCommandTest(TestCase):
             copyfile(os.path.join(fixture_dir, file), self.files[file])
             self.file_sizes[file] = os.path.getsize(self.files[file])
 
+        # grab an arbitrary archive from the fixture
+        self.archive = Archive.objects.all()[0]
+
     def tearDown(self):
         # remove any files created in temporary test staging dir
         rmtree(self.tmpdir)
-        # restore real settings
-        settings.FINDINGAID_EAD_SOURCE = self._ead_src
 
     def test_run(self):
         # process all files
-        self.command.run_command('-v', '2')
-        output = self.command.output
+        with patch('findingaids.fa.models.Archive.svn_local_path', self.tmpdir):
+            self.command.run_command('-v', '2')
+            output = self.command.output
 
         # check that correct unitid identifier was set
         ead = load_xmlobject_from_file(self.files['hartsfield558.xml'], FindingAid)

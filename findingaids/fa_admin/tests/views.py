@@ -61,6 +61,7 @@ class BaseAdminViewsTest(TestCase):
         # create temporary directory with files for testing
         # - turning off auto-delete so directory and files can be easily cleaned up
         self.tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
+
         self.tmpfiles = []
         for num in ['first', 'second', 'third']:
             self.tmpfiles.append(tempfile.NamedTemporaryFile(suffix='.xml',
@@ -70,11 +71,7 @@ class BaseAdminViewsTest(TestCase):
         self.nonxml_tmpfile = tempfile.NamedTemporaryFile(suffix='.txt',
                     prefix='nonxml', dir=self.tmpdir, delete=False)
 
-        # temporarily override setting for testing
-        if hasattr(settings, 'FINDINGAID_EAD_SOURCE'):
-            self._stored_ead_src = settings.FINDINGAID_EAD_SOURCE
-        settings.FINDINGAID_EAD_SOURCE = self.tmpdir
-
+        # FIXME: use override_settings instead
         # save the exist collection configs for restoring
         # (some tests changes to simulate an eXist save error)
         self.real_collection = settings.EXISTDB_ROOT_COLLECTION
@@ -94,9 +91,6 @@ class BaseAdminViewsTest(TestCase):
         views.utils.DjangoPidmanRestClient = MockDjangoPidmanClient
 
     def tearDown(self):
-        if hasattr(self, '_stored_ead_src'):
-            settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
-
         # clean up temp files & dir
         rmtree(self.tmpdir)
 
@@ -132,20 +126,22 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix='response for user with no permissions includes appropriate message')
         self.assertContains(response, reverse('fa-admin:list-published'), 0,
             msg_prefix='response for user with no permissions does not include link to published docs')
-        self.assertContains(response, reverse('fa-admin:preview-ead'), 0,
-            msg_prefix='response for user with no permissions does not include link to preview docs')
+        # TODO: resolve preview list view (going away? archive specific)
+        # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}), 0,
+        #     msg_prefix='response for user with no permissions does not include link to preview docs')
         self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
             msg_prefix='response for user with no permissions does not include link to list/edit staff')
         self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
             msg_prefix='response for user with no permissions does not include link to django db admin')
 
-        # user with limited permissions - in findingaid group
+        # user with limited permissions - in findingaid group, associated with first archive
         self.client.login(**self.credentials['admin'])
         response = self.client.get(admin_index)
         self.assertContains(response, reverse('fa-admin:list-published'),
             msg_prefix='response for FA admin includes link to published docs')
-        self.assertContains(response, reverse('fa-admin:preview-ead'),
-            msg_prefix='response for FA admin includes link to preview docs')
+        # TODO: resolve preview list view (going away? archive specific)
+        # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}),
+        #     msg_prefix='response for FA admin includes link to preview docs')
         self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
             msg_prefix='response for (non super) FA admin does not include link to list/edit staff')
         self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
@@ -229,7 +225,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(len(mockfiles), len(response.context['files'].object_list))
         self.assert_(response.context['show_pages'], "file list view includes list of pages to show")
         # file list contains buttons to preview documents
-        preview_url = reverse('fa-admin:preview-ead')
+        preview_url = reverse('fa-admin:preview-ead', kwargs={'archive': arch.slug})
         self.assertContains(response, '<form action="%s" method="post"' % preview_url)
 
         for f in mockfiles:
@@ -240,9 +236,11 @@ class AdminViewsTest(BaseAdminViewsTest):
                 % f.filename, 1)
             # file list contains link to prep documents
             prep_url = reverse('fa-admin:prep-ead-about',
-                args=[os.path.basename(f.filename)])
-            self.assertContains(response, 'href="%s?archive=%s">PREP</a>' %
-                (prep_url, f.archive.slug))
+                kwargs={
+                    'filename': os.path.basename(f.filename),
+                    'archive': f.archive.slug
+                })
+            self.assertContains(response, 'href="%s">PREP</a>' % prep_url)
 
         # contains pagination
         self.assertPattern('Pages:\s*1', response.content)
@@ -294,8 +292,8 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual('%d,%d' % (eua.id, theo.id), user.archivist.order)
 
     def test_preview(self):
-        preview_url = reverse('fa-admin:preview-ead')
         arch = Archive.objects.all()[0]
+        preview_url = reverse('fa-admin:preview-ead', kwargs={'archive': arch.slug})
         self.client.login(**self.credentials['admin'])
 
         # use fixture directory to test preview
@@ -350,8 +348,8 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # preview invalid document - should display errors
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.post(preview_url, {'filename': 'hartsfield558_invalid.xml',
-                'archive': arch.slug})
+            response = self.client.post(preview_url, {'filename': 'hartsfield558_invalid.xml'})
+
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
@@ -380,27 +378,31 @@ class AdminViewsTest(BaseAdminViewsTest):
         # ensure guest account cannot update
         self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-update')
 
+        fake_collection = '/bogus/doesntexist'
         with override_settings(EXISTDB_SERVER_USER=None,
                                EXISTDB_SERVER_PASSWORD=None,
-                               EXISTDB_PREVIEW_COLLECTION='/bogus/doesntexist'):
-            response = self.client.post(preview_url, {'filename': 'hartsfield558.xml',
-                'archive': arch.slug})
+                               EXISTDB_PREVIEW_COLLECTION=fake_collection):
+            with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+                response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
+
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "not allowed to write to collection",
+        print response
+        self.assertContains(response, "Collection %s not found" % fake_collection,
                 msg_prefix="error page displays specific eXist permission message")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
         with override_settings(EXISTDB_SERVER_URL='http://localhost:9191/not-exist',
             EXISTDB_TIMEOUT=150):
-        # with patch.object(settings, 'EXISTDB_TIMEOUT', new=150):
-            response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
-            self.assertContains(response, "Could not preview")
-            self.assertContains(response, "Database Error",
-                    msg_prefix="error page displays explanation and instructions to user")
-            self.assertContains(response, "I/O Error: Connection refused",
-                    msg_prefix="error page displays specific connection error message")
+            with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+                response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
+
+        self.assertContains(response, "Could not preview")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "I/O Error: Connection refused",
+                msg_prefix="error page displays specific connection error message")
 
     def test_logout(self):
         admin_logout = reverse('fa-admin:logout')
@@ -426,13 +428,14 @@ class AdminViewsTest(BaseAdminViewsTest):
         filename = 'hartsfield558.xml'
         fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
 
-        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
-        prep_diff = reverse('fa-admin:prep-ead-diff', args=[filename])
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs=url_args)
+        prep_diff = reverse('fa-admin:prep-ead-diff', kwargs=url_args)
 
         self.client.login(**self.credentials['admin'])
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_summary, {'archive': arch.slug})
+            response = self.client.get(prep_summary)
 
         code = response.status_code
         expected = 200
@@ -452,7 +455,7 @@ class AdminViewsTest(BaseAdminViewsTest):
                             msg_prefix="prepared EAD summary should link to xml download")
 
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_diff, {'archive': arch.slug})
+            response = self.client.get(prep_diff)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
@@ -461,7 +464,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, '<table')
 
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_xml, {'archive': arch.slug})
+            response = self.client.get(prep_xml)
         expected = 200
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, prep_xml))
@@ -484,9 +487,10 @@ class AdminViewsTest(BaseAdminViewsTest):
         filename = 'abbey244.xml'
         fixture_dir = os.path.join(settings.BASE_DIR, 'fa', 'tests', 'fixtures')
 
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs={'filename': filename,
+            'archive': arch.slug})
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_summary, {'archive': arch.slug}, follow=True)
+            response = self.client.get(prep_summary, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (following redirects, prep EAD)'
@@ -503,10 +507,11 @@ class AdminViewsTest(BaseAdminViewsTest):
         # prep an ead that needs an ARK, force ark generation error
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
         filename = 'bailey807.xml'
-        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs=url_args)
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_summary, {'archive': arch.slug}, follow=True)
+            response = self.client.get(prep_summary, follow=True)
         # summary should be 200, display prep error
         code = response.status_code
         expected = 200  # final code, after following redirects
@@ -518,7 +523,7 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_xml, {'archive': arch.slug})
+            response = self.client.get(prep_xml)
         expected = 500
         self.assertEqual(response.status_code, expected,
             'Expected %s but returned %s for %s (prep ead, ARK generation error)' % \
@@ -538,15 +543,17 @@ class AdminViewsTest(BaseAdminViewsTest):
         }
         # use django test client to login and setup session
         self.client.login(**self.credentials['admin'])
-        arch = Archive.objects.all()[0]
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        arch = user.archivist.archives.all()[0]
 
         # use a fixture that does not have an ARK
         filename = 'bailey807.xml'
         fixture_dir = os.path.join(settings.BASE_DIR, 'fa',
             'tests', 'fixtures')
-        prep_url = reverse('fa-admin:prep-ead-about', kwargs={'filename': filename})
+        prep_url = reverse('fa-admin:prep-ead-about',
+           kwargs={'filename': filename, 'archive': arch.slug})
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_url, {'archive': arch.slug})
+            response = self.client.get(prep_url)
 
         # retrieve messages from the request
         msgs = [unicode(m) for m in response.context['messages']
@@ -565,19 +572,20 @@ class AdminViewsTest(BaseAdminViewsTest):
         filename = 'badlyformed.xml'
         fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
 
-        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
-        prep_diff = reverse('fa-admin:prep-ead-diff', args=[filename])
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs=url_args)
+        prep_diff = reverse('fa-admin:prep-ead-diff', kwargs=url_args)
 
         self.client.login(**self.credentials['admin'])
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_xml, {'archive': arch.slug})
+            response = self.client.get(prep_xml)
         expected = 500
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s (non-well-formed xml)' % \
                         (expected, response.status_code, prep_summary))
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.get(prep_summary, {'archive': arch.slug})
+            response = self.client.get(prep_summary)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
@@ -775,8 +783,8 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         filename = 'hartsfield558.xml'
         # override archive svn working path to use fixture dir to load preview
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.post(reverse('fa-admin:preview-ead'),
-                {'filename': filename, 'archive': 'marbl'})
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': filename})
 
         # publish the preview file
         document_id = 'hartsfield558'
@@ -825,8 +833,8 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # force an exist save error by setting collection to a non-existent collection
         # - load to preview for next three tests
         with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-            response = self.client.post(reverse('fa-admin:preview-ead'),
-                {'filename': filename, 'archive': 'marbl'})
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': filename})
 
         # publish to non-existent collection
         with override_settings(EXISTDB_ROOT_COLLECTION='/bogus/doesntexist'):
