@@ -31,6 +31,8 @@ urlpatterns = patterns(
     '',
     url(r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt',
         content_type='text/plain')),
+    (r'^favicon\.ico$', RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)),
+
     # url(r'^robots\.txt$', direct_to_template, {
     #     'template': 'robots.txt', 'mimetype': 'text/plain'
     #     }),
