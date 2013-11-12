@@ -30,8 +30,9 @@ from eulexistdb.db import ExistDB
 from eullocal.django.emory_ldap.models import EmoryLDAPUser
 from eullocal.django.taskresult.models import TaskResult
 from eulexistdb.testutil import TestCase
+from eulxml.xmlmap import load_xmlobject_from_file
 
-from findingaids.fa.models import Deleted, Archive
+from findingaids.fa.models import Deleted, Archive, FindingAid
 from findingaids.fa_admin import tasks, views
 from findingaids.fa_admin.models import EadFile
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
@@ -388,7 +389,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        print response
         self.assertContains(response, "Collection %s not found" % fake_collection,
                 msg_prefix="error page displays specific eXist permission message")
 
@@ -866,3 +866,48 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
 
         # NOTE: formerly included test for exist not running, but not testable
         # because publish now requires preview database be accessible
+
+        # test user who doesn't have permissions on the archive
+        filename = 'hartsfield558.xml'
+        # load to preview
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': filename}, follow=True)
+
+        # update user to remove marbl access
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        marbl = Archive.objects.get(slug='marbl')
+        user.archivist.archives.remove(marbl)
+        user.save()
+        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('You do not have permission to publish' in msgs[0],
+            'user should see a message if they don\'t have access to publish')
+
+        # test archive not identified from ead (subarea/name mismatch)
+        marbl.name = 'Manuscripts & Archives'
+        marbl.save()
+        user.archivist.archives.add(marbl)
+        user.save()
+        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Publish failed. Could not find archive' in msgs[0],
+            'user should see a message if the EAD subarea doesn\'t match a configured archive')
+
+        # test subarea not specified in ead
+        self.tmpdir = tempfile.mkdtemp('fa-publish')
+        # load fixture and save elsewhere without a subarea
+        ead = load_xmlobject_from_file(os.path.join(fixture_dir, 'hartsfield558.xml'),
+                                       FindingAid)
+        del ead.repository[0]
+        with open(os.path.join(self.tmpdir, 'hartsfield558.xml'), 'w') as xmlfile:
+            ead.serializeDocument(xmlfile, pretty=True)
+        # load to preview
+        with patch('findingaids.fa.models.Archive.svn_local_path', self.tmpdir):
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': 'hartsfield558.xml'}, follow=True)
+        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Could not determine which archive' in msgs[0],
+            'user should see an error message if the EAD has no subarea present')
+

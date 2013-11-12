@@ -234,7 +234,8 @@ def publish(request):
         filename = ead_docname.document_name
     except Http404:     # not found in exist
         messages.error(request,
-            "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
+            '''Publish failed. Could not retrieve <b>%s</b> from preview collection.
+            Please reload and try again.''' % id)
 
         # if ead could not be retrieved from preview mode, skip processing
         return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
@@ -249,6 +250,8 @@ def publish(request):
             Please update subarea, reload, and try again.''' % id)
     else:
         archive_name = ead.repository[0]
+        # NOTE: EAD supports multiple subarea tags, but in practice we only
+        # use one, so it should be safe to assume the first should be used for permissions
         try:
             archive = Archive.objects.get(name=archive_name)
         except ObjectDoesNotExist:
@@ -259,9 +262,13 @@ def publish(request):
     if archive is None:
         return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
+    # check that user is allowed to publish this document
+    if not archive_access(request.user, archive.slug):
+        messages.error(request,
+            '''You do not have permission to publish <b>%s</b> materials.''' \
+            % archive.label)
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
-    # TODO: check that user is allowed to publish the document
-    # - will have to be based on subarea
 
     errors = []
     try:
