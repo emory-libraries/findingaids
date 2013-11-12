@@ -23,14 +23,6 @@
             </form>
             {% endif %}
         </td>
-{% comment %} publish temporarily disabled while assessing workflow (publish from preview only)
-        <td>
-            {% if perms.fa_admin.can_publish %}
-            <form action="{% url 'fa-admin:publish-ead' %}" method="post">{% csrf_token %}
-                <button type="submit" name="filename" value="{{ file.filename }}" class="admin-action">PUBLISH</button>
-            </form>
-            {% endif %}
-        </td> {% endcomment %}
         <td>{{ file.modified|date }}</td>
         <td>{{ file.published|date|default:'' }}</td>
         <td>{{ file.previewed|date|default:'' }}</td>

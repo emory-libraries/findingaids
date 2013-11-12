@@ -206,8 +206,8 @@ def _prepublication_check(request, filename, mode='publish', xml=None,
         response = None
     return [ok, response, dbpath, fullpath]
 
-# TODO: create variant decorator to check archive perms?
 @permission_required_with_403('fa_admin.can_publish')
+@require_POST
 def publish(request):
     """
     Admin publication form.  Allows publishing an EAD file by updating or adding
@@ -220,94 +220,82 @@ def publish(request):
     the site.  If publish is successful, redirects the user to main admin page
     with a success message that links to the published document on the site.
     If the sanity-check fails, displays a page with any problems found.
-
-    On GET, displays a list of files available for publication.
     """
-    if request.method == 'POST':
-        if 'filename' in request.POST:
-            publish_mode = 'file'
-            filename = request.POST['filename']
-            xml = None
+    # formerly supported publish from filename, but now only supports
+    # publish from preview
+    if 'preview_id' not in request.POST:
+        messages.error(request, "No preview document specified for publication")
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
-        elif 'preview_id' in request.POST:
-            publish_mode = 'preview'
-            id = request.POST['preview_id']
+    id = request.POST['preview_id']
 
-            # retrieve info about the document from preview collection
-            try:
-                # because of the way eulcore.existdb.queryset constructs returns with 'also' fields,
-                # it is simpler and better to retrieve document name separately
-                ead = get_findingaid(id, preview=True)
-                ead_docname = get_findingaid(id, preview=True, only=['document_name'])
-                filename = ead_docname.document_name
-            except Http404:     # not found in exist
-                ead = None
-                messages.error(request,
-                    "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
+    # retrieve info about the document from preview collection
+    try:
+        # because of the way eulcore.existdb.queryset constructs returns with 'also' fields,
+        # it is simpler and better to retrieve document name separately
+        ead = get_findingaid(id, preview=True)
+        ead_docname = get_findingaid(id, preview=True, only=['document_name'])
+        filename = ead_docname.document_name
+    except Http404:     # not found in exist
+        ead = None
+        messages.error(request,
+            "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
 
-            if ead is None:
-                # if ead could not be retrieved from preview mode, skip processing
-                return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
+    if ead is None:
+        # if ead could not be retrieved from preview mode, skip processing
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
-            xml = ead.serialize()
+    xml = ead.serialize()
 
-        errors = []
+    # TODO: check that user is allowed to publish the document
+    # - will have to be based on subarea
+
+    errors = []
+    try:
+        ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
+        if ok is not True:
+            # publication check failed - do not publish
+            return response
+
+        # only load to exist if there are no errors found
+        db = ExistDB()
+        # get information to determine if an existing file is being replaced
+        replaced = db.describeDocument(dbpath)
+
         try:
-            ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
-            if ok is not True:
-                # publication check failed - do not publish
-                return response
-
-            # only load to exist if there are no errors found
-            db = ExistDB()
-            # get information to determine if an existing file is being replaced
-            replaced = db.describeDocument(dbpath)
-
-            if publish_mode == 'file':
-                # load the document to the configured collection in eXist with the same fileneame
-                success = db.load(open(fullpath, 'r'), dbpath, overwrite=True)
-                # load the file as a FindingAid object so we can generate a url to the document
-                ead = load_xmlobject_from_file(fullpath, FindingAid)
-
-            elif publish_mode == 'preview' and ead is not None:
-                try:
-                    # move the document from preview collection to configured public collection
-                    success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
-                            settings.EXISTDB_ROOT_COLLECTION, filename)
-                    # FindingAid instance ead already set above
-                except ExistDBException, e:
-                    # special-case error message
-                    errors.append("Failed to move document %s from preview collection to main collection." \
-                                    % filename)
-                    # re-raise and let outer exception handling take care of it
-                    raise e
-
+            # move the document from preview collection to configured public collection
+            success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
+                    settings.EXISTDB_ROOT_COLLECTION, filename)
+            # FindingAid instance ead already set above
         except ExistDBException, e:
-            errors.append(e.message())
-            success = False
+            # special-case error message
+            errors.append("Failed to move document %s from preview collection to main collection." \
+                            % filename)
+            # re-raise and let outer exception handling take care of it
+            raise e
 
-        if success:
-            # request the cache to reload the PDF - queue asynchronous task
-            result = reload_cached_pdf.delay(ead.eadid.value)
-            task = TaskResult(label='PDF reload', object_id=ead.eadid.value,
-                url=reverse('fa:findingaid', kwargs={'id': ead.eadid.value}),
-                task_id=result.task_id)
-            task.save()
+    except ExistDBException, e:
+        errors.append(e.message())
+        success = False
 
-            ead_url = reverse('fa:findingaid', kwargs={'id': ead.eadid.value})
-            change = "updated" if replaced else "added"
-            messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
-                    % (change, filename, ead_url, unicode(ead.unittitle)))
+    if success:
+        # request the cache to reload the PDF - queue asynchronous task
+        result = reload_cached_pdf.delay(ead.eadid.value)
+        task = TaskResult(label='PDF reload', object_id=ead.eadid.value,
+            url=reverse('fa:findingaid', kwargs={'id': ead.eadid.value}),
+            task_id=result.task_id)
+        task.save()
 
-            # redirect to main admin page and display messages
-            return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
-        else:
-            return render(request, 'fa_admin/publish-errors.html',
-                {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e})
+        ead_url = reverse('fa:findingaid', kwargs={'id': ead.eadid.value})
+        change = "updated" if replaced else "added"
+        messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
+                % (change, filename, ead_url, unicode(ead.unittitle)))
+
+        # redirect to main admin page and display messages
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
     else:
-        # if not POST, display list of files available for publication
-        # for now, just using main admin page
-        return main(request)
+        return render(request, 'fa_admin/publish-errors.html',
+            {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e})
 
 @permission_required_with_403('fa_admin.can_preview')
 @user_passes_test_with_ajax(archive_access)
@@ -344,7 +332,8 @@ def preview(request):
             return render(request, 'fa_admin/publish-errors.html',
                     {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e})
 
-    # TODO: preview list needs to either go away (not currently used) or be filtered by archive
+    # TODO: preview list needs to either go away (not currently used)
+    # or be filtered by archive
     else:
         fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
                             order_by='last_modified')

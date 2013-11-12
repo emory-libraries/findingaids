@@ -8,6 +8,11 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.5
+---
+
+* Support for publish from local files is removed (only publish from preview)
+
 1.4.1
 -----
 
