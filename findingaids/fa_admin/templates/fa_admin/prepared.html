@@ -15,7 +15,7 @@
 {% endif %}
 
 {% if xml_status == 200 %} {# only display diffs / download if prep xml can be generated #}
-<p><a href="{% url 'fa-admin:prep-ead-diff' archive_slug filename %}" target="_blank">View file differences line by line.</a></p>
+<p><a href="{% url 'fa-admin:prep-ead-diff' archive.slug filename %}" target="_blank">View file differences line by line.</a></p>
 
 <div class="diff">
 {% for c in changes %}
@@ -24,11 +24,15 @@
 </div>
 
 <hr/> {# provide a link to prep xml after differences have been reviewed #}
-<p><a href="{% url 'fa-admin:prep-ead' archive_slug filename %}"
-      class="admin-action">DOWNLOAD</a></p>
+<div>
+    <p>Accept these changes and commit the prepared version of <b>{{ filename }}</b>
+     to the subversion repository for <b>{{ archive.name }}</b>.<br/>
+    <form action="{% url 'fa-admin:prep-ead' archive.slug filename %}" method="post">
+        {% csrf_token %}
+        <input type="submit" class="admin-action" value="SAVE CHANGES"/>
+    </form>
+</div>
 
-<p>Download and save the prepared version of {{ filename }}.<br/>
-    <i>Recommended:</i> right-click and choose <i>Save link as...</i>.</p>
 
 {% else %}
 

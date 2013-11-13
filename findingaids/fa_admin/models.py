@@ -33,6 +33,7 @@ class Findingaids(models.Model):
                 ("can_publish", "Can publish a finding aid"),
                 ("can_preview", "Can preview a finding aid"),
                 ("can_delete", "Can delete a finding aid"),
+                ("can_prepare", "Can prepare a finding aid"),
         )
 
 class Archivist(models.Model):

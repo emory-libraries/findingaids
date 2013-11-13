@@ -6,7 +6,8 @@
         "permissions": [
             ["can_delete", "fa_admin", "findingaids"],
             ["can_preview", "fa_admin", "findingaids"],
-            ["can_publish", "fa_admin", "findingaids"]
+            ["can_publish", "fa_admin", "findingaids"],
+            ["can_prepare", "fa_admin", "findingaids"]
         ]
     }
 }]

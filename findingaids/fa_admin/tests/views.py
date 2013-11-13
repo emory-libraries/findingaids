@@ -14,10 +14,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import filecmp
 from mock import patch
 import os
 import tempfile
-from shutil import rmtree
+from shutil import rmtree, copyfile
 import time
 
 from django.test import Client
@@ -545,6 +546,46 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(response.status_code, expected,
             'Expected %s but returned %s for %s (prep ead, ARK generation error)' % \
             (expected, response.status_code, prep_xml))
+
+        # use POST to prep-ead to save changes in subversion
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        filename = 'hartsfield558.xml'
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        # copy into a temp dir since the view will modify the file
+        tmpdir = tempfile.mkdtemp('fa-prep')
+        copy, fixture = os.path.join(fixture_dir, filename), os.path.join(tmpdir, filename)
+        copyfile(copy, fixture)
+
+        with patch('findingaids.fa.models.Archive.svn_local_path', tmpdir):
+            with patch('findingaids.fa_admin.views.svn_client') as svn_client:
+                # simulate successful commit
+                svn_client.return_value.commit.return_value = (8, '2013-11-13T18:19:00.191382Z', 'keep')
+                response = self.client.post(prep_xml, follow=True)
+
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Committed changes ' in msgs[0])
+        # check that file has been modified
+        self.assertFalse(filecmp.cmp(copy, fixture),
+            'prepared file should have been modified')
+
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(redirect_url.endswith(reverse('fa-admin:index')),
+            "response should redirect to main admin page")
+
+       # simulate commit with no changes
+        with patch('findingaids.fa.models.Archive.svn_local_path', tmpdir):
+            with patch('findingaids.fa_admin.views.svn_client') as svn_client:
+                svn_client.return_value.commit.return_value = None
+                response = self.client.post(prep_xml, follow=True)
+
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('No changes to commit ' in msgs[0])
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(redirect_url.endswith(reverse('fa-admin:index')),
+            "response should redirect to main admin page even if no changes are committed")
+
+
 
     @patch('findingaids.fa_admin.utils.DjangoPidmanRestClient')
     def test_prep_ark_messages(self, mockpidclient):

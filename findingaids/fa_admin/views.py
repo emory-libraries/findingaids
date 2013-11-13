@@ -49,6 +49,7 @@ from findingaids.fa_admin.auth import archive_access, archive_access_by_ead
 from findingaids.fa_admin.forms import DeleteForm
 from findingaids.fa_admin.models import Archivist
 from findingaids.fa_admin.source import files_to_publish
+from findingaids.fa_admin.svn import svn_client
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
 
@@ -360,16 +361,20 @@ def preview(request, archive):
                             order_by='last_modified')
         return render(request, 'fa_admin/preview_list.html',
                 {'findingaids': fa, 'querytime': [fa.queryTime()]})
-        return HttpResponse('preview placeholder- list of files to be added here')
 
 
-@login_required
+@permission_required_with_403('fa_admin.can_prepare')
 @cache_page(1)  # cache this view and use it as source for prep diff/summary views
 @user_passes_test_with_ajax(archive_access)
 def prepared_eadxml(request, archive, filename):
-    """Serve out a prepared version of the EAD file in the configured EAD source
-    directory.  Response header is set so the user should be prompted to download
-    the xml, with a filename matching that of the original document.
+    """On GET, serves out a prepared version of the EAD file in the specified
+    archive subversion directory. Response header is set so the user should
+    be prompted to download the xml, with a filename matching that of
+    the original document.
+
+    On POST, commits the prepared version of the EAD file to the subversion
+    directory of the specified archive, with a log message indicating the user
+    who requested the commit.
 
     Steps taken to prepare a document are documented in
     :meth:`~findingaids.fa_admin.utils.prep_ead`.
@@ -393,13 +398,44 @@ def prepared_eadxml(request, archive, filename):
             # any exception on prep is most likely ark generation
             return HttpResponseServerError('Failed to prep the document: ' + str(e))
 
-    prepped_xml = ead.serializeDocument()
+    # on GET, display the xml and make available for download
+    if request.method == 'GET':
+        prepped_xml = ead.serializeDocument()
+        response = HttpResponse(prepped_xml, mimetype='application/xml')
+        response['Content-Disposition'] = "attachment; filename=%s" % filename
+        return response
 
-    response = HttpResponse(prepped_xml, mimetype='application/xml')
-    response['Content-Disposition'] = "attachment; filename=%s" % filename
-    return response
+    # on POST, save to file and commit to subversion
+    if request.method == 'POST':
+        file_path = os.path.join(arch.svn_local_path, filename)
+        with open(file_path, 'w') as xmlfile:
+            ead.serializeDocument(xmlfile)  # FIXME: pretty print?
 
-@login_required
+        svn = svn_client()
+        # seems to be the only way to set a commit log message via client
+        def get_log_message(arg):
+            # argument looks something like this:
+            # [('foo', 'https://svn.library.emory.edu/svn/dev_ead-eua/trunk/eua0081affirmationvietnam.xml', 6, None, 4)]
+            # ignoring since we will only use this function for a single commit
+            return 'prepared EAD via FindingAids website admin, saved on behalf of %s' % request.user
+
+        svn.log_msg_func = get_log_message
+        saved = svn.commit(str(file_path))  # has to be string and not unicode
+        # commit returns something like this on success:
+        # (8, '2013-11-13T18:19:00.191382Z', 'keep')
+        # revision number, date, user
+        # returns nothing if there were no changes to commit
+
+        if saved:
+            messages.success(request, 'Committed changes to <b>%s</b>.' % filename)
+        else:
+            messages.info(request, 'No changes to commit for <b>%s</b>.' % filename)
+
+        # either way, redirect to main admin page with code 303 (See Other)
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
+
+
+@permission_required_with_403('fa_admin.can_prepare')
 @user_passes_test_with_ajax(archive_access)
 def prepared_ead(request, archive, filename, mode):
     """Display information about changes made by preparing an EAD file for
@@ -460,7 +496,7 @@ def prepared_ead(request, archive, filename, mode):
         'filename': filename,
         'changes': changes, 'errors': errors,
         'xml_status': prep_ead.status_code,
-        'archive_slug': arch.slug})
+        'archive': arch})
 
 
 @login_required
