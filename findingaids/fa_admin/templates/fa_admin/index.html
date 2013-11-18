@@ -15,7 +15,9 @@
     <script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script>
   $(function() {
-    var tabs = $("#tabs").tabs();
+    var tabs = $("#tabs").tabs({
+      active: {{ current_tab }}
+    });
     var csrftoken = $('input[name=csrfmiddlewaretoken]').val();
     tabs.tabs({
       beforeLoad: function( event, ui ) {
@@ -23,6 +25,15 @@
         ui.jqXHR.error(function() {
           ui.panel.html('There was an error loading this content.');
         });
+      },
+      activate: function(event, ui) {
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'fa-admin:current-archive' %}",
+          data: {'id': $(ui.newTab).index()},
+          headers: {'X-CSRFTOKEN': csrftoken}
+        });
+
       }
     });
     // make the tabs sortable
@@ -31,7 +42,7 @@
       stop: function() {
         tabs.tabs( "refresh" );
         var ids = tabs.find('li').map(function() { return this.id }).get();
-
+        {# on sort, post so we can save order preference #}
         $.ajax({
           type: 'POST',
           url: "{% url 'fa-admin:archive-order' %}",

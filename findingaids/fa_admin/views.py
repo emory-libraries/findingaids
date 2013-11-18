@@ -73,6 +73,9 @@ def main(request):
         else:
             archives = []
 
+    # get current tab if set in session; default to first tab
+    current_tab = request.session.get('active_admin_tab', 0)
+
     # files for publication now loaded in jquery ui tab via ajax
 
     # get the 10 most recent task results to display status
@@ -80,6 +83,7 @@ def main(request):
 
     return render(request, 'fa_admin/index.html', {
         'archives': archives,
+        'current_tab': current_tab,
         'task_results': recent_tasks})
 
 
@@ -141,12 +145,26 @@ def archive_order(request):
 
     return HttpResponse('Updated order')
 
+@require_POST
+@login_required_with_ajax()
+def current_archive(request):
+    # Store the cerrently active archive tab in the main admin page,
+    # so it can be automatically reloaded when returning there.
+    # Expects a numeric id for the index of the tab to be active.
+    tab_id = request.POST.get('id', None)
+    if not tab_id:
+        return HttpResponseBadRequest()
+    request.session['active_admin_tab'] = tab_id
+    return HttpResponse('Saved current tab')
+
 
 @login_required
 def logout(request):
     """Admin Logout view. Displays a message and then calls
     :meth:`django.contrib.auth.views.logout_then_login`.
     """
+    # make sure we reset any admin tab selection
+    del request.session['active_admin_tab']
     messages.success(request, 'You are now logged out.')
     return logout_then_login(request)
 
