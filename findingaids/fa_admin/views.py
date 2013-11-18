@@ -164,7 +164,8 @@ def logout(request):
     :meth:`django.contrib.auth.views.logout_then_login`.
     """
     # make sure we reset any admin tab selection
-    del request.session['active_admin_tab']
+    if 'active_admin_tab' in request.session:
+        del request.session['active_admin_tab']
     messages.success(request, 'You are now logged out.')
     return logout_then_login(request)
 

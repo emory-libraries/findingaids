@@ -699,7 +699,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.client.login(**self.credentials['admin'])
 
         eadid = 'hartsfield558'
-        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
+        # use archive-specific delete form for non-superuser admin
+        delete_url = reverse('fa-admin:delete-ead-by-archive',
+            kwargs={'id': eadid, 'archive': 'marbl'})
         # GET - should display delete form with eadid & title from document
         response = self.client.get(delete_url)
         self.assertEqual(eadid, unicode(response.context['form']['eadid'].value()))
@@ -740,8 +742,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(note, deleted_info.note, "deleted record has posted note")
         # - the user should be redirected with a success message
         (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(redirect_url.endswith(reverse('fa-admin:list-published')),
-            "response redirects to list of published documents")
+        self.assert_(redirect_url.endswith(reverse('fa-admin:published-by-archive',
+            kwargs={'archive': 'marbl'})),
+            "response redirects to archive-specific list of published documents")
         expected = 303      # redirect - see other
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST)'
                              % (expected, code, delete_url))
@@ -781,7 +784,8 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         self.client.login(**self.credentials['admin'])
         eadid = 'hartsfield558'
-        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
+        delete_url = reverse('fa-admin:delete-ead-by-archive',
+            kwargs={'id': eadid, 'archive': 'marbl'})
 
         title, note = 'Deleted EAD record', 'removed because of foo'
         Deleted(eadid=eadid, title=title, note=note).save()
