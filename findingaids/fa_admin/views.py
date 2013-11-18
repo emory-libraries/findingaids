@@ -534,8 +534,9 @@ def list_published(request, archive=None):
         'querytime': [fa.queryTime()], 'show_pages': show_pages, 'archive': arch})
 
 @permission_required_with_403('fa_admin.can_delete')
-@user_passes_test_with_ajax(archive_access_by_ead)
-def delete_ead(request, id):
+@user_passes_test_with_ajax(archive_access)
+# @user_passes_test_with_ajax(archive_access_by_ead)
+def delete_ead(request, id, archive=None):
     """ Delete a published EAD.
 
     On GET, display a form with information about the document to be removed.
@@ -545,9 +546,16 @@ def delete_ead(request, id):
     """
     # retrieve the finding aid to be deleted with fields needed for
     # form display or actual deletion
+
+    if archive is not None:
+        arch = get_object_or_404(Archive, slug=archive)
+        filter = {'repository__fulltext_terms': '"%s"' % arch.name}
+    else:
+        filter = {}
+
     try:
         fa = FindingAid.objects.only('eadid', 'unittitle',
-                            'document_name', 'collection_name').get(eadid=id)
+                            'document_name', 'collection_name').filter(**filter).get(eadid=id)
 
         # if this record has been deleted before, get that record and update it
         deleted_info, created = Deleted.objects.get_or_create(eadid=fa.eadid)
@@ -589,4 +597,10 @@ def delete_ead(request, id):
 
     # if we get to this point, either there was an error or the document was
     # successfully deleted - in any of those cases, redirect to publish list
-    return HttpResponseSeeOtherRedirect(reverse('fa-admin:list-published'))
+
+    # - if deletion was archive specific, redirect to publish list for that archive
+    if archive is not None:
+        url = reverse('fa-admin:published-by-archive', kwargs={'archive': archive})
+    else:
+        url = reverse('fa-admin:list-published')
+    return HttpResponseSeeOtherRedirect(url)

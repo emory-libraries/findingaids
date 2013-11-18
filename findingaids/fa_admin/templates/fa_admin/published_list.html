@@ -20,7 +20,12 @@
         <td><a href ="{% url 'fa:findingaid' fa.eadid %}">{{ fa.document_name }}</a></td>
         <td>{% if perms.fa_admin.can_delete %}
             {# FIXME: to do this properly, should check if user has permissions on the archive, if set... #}
-              <a class="admin-action" href ="{% url 'fa-admin:delete-ead' fa.eadid %}">DELETE</a>
+            {% if archive %}
+               {% url 'fa-admin:delete-ead-by-archive' archive.slug fa.eadid  as delete_url %}
+            {% else %}
+              {% url 'fa-admin:delete-ead' fa.eadid as delete_url %}
+            {% endif %}
+              <a class="admin-action" href ="{{ delete_url }}">DELETE</a>
             {% endif %}
         </td>
         <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>
