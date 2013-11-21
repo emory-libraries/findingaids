@@ -1,6 +1,7 @@
 {% extends "fa_admin/base.html" %}
-{% block page-subtitle %}{{block.super}} : Published Finding Aids{% if findingaids.number != 1 %} (page {{ findingaids.number }}){% endif %}{% endblock %}
-{% block content-title %}Published Finding Aids{% endblock %}
+{% block page-subtitle %}{{block.super}} : {% if archive %}{{ archive.label }} : {% endif %}Published Finding Aids{% if findingaids.number != 1 %} (page {{ findingaids.number }}){% endif %}{% endblock %}
+
+{% block content-title %}Published Finding Aids {% if archive %}for {{ archive.name }}{% endif %}{% endblock %}
 
 {% block content-body %}
 <div>{{findingaids.paginator.count}} documents</div>
@@ -18,7 +19,13 @@
     <tr>
         <td><a href ="{% url 'fa:findingaid' fa.eadid %}">{{ fa.document_name }}</a></td>
         <td>{% if perms.fa_admin.can_delete %}
-              <a class="admin-action" href ="{% url 'fa-admin:delete-ead' fa.eadid %}">DELETE</a>
+            {# FIXME: to do this properly, should check if user has permissions on the archive, if set... #}
+            {% if archive %}
+               {% url 'fa-admin:delete-ead-by-archive' archive.slug fa.eadid  as delete_url %}
+            {% else %}
+              {% url 'fa-admin:delete-ead' fa.eadid as delete_url %}
+            {% endif %}
+              <a class="admin-action" href ="{{ delete_url }}">DELETE</a>
             {% endif %}
         </td>
         <td>{{ fa.last_modified|date}} ({{ fa.last_modified|timesince }} ago)</td>

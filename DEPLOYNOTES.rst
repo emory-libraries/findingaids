@@ -401,6 +401,22 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.5 - svn admin release
+-----------------------
+
+* This release adds a dependency on subversion python bindings; installation
+  requires that subversion libraries be installed on the system (e.g., libsvn-dev
+  on debian/ubuntu systems).
+* Run ``python manage.py migrate emory_ldap`` to convert the user accounts
+  in the database to the new custom user model.
+* Run ``python manage.py syncdb`` to create new database tables and update
+  permissions.
+* Configure subversion admin user and base working directory in localsettings.py
+  with **SVN_USERNAME**, **SVN_PASSWORD**, and **SVN_WORKING_DIR**
+* Remove **FINDINGAID_EAD_SOURCE** from localsettings since it is no longer used.
+* Celery daemons should be restarted to pick up a newly added celery task.
+
+
 1.3
 ---
 

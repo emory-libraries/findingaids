@@ -14,36 +14,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from datetime import datetime
 from os import path
-import re
-from time import sleep
 from types import ListType
-from lxml import etree
-from mock import patch
-import unittest
-from urllib import quote as urlquote
 
-from django.conf import settings
-from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
-from django.http import Http404, HttpRequest
-from django.template import RequestContext, Template
-from django.test import Client, TestCase as DjangoTestCase
+from django.test import TestCase as DjangoTestCase
 
-from eulxml.xmlmap import load_xmlobject_from_file, \
-    load_xmlobject_from_string, XmlObject
-from eulxml.xmlmap.eadmap import EAD_NAMESPACE
-from eulexistdb.db import ExistDB, ExistDBException
+from eulxml.xmlmap import load_xmlobject_from_file, load_xmlobject_from_string
 from eulexistdb.testutil import TestCase
 
-from findingaids.fa.models import FindingAid, Series, Series2, Series3, \
-    LocalComponent, Deleted, EadRepository
-from findingaids.fa.views import _series_url, _subseries_links, _series_anchor
-from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
-from findingaids.fa.templatetags.ead import format_ead
-from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
-    collection_lastmodified, exist_datetime_with_timezone, alpha_pagelabels
+from findingaids.fa.models import FindingAid, LocalComponent, EadRepository
+from findingaids.fa.utils import pages_to_show, ead_lastmodified, \
+    collection_lastmodified
 
 
 ## unit tests for model objects in findingaids.fa

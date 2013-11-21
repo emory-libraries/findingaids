@@ -1,7 +1,7 @@
 [
     {
         "pk": 1,
-        "model": "auth.user",
+        "model": "emory_ldap.EmoryLDAPUser",
         "fields": {
             "username": "testadmin",
             "first_name": "",
@@ -19,7 +19,7 @@
     },
     {
         "pk": 2,
-        "model": "auth.user",
+        "model": "emory_ldap.EmoryLDAPUser",
         "fields": {
             "username": "peon",
             "first_name": "",
@@ -36,7 +36,7 @@
     },
     {
         "pk": 3,
-        "model": "auth.user",
+        "model": "emory_ldap.EmoryLDAPUser",
         "fields": {
             "username": "marbl",
             "first_name": "",

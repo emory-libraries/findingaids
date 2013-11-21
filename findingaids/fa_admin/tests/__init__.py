@@ -16,3 +16,5 @@
 
 from findingaids.fa_admin.tests.views import *
 from findingaids.fa_admin.tests.utils import *
+from findingaids.fa_admin.tests.source import *
+from findingaids.fa_admin.tests.models import *

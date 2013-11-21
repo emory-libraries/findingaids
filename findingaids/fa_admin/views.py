@@ -15,24 +15,27 @@
 #   limitations under the License.
 
 import os
-import glob
 import difflib
 import logging
 from lxml.etree import XMLSyntaxError
 
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError, Http404
+from django.http import HttpResponse, HttpResponseServerError, Http404, \
+    HttpResponseBadRequest
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import logout_then_login
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.views.decorators.cache import cache_page
+from django.views.decorators.http import require_POST
 
-from eulcommon.djangoextras.auth import permission_required_with_403
+
+from eulcommon.djangoextras.auth import permission_required_with_403, \
+   login_required_with_ajax, user_passes_test_with_ajax
 from eulexistdb.db import ExistDB, ExistDBException
 from eulcommon.djangoextras.http import HttpResponseSeeOtherRedirect
 from eullocal.django.log import message_logging
@@ -40,10 +43,13 @@ from eullocal.django.taskresult.models import TaskResult
 from eulxml.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulexistdb.exceptions import DoesNotExist
 
-from findingaids.fa.models import FindingAid, Deleted
+from findingaids.fa.models import FindingAid, Deleted, Archive
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
+from findingaids.fa_admin.auth import archive_access, archive_access_by_ead
 from findingaids.fa_admin.forms import DeleteForm
-from findingaids.fa_admin.models import EadFile
+from findingaids.fa_admin.models import Archivist
+from findingaids.fa_admin.source import files_to_publish
+from findingaids.fa_admin.svn import svn_client
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
 
@@ -57,19 +63,45 @@ def main(request):
     most recently modified) to be previewed, published, or prepared for
     preview/publish.
     """
-    recent_files = []
-    show_pages = []
-    if not hasattr(settings, 'FINDINGAID_EAD_SOURCE'):
-        error = "Please configure EAD source directory in local settings."
-    else:
-        dir = settings.FINDINGAID_EAD_SOURCE
-        if os.access(dir, os.F_OK | os.R_OK):
-            recent_files = _get_recent_xml_files(dir)
-            error = None
+    # get sorted archive list for this user
+    try:
+        archives = request.user.archivist.sorted_archives()
+    except ObjectDoesNotExist:
+        # i.e. no user -> archivist association
+        if request.user.is_superuser:
+            archives = Archive.objects.all()
         else:
-            error = "EAD source directory '%s' does not exist or is not readable; please check config file." % dir
+            archives = []
 
-    paginator = Paginator(recent_files, 30, orphans=5)
+    # get current tab if set in session; default to first tab
+    current_tab = request.session.get('active_admin_tab', 0)
+
+    # files for publication now loaded in jquery ui tab via ajax
+
+    # get the 10 most recent task results to display status
+    recent_tasks = TaskResult.objects.order_by('-created')[:10]
+
+    return render(request, 'fa_admin/index.html', {
+        'archives': archives,
+        'current_tab': current_tab,
+        'task_results': recent_tasks})
+
+
+# NOTE: viewing the file list sort of implies prep/preview/publish permissions
+# but currently does not actually *require* them
+@login_required_with_ajax()
+@user_passes_test_with_ajax(archive_access)
+def list_files(request, archive):
+    '''List files associated with an archive to be prepped and previewed
+    for publication.  Expected to be retrieved via ajax and loaded in a
+    jquery ui tab, so only returns a partial html page without site theme.
+    '''
+    archive = get_object_or_404(Archive, slug=archive)
+
+    files = files_to_publish(archive)
+    # sort by last modified time
+    files = sorted(files, key=lambda file: file.mtime, reverse=True)
+    paginator = Paginator(files, 30, orphans=5)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -81,13 +113,49 @@ def main(request):
     except (EmptyPage, InvalidPage):
         recent_files = paginator.page(paginator.num_pages)
 
-    # get the 10 most recent task results to display status
-    recent_tasks = TaskResult.objects.order_by('-created')[:10]
-    return render_to_response('fa_admin/index.html', {'files': recent_files,
-                            'show_pages': show_pages,
-                            'error': error,
-                            'task_results': recent_tasks},
-                            context_instance=RequestContext(request))
+    return render(request, 'fa_admin/snippets/list_files_tab.html', {
+        'files': recent_files,
+        'show_pages': show_pages})
+
+@require_POST
+@login_required_with_ajax()
+def archive_order(request):
+    # expects a comma-separated list of archive slugs
+    ids = request.POST.get('ids', None)
+    if not ids:
+        return HttpResponseBadRequest()
+
+    slugs = ids.split(',')
+    # find all archives matching any of the slugs passed in
+    archives = Archive.objects.filter(slug__in=slugs)
+    # re-sort according to the order in the request
+    archives = sorted(archives, key=lambda arch: slugs.index(arch.slug))
+
+    # save order to user account
+    try:
+        arc = request.user.archivist
+    except ObjectDoesNotExist:
+        # if for some reason user model does not have an archivist,
+        # create one so we can store the order preference
+        arc = Archivist()
+        request.user.archivist = arc
+
+    arc.order = ','.join([str(a.id) for a in archives])
+    request.user.archivist.save()
+
+    return HttpResponse('Updated order')
+
+@require_POST
+@login_required_with_ajax()
+def current_archive(request):
+    # Store the cerrently active archive tab in the main admin page,
+    # so it can be automatically reloaded when returning there.
+    # Expects a numeric id for the index of the tab to be active.
+    tab_id = request.POST.get('id', None)
+    if not tab_id:
+        return HttpResponseBadRequest()
+    request.session['active_admin_tab'] = tab_id
+    return HttpResponse('Saved current tab')
 
 
 @login_required
@@ -95,6 +163,9 @@ def logout(request):
     """Admin Logout view. Displays a message and then calls
     :meth:`django.contrib.auth.views.logout_then_login`.
     """
+    # make sure we reset any admin tab selection
+    if 'active_admin_tab' in request.session:
+        del request.session['active_admin_tab']
     messages.success(request, 'You are now logged out.')
     return logout_then_login(request)
 
@@ -105,12 +176,15 @@ def list_staff(request):
     Displays a list of user accounts, with summary information about each user
     and a link to edit each user account.
     """
-    users = User.objects.all()
-    return render_to_response('fa_admin/list-users.html', {'users': users},
-                              context_instance=RequestContext(request))
+    users = get_user_model().objects.all()
+    app, model = settings.AUTH_USER_MODEL.lower().split('.')
+    change_url = 'admin:%s_%s_change' % (app, model)
+
+    return render(request, 'fa_admin/list-users.html',
+        {'users': users, 'user_change_url': change_url})
 
 
-def _prepublication_check(request, filename, mode='publish', xml=None):
+def _prepublication_check(request, filename, archive, mode='publish', xml=None):
     """
     Pre-publication check logic common to :meth:`publish` and :meth:`preview`.
 
@@ -122,7 +196,10 @@ def _prepublication_check(request, filename, mode='publish', xml=None):
 
     :param request: request object passed into the view (for generating error response)
     :param filename: base filename of the ead file to be checked
+    :param archive: :class:`~findingaids.fa.models.Archive`, used to locate
+        the file on disk
     :param mode: optional mode, for display on error page (defaults to publish)
+
     :rtype: list
     :returns: list of the following:
       - boolean ok (if True, all checks passed)
@@ -132,22 +209,21 @@ def _prepublication_check(request, filename, mode='publish', xml=None):
     """
 
     # full path to the local file
-    fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+    fullpath = os.path.join(archive.svn_local_path, filename)
     # full path in exist db collection
     dbpath = settings.EXISTDB_ROOT_COLLECTION + "/" + filename
     errors = utils.check_ead(fullpath, dbpath, xml)
     if errors:
         ok = False
-        response = render_to_response('fa_admin/publish-errors.html',
-                {'errors': errors, 'filename': filename, 'mode': mode},
-                context_instance=RequestContext(request))
+        response = render(request, 'fa_admin/publish-errors.html',
+                {'errors': errors, 'filename': filename, 'mode': mode})
     else:
         ok = True
         response = None
     return [ok, response, dbpath, fullpath]
 
-
 @permission_required_with_403('fa_admin.can_publish')
+@require_POST
 def publish(request):
     """
     Admin publication form.  Allows publishing an EAD file by updating or adding
@@ -160,106 +236,121 @@ def publish(request):
     the site.  If publish is successful, redirects the user to main admin page
     with a success message that links to the published document on the site.
     If the sanity-check fails, displays a page with any problems found.
-
-    On GET, displays a list of files available for publication.
     """
-    if request.method == 'POST':
-        if 'filename' in request.POST:
-            publish_mode = 'file'
-            filename = request.POST['filename']
-            xml = None
+    # formerly supported publish from filename, but now only supports
+    # publish from preview
+    if 'preview_id' not in request.POST:
+        messages.error(request, "No preview document specified for publication")
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
-        elif 'preview_id' in request.POST:
-            publish_mode = 'preview'
-            id = request.POST['preview_id']
+    id = request.POST['preview_id']
 
-            # retrieve info about the document from preview collection
-            try:
-                # because of the way eulcore.existdb.queryset constructs returns with 'also' fields,
-                # it is simpler and better to retrieve document name separately
-                ead = get_findingaid(id, preview=True)
-                ead_docname = get_findingaid(id, preview=True, only=['document_name'])
-                filename = ead_docname.document_name
-            except Http404:     # not found in exist
-                ead = None
-                messages.error(request,
-                    "Publish failed. Could not retrieve <b>%s</b> from preview collection. Please reload and try again." % id)
+    # retrieve info about the document from preview collection
+    try:
+        # because of the way eulcore.existdb.queryset constructs returns with 'also' fields,
+        # it is simpler and better to retrieve document name separately
+        ead = get_findingaid(id, preview=True)
+        ead_docname = get_findingaid(id, preview=True, only=['document_name'])
+        filename = ead_docname.document_name
+    except Http404:     # not found in exist
+        messages.error(request,
+            '''Publish failed. Could not retrieve <b>%s</b> from preview collection.
+            Please reload and try again.''' % id)
 
-            if ead is None:
-                # if ead could not be retrieved from preview mode, skip processing
-                return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
+        # if ead could not be retrieved from preview mode, skip processing
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
-            xml = ead.serialize()
+    # determine archive this ead is associated with
 
-        errors = []
-        try:
-            ok, response, dbpath, fullpath = _prepublication_check(request, filename, xml=xml)
-            if ok is not True:
-                # publication check failed - do not publish
-                return response
-
-            # only load to exist if there are no errors found
-            db = ExistDB()
-            # get information to determine if an existing file is being replaced
-            replaced = db.describeDocument(dbpath)
-
-            if publish_mode == 'file':
-                # load the document to the configured collection in eXist with the same fileneame
-                success = db.load(open(fullpath, 'r'), dbpath, overwrite=True)
-                # load the file as a FindingAid object so we can generate a url to the document
-                ead = load_xmlobject_from_file(fullpath, FindingAid)
-
-            elif publish_mode == 'preview' and ead is not None:
-                try:
-                    # move the document from preview collection to configured public collection
-                    success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
-                            settings.EXISTDB_ROOT_COLLECTION, filename)
-                    # FindingAid instance ead already set above
-                except ExistDBException, e:
-                    # special-case error message
-                    errors.append("Failed to move document %s from preview collection to main collection." \
-                                    % filename)
-                    # re-raise and let outer exception handling take care of it
-                    raise e
-
-        except ExistDBException, e:
-            errors.append(e.message())
-            success = False
-
-        if success:
-            # request the cache to reload the PDF - queue asynchronous task
-            result = reload_cached_pdf.delay(ead.eadid.value)
-            task = TaskResult(label='PDF reload', object_id=ead.eadid.value,
-                url=reverse('fa:findingaid', kwargs={'id': ead.eadid.value}),
-                task_id=result.task_id)
-            task.save()
-
-            ead_url = reverse('fa:findingaid', kwargs={'id': ead.eadid.value})
-            change = "updated" if replaced else "added"
-            messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
-                    % (change, filename, ead_url, unicode(ead.unittitle)))
-
-            # redirect to main admin page and display messages
-            return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
-        else:
-            return render_to_response('fa_admin/publish-errors.html',
-                {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e},
-                context_instance=RequestContext(request))
+    xml = ead.serialize()
+    archive = None
+    if not ead.repository:
+        messages.error(request,
+            '''Publish failed. Could not determine which archive <b>%s</b> belongs to.
+            Please update subarea, reload, and try again.''' % id)
     else:
-        # if not POST, display list of files available for publication
-        # for now, just using main admin page
-        return main(request)
+        archive_name = ead.repository[0]
+        # NOTE: EAD supports multiple subarea tags, but in practice we only
+        # use one, so it should be safe to assume the first should be used for permissions
+        try:
+            archive = Archive.objects.get(name=archive_name)
+        except ObjectDoesNotExist:
+            messages.error(request,
+            '''Publish failed. Could not find archive <b>%s</b>.''' % archive_name)
 
+    # bail out if archive could not be identified
+    if archive is None:
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
+
+    # check that user is allowed to publish this document
+    if not archive_access(request.user, archive.slug):
+        messages.error(request,
+            '''You do not have permission to publish <b>%s</b> materials.''' \
+            % archive.label)
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
+
+
+    errors = []
+    try:
+        ok, response, dbpath, fullpath = _prepublication_check(request, filename, archive, xml=xml)
+        if ok is not True:
+            # publication check failed - do not publish
+            return response
+
+        # only load to exist if there are no errors found
+        db = ExistDB()
+        # get information to determine if an existing file is being replaced
+        replaced = db.describeDocument(dbpath)
+
+        try:
+            # move the document from preview collection to configured public collection
+            success = db.moveDocument(settings.EXISTDB_PREVIEW_COLLECTION,
+                    settings.EXISTDB_ROOT_COLLECTION, filename)
+            # FindingAid instance ead already set above
+        except ExistDBException, e:
+            # special-case error message
+            errors.append("Failed to move document %s from preview collection to main collection." \
+                            % filename)
+            # re-raise and let outer exception handling take care of it
+            raise e
+
+    except ExistDBException, e:
+        errors.append(e.message())
+        success = False
+
+    if success:
+        # request the cache to reload the PDF - queue asynchronous task
+        result = reload_cached_pdf.delay(ead.eadid.value)
+        task = TaskResult(label='PDF reload', object_id=ead.eadid.value,
+            url=reverse('fa:findingaid', kwargs={'id': ead.eadid.value}),
+            task_id=result.task_id)
+        task.save()
+
+        ead_url = reverse('fa:findingaid', kwargs={'id': ead.eadid.value})
+        change = "updated" if replaced else "added"
+        messages.success(request, 'Successfully %s <b>%s</b>. View <a href="%s">%s</a>.'
+                % (change, filename, ead_url, unicode(ead.unittitle)))
+
+        # redirect to main admin page and display messages
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
+    else:
+        return render(request, 'fa_admin/publish-errors.html',
+            {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e})
 
 @permission_required_with_403('fa_admin.can_preview')
-def preview(request):
+@user_passes_test_with_ajax(archive_access)
+def preview(request, archive):
     if request.method == 'POST':
+
+        archive = get_object_or_404(Archive, slug=archive)
         filename = request.POST['filename']
+
         errors = []
 
         try:
             # only load to exist if document passes publication check
-            ok, response, dbpath, fullpath = _prepublication_check(request, filename, mode='preview')
+            ok, response, dbpath, fullpath = _prepublication_check(request, filename,
+                archive, mode='preview')
             if ok is not True:
                 return response
 
@@ -279,24 +370,30 @@ def preview(request):
             # redirect to document preview page with code 303 (See Other)
             return HttpResponseSeeOtherRedirect(reverse('fa-admin:preview:findingaid', kwargs={'id': ead.eadid}))
         else:
-            return render_to_response('fa_admin/publish-errors.html',
-                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e},
-                    context_instance=RequestContext(request))
+            return render(request, 'fa_admin/publish-errors.html',
+                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e})
+
+    # TODO: preview list needs to either go away (not currently used)
+    # or be filtered by archive
     else:
         fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
                             order_by='last_modified')
-        return render_to_response('fa_admin/preview_list.html',
-                {'findingaids': fa, 'querytime': [fa.queryTime()]},
-                context_instance=RequestContext(request))
-        return HttpResponse('preview placeholder- list of files to be added here')
+        return render(request, 'fa_admin/preview_list.html',
+                {'findingaids': fa, 'querytime': [fa.queryTime()]})
 
 
-@login_required
+@permission_required_with_403('fa_admin.can_prepare')
 @cache_page(1)  # cache this view and use it as source for prep diff/summary views
-def prepared_eadxml(request, filename):
-    """Serve out a prepared version of the EAD file in the configured EAD source
-    directory.  Response header is set so the user should be prompted to download
-    the xml, with a filename matching that of the original document.
+@user_passes_test_with_ajax(archive_access)
+def prepared_eadxml(request, archive, filename):
+    """On GET, serves out a prepared version of the EAD file in the specified
+    archive subversion directory. Response header is set so the user should
+    be prompted to download the xml, with a filename matching that of
+    the original document.
+
+    On POST, commits the prepared version of the EAD file to the subversion
+    directory of the specified archive, with a log message indicating the user
+    who requested the commit.
 
     Steps taken to prepare a document are documented in
     :meth:`~findingaids.fa_admin.utils.prep_ead`.
@@ -304,7 +401,9 @@ def prepared_eadxml(request, filename):
     :param filename: name of the file to prep; should be base filename only,
         document will be pulled from the configured source directory.
     """
-    fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+    # find relative to svn path if associated with an archive
+    arch = get_object_or_404(Archive, slug=archive)
+    fullpath = os.path.join(arch.svn_local_path, filename)
     try:
         ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
     except XMLSyntaxError, e:
@@ -318,15 +417,46 @@ def prepared_eadxml(request, filename):
             # any exception on prep is most likely ark generation
             return HttpResponseServerError('Failed to prep the document: ' + str(e))
 
-    prepped_xml = ead.serializeDocument()
+    # on GET, display the xml and make available for download
+    if request.method == 'GET':
+        prepped_xml = ead.serializeDocument()
+        response = HttpResponse(prepped_xml, mimetype='application/xml')
+        response['Content-Disposition'] = "attachment; filename=%s" % filename
+        return response
 
-    response = HttpResponse(prepped_xml, mimetype='application/xml')
-    response['Content-Disposition'] = "attachment; filename=%s" % filename
-    return response
+    # on POST, save to file and commit to subversion
+    if request.method == 'POST':
+        file_path = os.path.join(arch.svn_local_path, filename)
+        with open(file_path, 'w') as xmlfile:
+            ead.serializeDocument(xmlfile)  # FIXME: pretty print?
+
+        svn = svn_client()
+        # seems to be the only way to set a commit log message via client
+        def get_log_message(arg):
+            # argument looks something like this:
+            # [('foo', 'https://svn.library.emory.edu/svn/dev_ead-eua/trunk/eua0081affirmationvietnam.xml', 6, None, 4)]
+            # ignoring since we will only use this function for a single commit
+            return 'prepared EAD via FindingAids website admin, saved on behalf of %s' % request.user
+
+        svn.log_msg_func = get_log_message
+        saved = svn.commit(str(file_path))  # has to be string and not unicode
+        # commit returns something like this on success:
+        # (8, '2013-11-13T18:19:00.191382Z', 'keep')
+        # revision number, date, user
+        # returns nothing if there were no changes to commit
+
+        if saved:
+            messages.success(request, 'Committed changes to <b>%s</b>.' % filename)
+        else:
+            messages.info(request, 'No changes to commit for <b>%s</b>.' % filename)
+
+        # either way, redirect to main admin page with code 303 (See Other)
+        return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
 
-@login_required
-def prepared_ead(request, filename, mode):
+@permission_required_with_403('fa_admin.can_prepare')
+@user_passes_test_with_ajax(archive_access)
+def prepared_ead(request, archive, filename, mode):
     """Display information about changes made by preparing an EAD file for
     publication.  If no changes are made, user will be redirected to main admin
     page with a message to that effect.
@@ -342,11 +472,15 @@ def prepared_ead(request, filename, mode):
     :param mode: one of **diff** or **summary**
 
     """
-    fullpath = os.path.join(settings.FINDINGAID_EAD_SOURCE, filename)
+
+    # determine full path based on archive / svn
+    arch = Archive.objects.get(slug=archive)
+    # arch = get_object_or_404(Archive, slug=archive)
+    fullpath = os.path.join(arch.svn_local_path, filename)
     changes = []
 
     # TODO: expire cache if file has changed since prepped eadxml was cached
-    prep_ead = prepared_eadxml(request, filename)
+    prep_ead = prepared_eadxml(request, arch.slug, filename)
 
     if prep_ead.status_code == 200:
         orig_ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
@@ -377,36 +511,33 @@ def prepared_ead(request, filename, mode):
         errors = ['Something went wrong trying to load the specified document.',
                   prep_ead.content]     # pass along the output in case it is useful?
 
-    return render_to_response('fa_admin/prepared.html', {'filename': filename,
-                                'changes': changes, 'errors': errors,
-                                'xml_status': prep_ead.status_code},
-                                context_instance=RequestContext(request))
-
-
-def _get_recent_xml_files(dir):
-    "Return recently modified xml files from the specified directory."
-    # get all xml files in the specified directory
-    filenames = glob.glob(os.path.join(dir, '*.xml'))
-    # modified time, base name of the file
-    files = [EadFile(os.path.basename(file), os.path.getmtime(file)) for file in filenames]
-    # sort by last modified time
-    return sorted(files, key=lambda file: file.mtime, reverse=True)
+    return render(request, 'fa_admin/prepared.html', {
+        'filename': filename,
+        'changes': changes, 'errors': errors,
+        'xml_status': prep_ead.status_code,
+        'archive': arch})
 
 
 @login_required
-def list_published(request):
-    """List all published EADs."""
+def list_published(request, archive=None):
+    """List all published EADs, optionally restricted to a single archive."""
     fa = FindingAid.objects.order_by('eadid').only('document_name', 'eadid', 'last_modified')
+    arch = None
+    if archive is not None:
+        arch = get_object_or_404(Archive, slug=archive)
+        # fa = fa.filter(repository=arch.name)
+        fa = fa.filter(repository__fulltext_terms='"%s"' % arch.name)
+
     fa_subset, paginator = paginate_queryset(request, fa, per_page=30, orphans=5)
     show_pages = pages_to_show(paginator, fa_subset.number)
 
-    return render_to_response('fa_admin/published_list.html', {'findingaids': fa_subset,
-                              'querytime': [fa.queryTime()], 'show_pages': show_pages},
-                              context_instance=RequestContext(request))
-
+    return render(request, 'fa_admin/published_list.html', {'findingaids': fa_subset,
+        'querytime': [fa.queryTime()], 'show_pages': show_pages, 'archive': arch})
 
 @permission_required_with_403('fa_admin.can_delete')
-def delete_ead(request, id):
+@user_passes_test_with_ajax(archive_access)
+# @user_passes_test_with_ajax(archive_access_by_ead)
+def delete_ead(request, id, archive=None):
     """ Delete a published EAD.
 
     On GET, display a form with information about the document to be removed.
@@ -416,9 +547,16 @@ def delete_ead(request, id):
     """
     # retrieve the finding aid to be deleted with fields needed for
     # form display or actual deletion
+
+    if archive is not None:
+        arch = get_object_or_404(Archive, slug=archive)
+        filter = {'repository__fulltext_terms': '"%s"' % arch.name}
+    else:
+        filter = {}
+
     try:
         fa = FindingAid.objects.only('eadid', 'unittitle',
-                            'document_name', 'collection_name').get(eadid=id)
+                            'document_name', 'collection_name').filter(**filter).get(eadid=id)
 
         # if this record has been deleted before, get that record and update it
         deleted_info, created = Deleted.objects.get_or_create(eadid=fa.eadid)
@@ -452,13 +590,18 @@ def delete_ead(request, id):
                 render_form = True
 
         if render_form:
-            return render_to_response('fa_admin/delete.html',
-                                    {'fa': fa, 'form': delete_form},
-                                    context_instance=RequestContext(request))
+            return render(request, 'fa_admin/delete.html',
+                {'fa': fa, 'form': delete_form})
     except DoesNotExist:
         # requested finding aid was not found (on either GET or POST)
         messages.error(request, "Error: could not retrieve <b>%s</b> for deletion." % id)
 
     # if we get to this point, either there was an error or the document was
     # successfully deleted - in any of those cases, redirect to publish list
-    return HttpResponseSeeOtherRedirect(reverse('fa-admin:list-published'))
+
+    # - if deletion was archive specific, redirect to publish list for that archive
+    if archive is not None:
+        url = reverse('fa-admin:published-by-archive', kwargs={'archive': archive})
+    else:
+        url = reverse('fa-admin:list-published')
+    return HttpResponseSeeOtherRedirect(url)

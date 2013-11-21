@@ -1,10 +1,11 @@
 eulxml>=0.12.0
 eulexistdb>=0.18.0
-eulcommon
-https://wilson.library.emory.edu/jenkins/job/eullocal-0.19.x/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.19.0.tar.gz
+# eulcommon - need dev eulcommon for updates to permission decorators
+-e git://github.com/emory-libraries/eulcommon@develop#egg=eulcommon
+https://wilson.library.emory.edu/jenkins/job/eullocal-0.20.x/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.20.0.tar.gz
 https://wilson.library.emory.edu/jenkins/job/pidman-rest-client_1.1.x/lastSuccessfulBuild/artifact/pidmanclient/dist/pidservices-1.1.1.tar.gz
-# NOTE: must be after eullocal, because eullocal still wants django < 1.4
-Django>=1.5
+# pin to before 1.6 for now, until we update to be compatible
+Django<1.6
 python-dateutil
 # pin ldap to 2.4.10 because 2.4.11 is causing errors
 python-ldap==2.4.10
@@ -16,3 +17,4 @@ feedparser
 django-celery>=3.0
 south
 rdflib
+subvertpy

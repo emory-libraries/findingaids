@@ -513,3 +513,26 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     padding-top: 2px;
 }
 
+/* hacky jquery ui overrides to compensate for over-specific genlib theme css*/
+#content .ui-tabs ul {
+  padding: 2px 0 0 1px;
+  margin-bottom: 0 !important;
+  border-bottom: 0 !important;
+  overflow: hidden;
+}
+
+#content .ui-tabs li {
+  list-style: none;
+  margin: 0 1px;
+  padding: 0 2px;
+}
+#content .ui-tabs li.ui-tabs-active {
+  margin-bottom: 0;
+  padding-bottom: 1px;
+  border-bottom: 0 !important;
+}
+
+
+#content .ui-tabs-panel {
+  border: 0 !important;
+}

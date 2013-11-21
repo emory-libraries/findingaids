@@ -14,25 +14,28 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+import filecmp
 from mock import patch
 import os
 import tempfile
-from shutil import rmtree
-from time import sleep
+from shutil import rmtree, copyfile
+import time
 
 from django.test import Client
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB
+from eullocal.django.emory_ldap.models import EmoryLDAPUser
 from eullocal.django.taskresult.models import TaskResult
 from eulexistdb.testutil import TestCase
+from eulxml.xmlmap import load_xmlobject_from_file
 
-from findingaids.fa.models import Deleted
+from findingaids.fa.models import Deleted, Archive, FindingAid
 from findingaids.fa_admin import tasks, views
-from findingaids.fa_admin.views import _get_recent_xml_files
+from findingaids.fa_admin.models import EadFile
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
 
 ### unit tests for findingaids.fa_admin.views
@@ -43,7 +46,7 @@ from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unu
 
 class BaseAdminViewsTest(TestCase):
     "Base TestCase for admin views tests.  Common setup/teardown for admin view tests."
-    fixtures = ['user']
+    fixtures = ['user', 'archivist', 'archives']
     credentials = {'superuser': {'username': 'testadmin', 'password': 'secret'},
                    'admin': {'username': 'marbl', 'password': 'marbl'},
                    'no_perms': {'username': 'peon', 'password': 'peon'},
@@ -60,20 +63,17 @@ class BaseAdminViewsTest(TestCase):
         # create temporary directory with files for testing
         # - turning off auto-delete so directory and files can be easily cleaned up
         self.tmpdir = tempfile.mkdtemp('findingaids-recentfiles-test')
+
         self.tmpfiles = []
         for num in ['first', 'second', 'third']:
             self.tmpfiles.append(tempfile.NamedTemporaryFile(suffix='.xml',
                     prefix=num + '_', dir=self.tmpdir, delete=False))
-            sleep(1)        # ensure modification times are different
+            time.sleep(1)        # ensure modification times are different
         # add a non-xml file
         self.nonxml_tmpfile = tempfile.NamedTemporaryFile(suffix='.txt',
                     prefix='nonxml', dir=self.tmpdir, delete=False)
 
-        # temporarily override setting for testing
-        if hasattr(settings, 'FINDINGAID_EAD_SOURCE'):
-            self._stored_ead_src = settings.FINDINGAID_EAD_SOURCE
-        settings.FINDINGAID_EAD_SOURCE = self.tmpdir
-
+        # FIXME: use override_settings instead
         # save the exist collection configs for restoring
         # (some tests changes to simulate an eXist save error)
         self.real_collection = settings.EXISTDB_ROOT_COLLECTION
@@ -93,9 +93,6 @@ class BaseAdminViewsTest(TestCase):
         views.utils.DjangoPidmanRestClient = MockDjangoPidmanClient
 
     def tearDown(self):
-        if hasattr(self, '_stored_ead_src'):
-            settings.FINDINGAID_EAD_SOURCE = self._stored_ead_src
-
         # clean up temp files & dir
         rmtree(self.tmpdir)
 
@@ -115,6 +112,15 @@ class BaseAdminViewsTest(TestCase):
 
 
 class AdminViewsTest(BaseAdminViewsTest):
+    # test for views that require eXist full-text index
+    exist_fixtures = {
+        'files': [
+            os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures', 'hartsfield558.xml'),
+            ],
+        'index': settings.EXISTDB_INDEX_CONFIGFILE
+        # NOTE: full-text index required for published documents by archive
+        # could split out full-text specific tests if it gets too slow
+    }
 
     def setUp(self):
         # avoid testing difficulties with cached prep-eadxml view
@@ -131,23 +137,32 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix='response for user with no permissions includes appropriate message')
         self.assertContains(response, reverse('fa-admin:list-published'), 0,
             msg_prefix='response for user with no permissions does not include link to published docs')
-        self.assertContains(response, reverse('fa-admin:preview-ead'), 0,
-            msg_prefix='response for user with no permissions does not include link to preview docs')
+        # TODO: resolve preview list view (going away? archive specific)
+        # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}), 0,
+        #     msg_prefix='response for user with no permissions does not include link to preview docs')
         self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
             msg_prefix='response for user with no permissions does not include link to list/edit staff')
-        self.assertContains(response, reverse('admin:index'), 0,
+        self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
             msg_prefix='response for user with no permissions does not include link to django db admin')
 
-        # user with limited permissions - in findingaid group
+        # user with limited permissions - in findingaid group, associated with first archive
         self.client.login(**self.credentials['admin'])
         response = self.client.get(admin_index)
-        self.assertContains(response, reverse('fa-admin:list-published'),
-            msg_prefix='response for FA admin includes link to published docs')
-        self.assertContains(response, reverse('fa-admin:preview-ead'),
-            msg_prefix='response for FA admin includes link to preview docs')
+        self.assertNotContains(response, reverse('fa-admin:list-published'),
+            msg_prefix='response for non-superuser FA admin does not link to all published docs')
+
+        # archive-specific published lists only
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        for archive in user.archivist.archives.all():
+            self.assertContains(response, reverse('fa-admin:published-by-archive',
+                kwargs={'archive': archive.slug}),
+               msg_prefix='response for FA admin includes link to published docs for %s' % archive.slug)
+        # TODO: resolve preview list view (going away? archive specific)
+        # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}),
+        #     msg_prefix='response for FA admin includes link to preview docs')
         self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
             msg_prefix='response for (non super) FA admin does not include link to list/edit staff')
-        self.assertContains(response, reverse('admin:index'), 0,
+        self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
             msg_prefix='response for (non super) FA admin does not include link to django db admin')
 
         # superuser
@@ -157,6 +172,8 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix='response for superuser includes link to list/edit staff')
         self.assertContains(response, reverse('admin:index'),
             msg_prefix='response for superuser includes link to django db admin')
+        self.assertContains(response, reverse('fa-admin:list-published'),
+            msg_prefix='response for superuser links to list of all published docs')
 
     def test_recent_files(self):
         admin_index = reverse('fa-admin:index')
@@ -182,47 +199,129 @@ class AdminViewsTest(BaseAdminViewsTest):
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin'
                              % (expected, code, admin_index))
-        self.assertEqual(3, len(response.context['files'].object_list))
+
+        # file list now loaded in tabs via ajax
+
+    @patch('findingaids.fa_admin.views.files_to_publish')
+    def test_list_files(self, mockfilestopub):
+        # using fixture archives
+        arch = Archive.objects.get(slug='marbl')
+        list_files = reverse('fa-admin:files', kwargs={'archive': arch.slug})
+
+        # not logged in
+        response = self.client.get(list_files)
+        code = response.status_code
+        expected = 302
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as AnonymousUser'
+                             % (expected, code, list_files))
+
+        # log in as an superuser
+        self.client.login(**self.credentials['superuser'])
+
+        # nonexistent archive should 404
+        bogus_list_files = reverse('fa-admin:files', kwargs={'archive': 'nonarchive'})
+        response = self.client.get(bogus_list_files)
+        self.assertEqual(response.status_code, 404)
+        # NOTE: for non-superuser this returns 302 because user doesn't have
+        # permissions on a non-existent archive
+
+        # login as admin user
+        self.client.login(**self.credentials['admin'])
+
+        # test actual results
+        now = time.time()
+        mockfiles = [
+            EadFile(filename='ead1.xml', modified=now, archive=arch),
+            EadFile(filename='ead2.xml', modified=now, archive=arch),
+            EadFile(filename='ead3.xml', modified=now, archive=arch),
+        ]
+        mockfilestopub.return_value = mockfiles
+        response = self.client.get(list_files)
+        self.assertEqual(response.status_code, 200)
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s as admin'
+                             % (expected, code, list_files))
+        self.assertEqual(len(mockfiles), len(response.context['files'].object_list))
         self.assert_(response.context['show_pages'], "file list view includes list of pages to show")
-        self.assertEqual(None, response.context['error'],
-                "correctly configured file list view has no error messages")
-        self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
-        self.assertContains(response, os.path.basename(self.tmpfiles[2].name))
-        # file list contains buttons to publish documents
-        # TEMPORARY: suppressing publish on list documents to assess workflow
-        #publish_url = reverse('fa-admin:publish-ead')
-        #self.assertContains(response, '<form action="%s" method="post"' % publish_url)
-        #self.assertContains(response, '<button type="submit" name="filename" value="%s" '
-        #        % os.path.basename(self.tmpfiles[0].name))
         # file list contains buttons to preview documents
-        preview_url = reverse('fa-admin:preview-ead')
+        preview_url = reverse('fa-admin:preview-ead', kwargs={'archive': arch.slug})
         self.assertContains(response, '<form action="%s" method="post"' % preview_url)
-        self.assertContains(response, '<button type="submit" name="filename" value="%s" '
-                % os.path.basename(self.tmpfiles[0].name), 1)
-        # file list contains link to prep documents
-        prep_url = reverse('fa-admin:prep-ead-about', args=[os.path.basename(self.tmpfiles[0].name)])
-        self.assertContains(response, 'href="%s">PREP</a>' % prep_url)
+
+        for f in mockfiles:
+            # filename is listed
+            self.assertContains(response, f.filename)
+            # preview button is present
+            self.assertContains(response, '<button type="submit" name="filename" value="%s" '
+                % f.filename, 1)
+            # file list contains link to prep documents
+            prep_url = reverse('fa-admin:prep-ead-about',
+                kwargs={
+                    'filename': os.path.basename(f.filename),
+                    'archive': f.archive.slug
+                })
+            self.assertContains(response, 'href="%s">PREP</a>' % prep_url)
+
         # contains pagination
         self.assertPattern('Pages:\s*1', response.content)
 
         # TODO: test last published date / preview load date?
         # This will require eXist fixtures that match the temp files
 
-        # simulate configuration error
-        settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
-        response = self.client.get(admin_index)
-        self.assert_("check config file" in response.context['error'])
-        self.assertEqual(0, len(response.context['files'].object_list))
+        # # simulate configuration error
+        # settings.FINDINGAID_EAD_SOURCE = "/does/not/exist"
+        # response = self.client.get(list_files)
+        # self.assert_("check config file" in response.context['error'])
+        # self.assertEqual(0, len(response.context['files'].object_list))
+
+    def test_archive_order(self):
+        order_url = reverse('fa-admin:archive-order')
+
+        # log in as an admin user
+        self.client.login(**self.credentials['admin'])
+        response = self.client.get(order_url)
+        code = response.status_code
+        expected = 405
+        self.assertEqual(code, expected,
+            'Expected %s (method not allowed) but returned %s for GET on %s'
+            % (expected, code, order_url))
+
+        # post with no data
+        response = self.client.post(order_url)
+        code = response.status_code
+        expected = 400
+        self.assertEqual(code, expected,
+            'Expected %s (bad request) but returned %s for POST on %s with no data'
+            % (expected, code, order_url))
+
+        # load archive fixtures to test ordering
+        marbl = Archive.objects.get(slug='marbl')
+        eua = Archive.objects.get(slug='eua')
+        theo = Archive.objects.get(slug='pitts')
+
+        response = self.client.post(order_url, {'ids': '%s,%s' % (eua.slug, theo.slug)})
+        code = response.status_code
+        expected = 200
+        self.assertEqual(code, expected,
+            'Expected %s but returned %s for POST on %s with valid data'
+            % (expected, code, order_url))
+
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        # check that order was stored as expected
+        self.assertEqual('%d,%d' % (eua.id, theo.id), user.archivist.order)
 
     def test_preview(self):
-        preview_url = reverse('fa-admin:preview-ead')
+        arch = Archive.objects.all()[0]
+        preview_url = reverse('fa-admin:preview-ead', kwargs={'archive': arch.slug})
         self.client.login(**self.credentials['admin'])
 
         # use fixture directory to test preview
         filename = 'hartsfield558.xml'
         eadid = 'hartsfield558'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
-        response = self.client.post(preview_url, {'filename': filename},
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.post(preview_url, {'filename': filename,
+                'archive': arch.slug},
                 follow=True)  # follow redirect so we can inspect message on response
         (redirect_url, code) = response.redirect_chain[0]
         preview_docurl = reverse('fa-admin:preview:findingaid', kwargs={'id': eadid})
@@ -239,7 +338,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # GET should just list files available for preview
-        response = self.client.get(preview_url)
+        # FIXME: preview list view doesn't currently use archive; this functionality
+        # needs to either be removed, separated, or filter on archive
+        response = self.client.get(preview_url, {'archive': arch.slug})
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
@@ -265,7 +366,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.db.removeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # preview invalid document - should display errors
-        response = self.client.post(preview_url, {'filename': 'hartsfield558_invalid.xml'})
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.post(preview_url, {'filename': 'hartsfield558_invalid.xml'})
+
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
@@ -280,38 +383,44 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # exist save errors should be caught & handled gracefully
         # - force an error by setting preview collection to a non-existent collection
-        settings.EXISTDB_PREVIEW_COLLECTION = "/bogus/doesntexist"
-        response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
-        self.assertContains(response, "Could not preview")
-        self.assertContains(response,
-                "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)
-        self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
+        with override_settings(EXISTDB_PREVIEW_COLLECTION='/bogus/doesntexist'):
+            with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+                response = self.client.post(preview_url, {'filename': 'hartsfield558.xml',
+                    'archive': arch.slug})
+                self.assertContains(response, "Could not preview")
+                self.assertContains(response,
+                    "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)
+                self.assertContains(response, "Database Error",
+                    msg_prefix="error page displays explanation and instructions to user")
 
         # simulate incorrect eXist permissions by not specifying username/password
-        settings.EXISTDB_PREVIEW_COLLECTION = self.preview_collection   # restore setting
         # ensure guest account cannot update
         self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-update')
 
-        settings.EXISTDB_SERVER_USER = None
-        settings.EXISTDB_SERVER_PASSWORD = None
+        fake_collection = '/bogus/doesntexist'
+        with override_settings(EXISTDB_SERVER_USER=None,
+                               EXISTDB_SERVER_PASSWORD=None,
+                               EXISTDB_PREVIEW_COLLECTION=fake_collection):
+            with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+                response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
 
-        response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "not allowed to write to collection",
+        self.assertContains(response, "Collection %s not found" % fake_collection,
                 msg_prefix="error page displays specific eXist permission message")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
-        settings.EXISTDB_SERVER_URL = 'http://localhost:9191/not-exist'
-        with patch.object(settings, 'EXISTDB_TIMEOUT', new=150):
-            response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
-            self.assertContains(response, "Could not preview")
-            self.assertContains(response, "Database Error",
-                    msg_prefix="error page displays explanation and instructions to user")
-            self.assertContains(response, "I/O Error: Connection refused",
-                    msg_prefix="error page displays specific connection error message")
+        with override_settings(EXISTDB_SERVER_URL='http://localhost:9191/not-exist',
+            EXISTDB_TIMEOUT=150):
+            with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+                response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
+
+        self.assertContains(response, "Could not preview")
+        self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+        self.assertContains(response, "I/O Error: Connection refused",
+                msg_prefix="error page displays specific connection error message")
 
     def test_logout(self):
         admin_logout = reverse('fa-admin:logout')
@@ -332,21 +441,26 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "peon")
 
     def test_prep_ead(self):
-         # use fixture directory to test publication
+        # use fixture directory to test publication
+        arch = Archive.objects.all()[0]
         filename = 'hartsfield558.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
 
-        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
-        prep_diff = reverse('fa-admin:prep-ead-diff', args=[filename])
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs=url_args)
+        prep_diff = reverse('fa-admin:prep-ead-diff', kwargs=url_args)
 
         self.client.login(**self.credentials['admin'])
-        response = self.client.get(prep_summary)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_summary)
 
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
                         (expected, code, prep_summary))
+        # FIXME: same type of error loading document before it gets to
+        # the logic tested here
         self.assert_(response.context['changes'])
 
         self.assertContains(response, 'Prepared EAD for %s' % filename)
@@ -358,7 +472,8 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, prep_xml,
                             msg_prefix="prepared EAD summary should link to xml download")
 
-        response = self.client.get(prep_diff)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_diff)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
@@ -366,7 +481,8 @@ class AdminViewsTest(BaseAdminViewsTest):
         # output is generated by difflib; just testing that response has content
         self.assertContains(response, '<table')
 
-        response = self.client.get(prep_xml)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_xml)
         expected = 200
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s' % \
                         (expected, response.status_code, prep_xml))
@@ -387,11 +503,12 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # prep an ead that doesn't need any changes
         filename = 'abbey244.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa',
-            'tests', 'fixtures')
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa', 'tests', 'fixtures')
 
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
-        response = self.client.get(prep_summary, follow=True)
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs={'filename': filename,
+            'archive': arch.slug})
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_summary, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (following redirects, prep EAD)'
@@ -408,9 +525,11 @@ class AdminViewsTest(BaseAdminViewsTest):
         # prep an ead that needs an ARK, force ark generation error
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
         filename = 'bailey807.xml'
-        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
-        response = self.client.get(prep_summary, follow=True)
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs=url_args)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_summary, follow=True)
         # summary should be 200, display prep error
         code = response.status_code
         expected = 200  # final code, after following redirects
@@ -421,11 +540,52 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, 'There was an error preparing the file')
 
         MockDjangoPidmanClient.raise_error = (401, 'unauthorized')
-        response = self.client.get(prep_xml)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_xml)
         expected = 500
         self.assertEqual(response.status_code, expected,
             'Expected %s but returned %s for %s (prep ead, ARK generation error)' % \
             (expected, response.status_code, prep_xml))
+
+        # use POST to prep-ead to save changes in subversion
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        filename = 'hartsfield558.xml'
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        # copy into a temp dir since the view will modify the file
+        tmpdir = tempfile.mkdtemp('fa-prep')
+        copy, fixture = os.path.join(fixture_dir, filename), os.path.join(tmpdir, filename)
+        copyfile(copy, fixture)
+
+        with patch('findingaids.fa.models.Archive.svn_local_path', tmpdir):
+            with patch('findingaids.fa_admin.views.svn_client') as svn_client:
+                # simulate successful commit
+                svn_client.return_value.commit.return_value = (8, '2013-11-13T18:19:00.191382Z', 'keep')
+                response = self.client.post(prep_xml, follow=True)
+
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Committed changes ' in msgs[0])
+        # check that file has been modified
+        self.assertFalse(filecmp.cmp(copy, fixture),
+            'prepared file should have been modified')
+
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(redirect_url.endswith(reverse('fa-admin:index')),
+            "response should redirect to main admin page")
+
+       # simulate commit with no changes
+        with patch('findingaids.fa.models.Archive.svn_local_path', tmpdir):
+            with patch('findingaids.fa_admin.views.svn_client') as svn_client:
+                svn_client.return_value.commit.return_value = None
+                response = self.client.post(prep_xml, follow=True)
+
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('No changes to commit ' in msgs[0])
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(redirect_url.endswith(reverse('fa-admin:index')),
+            "response should redirect to main admin page even if no changes are committed")
+
+
 
     @patch('findingaids.fa_admin.utils.DjangoPidmanRestClient')
     def test_prep_ark_messages(self, mockpidclient):
@@ -441,17 +601,24 @@ class AdminViewsTest(BaseAdminViewsTest):
         }
         # use django test client to login and setup session
         self.client.login(**self.credentials['admin'])
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        arch = user.archivist.archives.all()[0]
 
         # use a fixture that does not have an ARK
         filename = 'bailey807.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa',
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa',
             'tests', 'fixtures')
-        prep_url = reverse('fa-admin:prep-ead-about', kwargs={'filename': filename})
-        #expire_view_cache(reverse('fa-admin:prep-ead', kwargs={'filename': filename}))
-        response = self.client.get(prep_url)
+        prep_url = reverse('fa-admin:prep-ead-about',
+           kwargs={'filename': filename, 'archive': arch.slug})
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_url)
+
         # retrieve messages from the request
         msgs = [unicode(m) for m in response.context['messages']
             if m is not None]
+        # FIXME: this test is failing because there is an error loading the file
+        # before it ever gets to the mock pidman error
+
         self.assert_('Found 2 ARKs when searching' in msgs[0],
             'multiple ARK warning is set in messages')
         self.assert_('Using existing ARK' in msgs[1],
@@ -459,26 +626,30 @@ class AdminViewsTest(BaseAdminViewsTest):
 
     def test_prep_badlyformedxml(self):
         # use fixture directory to test publication
+        arch = Archive.objects.all()[0]
         filename = 'badlyformed.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
 
-        prep_xml = reverse('fa-admin:prep-ead', args=[filename])
-        prep_summary = reverse('fa-admin:prep-ead-about', args=[filename])
-        prep_diff = reverse('fa-admin:prep-ead-diff', args=[filename])
+        url_args = {'filename': filename, 'archive': arch.slug}
+        prep_xml = reverse('fa-admin:prep-ead', kwargs=url_args)
+        prep_summary = reverse('fa-admin:prep-ead-about', kwargs=url_args)
+        prep_diff = reverse('fa-admin:prep-ead-diff', kwargs=url_args)
 
         self.client.login(**self.credentials['admin'])
-        response = self.client.get(prep_xml)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_xml)
         expected = 500
         self.assertEqual(response.status_code, expected,
                         'Expected %s but returned %s for %s (non-well-formed xml)' % \
                         (expected, response.status_code, prep_summary))
-
-        response = self.client.get(prep_summary)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.get(prep_summary)
         code = response.status_code
         expected = 200
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s' % \
                         (expected, code, prep_summary))
-
+        # FIXME: test is failing because document fails to load before
+        # we get to the expected error
         self.assertContains(response, 'Could not load document',
                 msg_prefix='error loading document displayed')
         self.assertContains(response, 'not allowed in attributes',
@@ -488,19 +659,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         # prep xml link is included in about link; check not present as entire link
         self.assertNotContains(response, 'href="%s"' % prep_xml,
                 msg_prefix="prep summary for badly formed xml should NOT link to xml for download")
-
-    # tests for view helper functions
-
-    def test_get_recent_xml_files(self):
-        recent_xml = _get_recent_xml_files(self.tmpdir)
-        self.assertEqual(3, len(recent_xml))
-        # should be in reverse order - last created first
-        self.assertEqual(recent_xml[0].filename, os.path.basename(self.tmpfiles[2].name))
-        self.assertEqual(recent_xml[1].filename, os.path.basename(self.tmpfiles[1].name))
-        self.assertEqual(recent_xml[2].filename, os.path.basename(self.tmpfiles[0].name))
-        # non-xml file not included
-        filenames = [eadfile.filename for eadfile in recent_xml]
-        self.assert_(os.path.basename(self.nonxml_tmpfile.name) not in filenames)
 
     def test_list_published(self):
         # login to test admin-only view
@@ -517,12 +675,33 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertPattern('Pages:\s*1', response.content,
             "response contains pagination")
 
+    def test_published_by_archive(self):
+        self.client.login(**self.credentials['admin'])
+
+        archive = Archive.objects.get(slug='marbl')
+        arch_published_url = reverse('fa-admin:published-by-archive',
+            kwargs={'archive': archive.slug})
+        response = self.client.get(arch_published_url)
+        self.assertContains(response, "Published Finding Aids for %s" % archive.name)
+
+        print response
+        fa = response.context['findingaids']
+
+        self.assert_(fa, "findingaids result is set in response context")
+        self.assertEqual(fa.object_list[0].eadid.value, 'hartsfield558',
+            "fixture document is included in findingaids object list")
+        self.assertPattern('Pages:\s*1', response.content,
+            "response contains pagination")
+
+
     def test_delete_ead(self):
         # login as admin to test admin-only feature
         self.client.login(**self.credentials['admin'])
 
         eadid = 'hartsfield558'
-        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
+        # use archive-specific delete form for non-superuser admin
+        delete_url = reverse('fa-admin:delete-ead-by-archive',
+            kwargs={'id': eadid, 'archive': 'marbl'})
         # GET - should display delete form with eadid & title from document
         response = self.client.get(delete_url)
         self.assertEqual(eadid, unicode(response.context['form']['eadid'].value()))
@@ -531,6 +710,25 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         # POST form data to trigger a deletion
         title, note = 'William Berry Hartsfield papers', 'Moved to another archive.'
+
+        # temporarily remove access to archive to test permission logic
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        marbl = Archive.objects.get(slug='marbl')
+        user.archivist.archives.remove(marbl)
+        user.save()
+        response = self.client.post(delete_url, {'eadid': eadid, 'title': title,
+                                    'note': note, 'date': '2010-07-01 15:01:20'}, follow=False)
+        code = response.status_code
+        expected = 302   # permission denied - currently redirects to login form (even if logged in)
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s for user without archive access'
+                         % (expected, code, delete_url))
+        # - the document should NOT have been removed from eXist
+        self.assertTrue(self.db.hasDocument('%s/%s.xml' % (settings.EXISTDB_TEST_COLLECTION, eadid)),
+            "document should be present in eXist collection when user has insufficient access for delete_ead")
+
+        # restore access
+        user.archivist.archives.add(marbl)
+        user.save()
         response = self.client.post(delete_url, {'eadid': eadid, 'title': title,
                                     'note': note, 'date': '2010-07-01 15:01:20'}, follow=True)
         # on success:
@@ -544,8 +742,9 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(note, deleted_info.note, "deleted record has posted note")
         # - the user should be redirected with a success message
         (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(redirect_url.endswith(reverse('fa-admin:list-published')),
-            "response redirects to list of published documents")
+        self.assert_(redirect_url.endswith(reverse('fa-admin:published-by-archive',
+            kwargs={'archive': 'marbl'})),
+            "response redirects to archive-specific list of published documents")
         expected = 303      # redirect - see other
         self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST)'
                              % (expected, code, delete_url))
@@ -554,6 +753,9 @@ class AdminViewsTest(BaseAdminViewsTest):
                 "delete success message is set in response context")
 
         # test for expected failures for a non-existent eadid
+        # NOTE: logging in as superuser, because non-super admin will be denied
+        # based on lack of archive information
+        self.client.login(**self.credentials['superuser'])
         eadid = 'bogus-id'
         delete_nonexistent = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
         # GET - attempt to load form to delete an ead not present in eXist db
@@ -582,7 +784,8 @@ class AdminViewsTest(BaseAdminViewsTest):
 
         self.client.login(**self.credentials['admin'])
         eadid = 'hartsfield558'
-        delete_url = reverse('fa-admin:delete-ead', kwargs={'id': eadid})
+        delete_url = reverse('fa-admin:delete-ead-by-archive',
+            kwargs={'id': eadid, 'archive': 'marbl'})
 
         title, note = 'Deleted EAD record', 'removed because of foo'
         Deleted(eadid=eadid, title=title, note=note).save()
@@ -659,30 +862,41 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # restore the real celery task
         views.reload_cached_pdf = self.real_reload
 
-    # use fixture directory to test publication
-    @patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures'))
     def test_publish(self):
+        # publish from file no longer supported; publish from preview only
+        self.client.login(**self.credentials['admin'])
 
-        # first test only uses temp dir & files created in setup
-        with patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=self.tmpdir):
-            publish_url = reverse('fa-admin:publish-ead')
-            self.client.login(**self.credentials['admin'])
-            # GET should just list files available to be published
-            response = self.client.get(publish_url)
+        publish_url = reverse('fa-admin:publish-ead')
+        # post without preview id should error - message + redirect
+        response = self.client.post(publish_url, follow=True)
+        (redirect_url, code) = response.redirect_chain[0]
+        self.assert_(reverse('fa-admin:index') in redirect_url)
+        expected = 303      # redirect
+        self.assertEqual(code, expected, 'Expected %s but returned %s for %s without preview id'
+            % (expected, code, publish_url))
 
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (GET) as admin user'
-         % (expected, code, publish_url))
-        self.assertContains(response, os.path.basename(self.tmpfiles[0].name))
+        # convert messages into an easier format to test
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assertEqual('No preview document specified for publication',
+            msgs[0], 'message should indicate no preview document specified')
 
-        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
         # use fixture directory to test publication
+        fixture_dir = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
+        # load a file to preview for testing
         filename = 'hartsfield558.xml'
-        response = self.client.post(publish_url, {'filename': filename}, follow=True)
+        # override archive svn working path to use fixture dir to load preview
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': filename})
+
+        # publish the preview file
+        document_id = 'hartsfield558'
+        filename = '%s.xml' % document_id
+        response = self.client.post(publish_url, {'preview_id': document_id}, follow=True)
         code = response.status_code
         expected = 200  # final code, after following redirects
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
+        self.assertEqual(code, expected,
+            'Expected %s but returned %s for %s (POST, following redirects) as admin user'
             % (expected, code, publish_url))
         (redirect_url, code) = response.redirect_chain[0]
         self.assert_(reverse('fa-admin:index') in redirect_url)
@@ -691,98 +905,6 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
             % (expected, code, publish_url))
 
         # convert messages into an easier format to test
-        msgs = [str(msg) for msg in response.context['messages']]
-        self.assert_("Successfully updated" in msgs[0], "success message set in context")
-
-        # confirm that document was actually saved to exist
-        docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/' + filename)
-        self.assertEqual(docinfo['name'], settings.EXISTDB_TEST_COLLECTION + '/' + filename)
-
-        task = TaskResult.objects.get(object_id='hartsfield558')
-        self.assert_(isinstance(task, TaskResult),
-            "TaskResult was created in db for pdf reload after successful publish")
-
-        # publish invalid document - should display errors
-        response = self.client.post(publish_url, {'filename': 'hartsfield558_invalid.xml'})
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, invalid document) as admin user'
-                             % (expected, code, publish_url))
-        self.assertContains(response, "Could not publish")
-        self.assertContains(response, "The attribute &#39;invalid&#39; is not allowed")   # DTD validation error
-        self.assertContains(response, "series c01 id attribute is not set")
-        self.assertContains(response, "index id attribute is not set")
-        docinfo = self.db.describeDocument(settings.EXISTDB_TEST_COLLECTION + '/hartsfield558_invalid.xml')
-        self.assertEqual({}, docinfo)   # invalid document not loaded to exist
-
-        # attempt to publish non-well-formed xml - display errors
-        with patch.object(settings, 'FINDINGAID_EAD_SOURCE', new=fixture_dir):
-            response = self.client.post(publish_url, {'filename': 'badlyformed.xml'})
-        code = response.status_code
-        expected = 200
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, not well-formed xml) as admin user'
-                             % (expected, code, publish_url))
-        self.assertContains(response, "Could not publish")
-        self.assertContains(response, "Unescaped &#39;&lt;&#39; not allowed in attributes values",
-            msg_prefix="syntax error detail for badly formed XML displays")
-
-        # exist save errors should be caught & handled gracefully
-        # - force an exist save error by setting collection to a non-existent collection
-        with patch.object(settings, 'EXISTDB_ROOT_COLLECTION', new='/bogus/doesntexist'):
-            response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
-            self.assertContains(response, "Could not publish",
-                msg_prefix="exist save error on publish displays error to user")
-            self.assertContains(response,
-                "Collection %s not found" % settings.EXISTDB_ROOT_COLLECTION,
-                msg_prefix="specific exist save error displayed to user")
-            self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-
-        # simulate incorrect eXist permissions by not specifying username/password
-                # ensure guest account cannot update
-        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
-        with patch.object(settings, 'EXISTDB_SERVER_USER', new=None):
-            with patch.object(settings, 'EXISTDB_SERVER_PASSWORD', new=None):
-
-                response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
-                self.assertContains(response, "Could not publish")
-                self.assertContains(response, "Database Error",
-                    msg_prefix="error page displays explanation and instructions to user")
-                self.assertContains(response, "update is not allowed",
-                    msg_prefix="error page displays specific exist permissions message")
-
-        # - simulate eXist not running by setting existdb url to non-existent exist
-        with patch.object(settings, 'EXISTDB_SERVER_URL', new='http://localhost:9191/not-exist'):
-            response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
-            self.assertContains(response, "Could not publish")
-            self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-            self.assertContains(response, "I/O Error: Connection refused",
-                msg_prefix="error page displays specific connection error message")
-
-    def test_publish_from_preview(self):
-        # test publishing a document that has been loaded for preview
-        publish_url = reverse('fa-admin:publish-ead')
-        self.client.login(**self.credentials['admin'])
-
-        # load a file to preview to test
-        filename = 'hartsfield558.xml'
-        settings.FINDINGAID_EAD_SOURCE = os.path.join(settings.BASE_DIR, 'fa_admin', 'fixtures')
-        response = self.client.post(reverse('fa-admin:preview-ead'), {'filename': filename})
-
-        # publish the preview file
-        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
-        code = response.status_code
-        expected = 200  # final code, after following redirects
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST, following redirects) as admin user'
-                             % (expected, code, publish_url))
-        (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(reverse('fa-admin:index') in redirect_url)
-        expected = 303      # redirect
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
-                             % (expected, code, publish_url))
-
-        # convert mesages into an easier format to test
         msgs = [str(msg) for msg in response.context['messages']]
         # last message is the publication one (preview load message still in message queue)
         self.assert_("Successfully updated" in msgs[-1],
@@ -800,28 +922,95 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         docinfo = self.db.describeDocument(settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
         self.assertEqual({}, docinfo)
 
-        task = TaskResult.objects.get(object_id='hartsfield558')
+        task = TaskResult.objects.get(object_id=document_id)
         self.assert_(isinstance(task, TaskResult),
-            "TaskResult was created in db for pdf reload after successful publish from preview")
+            "TaskResult was created in db for pdf reload after successful publish")
 
         # attempt to publish a document NOT loaded to preview
-        response = self.client.post(publish_url, {'preview_id': 'bogus345'}, follow=True)
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.post(publish_url, {'preview_id': 'bogus345'}, follow=True)
         msgs = [str(msg) for msg in response.context['messages']]
         self.assert_('Publish failed. Could not retrieve' in msgs[0],
             'error message set in response context attempting to publish a document not in preview')
 
         # force an exist save error by setting collection to a non-existent collection
-        real_collection = settings.EXISTDB_ROOT_COLLECTION
-        settings.EXISTDB_ROOT_COLLECTION = "/bogus/doesntexist"
-        response = self.client.post(publish_url, {'filename': 'hartsfield558.xml'})
-        self.assertContains(response, "Could not publish",
+        # - load to preview for next three tests
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': filename})
+
+        # publish to non-existent collection
+        with override_settings(EXISTDB_ROOT_COLLECTION='/bogus/doesntexist'):
+            response = self.client.post(publish_url, {'preview_id': document_id})
+
+            self.assertContains(response, "Could not publish",
                 msg_prefix="exist save error on publish displays error to user")
-        self.assertContains(response,
+            self.assertContains(response,
                 "Collection %s not found" % settings.EXISTDB_ROOT_COLLECTION,
                 msg_prefix="specific exist save error displayed to user")
-        self.assertContains(response, "Database Error",
+            self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
 
-        # restore settings
-        settings.EXISTDB_ROOT_COLLECTION = real_collection
+        # NOTE: formerly included tests for publish invalid or badly formed xml
+        # these cases are no longer possible since it is impossible
+        # to load that content to preview
+
+        # simulate incorrect eXist permissions by not specifying username/password
+        # ensure guest account cannot update
+        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+        with override_settings(EXISTDB_SERVER_USER=None,
+                               EXISTDB_SERVER_PASSWORD=None):
+            response = self.client.post(publish_url, {'preview_id': document_id})
+            self.assertContains(response, "Could not publish")
+            self.assertContains(response, "Database Error",
+                msg_prefix="error page displays explanation and instructions to user")
+            self.assertContains(response, "Insufficient privileges",
+                msg_prefix="error page displays specific exist permissions message")
+
+        # NOTE: formerly included test for exist not running, but not testable
+        # because publish now requires preview database be accessible
+
+        # test user who doesn't have permissions on the archive
+        filename = 'hartsfield558.xml'
+        # load to preview
+        with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': filename}, follow=True)
+
+        # update user to remove marbl access
+        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        marbl = Archive.objects.get(slug='marbl')
+        user.archivist.archives.remove(marbl)
+        user.save()
+        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('You do not have permission to publish' in msgs[0],
+            'user should see a message if they don\'t have access to publish')
+
+        # test archive not identified from ead (subarea/name mismatch)
+        marbl.name = 'Manuscripts & Archives'
+        marbl.save()
+        user.archivist.archives.add(marbl)
+        user.save()
+        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Publish failed. Could not find archive' in msgs[0],
+            'user should see a message if the EAD subarea doesn\'t match a configured archive')
+
+        # test subarea not specified in ead
+        self.tmpdir = tempfile.mkdtemp('fa-publish')
+        # load fixture and save elsewhere without a subarea
+        ead = load_xmlobject_from_file(os.path.join(fixture_dir, 'hartsfield558.xml'),
+                                       FindingAid)
+        del ead.repository[0]
+        with open(os.path.join(self.tmpdir, 'hartsfield558.xml'), 'w') as xmlfile:
+            ead.serializeDocument(xmlfile, pretty=True)
+        # load to preview
+        with patch('findingaids.fa.models.Archive.svn_local_path', self.tmpdir):
+            response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
+                {'filename': 'hartsfield558.xml'}, follow=True)
+        response = self.client.post(publish_url, {'preview_id': 'hartsfield558'}, follow=True)
+        msgs = [str(msg) for msg in response.context['messages']]
+        self.assert_('Could not determine which archive' in msgs[0],
+            'user should see an error message if the EAD has no subarea present')
 

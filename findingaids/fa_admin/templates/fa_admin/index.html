@@ -5,8 +5,58 @@
 
 {% block style %}
   {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/style/redmond/jquery-ui-1.10.3.custom.min.css" />
    {% include 'taskresult/snippets/task_styles.html' %}
 {% endblock %}
+
+{% block scripts %}
+    {{ block.super }}
+    <script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.10.3.custom.min.js"></script>
+    <script>
+  $(function() {
+    var tabs = $("#tabs").tabs({
+      active: {{ current_tab }}
+    });
+    var csrftoken = $('input[name=csrfmiddlewaretoken]').val();
+    tabs.tabs({
+      beforeLoad: function( event, ui ) {
+        ui.panel.html('Loading...');
+        ui.jqXHR.error(function() {
+          ui.panel.html('There was an error loading this content.');
+        });
+      },
+      activate: function(event, ui) {
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'fa-admin:current-archive' %}",
+          data: {'id': $(ui.newTab).index()},
+          headers: {'X-CSRFTOKEN': csrftoken}
+        });
+
+      }
+    });
+    // make the tabs sortable
+    tabs.find(".ui-tabs-nav").sortable({
+      axis: "x",
+      stop: function() {
+        tabs.tabs( "refresh" );
+        var ids = tabs.find('li').map(function() { return this.id }).get();
+        {# on sort, post so we can save order preference #}
+        $.ajax({
+          type: 'POST',
+          url: "{% url 'fa-admin:archive-order' %}",
+          data: {'ids': ids.join()},
+          headers: {'X-CSRFTOKEN': csrftoken}
+        });
+      }
+    });
+
+  });
+
+  </script>
+{% endblock %}
+
 
 {% block sidebar-left %}
   {{ block.super }}
@@ -17,45 +67,49 @@
       <ul>
       {% for r in task_results %}
       {% include 'taskresult/snippets/display_task.html' %}
-      {% comment %}
-        <li class="{{r.task.status|lower}}">{{ r.label }}
-            {% if r.eadid %}<a href="{% url 'fa:findingaid' id=r.eadid %}">{{ r.eadid }}</a>{% endif %}:
-            <span class="code">{{ r.task.status }}</span>
-            {% if r.task_end %}<div class="task_end">ended {{ r.task_end|timesince }} ago</div>{% endif %}
-            </li>
-            {% endcomment %}
       {% empty %}
         <li>No recent tasks.</li>
       {% endfor %}
       </ul>
   </div>
-
 {% endblock %}
 
 {% block content-body %} {# no permissions to do any finding aid tasks #}
-{% if not perms.fa_admin.can_publish and not perms.fa_admin.can_preview and not perms.fa_admin.can_preview %}
+{% if not perms.fa_admin.can_publish and not perms.fa_admin.can_preview and not perms.fa_admin.can_preview or not archives%}
 <p>You don't have permission to do anything yet.  If you don't have the permissions
 you require to do your work, please contact a site administrator and ask them to
 give your account the appropriate permissions.</p>
 {% endif %}
 
-{% if user.is_superuser %}
+{% if user.is_superuser %} {# FIXME: could be more exact with permissions here #}
   <div class="section">
       <h2>Manage users and site</h2>
           <ul>
             <li><a href="{% url 'fa-admin:list-staff' %}">Manage user accounts</a></li>
+            <li><a href="{% url 'admin:fa_archive_changelist' %}">Manage archives</a></li>
             <li><a href="{% url 'admin:index' %}">Django DB admin site</a></li>
           </ul>
   </div>
 {% endif %}
 
 {% if perms.fa_admin.can_delete or perms.fa_admin.can_preview %}
+{% csrf_token %} {# make available for jquery post #}
  <div class="section">
   <h2>Manage documents</h2>
     <ul>
-      <li><a href="{% url 'fa-admin:list-published' %}">Published documents</a></li>
+      <li><b>Published documents by archive:</b>
+          {% for archive in archives %}
+          <a href="{% url 'fa-admin:published-by-archive' archive.slug %}">{{ archive.label }}</a>
+          {% if not forloop.last %} | {% endif %}
+          {% endfor %}
+      </li>
+      {% if user.is_superuser %} {# others are allowed to see this list, but can't delete so probably not useful #}
+        <li><a href="{% url 'fa-admin:list-published' %}">all published documents</a>
+      {% endif %}
+
       {% if perms.fa_admin.can_preview %}
-        <li><a href="{% url 'fa-admin:preview-ead' %}">Documents available for preview</a></li>
+      {# FIXME: disabled until we can resolve what should be done with it #}
+        {# <li><a href="{% url 'fa-admin:preview-ead' %}">Documents available for preview</a></li> #}
       {% endif %}
   </ul>
  </div>

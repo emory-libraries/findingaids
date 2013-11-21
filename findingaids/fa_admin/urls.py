@@ -19,20 +19,26 @@ from findingaids.fa.urls import EADID_URL_REGEX, findingaid_urlpatterns
 
 urlpatterns = patterns('findingaids.fa_admin.views',
     url(r'^$', 'main', name="index"),
+    url(r'^(?P<archive>[a-z0-9-]+)/files/', 'list_files', name='files'),
+    url(r'^archives/order/', 'archive_order', name='archive-order'),
+    url(r'^archives/current/', 'current_archive', name='current-archive'),
     url(r'^accounts/$', 'list_staff', name="list-staff"),
     url(r'^accounts/logout$', 'logout', name="logout"),
     url(r'^publish/$', 'publish', name="publish-ead"),
-    url(r'^preview/$', 'preview', name="preview-ead"),
-    url(r'^(?P<filename>[^/]+)/prep/$', 'prepared_eadxml', name="prep-ead"),
-    url(r'^(?P<filename>[^/]+)/prep/diff/', 'prepared_ead', {'mode': 'diff'},
+    url(r'^(?P<archive>[a-z0-9-]+)/preview/$', 'preview', name="preview-ead"),
+    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/$', 'prepared_eadxml', name="prep-ead"),
+    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/diff/', 'prepared_ead', {'mode': 'diff'},
             name="prep-ead-diff"),
-    url(r'^(?P<filename>[^/]+)/prep/about/', 'prepared_ead', {'mode': 'summary'},
+    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/about/', 'prepared_ead', {'mode': 'summary'},
             name="prep-ead-about"),
     # include finding aid document urls in preview mode
     url(r'^preview/documents/', include(findingaid_urlpatterns, namespace='preview'),
             {'preview': True}),
     url(r'^documents/$', 'list_published', name="list-published"),
+    url(r'^(?P<archive>[a-z0-9-]+)/documents/$', 'list_published', name="published-by-archive"),
     url(r'^documents/%s/delete/$' % EADID_URL_REGEX, 'delete_ead', name="delete-ead"),
+    url(r'^(?P<archive>[a-z0-9-]+)/documents/%s/delete/$' % EADID_URL_REGEX, 'delete_ead',
+        name="delete-ead-by-archive"),
 )
 
 # contrib views

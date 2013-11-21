@@ -31,9 +31,8 @@ urlpatterns = patterns(
     '',
     url(r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt',
         content_type='text/plain')),
-    # url(r'^robots\.txt$', direct_to_template, {
-    #     'template': 'robots.txt', 'mimetype': 'text/plain'
-    #     }),
+    (r'^favicon\.ico$', RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)),
+
     # embedded url on non-library Emory sites that gets picked up by search bots
     url(r'^-Libraries-EmoryFindingAids$',
         RedirectView.as_view(url='/', permanent=True)),

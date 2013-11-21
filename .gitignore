@@ -8,3 +8,6 @@ coverage.xml
 nosetests.xml
 build
 dist
+
+# OSX
+.DS_Store

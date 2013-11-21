@@ -8,4 +8,9 @@
 <h1 id="site-name">{% trans 'EmoryFindingAids: Administration' %}</h1>
 {% endblock %}
 
-{% block nav-global %}{% endblock %}
+{% block nav-global %}
+<p>Return to:
+    <a href="{% url 'fa-admin:index' %}">Finding Aids Admin</a> |
+    <a href="{% url 'site-index' %}">Finding Aids Home</a>
+</p>
+{% endblock %}

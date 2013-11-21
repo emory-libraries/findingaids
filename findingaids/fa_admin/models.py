@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/models.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,10 @@
 
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 
+from findingaids.fa.models import Archive
 from findingaids.fa.utils import get_findingaid
 
 
@@ -31,17 +33,44 @@ class Findingaids(models.Model):
                 ("can_publish", "Can publish a finding aid"),
                 ("can_preview", "Can preview a finding aid"),
                 ("can_delete", "Can delete a finding aid"),
+                ("can_prepare", "Can prepare a finding aid"),
         )
+
+class Archivist(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    archives = models.ManyToManyField(Archive, blank=True, null=True)
+    order = models.CommaSeparatedIntegerField(max_length=255, blank=True,
+        null=True)
+
+    def sorted_archives(self):
+        '''List of archives this user is associated with, in order if
+        they have specified any order preference.'''
+        archives = self.archives.all()
+        # if no archives are explicitly defined and this is a superuser,
+        # give them access to all
+        if not archives and self.user.is_superuser:
+            archives = Archive.objects.all()
+        if self.order:
+            id_order = [int(id) for id in self.order.split(',')]
+            # if id is not present (e.g., new archive), sort to the end
+            return sorted(archives,
+                key=lambda a: id_order.index(a.id) if a.id in id_order else 50)
+
+        return archives
 
 class EadFile:
     """Information about an EAD file available to be published or previewed."""
-    def __init__(self, filename, modified):
+    def __init__(self, filename, modified, archive=None):
         self.filename = filename
         self.mtime = modified
         self.modified = datetime.utcfromtimestamp(modified)
         self._published = None
         self._previewed = None
-        
+        self.archive = archive
+
+    def __repr__(self):
+        return '<%s %s>' % (self.__class__, self.filename)
+
     @property
     def published(self):
         "Date object was modified in eXist, if published"
@@ -49,7 +78,7 @@ class EadFile:
         if self._published is None:
             try:
                 fa = get_findingaid(filter={'document_name': self.filename},
-                                       only=['last_modified'])            
+                                       only=['last_modified'])
                 if fa.count():
                     self._published = fa[0].last_modified
             except Exception:
@@ -60,7 +89,7 @@ class EadFile:
             if self._published is None:
                 self._published = False
         return self._published
-    
+
     @property
     def previewed(self):
         """Date object was loaded to eXist preview collection, if currently
