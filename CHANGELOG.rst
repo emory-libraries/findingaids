@@ -11,7 +11,35 @@ recent version first.  Upgrade or deployment notes should be found in
 1.5
 ---
 
-* Support for publish from local files is removed (only publish from preview)
+* A superuser can associate an archivist with one or more archives and their
+  corresponding subversion repositories so that archivists can preview and
+  publish for only the archives they are assigned.
+* Superusers of the finding aids database can easily navigate between the
+  django administrative module and the finding aids database administrative module.
+* When an archivist associated with a single archive logs in to the admin site,
+  they see a list of EAD documents in the associated subversion repository and
+  are able to prep, preview, and publish finding aids from that repository.
+* When an archivist associated with multiple archives logs in to the admin site,
+  they see a tab for each corresponding subversion repository, each with a list
+  of EAD documents in that subversion repo for prep, preview and publication.
+* An archivist with permissions on multiple archives can choose a primary
+  archive so they can view EAD documents from that repository by default
+  when they log in.
+* When an archivist preps an EAD document that requires modifications, they can
+  click a button to accept and apply those changes so that updates are automatically
+  committed to subversion on their behalf.
+* Archivists can only prep, preview, and publish EAD documents from the  subversion
+  repositories they have been associated with in the admin site, for security.
+* An archivist can only delete a published finding aid from the website if it is
+  associated with an archive that they have permission to manage, for security reasons.
+* When an archivist with permissions for multiple repositories selects a repository
+  tab on the main admin page, that repository tab stays active until they select
+  another repository or logout, in order to avoid confusion when prepping,
+  previewing, and publishing content from a single repository.
+* Deprecated and unused support for publish without preview has been removed.
+* New celery task: when an archive is defined or updated, check out (or update)
+  a local copy of the subversion repository.
+* bugfix: add redirect for top-level /favicon.ico url
 
 1.4.1
 -----
