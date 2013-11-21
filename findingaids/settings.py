@@ -23,7 +23,8 @@ djcelery.setup_loader()
 
 # explicitly set celery task to findingaids queue (let celery create the queue)
 CELERY_ROUTES = {
-    'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': 'findingaids'}
+    'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': 'findingaids'},
+    'findingaids.fa_admin.tasks.archive_svn_checkout': {'queue': 'findingaids'}
 }
 
 # Get the directory of this file for relative dir paths.
