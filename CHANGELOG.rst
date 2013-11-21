@@ -8,6 +8,12 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.5.1
+-----
+
+* bugfix: configure celery task added in 1.5 for svn checkout so it is
+  directed to findingaids queue so it gets picked up by the celery worker.
+
 1.5
 ---
 
