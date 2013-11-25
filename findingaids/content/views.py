@@ -46,6 +46,8 @@ def content_page(request, page):
             }, context_instance=RequestContext(request))
 
 
+
+
 def feedback(request):
     '''Feedback form. On GET, displays the form; on POST, processes the submitted
     form and sends an email (if all required fields are present).'''
