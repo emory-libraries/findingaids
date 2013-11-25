@@ -1,0 +1,28 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+{% block page-subtitle %}: Contributors{% endblock %}
+{% block content-header  %}
+ <h1 class="title toplevel" property="schema:name">Contributors</h1>
+{% endblock %}
+
+{% block content-body %}
+
+<p>The EmoryFindingAids database provides centralized access to
+    detailed descriptions of archival and manuscript collections
+    held in various repositories at Emory University. As this project
+    is a "work in progress," new finding aids are being created and
+    added to the database all the time.</p>
+<p>The list below includes the names of the repositories that are
+    currently participating in the EmoryFindingAids database. Their
+     websites will provide more details regarding collection scope,
+     operating hours, and other helpful information.</p>
+
+<ul>
+    <li><a href="http://marbl.library.emory.edu/">Manuscript, Archives, and Rare Book Library</a></li>
+    <li><a href="http://marbl.library.emory.edu/">Emory University Archives</a></li>
+    <li><a href="http://library.law.emory.edu/about-the-library/archives-special-collections/">Emory Law School Archives</a></li>
+    <li><a href="http://www.pitts.emory.edu/DIA/speccoll.html">Pitts Theology Library</a></li>
+    <li><a href="http://health.library.emory.edu/">Woodruff Health Sciences Center Library</a></li>
+    <li><a href="http://oxford.library.emory.edu/">Oxford College Archives</a></li>
+</ul>
+{% endblock %}

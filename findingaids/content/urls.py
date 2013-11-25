@@ -25,6 +25,7 @@ urlpatterns = patterns('findingaids.content.views',
         name='faq'),
     url(r'^search-tips/$', TemplateView.as_view(template_name='content/search_tips.html'),
         name='search-tips'),
-
+    url(r'^institutions/$', TemplateView.as_view(template_name='content/contributors.html'),
+        name='contributors'),
     url(r'^(?P<page>.+)/$', 'content_page', name='page'),
 )
