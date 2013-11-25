@@ -21,6 +21,10 @@ from django.views.generic import TemplateView
 urlpatterns = patterns('findingaids.content.views',
     url(r'^request-materials/$', 'request_materials', name='request-materials'),
     url(r'^feedback/$', 'feedback', name='feedback'),
-    url(r'^faq/$', TemplateView.as_view(template_name='content/faq.html')),
+    url(r'^faq/$', TemplateView.as_view(template_name='content/faq.html'),
+        name='faq'),
+    url(r'^search-tips/$', TemplateView.as_view(template_name='content/search_tips.html'),
+        name='search-tips'),
+
     url(r'^(?P<page>.+)/$', 'content_page', name='page'),
 )

@@ -1,0 +1,64 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+{% block page-subtitle %}: Search Tips{% endblock %}
+{% block content-header  %}
+ <h1 class="title toplevel" property="schema:name">Search Tips</h1>
+{% endblock %}
+
+{% block content-body %}
+<div class="search-tips">
+
+<h4><strong>Keyword searching all EmoryFindingAids</strong></h4>
+
+<ul>
+ <li><strong>Direct phase search:</strong>
+     To search two or more words in a phrase use double quotes:
+     <blockquote>
+        <p>"League of Women Voters"</p>
+        <p>"African Methodist Episcopal"</p>
+    </blockquote>
+ </li>
+ <li><strong>Wildcard:</strong>
+    To search a partial word, use an asterisk at the end of the word:
+    <em>poe*</em> will find Poe, poet, poets, poems, poetry, etc.
+ </li>
+ <li><strong>Boolean operators:</strong>
+    To create a more precise search, use Boolean operators (AND, OR, NOT):
+    <ul>
+        <li><strong>AND</strong> retrieves finding aids that contain both terms: <em>women AND georgia</em></p></li>
+        <li><strong>OR</strong> retrieves finding aids with either term: <em>NAACP OR "national association for the advancement of colored people"</em>; Use this search for searching synonyms.</li>
+        <li><strong>NOT</strong> narrows a search by retrieving finding aids that only contain the first term and not the second: <em>emory NOT oxford</em></li>
+    </ul>
+ </li>
+ <li>Search techniques can be combined to create a complex search string:
+    <blockquote>"African American*" AND (Georgia OR Alabama OR "South Carolina")</blockquote>
+ <li>Searches are not case sensitive: searching <em>United States</em> or <em>united states</em> will produce the same result</li>
+ <li>Two or more words in a text box will be searched using a default AND operator: A search for <strong>emory university </strong>returns all finding aids containing both words. To find phrases of two or more words use quotes: "emory university."</li>
+</ul>
+
+ <p><strong>To limit a search to a single repository, select a repository from the drop down list</strong>. If your search returns no results, try searching all the finding aids (the default search).</p>
+
+ <p><strong>The results list will be displayed with the most relevant finding aids first.</strong> Search results are sorted by a relevance algorithm that weighs factors such as the number of search terms found in the full text of the finding aids and the number of terms found in certain fields.</p>
+
+ <h4><strong>Searching within individual finding aids</strong></h4>
+
+ <p><strong>Keyword searching: Enter one or more search terms in the search boxes</strong></p>
+ <ul>
+  <li>Entering terms into the "Search all finding aids" search box searches all the finding aids again.</li>
+  <li>Entering terms into the "Search for items in the container list" search box returns results ONLY for that finding aid. Search results return hits for terms found in the container list of that finding aid.</li>
+  <li>Search boxes accept searches using Boolean operators, asterisks, and double quotes. For more information on constructing searches, see above.</li>
+</ul>
+
+<p><strong>Browsing Library of Congress Subject headings</strong></p>
+<ul>
+    <li><p>Choose a subject heading from the list under the heading "Selected Search Terms" by clicking on the hyperlinked heading. This will return a list of other relevant finding aids containing that subject heading. This search is especially useful for browsing finding aids on a particular topic.</p>
+
+        <p>**<em>Note that this search does not search collection creators. For instance, clicking on the subject heading for Ted Hughes returns collections of other individuals with material related to Hughes. The search would not return finding aids for collections Ted Hughes created.</em></p>
+    </li>
+</ul>
+
+
+
+</div>
+
+{% endblock %}
