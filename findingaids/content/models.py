@@ -150,12 +150,6 @@ class BannerFeed(CachedFeed):
     url = settings.CONTENT_RSS_FEEDS[id]
 
 
-class NewsFeed(CachedFeed):
-    'Feed object to access configured RSS feed for home page announcements'
-    id = 'news'
-    url = settings.CONTENT_RSS_FEEDS[id]
-
-
 class ContentFeed(CachedFeed):
     'Feed object to access configured RSS feed for drupal-managed site content pages'
     id = 'content'

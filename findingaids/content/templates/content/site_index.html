@@ -26,11 +26,6 @@
  </div>
 
  <div class="clear"/>
- {% if news %}
- <div class="announcement">
-     <h2>{{ news.title }}</h2> {% firstof news.summary_detail.value|safe news.summary|safe %}
- </div>
-{% endif %}
  <div class="bottom-half">
         <div id="search" class="left-col">
              <h2>Search FindingAids</h2>

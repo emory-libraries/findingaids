@@ -108,6 +108,7 @@ SVN_USERNAME = ''
 SVN_PASSWORD = ''
 SVN_WORKING_DIR = ''
 
+
 # default text for links to digital archival objects
 #DEFAULT_DAO_LINK_TEXT = '[Resource available online]'
 
@@ -126,7 +127,6 @@ BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672/'
 # URLS for RSS feeds to populate site content pages
 CONTENT_RSS_FEEDS = {
     'banner': '',
-    'news': '',
     'content': '',
 }
 
