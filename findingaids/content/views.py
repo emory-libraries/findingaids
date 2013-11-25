@@ -32,7 +32,6 @@ def site_index(request):
                 'letters': title_letters(),
                  # banner feed items for rotating home page banner image
                 'banner': BannerFeed().items,
-                'about': ContentFeed().get_entry('about'),
             }, context_instance=RequestContext(request))
 
 
