@@ -160,35 +160,6 @@ class CachedFeedTest(TestCase):
             'anchor link that does not match an anchor in the page should not be converted to a relative link')
 
 
-class ContentFeedTest(TestCase):
-
-    def setUp(self):
-        entry = feedparser.FeedParserDict()
-        entry.title = 'About'
-        entry.link = 'findingaids-about'
-        entry.summary = 'some text'
-
-        # replace feedparser module with a mock for testing
-        self.mockfeedparser = MockFeedParser()
-        self.mockfeedparser.entries = [entry]
-        self._feedparser = models.feedparser
-        models.feedparser = self.mockfeedparser
-
-    def tearDown(self):
-        # restore the real feedparser
-        models.feedparser = self._feedparser
-        # clear any feed data cached by tests
-        models.ContentFeed().clear_cache()
-
-    def test_get_entry(self):
-        content = models.ContentFeed()
-        # find test entry
-        entry = content.get_entry('about')
-        self.assertEqual('About', entry.title)
-        # non-existent
-        self.assertEqual(None, content.get_entry('bogus'))
-
-
 class EmailTestCase(EulexistdbTestCase):
     # Common test class with logic to mock sending mail and mock captcha submission
     # to test functionality without actual sending email or querying captcha servers.
@@ -390,29 +361,11 @@ class RequestMaterialsFormTest(EmailTestCase):
 
 
 class ContentViewsTest(EmailTestCase):
-    feed_entries = [
-        feedparser.FeedParserDict({'title': 'news', 'link': 'fa-news'}),
-        feedparser.FeedParserDict({'title': 'banner', 'link': 'fa-banner'}),
-        feedparser.FeedParserDict({'title': 'about', 'link': 'fa-about'}),
-    ]
     exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
 
     def setUp(self):
         self.client = Client()
-        # replace feedparser module with a mock for testing
-        self.mockfeedparser = MockFeedParser()
-        self.mockfeedparser.entries = self.feed_entries
-        self._feedparser = models.feedparser
-        models.feedparser = self.mockfeedparser
         super(ContentViewsTest, self).setUp()
-
-    def tearDown(self):
-        # restore the real feedparser
-        models.feedparser = self._feedparser
-        # clear any feed data cached by tests
-        models.BannerFeed().clear_cache()
-        models.ContentFeed().clear_cache()
-        super(ContentViewsTest, self).tearDown()
 
     def test_site_index_banner(self):
         index_url = reverse('site-index')
@@ -420,39 +373,6 @@ class ContentViewsTest(EmailTestCase):
         expected = 200
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
                              % (expected, response.status_code, index_url))
-        self.assertEqual(self.feed_entries, response.context['banner'],
-            'feed entries should be set in template context as "banner"')
-
-    def test_content_page(self):
-        about = feedparser.FeedParserDict()
-        about.title = 'About'
-        about.link = 'findingaids-about'
-        about.summary = 'some text'
-        faq = feedparser.FeedParserDict()
-        faq.title = 'FAQ'
-        faq.link = 'findingaids-faq'
-        faq.summary = 'other text'
-        self.mockfeedparser.entries = [about, faq]
-
-        content_url = reverse('content:page', args=['faq'])
-        response = self.client.get(content_url)
-        expected = 200
-        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
-             % (expected, response.status_code, content_url))
-        self.assertEqual(faq, response.context['page'],
-            'feed item matching requested page is set in template context')
-        self.assertPattern('<title>.*: %s.*</title>' % faq.title,
-            response.content, msg_prefix='feed entry title should be set in html title')
-        self.assertPattern('<h1[^>]*>.*%s.*</h1>' % faq.title,
-            response.content, msg_prefix='feed entry title should be set as h1')
-
-        # not found
-        content_url = reverse('content:page', args=['bogus'])
-        response = self.client.get(content_url)
-        expected = 404
-        self.assertEqual(response.status_code, expected,
-            'Expected %s but returned %s for %s (non-existent page)'
-             % (expected, response.status_code, content_url))
 
     def test_feedback_form(self):
         # GET - display the form
