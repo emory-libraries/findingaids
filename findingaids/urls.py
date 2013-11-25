@@ -18,7 +18,6 @@ from django.conf.urls.defaults import *
 from django.contrib import admin
 from django.contrib.sitemaps import views as sitemaps_views
 from django.views.generic import TemplateView
-#from django.views.generic.simple import direct_to_template
 from django.views.generic.base import RedirectView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
