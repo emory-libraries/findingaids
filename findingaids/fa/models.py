@@ -142,10 +142,15 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     # temporary manual mapping for processinfo, will be incorporated into a release of eulxml
     process_info = xmlmap.NodeField("e:archdesc/e:processinfo", eadmap.Section)
 
+    # is mapped as single in eulxml.eadmap but could be multiple
+    separatedmaterial_list = xmlmap.NodeListField("e:archdesc/e:separatedmaterial", eadmap.Section)
+
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
     _admin_info = ['userestrict', 'altformavail', 'relatedmaterial', 'separatedmaterial',
                    'acqinfo', 'custodhist', 'prefercite']
+
+
     # -- map as regular xmlmap field, for use when entire object is returned
     admin_info_matches = xmlmap.IntegerField(
         'count(./e:archdesc/*[' +
@@ -208,8 +213,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             info.append(self.archdesc.alternate_form)
         if self.archdesc.related_material:
             info.append(self.archdesc.related_material)
-        if self.archdesc.separated_material:
-            info.append(self.archdesc.separated_material)
+        for sep_m in self.separatedmaterial_list:
+            info.append(sep_m)
         if self.archdesc.acquisition_info:
             info.append(self.archdesc.acquisition_info)
         if self.archdesc.custodial_history:
