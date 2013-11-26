@@ -20,8 +20,7 @@ import tempfile
 import time
 
 from django.test import TestCase
-from django.test.utils import override_settings
-from mock import patch
+from mock import patch, Mock
 
 from findingaids.fa.models import Archive
 from findingaids.fa_admin.models import EadFile
@@ -62,8 +61,8 @@ class RecentXmlFilesTest(TestCase):
 
 class SvnXmlFilesTest(TestCase):
 
-    @patch('findingaids.fa_admin.source.svn_client')
-    def test_svn_xml_files(self, mocksvnclient):
+    @patch('findingaids.fa_admin.source.wc')
+    def test_svn_xml_files(self, mocksvnwc):
         arch = Archive(label='Test', name='Test Archives and Collections',
             svn='http://svn.example.com/test/trunk', slug='test')
 
@@ -71,15 +70,15 @@ class SvnXmlFilesTest(TestCase):
         earlier = now - 300
         earliest = now - 1500
         xml_info = {
-            'now.xml': {'time': now * 1000000},
-            'earliest.xml': {'time': earliest * 1000000},
-            'earlier.xml': {'time': earlier * 1000000}
+            'now.xml': Mock(cmt_date=now * 1000000),
+            'earliest.xml': Mock(cmt_date=earliest * 1000000),
+            'earlier.xml': Mock(cmt_date=earlier * 1000000)
         }
         info = xml_info.copy()
-        info['nonxml.txt'] =  {'time': now * 1000000}
-        mocksvnclient.return_value.list.return_value = info
+        info['nonxml.txt'] =  Mock(cmt_date=now * 1000000)
+        mocksvnwc.WorkingCopy.return_value.entries_read.return_value = info
         files = svn_xml_files(arch)
-        mocksvnclient.return_value.list.assert_called_with(arch.svn_local_path, 'HEAD', 1)
+        mocksvnwc.WorkingCopy.return_value.entries_read.assert_called()
         # should consist of all xml files in svn info
         self.assertEqual(len(xml_info.keys()), len(files))
         self.assert_(isinstance(files[0], EadFile))
@@ -98,16 +97,27 @@ class FilesToPublishTest(TestCase):
         # clean up temp files & dir
         shutil.rmtree(self.tmpdir)
 
+    @patch('findingaids.fa_admin.source.wc')
+    @patch('findingaids.fa_admin.source.svn_remote')
     @patch('findingaids.fa_admin.source.svn_client')
     @patch('findingaids.fa_admin.source.svn_xml_files')
-    def test_files_to_publish(self, mocksvnfiles, mocksvnclient):
+    def test_files_to_publish(self, mocksvnfiles, mocksvnclient, mocksvnremote, mocksvnwc):
         arch = Archive(label='Test', name='Test Archives and Collections',
             svn='http://svn.example.com/test/trunk', slug='test')
 
+        # simulate up to date working copy
+        mocksvnwc.WorkingCopy.return_value.entry.return_value.revision = 10
+        mocksvnremote.return_value.get_latest_revnum.return_value = 10
+
         mocksvnfiles.return_value = ['file1', 'file2']  # not reflective of actual result
         result = files_to_publish(arch)
-        mocksvnclient.return_value.update.assert_called_with(arch.svn_local_path)
+        # should not update
+        mocksvnclient.return_value.update.assert_not_called()
         mocksvnfiles.assert_called_with(arch)
         self.assertEqual(mocksvnfiles.return_value, result)
 
+        # simulate out of date working copy - should do an svn up
+        mocksvnwc.WorkingCopy.return_value.entry.return_value.revision = 8
+        result = files_to_publish(arch)
+        mocksvnclient.return_value.update.assert_called_with(arch.svn_local_path)
 

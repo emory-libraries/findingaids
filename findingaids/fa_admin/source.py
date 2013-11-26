@@ -14,11 +14,12 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from datetime import datetime
 import glob
 import logging
 import os
 import time
+
+from subvertpy import wc
 
 from django.shortcuts import get_object_or_404
 
@@ -48,50 +49,48 @@ def recent_xml_files(dir):
 
 
 def svn_xml_files(archive):
-    svn = svn_client()
-    # url, most recent revision, depth 1
+    # NOTE: svn client still access remote repo info instead of local working copy
+    # (using the working copy is significantly faster)
+    svnwc = wc.WorkingCopy(None, archive.svn_local_path)
     start = time.time()
-    svn_list = svn.list(archive.svn_local_path, 'HEAD', 1)
-    logger.debug('svn list %d files for %s in %f sec' %
-                (len(svn_list.keys()), archive.slug, time.time() - start))
+    svn_info = svnwc.entries_read()
+    logger.debug('svn read entries for %d files for %s in %f sec' %
+                (len(svn_info.keys()), archive.slug, time.time() - start))
 
     files = []
-    start = time.time()
-    for filename, info in svn_list.iteritems():
+    # for filename, info in svn_info.iteritems():
+    for filename, entry in svn_info.iteritems():
         # skip non-xml content
         if not filename.endswith('.xml'):
             continue
         # svn timestamp includes microseconds and has to be divided
         # before we can treat it as a normal unix timestamp
         # https://github.com/jelmer/subvertpy/blob/f5608aa28506cfc0eb62e7a780b60f6aecb88135/subvertpy/properties.py#L50
-        files.append(EadFile(filename, (info['time'] / 1000000), archive))
-
-    logger.debug('generated list of %d XML files for %s in %f sec' %
-                (len(files), archive.slug, time.time() - start))
+        files.append(EadFile(filename, (entry.cmt_date / 1000000), archive))
 
     return files
 
 def files_to_publish(archive):
-    svn = svn_client()
-    remote = svn_remote(archive.svn)
-
     # determine local/remote revision to see if an update is needed
     start = time.time()
-    latest_rev = remote.get_latest_revnum()
-    logger.debug('svn remote get latest revision for %s (%d) in %f sec' %
-                (archive.slug, latest_rev, time.time() - start))
-
-    start = time.time()
-    info = svn.list(archive.svn_local_path, 'HEAD', 0)
-    local_rev = info['']['created_rev']
-    logger.debug('svn local revision for %s (%d) in %f sec' %
+    svnwc = wc.WorkingCopy(None, archive.svn_local_path)
+    # NOTE: second arg is path; first arg not documented (?!)
+    local_rev = svnwc.entry(archive.svn_local_path).revision
+    logger.debug('svn local revision for %s is %d (%f sec)' %
                 (archive.slug, local_rev, time.time() - start))
 
-    # do an svn update if the revisions don't match
+    remote = svn_remote(archive.svn)
+    start = time.time()
+    latest_rev = remote.get_latest_revnum()
+    logger.debug('svn remote revision for %s is %d (%f sec)' %
+                (archive.slug, latest_rev, time.time() - start))
+
+    # ONLY do an svn update if the revisions don't match
     if local_rev != latest_rev:
+        svn = svn_client()
         start = time.time()
         svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
         logger.debug('svn update %s in %f sec' % (archive.slug, time.time() - start))
 
-    # return list of recent xml files from the svn
+    # return list of recent xml files from the working copy
     return svn_xml_files(archive)
