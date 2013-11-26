@@ -23,7 +23,7 @@ from django.http import HttpResponse, HttpResponseServerError, Http404, \
     HttpResponseBadRequest
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -45,7 +45,7 @@ from eulexistdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Deleted, Archive
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
-from findingaids.fa_admin.auth import archive_access, archive_access_by_ead
+from findingaids.fa_admin.auth import archive_access
 from findingaids.fa_admin.forms import DeleteForm
 from findingaids.fa_admin.models import Archivist
 from findingaids.fa_admin.source import files_to_publish
@@ -81,16 +81,20 @@ def main(request):
     # get the 10 most recent task results to display status
     recent_tasks = TaskResult.objects.order_by('-created')[:10]
 
+    # absolute path to login, for use in javascript if timeout occurs
+    login_url = request.build_absolute_uri(settings.LOGIN_URL)
+
     return render(request, 'fa_admin/index.html', {
         'archives': archives,
         'current_tab': current_tab,
+        'login_url': login_url,
         'task_results': recent_tasks})
 
 
 # NOTE: viewing the file list sort of implies prep/preview/publish permissions
 # but currently does not actually *require* them
 @login_required_with_ajax()
-@user_passes_test_with_ajax(archive_access)
+@user_passes_test_with_ajax(archive_access)   # could add last-modified but ajax doesn't cache
 def list_files(request, archive):
     '''List files associated with an archive to be prepped and previewed
     for publication.  Expected to be retrieved via ajax and loaded in a

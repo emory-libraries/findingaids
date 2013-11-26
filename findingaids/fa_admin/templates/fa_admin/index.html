@@ -23,6 +23,11 @@
       beforeLoad: function( event, ui ) {
         ui.panel.html('Loading...');
         ui.jqXHR.error(function() {
+          console.log(ui.jqXHR.status);
+          // if status code is 401, login session has timed out: redirect to login page
+          if (ui.jqXHR.status == 401) {
+            window.location.href = "{{ login_url }}?next={{ request.path }}";
+          }
           ui.panel.html('There was an error loading this content.');
         });
       },
