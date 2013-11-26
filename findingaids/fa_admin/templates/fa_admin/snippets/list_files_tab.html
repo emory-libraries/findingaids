@@ -1,4 +1,5 @@
-<div>{{ files.paginator.count }} files total</div>
+{% load humanize %}
+<div>{{ files.paginator.count|intcomma }} files total</div>
 {% with items=files base_url=request.path %}
   {% include "snippets/pagination.html" %}
 {% endwith %}
@@ -21,8 +22,8 @@
             </form>
             {% endif %}
         </td>
-        <td>{{ file.modified|date }}</td>
-        <td>{{ file.published|date|default:'' }}</td>
+        <td>{{ file.modified|naturalday }}</td>
+        <td>{{ file.published|naturalday|default:'' }}</td>
     </tr>
 {% empty %}
   <tr><td colspan="2">No files found</td></tr>
