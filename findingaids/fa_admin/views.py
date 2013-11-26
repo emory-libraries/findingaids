@@ -18,6 +18,7 @@ import os
 import difflib
 import logging
 from lxml.etree import XMLSyntaxError
+import time
 
 from django.http import HttpResponse, HttpResponseServerError, Http404, \
     HttpResponseBadRequest
@@ -53,6 +54,7 @@ from findingaids.fa_admin.svn import svn_client
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
 
+logger = logging.getLogger(__name__)
 
 @login_required
 def main(request):
@@ -103,8 +105,9 @@ def list_files(request, archive):
     archive = get_object_or_404(Archive, slug=archive)
 
     files = files_to_publish(archive)
-    # sort by last modified time
+    # sort by last modified time, most recent first
     files = sorted(files, key=lambda file: file.mtime, reverse=True)
+
     paginator = Paginator(files, 30, orphans=5)
     try:
         page = int(request.GET.get('page', '1'))
@@ -116,6 +119,20 @@ def list_files(request, archive):
         recent_files = paginator.page(page)
     except (EmptyPage, InvalidPage):
         recent_files = paginator.page(paginator.num_pages)
+
+    # query for publish/preview modification time all at once
+    # (more efficient than individual queries for each file)
+    published = FindingAid.objects.only('document_name', 'last_modified') \
+        .filter(document_name__in=[f.filename for f in recent_files.object_list])
+    pubinfo = dict((r.document_name, r.last_modified) for r in published)
+    # preview info uses the same query, but against the preview db
+    preview = published.using(settings.EXISTDB_PREVIEW_COLLECTION)
+    previewinfo = {}
+    previewinfo = dict((r.document_name, r.last_modified) for r in preview)
+
+    for f in recent_files.object_list:
+        f.published = pubinfo.get(f.filename, None)
+        f.previewed = previewinfo.get(f.filename, None)
 
     return render(request, 'fa_admin/snippets/list_files_tab.html', {
         'files': recent_files,
