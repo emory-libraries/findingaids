@@ -15,11 +15,9 @@
     <script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.10.3.custom.min.js"></script>
     <script>
   $(function() {
-    var tabs = $("#tabs").tabs({
-      active: {{ current_tab }}
-    });
     var csrftoken = $('input[name=csrfmiddlewaretoken]').val();
-    tabs.tabs({
+    var tabs = $("#tabs").tabs({
+      active: {{ current_tab }},
       beforeLoad: function( event, ui ) {
         ui.panel.html('Loading...');
         ui.jqXHR.error(function() {
