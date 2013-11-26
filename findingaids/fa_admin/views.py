@@ -125,14 +125,11 @@ def list_files(request, archive):
     published = FindingAid.objects.only('document_name', 'last_modified') \
         .filter(document_name__in=[f.filename for f in recent_files.object_list])
     pubinfo = dict((r.document_name, r.last_modified) for r in published)
-    # preview info uses the same query, but against the preview db
-    preview = published.using(settings.EXISTDB_PREVIEW_COLLECTION)
-    previewinfo = {}
-    previewinfo = dict((r.document_name, r.last_modified) for r in preview)
+    # NOTE: if needed, we can also load preview info like this:
+    # preview = published.using(settings.EXISTDB_PREVIEW_COLLECTION)
 
     for f in recent_files.object_list:
         f.published = pubinfo.get(f.filename, None)
-        f.previewed = previewinfo.get(f.filename, None)
 
     return render(request, 'fa_admin/snippets/list_files_tab.html', {
         'files': recent_files,

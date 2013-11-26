@@ -8,7 +8,6 @@
         <th colspan="3">Filename</th> {# spans columns for [publish,] preview, & prep #}
         <th>Last Modified</th>
         <th>Last Published</th>
-        <th>Available for<br/>Preview</th>
     </tr>
 {% for file in files.object_list %}
     <tr>
@@ -24,7 +23,6 @@
         </td>
         <td>{{ file.modified|date }}</td>
         <td>{{ file.published|date|default:'' }}</td>
-        <td>{{ file.previewed|date|default:'' }}</td>
     </tr>
 {% empty %}
   <tr><td colspan="2">No files found</td></tr>
