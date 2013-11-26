@@ -14,14 +14,17 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from datetime import datetime
 import glob
 import logging
 import os
+import time
 
-from django.conf import settings
+from django.shortcuts import get_object_or_404
 
+from findingaids.fa.models import Archive
 from findingaids.fa_admin.models import EadFile
-from findingaids.fa_admin.svn import svn_client
+from findingaids.fa_admin.svn import svn_client, svn_remote
 
 '''
 Methods to support identifying and accessing source content to be published
@@ -43,11 +46,17 @@ def recent_xml_files(dir):
     # sort by last modified time
     return sorted(files, key=lambda file: file.mtime, reverse=True)
 
+
 def svn_xml_files(archive):
     svn = svn_client()
     # url, most recent revision, depth 1
+    start = time.time()
     svn_list = svn.list(archive.svn_local_path, 'HEAD', 1)
+    logger.debug('svn list %d files for %s in %f sec' %
+                (len(svn_list.keys()), archive.slug, time.time() - start))
+
     files = []
+    start = time.time()
     for filename, info in svn_list.iteritems():
         # skip non-xml content
         if not filename.endswith('.xml'):
@@ -57,14 +66,32 @@ def svn_xml_files(archive):
         # https://github.com/jelmer/subvertpy/blob/f5608aa28506cfc0eb62e7a780b60f6aecb88135/subvertpy/properties.py#L50
         files.append(EadFile(filename, (info['time'] / 1000000), archive))
 
+    logger.debug('generated list of %d XML files for %s in %f sec' %
+                (len(files), archive.slug, time.time() - start))
+
     return files
 
 def files_to_publish(archive):
-
     svn = svn_client()
-    # update to make sure we have latest version of everything
-    svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
-    # returns a list of revisions
-    # NOTE: might be nice to log current revision if we know it has changed
+    remote = svn_remote(archive.svn)
+
+    # determine local/remote revision to see if an update is needed
+    start = time.time()
+    latest_rev = remote.get_latest_revnum()
+    logger.debug('svn remote get latest revision for %s (%d) in %f sec' %
+                (archive.slug, latest_rev, time.time() - start))
+
+    start = time.time()
+    info = svn.list(archive.svn_local_path, 'HEAD', 0)
+    local_rev = info['']['created_rev']
+    logger.debug('svn local revision for %s (%d) in %f sec' %
+                (archive.slug, local_rev, time.time() - start))
+
+    # do an svn update if the revisions don't match
+    if local_rev != latest_rev:
+        start = time.time()
+        svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
+        logger.debug('svn update %s in %f sec' % (archive.slug, time.time() - start))
+
     # return list of recent xml files from the svn
     return svn_xml_files(archive)
