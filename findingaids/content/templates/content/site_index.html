@@ -1,4 +1,5 @@
 {% extends "site_base.html" %}
+{% load static %}
 
 {% block style %}
     {{ block.super }}
@@ -21,8 +22,10 @@
      </div>
 
      <div id="banner" class="left-col">
-     {% if banner|length %} {# display random banner if entries are returned (FIXME: fallback?) #}
-        {% with banner|random as banner %}{{ banner.summary|safe }}{% endwith %}
+     {% if banner|length %} {# display random banner image #}
+     {% with banner|random as img %}
+        <img src="{% static 'images/banner/'|add:img %}" />
+        {% endwith %}
      {% endif %}
      </div>
  </div>

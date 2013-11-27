@@ -19,7 +19,7 @@ from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 
-from findingaids.content.models import BannerFeed
+from findingaids.content.models import BANNER_IMAGES
 from findingaids.content.forms import FeedbackForm, RequestMaterialsForm
 from findingaids.fa.models import title_letters
 from findingaids.fa.utils import get_findingaid
@@ -30,8 +30,8 @@ def site_index(request):
 
     return render_to_response('content/site_index.html', {
                 'letters': title_letters(),
-                 # banner feed items for rotating home page banner image
-                'banner': BannerFeed().items,
+                 # images rotating home page banner
+                'banner': BANNER_IMAGES,
             }, context_instance=RequestContext(request))
 
 
