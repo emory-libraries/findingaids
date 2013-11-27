@@ -12,8 +12,6 @@ python-ldap==2.4.10
 zc.icp
 recaptcha-client
 mimeparse
-BeautifulSoup
-feedparser
 django-celery>=3.0
 south
 rdflib
