@@ -2,7 +2,7 @@ eulxml>=0.12.0
 eulexistdb>=0.18.0
 # eulcommon - need dev eulcommon for updates to permission decorators
 -e git://github.com/emory-libraries/eulcommon@develop#egg=eulcommon
-https://wilson.library.emory.edu/jenkins/job/eullocal-0.20.x/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.20.0.tar.gz
+https://wilson.library.emory.edu/jenkins/job/eullocal-0.20.x/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.20.1.tar.gz
 https://wilson.library.emory.edu/jenkins/job/pidman-rest-client_1.1.x/lastSuccessfulBuild/artifact/pidmanclient/dist/pidservices-1.1.1.tar.gz
 # pin to before 1.6 for now, until we update to be compatible
 Django<1.6
