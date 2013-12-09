@@ -1,3 +1,4 @@
+
 # file findingaids/content/sitemaps.py
 #
 #   Copyright 2012 Emory University Library
@@ -17,49 +18,35 @@
 from django.contrib.sitemaps import Sitemap
 from django.core.urlresolvers import reverse
 
-from findingaids.content.models import ContentFeed
-
-
-class ContentPage(object):
-# simple object to wrap around feed-based content and local
-# django content pages
-
-    def __init__(self, url):
-        self.url = url
-
-    def get_absolute_url(self):
-        return self.url
-
 
 class ContentSitemap(Sitemap):
     changefreq = 'yearly'    # this content changes very rarely
     default_priority = 0.4   # lower priority than actual findingaid content
 
-    def items(self):
-        # special case pages
-        # non-findingaid site pages not based on feed content
-        items = [
-            ContentPage(reverse('site-index')),
-            ContentPage(reverse('content:request-materials')),
-            ContentPage(reverse('content:feedback')),
-            # possibly also advanced search? (not really content to index)
-        ]
+    # names for pages within content url namespace
+    content_pages = ['request-materials', 'feedback', 'faq',
+                     'search-tips', 'contributors']
 
-        # collect all content pages via content RSS feed
-        # NOTE: feed entry includes publication date, but it is not
-        # included here because we can't rely on publication
-        # date being the same as last modification date
-        for entry_id, entry in ContentFeed().get_items().iteritems():
-            items.append(ContentPage(
-                url=reverse('content:page', kwargs={'page': entry_id})
-            ))
+
+    def items(self):
+        # special case pages - index, static html site pages
+        items = [reverse('content:%s' % page) for page in self.content_pages]
+        items.append(reverse('site-index'))
+
+        # possibly also advanced search? (not really content to index)
+
+        # generate list of higher priority urls (can't be calculated at load
+        # time because urls haven't been defined yet)
+        self.higher_priority = [reverse('site-index'), reverse('content:faq'),
+                       reverse('content:search-tips')]
 
         return items
 
+    def location(self, item):
+        return item
+
     def priority(self, item):
-        # set home page to higher priority
-        # NOTE: faq and search tips might also possibly be higher
-        # priority than other pages
-        if item.get_absolute_url() == reverse('site-index'):
+        # set specific urls (such as home page) to higher priority
+        if item in self.higher_priority:
             return 0.5
         return self.default_priority

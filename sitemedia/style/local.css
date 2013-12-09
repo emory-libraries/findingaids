@@ -513,6 +513,15 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     padding-top: 2px;
 }
 
+.search-tips blockquote {
+  margin: 0;
+  padding: 10px 0 0;
+  color:#4c4c4c;
+}
+.search-tips li {
+  margin: 0;
+}
+
 /* hacky jquery ui overrides to compensate for over-specific genlib theme css*/
 #content .ui-tabs ul {
   padding: 2px 0 0 1px;

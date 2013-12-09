@@ -14,7 +14,6 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-import feedparser
 from os import path
 from mock import patch
 
@@ -31,162 +30,6 @@ from findingaids.content import models, forms
 # re-using finding aid fixtures from main fa app
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..',
     'fa', 'tests', 'fixtures')
-
-class MockFeedParser:
-    entries = []
-    status = 200
-
-    def parse(self, url):
-        # construct a new feed result based on current entries & status
-        feed = feedparser.FeedParserDict()
-        feed['entries'] = self.entries
-        feed.status = self.status
-        return feed
-
-class CachedFeedTest(TestCase):
-    testid = 'testfeed'
-    url = 'http://'
-
-    def setUp(self):
-        # replace feedparser module with a mock for testing
-        self.mockfeedparser = MockFeedParser()
-        self._feedparser = models.feedparser
-        models.feedparser = self.mockfeedparser
-        # get & store cache key from a model instance
-        cf = models.CachedFeed(self.testid, self.url)
-        self.cache_key = cf._cache_key
-
-    def tearDown(self):
-        # restore the real feedparser
-        models.feedparser = self._feedparser
-        # clear any feed data cached by tests
-        cache.set(self.cache_key, None)
-
-    def test_load_from_cache(self):
-        # populate the cache
-        cached_feed = feedparser.FeedParserDict()
-        cached_feed['entries'] = ['a', 'b']
-        cached_feed.status = 200
-        cache.set(self.cache_key, cached_feed)
-        # set mock feed parser to return something different
-        self.mockfeedparser.entries = ['c', 'd']
-        self.mockfeedparser.status = 304    # simulate content not modified
-        cf = models.CachedFeed(self.testid, self.url)
-        # original cached content should be returned
-        self.assertEqual(cached_feed['entries'], cf.items,
-            'feed should be loaded from cache when possible')
-
-        # exception on cache retrieval should not error,
-        # but simply trigger content reload
-        with patch('findingaids.content.models.cache.get') as mockcacheget:
-            mockcacheget.side_effect = ImportError('cannot import from file')
-            cached_items = ['y', 'z']
-            cached_feed['entries'] = cached_items
-            cf = models.CachedFeed(self.testid, self.url)
-
-            # should use the mockfeed entries, not the cached values
-            self.assertNotEqual(cached_items, cf.items)
-
-    def test_load_feed(self):
-        data = ['a', 'b']
-        self.mockfeedparser.entries = data
-        cf = models.CachedFeed(self.testid, self.url)
-        self.assert_(isinstance(cf.feed, feedparser.FeedParserDict),
-            'feed property should be set from feedparse result')
-        self.assert_(isinstance(cache.get(self.cache_key), feedparser.FeedParserDict),
-            'feed data should be cached when loaded')
-
-    def test_load_ifmodified(self):
-        initial = ['a', 'b']
-        self.mockfeedparser.entries = initial
-        cf = models.CachedFeed(self.testid, self.url)
-        cf.feed  # access feed to load initial feed
-        # change the data for comparison
-        mod = ['z', 'y']
-        self.mockfeedparser.entries = mod
-        # set status to 304 Not Modified - new data should *not* be loaded
-        self.mockfeedparser.status = 304
-        self.assertEqual(initial, cf.items,
-            'feed data should be unchanged when feed request returns 304 Not Modified')
-        # set status to something besides 304 - new data should be loaded
-        self.mockfeedparser.status = 200
-        self.assertEqual(mod, cf.items,
-            'feed data should be updated when feed request returns something besides 304')
-
-    def test_items(self):
-        myitems = ['news', 'update']
-        self.mockfeedparser.entries = myitems
-
-        cf = models.CachedFeed(self.testid, self.url)
-        self.assertEqual(myitems, cf.items,
-            'items property should be returned from feed entries')
-
-    def test_clear_cache(self):
-        # populate the cache with test feed result
-        cache.set(self.cache_key, self.mockfeedparser.parse(self.url))
-        cf = models.CachedFeed(self.testid, self.url)
-        cf.clear_cache()
-        self.assertEqual(None, cache.get(self.cache_key),
-            'cached data should be None after calling clear_cache()')
-
-    def test_convert_same_page_links(self):
-        # create a mock feed & entry with base url & anchors to be converted
-        entry = feedparser.FeedParserDict()
-        base_url = 'http://base.url/test'
-        entry.summary = '''<html>
-        <a href="%(base_url)s#same-page">link1</a>
-        <a href="%(base_url)s#not-same-page">link2</a>
-        <a name="same-page">text</a>
-        </html>''' % {'base_url': base_url}
-        self.mockfeedparser.entries = [entry]
-        cached_feed = feedparser.FeedParserDict({
-            'feed': feedparser.FeedParserDict({
-                'title_detail': feedparser.FeedParserDict({
-                    'base': 'http://base.url/test'
-                })
-            })
-        })
-        cached_feed['entries'] = [entry]
-        cached_feed.status = 200
-        cache.set(self.cache_key, cached_feed)
-        # set status to 304 Not Modified so cached mock data will be used
-        self.mockfeedparser.status = 304
-
-        cf = models.CachedFeed(self.testid, self.url)
-        cf.convert_same_page_links(entry)
-        self.assert_('href="#same-page"' in str(entry.summary),
-            'same-page anchor link should be converted to a relative anchor')
-        self.assert_('href="#not-same-page"' not in str(entry.summary),
-            'anchor link that does not match an anchor in the page should not be converted to a relative link')
-
-
-class ContentFeedTest(TestCase):
-
-    def setUp(self):
-        entry = feedparser.FeedParserDict()
-        entry.title = 'About'
-        entry.link = 'findingaids-about'
-        entry.summary = 'some text'
-
-        # replace feedparser module with a mock for testing
-        self.mockfeedparser = MockFeedParser()
-        self.mockfeedparser.entries = [entry]
-        self._feedparser = models.feedparser
-        models.feedparser = self.mockfeedparser
-
-    def tearDown(self):
-        # restore the real feedparser
-        models.feedparser = self._feedparser
-        # clear any feed data cached by tests
-        models.ContentFeed().clear_cache()
-
-    def test_get_entry(self):
-        content = models.ContentFeed()
-        # find test entry
-        entry = content.get_entry('about')
-        self.assertEqual('About', entry.title)
-        # non-existent
-        self.assertEqual(None, content.get_entry('bogus'))
 
 
 class EmailTestCase(EulexistdbTestCase):
@@ -390,30 +233,11 @@ class RequestMaterialsFormTest(EmailTestCase):
 
 
 class ContentViewsTest(EmailTestCase):
-    feed_entries = [
-        feedparser.FeedParserDict({'title': 'news', 'link': 'fa-news'}),
-        feedparser.FeedParserDict({'title': 'banner', 'link': 'fa-banner'}),
-        feedparser.FeedParserDict({'title': 'about', 'link': 'fa-about'}),
-    ]
     exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
 
     def setUp(self):
         self.client = Client()
-        # replace feedparser module with a mock for testing
-        self.mockfeedparser = MockFeedParser()
-        self.mockfeedparser.entries = self.feed_entries
-        self._feedparser = models.feedparser
-        models.feedparser = self.mockfeedparser
         super(ContentViewsTest, self).setUp()
-
-    def tearDown(self):
-        # restore the real feedparser
-        models.feedparser = self._feedparser
-        # clear any feed data cached by tests
-        models.BannerFeed().clear_cache()
-        models.NewsFeed().clear_cache()
-        models.ContentFeed().clear_cache()
-        super(ContentViewsTest, self).tearDown()
 
     def test_site_index_banner(self):
         index_url = reverse('site-index')
@@ -421,58 +245,6 @@ class ContentViewsTest(EmailTestCase):
         expected = 200
         self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
                              % (expected, response.status_code, index_url))
-        self.assertEqual(self.feed_entries, response.context['banner'],
-            'feed entries should be set in template context as "banner"')
-
-    def test_site_index_news(self):
-        index_url = reverse('site-index')
-        response = self.client.get(index_url)
-        expected = 200
-        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
-                             % (expected, response.status_code, index_url))
-        self.assertEqual(self.feed_entries[0], response.context['news'],
-            'first news feed entry should be set in template context as "news"')
-
-    def test_site_index_no_news(self):
-        self.mockfeedparser.entries = []        # simulate no entries in feed
-        index_url = reverse('site-index')
-        response = self.client.get(index_url)
-        expected = 200
-        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
-                             % (expected, response.status_code, index_url))
-        self.assertEqual(None, response.context['news'],
-            'news item should be None in template context when news feed has no items')
-
-    def test_content_page(self):
-        about = feedparser.FeedParserDict()
-        about.title = 'About'
-        about.link = 'findingaids-about'
-        about.summary = 'some text'
-        faq = feedparser.FeedParserDict()
-        faq.title = 'FAQ'
-        faq.link = 'findingaids-faq'
-        faq.summary = 'other text'
-        self.mockfeedparser.entries = [about, faq]
-
-        content_url = reverse('content:page', args=['faq'])
-        response = self.client.get(content_url)
-        expected = 200
-        self.assertEqual(response.status_code, expected, 'Expected %s but returned %s for %s'
-             % (expected, response.status_code, content_url))
-        self.assertEqual(faq, response.context['page'],
-            'feed item matching requested page is set in template context')
-        self.assertPattern('<title>.*: %s.*</title>' % faq.title,
-            response.content, msg_prefix='feed entry title should be set in html title')
-        self.assertPattern('<h1[^>]*>.*%s.*</h1>' % faq.title,
-            response.content, msg_prefix='feed entry title should be set as h1')
-
-        # not found
-        content_url = reverse('content:page', args=['bogus'])
-        response = self.client.get(content_url)
-        expected = 404
-        self.assertEqual(response.status_code, expected,
-            'Expected %s but returned %s for %s (non-existent page)'
-             % (expected, response.status_code, content_url))
 
     def test_feedback_form(self):
         # GET - display the form

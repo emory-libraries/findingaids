@@ -1,4 +1,5 @@
-<div>{{ files.paginator.count }} files total</div>
+{% load humanize %}
+<div>{{ files.paginator.count|intcomma }} files total</div>
 {% with items=files base_url=request.path %}
   {% include "snippets/pagination.html" %}
 {% endwith %}
@@ -8,7 +9,6 @@
         <th colspan="3">Filename</th> {# spans columns for [publish,] preview, & prep #}
         <th>Last Modified</th>
         <th>Last Published</th>
-        <th>Available for<br/>Preview</th>
     </tr>
 {% for file in files.object_list %}
     <tr>
@@ -22,9 +22,8 @@
             </form>
             {% endif %}
         </td>
-        <td>{{ file.modified|date }}</td>
-        <td>{{ file.published|date|default:'' }}</td>
-        <td>{{ file.previewed|date|default:'' }}</td>
+        <td>{{ file.modified|naturalday }}</td>
+        <td>{{ file.published|naturalday|default:'' }}</td>
     </tr>
 {% empty %}
   <tr><td colspan="2">No files found</td></tr>

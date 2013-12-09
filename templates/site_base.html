@@ -16,9 +16,9 @@
     <a class="first" href="{% url 'site-index' %}">Home</a>
     <a href="{% url 'fa:search' %}" rel="search">Advanced Search</a>
     <a href="{% url 'content:request-materials' %}">Request Materials</a>
-    <a href="{% url 'content:page' 'institutions' %}">Contributors</a>
-    <a href="{% url 'content:page' 'search-tips' %}" rel="help">Search Tips</a>
-    <a href="{% url 'content:page' 'faq' %}" rel="help">FindingAid FAQ</a>
+    <a href="{% url 'content:contributors' %}">Contributors</a>
+    <a href="{% url 'content:search-tips' %}" rel="help">Search Tips</a>
+    <a href="{% url 'content:faq' %}" rel="help">FindingAid FAQ</a>
     <a class="last" href="{% url 'content:feedback' %}">Feedback</a>
 {% endblock %}
 {% block admin-url %}{% url 'fa-admin:index' %}{% endblock %}

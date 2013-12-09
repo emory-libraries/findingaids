@@ -18,12 +18,13 @@ import os
 import difflib
 import logging
 from lxml.etree import XMLSyntaxError
+import time
 
 from django.http import HttpResponse, HttpResponseServerError, Http404, \
     HttpResponseBadRequest
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -45,7 +46,7 @@ from eulexistdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Deleted, Archive
 from findingaids.fa.utils import pages_to_show, get_findingaid, paginate_queryset
-from findingaids.fa_admin.auth import archive_access, archive_access_by_ead
+from findingaids.fa_admin.auth import archive_access
 from findingaids.fa_admin.forms import DeleteForm
 from findingaids.fa_admin.models import Archivist
 from findingaids.fa_admin.source import files_to_publish
@@ -53,6 +54,7 @@ from findingaids.fa_admin.svn import svn_client
 from findingaids.fa_admin.tasks import reload_cached_pdf
 from findingaids.fa_admin import utils
 
+logger = logging.getLogger(__name__)
 
 @login_required
 def main(request):
@@ -81,16 +83,20 @@ def main(request):
     # get the 10 most recent task results to display status
     recent_tasks = TaskResult.objects.order_by('-created')[:10]
 
+    # absolute path to login, for use in javascript if timeout occurs
+    login_url = request.build_absolute_uri(settings.LOGIN_URL)
+
     return render(request, 'fa_admin/index.html', {
         'archives': archives,
         'current_tab': current_tab,
+        'login_url': login_url,
         'task_results': recent_tasks})
 
 
 # NOTE: viewing the file list sort of implies prep/preview/publish permissions
 # but currently does not actually *require* them
 @login_required_with_ajax()
-@user_passes_test_with_ajax(archive_access)
+@user_passes_test_with_ajax(archive_access)   # could add last-modified but ajax doesn't cache
 def list_files(request, archive):
     '''List files associated with an archive to be prepped and previewed
     for publication.  Expected to be retrieved via ajax and loaded in a
@@ -99,8 +105,9 @@ def list_files(request, archive):
     archive = get_object_or_404(Archive, slug=archive)
 
     files = files_to_publish(archive)
-    # sort by last modified time
+    # sort by last modified time, most recent first
     files = sorted(files, key=lambda file: file.mtime, reverse=True)
+
     paginator = Paginator(files, 30, orphans=5)
     try:
         page = int(request.GET.get('page', '1'))
@@ -112,6 +119,17 @@ def list_files(request, archive):
         recent_files = paginator.page(page)
     except (EmptyPage, InvalidPage):
         recent_files = paginator.page(paginator.num_pages)
+
+    # query for publish/preview modification time all at once
+    # (more efficient than individual queries for each file)
+    published = FindingAid.objects.only('document_name', 'last_modified') \
+        .filter(document_name__in=[f.filename for f in recent_files.object_list])
+    pubinfo = dict((r.document_name, r.last_modified) for r in published)
+    # NOTE: if needed, we can also load preview info like this:
+    # preview = published.using(settings.EXISTDB_PREVIEW_COLLECTION)
+
+    for f in recent_files.object_list:
+        f.published = pubinfo.get(f.filename, None)
 
     return render(request, 'fa_admin/snippets/list_files_tab.html', {
         'files': recent_files,

@@ -1,0 +1,95 @@
+{% extends "site_base.html" %}
+{% load staticfiles %}
+{% block page-subtitle %}: FAQ{% endblock %}
+{% block content-header  %}
+ <h1 class="title toplevel" property="schema:name">EmoryFindingAid FAQ</h1>
+{% endblock %}
+
+{% block content-body %}
+
+<h6><a href="#what_is_FA">What is a finding aid?</a></h6>
+<h6><a href="#elements">What are the key elements to look for in a finding aid?</a></h6>
+<h6><a href="#unprocessed">Are unprocessed collections included in the database?</a></h6>
+<h6><a href="#detail">Why do some finding aids have detailed series descriptions and container lists and others do not?</a></h6>
+<h6><a href="#access">How do I access the material described in a finding aid?</a></h6>
+<h6><a href="#error">If I see a mistake or error, what should I do? </a></h6>
+
+<hr/>
+
+<div>
+ <h6><strong><a name="what_is_FA"></a>What is a finding aid?</strong></h6>
+ <p>A finding aid is a detailed guide to an archival collection, similar to the index found in the back of a book. Created by archivists, a finding aid provides contextual information and detailed descriptions of the material and allows users to determine whether or not a collection may meet their research needs.</p>
+</div>
+
+<div>
+ <h6><strong><a name="elements"></a>What are the key elements to look for in a finding aid?</strong></h6>
+
+  <p><strong>Descriptive Summary:</strong></p>
+
+  <ul>
+   <li><strong>Repository name:</strong>
+    Indicates the library that houses the collection and their contact information.</li>
+
+    <li><strong>Creator:</strong>
+    The name of the person, family, government agency, business, organization, conference, or meeting that is primarily responsible for the creation and use of the material.</li>
+
+    <li><strong>Extent:</strong>
+    This indicates how big a collection is, and how many boxes, bound volumes, or oversized boxes in which it is housed. </li>
+
+    <li><strong>Call number:</strong>
+    This is a unique number used to identify the collection and retrieve it for use in the reading room.</li>
+</ul>
+
+<p><img src="{% static 'images/faq_image1.jpg' %}" alt="" height="241" width="591" /></p>
+
+<p><strong>Collection Description:</strong></p>
+
+<ul>
+    <li><strong>Biographical note:</strong>
+     Contains basic information about the creator of the collection, such as birth and death dates, occupations, family relationships, and other identifying information.</li>
+    <li><strong>Scope and content note:</strong>
+     An overview of the contents of the collection and the date ranges.&nbsp; Information included in this note will highlight collection strengths, as well as indicate significant gaps in dates or types of material. </li>
+ </ul>
+
+ <p><strong>Administrative Information:</strong></p>
+ <ul>
+    <li><strong>Restriction information</strong>: Portions of a collection may be restricted due to privacy concerns, donor restrictions, or because of preservation concerns.&nbsp; There may also be restrictions relating to photocopying or personal camera use.&nbsp; In addition, some collections are stored off-site and require advance notice to be able to access the material in the reading room.&nbsp; It is important to make note of any use or reproduction restrictions before you visit the reading room and plan accordingly. </li>
+</ul>
+
+<p><img src="{% static 'images/faq_restrictions.jpg' %}" alt="" height="177" width="630" /></p>
+
+<ul>
+    <li><strong>Selected search terms:</strong> These are terms that describe the significant subjects, people, and places covered in a collection.&nbsp; Click on any one of these terms to find other collections which contain similar subjects.</li>
+</ul>
+
+<p><img src="{% static 'images/faq_image3.jpg' %}" alt="" height="308" width="328" /></p>
+
+<ul>
+    <li><strong>Series descriptions and container lists:</strong>
+        Simple collections include a basic container list, which is a detailed box and folder listing of the material.&nbsp; If a collection is more complex, it will also include a series description, which outlines the way in which the material has been organized, most often into types of material.&nbsp; Common series include correspondence, writings, subject files, or photographs.&nbsp; Each series will then have its own container list.&nbsp;</li>
+ </ul>
+
+ <p><img src="{% static 'images/faq_image4.jpg' %}" alt="" height="300" width="630" /></p>
+
+ <h6><strong><a name="unprocessed"></a>Are unprocessed collections included in the database?</strong></h6>
+
+ <p>Yes, the database includes finding aids for collections that are unprocessed.&nbsp; In general, these finding aids contain brief biographical or historical information, a general overview of the contents of the collections, and a preliminary inventory if available.</p>
+
+ <h6><strong><a name="detail"></a>Why do some finding aids have detailed series descriptions and container lists and others do not?</strong></h6>
+
+ <p>As noted above, some collections have not been fully processed, and therefore we can only provide a broad overview of the contents of the collection.&nbsp; Keep in mind, research into these collections may require a bit more time because material relevant to your topic may be harder to find.</p>
+
+ <h6><strong><a name="access"></a>How do I access the material described in a finding aid?</strong></h6>
+
+ <p>Click on the <a href="{% url 'content:request-materials' %}">Request Materials</a> tab to access a form which will be sent directly to the corresponding institution.&nbsp; You many also directly contact the repository which holds the material. See the list of
+    <a href="{% url 'content:contributors' %}">participating institutions</a>
+    for contact information.</p>
+
+ <p><img src="{% static 'images/faq_image5.jpg' %}" alt="" height="227" width="630" /></p>
+
+ <h6><strong><a name="error"></a></strong>If I see a mistake or error, what should I do?</h6>
+ <ul>
+    <li>If you see a factual or typographical error or experience technical problems, please use our
+        <a href="{% url 'content:feedback' %}">feedback form</a>.</li>
+</ul>
+{% endblock %}

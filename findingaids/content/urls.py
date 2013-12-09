@@ -1,5 +1,5 @@
 # file findingaids/content/urls.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,16 @@
 #   limitations under the License.
 
 from django.conf.urls.defaults import *
+from django.views.generic import TemplateView
+
 
 urlpatterns = patterns('findingaids.content.views',
-    url(r'^request-materials/$', 'request_materials', name="request-materials"),
-    url(r'^feedback/$', 'feedback', name="feedback"),
-    url(r'^(?P<page>.+)/$', 'content_page', name="page"),
+    url(r'^request-materials/$', 'request_materials', name='request-materials'),
+    url(r'^feedback/$', 'feedback', name='feedback'),
+    url(r'^faq/$', TemplateView.as_view(template_name='content/faq.html'),
+        name='faq'),
+    url(r'^search-tips/$', TemplateView.as_view(template_name='content/search_tips.html'),
+        name='search-tips'),
+    url(r'^institutions/$', TemplateView.as_view(template_name='content/contributors.html'),
+        name='contributors'),
 )

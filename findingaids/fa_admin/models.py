@@ -71,8 +71,7 @@ class EadFile:
     def __repr__(self):
         return '<%s %s>' % (self.__class__, self.filename)
 
-    @property
-    def published(self):
+    def get_published(self):
         "Date object was modified in eXist, if published"
         # TODO: previewed & published logic substantially the same; consolidate
         if self._published is None:
@@ -90,8 +89,15 @@ class EadFile:
                 self._published = False
         return self._published
 
-    @property
-    def previewed(self):
+    def set_published(self, value):
+        if value is None:
+            self._published = False  # store to prevent xquery lookup
+        else:
+            self._published = value
+
+    published = property(get_published, set_published)
+
+    def get_previewed(self):
         """Date object was loaded to eXist preview collection, if currently
             available in preview."""
         if self._previewed is None:
@@ -104,6 +110,14 @@ class EadFile:
                 pass
 
             # not found or error - store so we don't look up again
-            if self._published is None:
+            if self._previewed is None:
                 self._previewed = False
         return self._previewed
+
+    def set_previewed(self, value):
+        if value is None:
+            self._previewed = False  # store to prevent xquery lookup
+        else:
+            self._previewed = value
+
+    previewed = property(get_previewed, set_previewed)

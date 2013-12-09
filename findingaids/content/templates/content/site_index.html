@@ -1,4 +1,5 @@
 {% extends "site_base.html" %}
+{% load static %}
 
 {% block style %}
     {{ block.super }}
@@ -11,26 +12,25 @@
  {% block content-body %}
  <div class="top-half">
      <div id="about" class="right-col">
-         <h2>{{ about.title|default:"About EmoryFindingAids" }}</h2>
-         {% firstof about.summary_detail.value|safe about.summary|safe %}
+         <h2>About EmoryFindingAids</h2>
+
+         <p>The EmoryFindingAids database provides centralized access to detailed descriptions of archival and manuscript collections held in various repositories at Emory.&nbsp; Finding aids describe our unique primary resources and help researchers determine if collections contain material of interest to them and exactly where that material is located. The database includes finding aids for both processed and unprocessed collections.&nbsp; At present, the database contains finding aids for MARBL, the Emory University Archives, and the Emory Law School Archives.&nbsp; Additional Emory repositories will be added over time.</p>
+
          <div class="block-links subsection">
-             <a href="{% url 'content:page' 'faq' %}">Learn more</a>
+             <a href="{% url 'content:faq' %}">Learn more</a>
          </div>
      </div>
 
      <div id="banner" class="left-col">
-     {% if banner|length %} {# display random banner if entries are returned (FIXME: fallback?) #}
-        {% with banner|random as banner %}{{ banner.summary|safe }}{% endwith %}
+     {% if banner|length %} {# display random banner image #}
+     {% with banner|random as img %}
+        <img src="{% static 'images/banner/'|add:img %}" />
+        {% endwith %}
      {% endif %}
      </div>
  </div>
 
  <div class="clear"/>
- {% if news %}
- <div class="announcement">
-     <h2>{{ news.title }}</h2> {% firstof news.summary_detail.value|safe news.summary|safe %}
- </div>
-{% endif %}
  <div class="bottom-half">
         <div id="search" class="left-col">
              <h2>Search FindingAids</h2>
@@ -44,7 +44,7 @@
 
              <div class="block-links">
                 <a href="{% url 'fa:search' %}">Advanced Search</a>
-                <a href="{% url 'content:page' 'search-tips' %}">Search Tips</a>
+                <a href="{% url 'content:search-tips' %}">Search Tips</a>
              </div>
 
 
