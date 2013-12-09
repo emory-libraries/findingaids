@@ -8,6 +8,19 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.6
+---
+
+* Remove dependency on RSS feeds for content pages, home page banners,
+  and home page news items.
+* Updated organizational logo in the header.
+* bugfix: Loading the list of finding aid files from subversion in the
+  tabbed display of the administrative interface is too slow.
+* bugfix: display repeated <separatedmaterial> sections (formerly
+  only the first one was being displayed)
+* bugfix: if a login session times out, admin file tabs will not load;
+  now redirects user to login again
+
 1.5.1
 -----
 
