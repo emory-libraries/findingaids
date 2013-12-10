@@ -124,12 +124,6 @@ PROXY_ICP_PORT = 3130       # ICP port for checking status of objects in cache
 # settings for celery & rabbit-mq for asynchronous task handling
 BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672/'
 
-# URLS for RSS feeds to populate site content pages
-CONTENT_RSS_FEEDS = {
-    'banner': '',
-    'content': '',
-}
-
 # reCAPTCHA keys for your server or domain from https://www.google.com/recaptcha/
 RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''

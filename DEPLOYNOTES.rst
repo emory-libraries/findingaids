@@ -401,6 +401,13 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.6
+---
+
+* **CONTENT_RSS_FEEDS** configuration is no longer used and can be removed
+  from localsettings.
+
+
 1.5 - svn admin release
 -----------------------
 
