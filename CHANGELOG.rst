@@ -8,6 +8,11 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.6.1
+-----
+
+* Correct RDFa relation between collection and creator of the collection.
+
 1.6
 ---
 
