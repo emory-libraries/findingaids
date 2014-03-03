@@ -41,6 +41,7 @@ exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', '..', '
 
 
 class FaViewsTest(TestCase):
+    fixtures = ['user']
     exist_fixtures = {'directory': exist_fixture_path}
     # NOTE: views that require full-text search tested separately below for response-time reasons
     exist_files = []    # place-holder for any fixtures loaded by individual tests
@@ -421,6 +422,17 @@ class FaViewsTest(TestCase):
             '<a href="http://some.url/item/id1">Digitized Content</a>',
             html=True,
             msg_prefix='dao with audience=internal should not display to anonymous user')
+
+        # when logged in as an admin, internal dao *should* be displayed
+        self.client.login(username='marbl', password='marbl')
+        response = self.client.get(fa_url)
+        print response
+        self.assertContains(
+            response,
+            '<a href="http://some.url/item/id1">Digitized Content</a>',
+            html=True,
+            msg_prefix='dao with audience=internal should display for admin user')
+        self.client.logout()
 
         # title with formatting
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
