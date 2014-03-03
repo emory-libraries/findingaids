@@ -34,6 +34,7 @@
             {% for dao in component.did.dao_list %}
               {% if dao.audience != 'internal' or perms.fa_admin.can_view_internal_dao %} {# audience = external or unset should be publicly viewable #}
               <a {% if component.unittitle_name %}property="schema:URL" {% endif %}
+                 class="dao{% if dao.audience = 'internal' %} dao-internal{% endif %}"
                  href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
               {# NOTE: when we get to internal/admin, not all will have hrefs #}
               {% endif %}
