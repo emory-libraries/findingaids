@@ -7,7 +7,8 @@
             ["can_delete", "fa_admin", "findingaids"],
             ["can_preview", "fa_admin", "findingaids"],
             ["can_publish", "fa_admin", "findingaids"],
-            ["can_prepare", "fa_admin", "findingaids"]
+            ["can_prepare", "fa_admin", "findingaids"],
+            ["can_view_internal_dao", "fa_admin", "findingaids"]
         ]
     }
 }]
