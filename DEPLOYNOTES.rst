@@ -401,6 +401,15 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.7
+---
+
+* A new custom permission has been added to allow admins to view internal
+  digital archival object (dao) links.  Run ``python manage.py syncdb``
+  to create the new permission and add it to the Finding Aids Administrator
+  group.
+
+
 1.6
 ---
 
