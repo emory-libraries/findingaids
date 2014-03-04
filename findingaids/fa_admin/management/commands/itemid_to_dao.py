@@ -17,6 +17,7 @@
 import glob
 import httplib2
 from lxml.etree import XMLSyntaxError
+from optparse import make_option
 import os
 import re
 import sunburnt
@@ -46,8 +47,23 @@ the defined Archives will be prepared."""
 
     args = '[<filename filename ... >]'
 
+    option_list = BaseCommand.option_list + (
+        make_option('--dry-run', '-n',
+            dest='dryrun',
+            action='store_true',
+            help='''Report on what would be done, but don't make any actual changes'''),
+    )
+
     # django default verbosity level options --  1 = normal, 0 = minimal, 2 = all
     v_normal = 1
+
+# TODO: report mode that will flag digitized notes where I can't pull an id
+# - include [digitized] with no id here
+# normal operation: error report if ids couldn't be pulled or processed (e.g. out of order range)
+
+    # regex for recognizing digitized content
+    digitized_ids = re.compile('\[digitized;?( (Emory|filename):?\s*(?P<ids>[0-9a-z-, ]+)\s*)?\]?\s*$', re.IGNORECASE)
+
 
     def handle(self, *args, **options):
         verbosity = int(options.get('verbosity', self.v_normal))
@@ -61,6 +77,8 @@ the defined Archives will be prepared."""
 
         if verbosity > self.v_normal:
             print "Preparing documents from all defined Archives"
+            if options['dryrun']:
+                print "Running in dry-run mode; no changes will be made"
 
         updated = 0
         unchanged = 0
@@ -77,76 +95,89 @@ the defined Archives will be prepared."""
                 svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
                 files.update(set(glob.iglob(os.path.join(archive.svn_local_path, '*.xml'))))
 
-        # regex for recognizing digitized content
-        digitized_ids = re.compile('\[digitized;? (Emory|filename):?\s*(?P<ids>[0-9a-z-, ]+)\s*\]', re.IGNORECASE)
 
         for file in files:
+            file_items = 0
+            daos = 0
             try:
+                if verbosity >= self.v_normal and len(files) > 1:
+                    self.stdout.write('\nProcessing %s' % os.path.basename(file))
+
                 ead = load_xmlobject_from_file(file, FindingAid)
                 orig_xml = ead.serializeDocument(pretty=True)  # keep to check if changed
 
                 for c in self.ead_file_items(ead):
-                    # print unicode(c.did.unittitle)
-                    # TODO: may want to move into class methods to make easier to test
-                    match = digitized_ids.search(unicode(c.did.unittitle))
+                    # if item already contains any dao tags, skip it (no furher processing needed)
+                    if c.did.dao_list:
+                        continue
+
+                    match = self.has_digitized_content(unicode(c.did.unittitle))
                     if match:
-                        print unicode(c.did.unittitle)
-                        ids = match.groupdict()['ids']
-                        # check what kind of id(s) are listed
+                        file_items += 1
+                        # print unicode(c.did.unittitle)
+                        # print match.groupdict()
+                        try:
+                            id_list = self.id_list(match.groupdict()['ids'])
+                        except Exception as e:
+                            self.stdout.write('Error parsing ids from "%s" : %s' % \
+                                              (unicode(c.did.unittitle), e))
+                            continue
 
-                        # comma-separated list
-                        if ',' in ids:
-                            id_list = [i.strip() for i in ids.split(',')]
+                        # if no ids were found even though title seemed to have digitized content,
+                        # error and skip to next
+                        if not id_list:
+                            self.stdout.write('Appears to have digitized content, but no ids found in "%s"' % \
+                                              (unicode(c.did.unittitle)))
+                            continue
 
-                        # range of numbers
-                        elif '-' in ids:
-                            start, stop = [i.strip() for i in ids.split('-')]
-                            length = len(start)
-                            # use range to get an inclusive list of the ids
-                            # then reformat with the same number of leading 000s
-                            fmt = '%%0%dd' % length
-                            id_list = [fmt % i for i in range(int(start), int(stop) + 1)]
 
-                        # otherwise, must be a single id listed only
-                        else:
-                            id_list = [ids.strip()]
+                        # dictionary for any Keep info corresponding to these ids
+                        id_info = {}
 
-                        print id_list
-                        found_list = []
-
+                        # look up each id in the Keep
                         for i in id_list:
                             q = solr.query(solr.Q(dm1_id="%s" % i) | solr.Q(pid="%s" % i)) \
                                     .field_limit(['ark_uri', 'pid'])
                             if q.count() == 1:
-                                found_list.append(q[0])
-                                print '*** %d matches for id %s' % (q.count(), i)
-                                print q[0]['ark_uri']
+                                id_info[i] = q[0]
 
-                        # if we found a keep item for every id, then proceed
-                        if len(id_list) == len(found_list):
-                            # remove the plain-text digitized ids from unittitle
-                            # FIXME: check if there is a unitdate?
-                            c.did.unittitle.text = re.sub(digitized_ids, '', c.did.unittitle.text)
-                            # append a new dao for each found item
-                            for info in found_list:
-                                c.did.dao_list.append(eadmap.DigitalArchivalObject(id=info['pid'],
-                                    href=info['ark_uri'], audience='internal'))
+                        # remove the plain-text digitized ids from unittitle
+                        # FIXME: check if there is a unitdate?
+                        c.did.unittitle.text = re.sub(self.digitized_ids, '', c.did.unittitle.text)
+
+                        for i in id_list:
+                            info = id_info.get(id, None)
+                            # append a new dao for each id; audience will always be internal
+                            dao_opts = {'audience': 'internal'}
+                            if info:
+                                dao_opts.update({'id': info['pid'],
+                                                 'href': info['ark_uri']})
+                            else:
+                                # if no ARK was found, assume digital masters id
+                                dao_opts['id'] = 'dm%s' % i
+
+                            c.did.dao_list.append(eadmap.DigitalArchivalObject(**dao_opts))
+                            daos += 1
 
                 if orig_xml == ead.serializeDocument(pretty=True):
-                    if verbosity >= self.v_normal:
-                        print "No changes made to %s" % file
+                    if verbosity > self.v_normal:
+                        self.stdout.write("No changes made to %s" % file)
                     unchanged += 1
                 else:
-                    with open(file, 'w') as f:
-                        ead.serializeDocument(f, pretty=True)
+                    # in dry run, don't actually change the file
+                    if not options['dryrun']:
+                        with open(file, 'w') as f:
+                            ead.serializeDocument(f, pretty=True)
                     if verbosity >= self.v_normal:
-                        print "Updated %s" % file
+                        self.stdout.write("Updated %s; found %d item%s with digitized content, added %d <dao>%s" \
+                            % (file, file_items, 's' if file_items != 1 else '',
+                               daos, 's' if daos != 1 else ''))
                     updated += 1
 
             except XMLSyntaxError:
                 # xml is not well-formed
-                print "Error: failed to load %s (document not well-formed XML?)" \
-                            % file
+                self.stdout.write("Error: failed to load %s (document not well-formed XML?)" \
+                                  % file)
                 errored += 1
             # except Exception, e:
             #     # catch any other exceptions
@@ -156,21 +187,63 @@ the defined Archives will be prepared."""
         # TODO: might be nice to also report total number of daos added
 
         # summary of what was done
-        print "%d document%s updated" % (updated, 's' if updated != 1 else '')
-        print "%d document%s unchanged" % (unchanged, 's' if unchanged != 1 else '')
-        print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
+        self.stdout.write("\n%d document%s updated" % (updated, 's' if updated != 1 else ''))
+        self.stdout.write("%d document%s unchanged" % (unchanged, 's' if unchanged != 1 else ''))
+        self.stdout.write("%d document%s with errors" % (errored, 's' if errored != 1 else ''))
+
+    def has_digitized_content(self, text):
+        # check if text (i.e. unittitle) seems to contain digitized content
+        # returns regex match which should contains matched 'ids' in the groupdict
+        return self.digitized_ids.search(text)
+
+    def id_list(self, ids):
+        # could match [digitized] with no ids; if so, return empty list
+        if not ids:
+            return []
+        # parse out any id that are listed
+        return self._parse_ids(ids)
+
+    def _parse_ids(self, ids):
+        # comma-separated list
+        if ',' in ids:
+            id_list = []
+            # NOTE: these parts could have delimiters, so recurse and
+            # parse the split ids
+            # e.g., handle ####, ####-####
+            for part in [i.strip() for i in ids.split(',')]:
+                id_list.extend(self._parse_ids(part))
+
+        # range of numbers
+        elif '-' in ids:
+            start, stop = [i.strip() for i in ids.split('-')]
+            if not int(stop) > int(start):
+                raise Exception('Range cannot be constructed from %s-%s' % (start, stop))
+
+            length = len(start)
+            # use range to get an inclusive list of the ids
+            # then reformat with the same number of leading 000s
+            fmt = '%%0%dd' % length
+            id_list = [fmt % i for i in range(int(start), int(stop) + 1)]
+
+        # otherwise, must be a single id listed only
+        else:
+            id_list = [ids.strip()]
+
+        return id_list
+
 
     def ead_file_items(self, ead):
         '''generator that returns all file-level components in a findingaid,
         including any in series or subseries.
         '''
-        if ead.dsc.hasSeries():
-            for c in ead.dsc.c:
-                for subc in self.series_file_items(c):
-                    yield subc
-        else:
-            for c in ead.dsc.c:
-                yield c
+        if ead.dsc:
+            if ead.dsc.hasSeries():
+                for c in ead.dsc.c:
+                    for subc in self.series_file_items(c):
+                        yield subc
+            else:
+                for c in ead.dsc.c:
+                    yield c
 
     def series_file_items(self, series):
         '''generator that returns all file-level components in a series,
