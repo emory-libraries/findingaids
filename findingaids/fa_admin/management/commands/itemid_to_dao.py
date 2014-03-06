@@ -53,8 +53,6 @@ the defined Archives will be prepared."""
             action='store_true',
             default=False,
             help='''Report on what would be done, but don't make any actual changes'''),
-    )
-    option_list = BaseCommand.option_list + (
         make_option('--commit', '-c',
             dest='commit',
             action='store_true',
