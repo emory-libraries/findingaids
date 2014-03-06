@@ -426,7 +426,6 @@ class FaViewsTest(TestCase):
         # when logged in as an admin, internal dao *should* be displayed
         self.client.login(username='marbl', password='marbl')
         response = self.client.get(fa_url)
-        print response
         self.assertContains(
             response,
             '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
@@ -1286,6 +1285,7 @@ class FaViewsTest(TestCase):
 
 
 class FullTextFaViewsTest(TestCase):
+    fixtures = ['user']
     # test for views that require eXist full-text index
     exist_fixtures = {'index': exist_index_path,
                       'directory': exist_fixture_path}
@@ -1362,6 +1362,21 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(
             response, "No finding aids matched",
             msg_prefix='search for nonexistent term should indicate no matches found')
+
+        response = self.client.get(search_url, {'dao': 'on'})
+        leverette_url = reverse('fa:findingaid', kwargs={'id': 'leverette135'})
+        abbey_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})
+        self.assertContains(response, leverette_url,
+            msg_prefix='search for digital resources should include Leverette')
+        self.assertNotContains(response, abbey_url,
+            msg_prefix='search for digital resources should not include abbey (internal dao only)')
+
+        # when logged in as an admin, documents with internal dao should also be returned
+
+        self.client.login(username='marbl', password='marbl')
+        response = self.client.get(search_url, {'dao': 'on'})
+        self.assertContains(response, abbey_url,
+            msg_prefix='search for digital resources should include abbey (internal dao only)')
 
     def test_search__exact_phrase(self):
         search_url = reverse('fa:search')
@@ -1828,6 +1843,7 @@ class FullTextFaViewsTest(TestCase):
 
         # simple document with no series/subseries
         search_url = reverse('fa:singledoc-search', kwargs={'id': 'leverette135'})
+
         response = self.client.get(search_url, {'keywords': 'photos'})
         # response should return without an error
         self.assertContains(
@@ -1836,6 +1852,27 @@ class FullTextFaViewsTest(TestCase):
         self.assertNotContains(
             response, "Series",
             msg_prefix='single-document search response in simple finding aid should not include series')
+
+        response = self.client.get(search_url, {'dao': 'on'})
+        self.assertContains(response, 'Photo 1',
+            msg_prefix='search for digital resources in leverette should include photo 1')
+        self.assertNotContains(response, 'Digitized Content',
+            msg_prefix='search for digital resources should not include internal digital content')
+        abbey_search_url = reverse('fa:singledoc-search', kwargs={'id': 'abbey244'})
+        response = self.client.get(abbey_search_url, {'dao': 'on'})
+        self.assertContains(response, 'No matches found',
+            msg_prefix='document with only internal daos returns no matches for guest user')
+
+        # when logged in as an admin, documents with internal dao should also be returned
+
+        self.client.login(username='marbl', password='marbl')
+        response = self.client.get(search_url, {'dao': 'on'})
+        self.assertContains(response, 'Digitized Content',
+            msg_prefix='search for digital resources should include internal digital content if user has access')
+        response = self.client.get(abbey_search_url, {'dao': 'on'})
+        self.assertContains(response, 'Resource available online',
+            msg_prefix='document with only internal daos returns matches for user with access')
+
 
     def test_findingaid_match_count(self):
         # finding aid match_count field can only be tested via eXist return
