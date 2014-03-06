@@ -161,8 +161,7 @@ the defined Archives will be prepared."""
                             # append a new dao for each id; audience will always be internal
                             dao_opts = {'audience': 'internal'}
                             if info:
-                                dao_opts.update({'id': info['pid'],
-                                                 'href': info['ark_uri']})
+                                dao_opts['href'] = info['ark_uri']
 
                             # if no record was found, *should* be a digital masters id
                             else:
@@ -176,7 +175,8 @@ the defined Archives will be prepared."""
                                 else:
                                     self.stdout.write('Warning: non-digital masters id %s not found in the Keep' \
                                                        % i)
-                                    dao_opts['id'] = 'emory:%s' % i
+                                    # generate an ark anyway, since pids don't make valid ids
+                                    dao_opts['href'] = 'http://pid.emory.edu/ark:/25593/%s' % i
 
                             c.did.dao_list.append(eadmap.DigitalArchivalObject(**dao_opts))
                             daos += 1
