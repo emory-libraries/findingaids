@@ -51,8 +51,17 @@ the defined Archives will be prepared."""
         make_option('--dry-run', '-n',
             dest='dryrun',
             action='store_true',
+            default=False,
             help='''Report on what would be done, but don't make any actual changes'''),
     )
+    option_list = BaseCommand.option_list + (
+        make_option('--commit', '-c',
+            dest='commit',
+            action='store_true',
+            default=False,
+            help='''Commit changes to subversion after processing is finished'''),
+    )
+
 
     # django default verbosity level options --  1 = normal, 0 = minimal, 2 = all
     v_normal = 1
@@ -62,11 +71,13 @@ the defined Archives will be prepared."""
 # normal operation: error report if ids couldn't be pulled or processed (e.g. out of order range)
 
     # regex for recognizing digitized content
-    digitized_ids = re.compile('\[digitized;?( (Emory|filename):?\s*(?P<ids>[0-9a-z-, ]+)\s*)?\]?\s*$', re.IGNORECASE)
+    digitized_ids = re.compile('\[digitized;?( (Emory|filename)?:?\s*(?P<ids>[0-9a-z-, ]+)\s*)?\]?\s*$', re.IGNORECASE)
 
 
     def handle(self, *args, **options):
         verbosity = int(options.get('verbosity', self.v_normal))
+        svn_commit = options.get('commit', False)
+        dry_run = options.get('dryrun', False)
 
         # check for required settings
         if not hasattr(settings, 'KEEP_SOLR_SERVER_URL') or not settings.KEEP_SOLR_SERVER_URL:
@@ -77,7 +88,7 @@ the defined Archives will be prepared."""
 
         if verbosity > self.v_normal:
             print "Preparing documents from all defined Archives"
-            if options['dryrun']:
+            if dry_run:
                 print "Running in dry-run mode; no changes will be made"
 
         updated = 0
@@ -152,9 +163,20 @@ the defined Archives will be prepared."""
                             if info:
                                 dao_opts.update({'id': info['pid'],
                                                  'href': info['ark_uri']})
+
+                            # if no record was found, *should* be a digital masters id
                             else:
-                                # if no ARK was found, assume digital masters id
-                                dao_opts['id'] = 'dm%s' % i
+                                # if id already starts with dm, don't duplicate the prefix
+                                if i.startswith('dm'):
+                                    dao_opts['id'] = i
+                                # if it's a digit, add dm prefix
+                                elif i.isdigit():
+                                    dao_opts['id'] = 'dm%s' % i
+                                # otherwise, warn and add the id in pid notation
+                                else:
+                                    self.stdout.write('Warning: non-digital masters id %s not found in the Keep' \
+                                                       % i)
+                                    dao_opts['id'] = 'emory:%s' % i
 
                             c.did.dao_list.append(eadmap.DigitalArchivalObject(**dao_opts))
                             daos += 1
@@ -165,7 +187,7 @@ the defined Archives will be prepared."""
                     unchanged += 1
                 else:
                     # in dry run, don't actually change the file
-                    if not options['dryrun']:
+                    if not dry_run:
                         with open(file, 'w') as f:
                             ead.serializeDocument(f, pretty=True)
                     if verbosity >= self.v_normal:
@@ -190,6 +212,21 @@ the defined Archives will be prepared."""
         self.stdout.write("\n%d document%s updated" % (updated, 's' if updated != 1 else ''))
         self.stdout.write("%d document%s unchanged" % (unchanged, 's' if unchanged != 1 else ''))
         self.stdout.write("%d document%s with errors" % (errored, 's' if errored != 1 else ''))
+
+        if svn_commit:
+            svn = svn_client()
+            # seems to be the only way to set a commit log message via client
+            def get_log_message(arg):
+                # argument looks something like this:
+                # [('foo', 'https://svn.library.emory.edu/svn/dev_ead-eua/trunk/eua0081affirmationvietnam.xml', 6, None, 4)]
+                # ignoring since we will only use this function for a single commit
+                return 'converted digitized item ids to <dao> tags'
+
+            svn.log_msg_func = get_log_message
+
+            for archive in Archive.objects.all():
+                # update to make sure we have latest version of everything
+                svn.commit(str(archive.svn_local_path))
 
     def has_digitized_content(self, text):
         # check if text (i.e. unittitle) seems to contain digitized content
