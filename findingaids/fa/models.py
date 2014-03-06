@@ -31,6 +31,10 @@ from eulexistdb.models import XmlModel
 
 ID_DELIMITER = '_'
 
+class DigitalArchivalObject(eadmap.DigitalArchivalObject):
+    show = xmlmap.StringField("@xlink:show")
+    'attribute to determine how the resource should be displayed'
+
 
 class Name(XmlModel):
     '''XmlObject for a generic name in an EAD document.  Includes common
@@ -173,7 +177,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     'origination name, as an instance of :class:`Name`'
 
     # dao anywhere in the ead, to allow filtering on finding aids with daos
-    daos = xmlmap.NodeListField('.//e:dao', eadmap.DigitalArchivalObject)
+    daos = xmlmap.NodeListField('.//e:dao', DigitalArchivalObject)
     # count of public dao in a record, to support search filtering
     public_dao_count = xmlmap.IntegerField('count(.//e:dao[not(@audience) or @audience="external"])')
 
@@ -444,6 +448,10 @@ class Series(XmlModel, LocalComponent):
 eadmap.Component._fields['c'].node_class = Series
 eadmap.SubordinateComponents._fields['c'].node_class = Series
 
+# override DigitalArchivalObject with local version
+eadmap.DescriptiveIdentification._fields['dao_list'].node_class = DigitalArchivalObject
+eadmap.Component._fields['dao_list'].node_class = DigitalArchivalObject
+eadmap.ArchivalDescription._fields['dao_list'].node_class = DigitalArchivalObject
 
 def shortform_id(id, eadid=None):
     """Calculate a short-form id (without eadid prefix) for use in external urls.
