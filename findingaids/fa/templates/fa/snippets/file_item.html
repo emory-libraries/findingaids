@@ -1,5 +1,5 @@
 {# display a single file-level container list item #}
-{% load ead %}
+{% load ead %} {% load ark_pid %}
 <tr{% if not component.did.container %} class="section" {% endif %}>
   {% spaceless %}
     {% for container in component.did.container %}
@@ -32,11 +32,18 @@
         {% if component.did.dao_list %}
         <div>
             {% for dao in component.did.dao_list %}
-              {% if dao.audience != 'internal' or perms.fa_admin.can_view_internal_dao %} {# audience = external or unset should be publicly viewable #}
+              {% if dao.audience != 'internal' or perms.fa_admin.can_view_internal_dao and dao.href %}
+              {# audience = external or unset should be publicly viewable #}
+              {# if user has permission to view internal, display normally as a link #}
               <a {% if component.unittitle_name %}property="schema:URL" {% endif %}
                  class="dao{% if dao.audience = 'internal' %} dao-internal{% endif %}"
                  href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
-              {# NOTE: when we get to internal/admin, not all will have hrefs #}
+              {% else %}
+                {# if internal but not show=none or user can view, display id for reading room #}
+                {% if dao.show != "none" or perms.fa_admin.can_view_internal_dao %}
+                  {# display id if present (e.g. dm id); display ark pid if href is an ark #}
+                  <a class="dao dao-rronly">[Reading Room access only: id {% firstof dao.id dao.href|ark_pid %}]</a>
+                {% endif %}
               {% endif %}
             {% endfor %}
         </div>

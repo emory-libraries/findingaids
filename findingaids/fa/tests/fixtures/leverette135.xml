@@ -180,6 +180,7 @@
                     <container type="box">MF1</container>
                     <container type="folder">1</container>
                     <unittitle>Poems, photos (page 7-8)</unittitle>
+                    <dao xlink:href="http://some.url/item/id5" audience="internal" xlink:show="none" xlink:title="Hide Me"/>
                 </did>
             </c01>
             <c01 level="file">
@@ -187,6 +188,7 @@
                     <container type="box">MF1</container>
                     <container type="folder">1</container>
                     <unittitle>FLL's "biography" (page 10)</unittitle>
+                    <dao audience="internal" id="dm1234"/>
                 </did>
             </c01>
             <c01 level="file">

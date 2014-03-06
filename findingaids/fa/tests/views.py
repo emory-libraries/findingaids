@@ -409,6 +409,11 @@ class FaViewsTest(TestCase):
             html=True,
             msg_prefix='multiple daos in the same did should be converted')
 
+        # dao with audience=internal displayed as reading room access only with id
+        self.assertContains(response,
+           '[Reading Room access only: id dm1234]',
+            msg_prefix='internal dao should be displayed as reading room access only')
+
         def_link_text = getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
                                 '[Resource available online]')
         self.assertContains(
@@ -422,6 +427,13 @@ class FaViewsTest(TestCase):
             '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
             html=True,
             msg_prefix='dao with audience=internal should not display to anonymous user')
+        # show=none
+        self.assertNotContains(
+            response,
+            '<a class="dao dao-internal" href="http://some.url/item/id5">Hide Me</a>',
+            html=True,
+            msg_prefix='dao with audience=internal and show=none should not display to anonymous user')
+
 
         # when logged in as an admin, internal dao *should* be displayed
         self.client.login(username='marbl', password='marbl')
@@ -431,6 +443,18 @@ class FaViewsTest(TestCase):
             '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
             html=True,
             msg_prefix='dao with audience=internal should display for admin user')
+
+        # dao with audience=internal and NO href displayed as reading room access only with id
+        self.assertContains(response,
+           '[Reading Room access only: id dm1234]',
+            msg_prefix='internal dao without href should display as reading room access only to admins')
+        # show=none
+        self.assertContains(
+            response,
+            '<a class="dao dao-internal" href="http://some.url/item/id5">Hide Me</a>',
+            html=True,
+            msg_prefix='dao with audience=internal and show=none should not display to anonymous user')
+
         self.client.logout()
 
         # title with formatting
