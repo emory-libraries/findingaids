@@ -522,9 +522,13 @@ def search(request):
 
             # optional filter: restrict to items with digital archival objects
             if dao:
-                findingaids = findingaids.filter(daos__exists=True) \
-                                         .filter(public_dao_count__gte=1)
-                # restrict to public daos for now
+                findingaids = findingaids.filter(daos__exists=True)
+
+                # if user does not have permission to view internal daos,
+                # restrict to public daos only
+                if not request.user.has_perm('fa_admin.can_view_internal_dao'):
+                    findingaids = findingaids.filter(public_dao_count__gte=1)
+
                 # NOTE: using >= filter to force a where clause because this works
                 # when what seems to be the same filter on the xpath does not
                 # (possibly an indexing issue?)
