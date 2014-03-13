@@ -2,6 +2,15 @@
 {% load ead %}
 <div class="nextpage">
 <a name="{{ index.id }}"><h2>{{ index.head|format_ead }}</h2></a>
+
+{% if index.note %}
+   <div>
+     {% for para in index.note.content %}
+       <p>{{ para|format_ead }}</p>
+     {% endfor %}
+   </div>
+{% endif %}
+
 {# FIXME: move the correspondence/rdfa detection logic into the view? #}
 {% if 'Selected Correspondents' in index.head|format_ead and index.ead.origination_name.authfilenumber %}
   <div typeof="schema:Person" about="{{ index.ead.origination_name.uri}}">
