@@ -138,7 +138,6 @@ the defined Archives will be prepared."""
                                               (unicode(c.did.unittitle)))
                             continue
 
-
                         # dictionary for any Keep info corresponding to these ids
                         id_info = {}
 
@@ -167,7 +166,7 @@ the defined Archives will be prepared."""
                         # or else it will be repeated for each dao
 
                         for i in id_list:
-                            info = id_info.get(id, None)
+                            info = id_info.get(i, None)
                             # append a new dao for each id; audience will always be internal
                             dao_opts = {'audience': 'internal'}
                             href = None
