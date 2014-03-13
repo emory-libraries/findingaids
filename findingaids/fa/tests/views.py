@@ -399,63 +399,6 @@ class FaViewsTest(TestCase):
             '<li>.*Container List.*</li>', response.content,
             'container list included in top-level table of contents')
 
-        # dao with audience=external converted to html links
-        self.assertContains(
-            response, '<a class="dao" href="http://some.url/item/id2">Photo 1</a>',
-            html=True,
-            msg_prefix='dao should be converted to html link using href & attribute')
-        self.assertContains(
-            response, '<a class="dao" href="http://some.url/item/id3">Photo 2</a>',
-            html=True,
-            msg_prefix='multiple daos in the same did should be converted')
-
-        # dao with audience=internal displayed as reading room access only with id
-        self.assertContains(response,
-           '[Reading Room access only: id dm1234]',
-            msg_prefix='internal dao should be displayed as reading room access only')
-
-        def_link_text = getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
-                                '[Resource available online]')
-        self.assertContains(
-            response,
-            '<a class="dao" href="http://some.url/item/id4">%s</a>' % def_link_text,
-            html=True,
-            msg_prefix='dao with no title should use configured default')
-
-        self.assertNotContains(
-            response,
-            '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
-            html=True,
-            msg_prefix='dao with audience=internal should not display to anonymous user')
-        # show=none
-        self.assertNotContains(
-            response,
-            '<a class="dao dao-internal" href="http://some.url/item/id5">Hide Me</a>',
-            html=True,
-            msg_prefix='dao with audience=internal and show=none should not display to anonymous user')
-
-
-        # when logged in as an admin, internal dao *should* be displayed
-        self.client.login(username='marbl', password='marbl')
-        response = self.client.get(fa_url)
-        self.assertContains(
-            response,
-            '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
-            html=True,
-            msg_prefix='dao with audience=internal should display for admin user')
-
-        # dao with audience=internal and NO href displayed as reading room access only with id
-        self.assertContains(response,
-           '[Reading Room access only: id dm1234]',
-            msg_prefix='internal dao without href should display as reading room access only to admins')
-        # show=none
-        self.assertContains(
-            response,
-            '<a class="dao dao-internal" href="http://some.url/item/id5">Hide Me</a>',
-            html=True,
-            msg_prefix='dao with audience=internal and show=none should not display to anonymous user')
-
-        self.client.logout()
 
         # title with formatting
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
@@ -485,6 +428,80 @@ class FaViewsTest(TestCase):
         self.assertNotContains(
             response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="non-highlighted finding aid does NOT include robots directives noindex, nofollow")
+
+    def test_view_dao(self):
+        fa_url = reverse('fa:findingaid', kwargs={'id': 'leverette135'})
+        response = self.client.get(fa_url)
+
+        # dao with audience=external converted to html links
+        self.assertContains(
+            response, '<a class="dao" href="http://some.url/item/id2">Photo 1</a>',
+            html=True,
+            msg_prefix='dao should be converted to html link using href & attribute')
+        self.assertContains(
+            response, '<a class="dao" href="http://some.url/item/id3">Photo 2</a>',
+            html=True,
+            msg_prefix='multiple daos in the same did should be converted')
+        # external with show=none should be suppressed
+        self.assertNotContains(response, 'http://some.url/item/id7',
+            msg_prefix='external dao with show=none should not be displayed')
+        # external with no href; fallback to reading room display
+        self.assertContains(response,
+            '<a class="dao">[Reading Room access only: id dm4567]</a>',
+            html=True,
+            msg_prefix='external dao with no href should be displayed as reading room access only')
+
+        # dao with audience=internal displayed as reading room access only with id
+        self.assertContains(response,
+            '<a class="dao dao-internal">[Reading Room access only: id dm1234]</a>',
+            html=True,
+            msg_prefix='internal dao should be displayed as reading room access only')
+
+        def_link_text = getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
+                                '[Resource available online]')
+        self.assertContains(
+            response,
+            '<a class="dao" href="http://some.url/item/id4">%s</a>' % def_link_text,
+            html=True,
+            msg_prefix='dao with no title should use configured default')
+
+        self.assertNotContains(
+            response,
+            '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
+            html=True,
+            msg_prefix='dao with audience=internal should not display to anonymous user')
+        # show=none
+        self.assertNotContains(
+            response,
+            '<a class="dao dao-internal dao-hidden" href="http://some.url/item/id5">Hide Me</a>',
+            html=True,
+            msg_prefix='dao with audience=internal and show=none should not display to anonymous user')
+
+        # when logged in as an admin, internal dao *should* be displayed
+        self.client.login(username='marbl', password='marbl')
+        response = self.client.get(fa_url)
+        self.assertContains(
+            response,
+            '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
+            html=True,
+            msg_prefix='dao with audience=internal should display for admin user')
+
+        # dao with audience=internal and NO href displayed as reading room access only with id
+        self.assertContains(response,
+           '[Reading Room access only: id dm1234]',
+            msg_prefix='internal dao without href should display as reading room access only to admins')
+        # internal show=none
+        self.assertContains(
+            response,
+            '<a class="dao dao-internal dao-hidden" href="http://some.url/item/id5">Hide Me</a>',
+            html=True,
+            msg_prefix='dao with audience=internal and show=none should display to admin user')
+        # external show=none
+        self.assertContains(response,
+            '<a class="dao dao-hidden" href="http://some.url/item/id7">%s</a>' % def_link_text,
+            html=True,
+            msg_prefix='external dao with show=none should be displayed to admin user')
+
 
     def test_view__fa_with_series(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})

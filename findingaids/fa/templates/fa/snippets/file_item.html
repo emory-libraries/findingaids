@@ -1,5 +1,5 @@
 {# display a single file-level container list item #}
-{% load ead %} {% load ark_pid %}
+{% load ead %}
 <tr{% if not component.did.container %} class="section" {% endif %}>
   {% spaceless %}
     {% for container in component.did.container %}
@@ -32,19 +32,22 @@
         {% if component.did.dao_list %}
         <div>
             {% for dao in component.did.dao_list %}
-              {% if dao.audience != 'internal' or perms.fa_admin.can_view_internal_dao and dao.href %}
-              {# audience = external or unset should be publicly viewable #}
-              {# if user has permission to view internal, display normally as a link #}
-              <a {% if component.unittitle_name %}property="schema:URL" {% endif %}
-                 class="dao{% if dao.audience = 'internal' %} dao-internal{% endif %}"
-                 href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
-              {% else %}
-                {# if internal but not show=none or user can view, display id for reading room #}
-                {% if dao.show != "none" or perms.fa_admin.can_view_internal_dao %}
-                  {# display id if present (e.g. dm id); display ark pid if href is an ark #}
-                  <a class="dao dao-rronly">[Reading Room access only: id {% firstof dao.id dao.href|ark_pid %}]</a>
-                {% endif %}
-              {% endif %}
+              {# show=none should take precedence over anything else (override) #}
+              {% if dao.show == "none" %}
+                {% if perms.fa_admin.can_view_internal_dao %}
+                  {# generate link if possible; otherwise display as reading room access + pid #}
+                  {% include "fa/snippets/dao.html" with show_link=1 %}
+                {% endif %}  {# if no perms to view, display nothing #}
+              {% else %} {# not show=none, so check audience #}
+                 {% if dao.audience == "internal" %}
+                    {# if user can view internal links, show as a link if possible #}
+                    {# otherwise display as reading room access only, even if href is available #}
+                   {% include "fa/snippets/dao.html" with show_link=perms.fa_admin.can_view_internal_dao %}
+                 {% else %}
+                   {# show as link; fallback to reading room access display if href is missing #}
+                   {% include "fa/snippets/dao.html" with show_link=1 %}
+                 {% endif %} {# end audience check #}
+              {% endif %} {# end show none check #}
             {% endfor %}
         </div>
         {% endif %}

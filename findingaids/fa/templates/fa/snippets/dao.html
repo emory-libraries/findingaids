@@ -1,0 +1,11 @@
+{% comment %} Display a <dao> as a link or as reading room access only.
+Will display as a link of the dao has an href and show_link is true; otherwise,
+will be shown in reading room access format.
+Adds CSS classes to style public, internal, and hidden daos differently.
+{% endcomment %}
+{% load ark_pid %}
+<a {% if component.unittitle_name and dao.href and show_link %}property="schema:URL" {% endif %}
+   class="dao{% if dao.audience = 'internal' %} dao-internal{% endif %}{% if dao.show = 'none' %} dao-hidden{% endif %}"
+   {% if dao.href and show_link %}href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
+   {% else %}>[Reading Room access only: id {% firstof dao.id dao.href|ark_pid %}]</a>
+{% endif %}
