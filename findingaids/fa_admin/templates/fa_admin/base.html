@@ -2,13 +2,4 @@
 
 {% block page-subtitle %} : Admin{% endblock %}
 
-{% block content-header  %}
-{% if user.is_authenticated %}
-  <div style="float:right">
-    Welcome, <strong>{%firstof user.first_name user.username %}</strong>.
-    <a href="{% url 'fa-admin:logout' %}">Logout</a>
-  </div>
-  {% endif %}
-{{ block.super }}
-
-{% endblock %}
+{# NOTE: welcome user & logout link now on *all* pages instead of just admin site #}
