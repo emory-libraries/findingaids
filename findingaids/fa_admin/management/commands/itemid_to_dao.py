@@ -154,8 +154,7 @@ the defined Archives will be prepared."""
                         # NOTE: because unittitle could contain nested tags (dates,
                         # titles, names, etc), iterate through the text nodes and
                         # remove the digitized note wherever it occurs
-                        node = c.did.unittitle.node
-                        # use smart strings to update based on parent nodes
+                        # - use lxml smart strings to update based on parent nodes
                         text_nodes = c.did.unittitle.node.xpath('text()')
                         for txt in text_nodes:
                             updated_txt = re.sub(self.digitized_ids, u'', txt)
@@ -164,12 +163,16 @@ the defined Archives will be prepared."""
                             else:
                                 txt.getparent().tail = updated_txt
 
+                        # ensure document has xlink namespace declared at the top
+                        # or else it will be repeated for each dao
+
                         for i in id_list:
                             info = id_info.get(id, None)
                             # append a new dao for each id; audience will always be internal
                             dao_opts = {'audience': 'internal'}
+                            href = None
                             if info:
-                                dao_opts['href'] = info['ark_uri']
+                                href = info['ark_uri']
 
                             # if no record was found, *should* be a digital masters id
                             else:
@@ -184,9 +187,12 @@ the defined Archives will be prepared."""
                                     self.stdout.write('Warning: non-digital masters id %s not found in the Keep' \
                                                        % i)
                                     # generate an ark anyway, since pids don't make valid ids
-                                    dao_opts['href'] = 'http://pid.emory.edu/ark:/25593/%s' % i
+                                    href = 'http://pid.emory.edu/ark:/25593/%s' % i
 
                             c.did.dao_list.append(eadmap.DigitalArchivalObject(**dao_opts))
+                            if href is not None:
+                                c.did.dao_list[-1].href = href
+
                             daos += 1
 
                 # NOTE: could use pretty=True, but not used elsewhere in fa_admin,
