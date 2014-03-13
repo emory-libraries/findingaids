@@ -752,6 +752,7 @@ class UnitidIdentifierCommandTest(TestCase):
                         os.path.getsize(self.files['badlyformed.xml']),
                     'file with errors not modified by unitid_identifier script')
 
+
 class ItemidToDaoCommandTest(TestCase):
 
     # examples of the different variations of digitized content we need to be able to handle
@@ -769,11 +770,17 @@ class ItemidToDaoCommandTest(TestCase):
         # mixed: comma separated and range
         {'txt': "Wayne State Men's Glee Club, Concert, 1974 [audiocassette] [digitized; Emory:00000028, 6551-6552]",
           'has_digital': True, 'expected_ids': ['00000028', '6551', '6552']},
-          # this one should error: non-sequential
+        # semicolon used as delimiter instead of comma
+        {'txt': 'some content [digitized; Emory:btcbh; btcfx]',
+          'has_digital': True, 'expected_ids': ['btcbh', 'btcfx']},
+        {'txt': 'other content [digitized; Emory:00000024-00000025; 6176]',
+          'has_digital': True, 'expected_ids': ['00000024', '00000025', '6176']},
+        # this one should error: non-sequential
         {'txt': "Wayne State Men's Glee Club, Concert, 1974 [audiocassette] [digitized; Emory:00000028, 6551-6152]",
           'has_digital': True, 'id_error': True},
        {'txt': '3 cassette tapes (use copies) [RESTRICTED]',
           'has_digital': False},
+
     ]
 
     def setUp(self):
@@ -782,9 +789,11 @@ class ItemidToDaoCommandTest(TestCase):
     def test_has_digitized_content(self):
         for test_content in self.test_content:
             if test_content['has_digital']:
-                self.assertTrue(self.cmd.has_digitized_content(test_content['txt']))
+                self.assertTrue(self.cmd.has_digitized_content(test_content['txt']),
+                    'expected digitized content for %(txt)s' % test_content)
             else:
-                self.assertFalse(self.cmd.has_digitized_content(test_content['txt']))
+                self.assertFalse(self.cmd.has_digitized_content(test_content['txt']),
+                    'expected no digitized content for %(txt)s' % test_content)
 
     def test_id_list(self):
         for test_content in self.test_content:

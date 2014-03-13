@@ -69,7 +69,7 @@ the defined Archives will be prepared."""
 # normal operation: error report if ids couldn't be pulled or processed (e.g. out of order range)
 
     # regex for recognizing digitized content
-    digitized_ids = re.compile('\[digitized;?( (Emory|filename)?:?\s*(?P<ids>[0-9a-z-, ]+)\s*)?\]?\s*$', re.IGNORECASE)
+    digitized_ids = re.compile('\[digitized;?( (Emory|filename)?:?\s*(?P<ids>[0-9a-z-,; ]+)\s*)?\]?\s*$', re.IGNORECASE)
 
 
     def handle(self, *args, **options):
@@ -240,12 +240,14 @@ the defined Archives will be prepared."""
 
     def _parse_ids(self, ids):
         # comma-separated list
-        if ',' in ids:
+        if ',' in ids or ';' in ids:
             id_list = []
+            # figure out which delimiter we're splitting on
+            delim = ',' if ',' in ids else ';'
             # NOTE: these parts could have delimiters, so recurse and
             # parse the split ids
             # e.g., handle ####, ####-####
-            for part in [i.strip() for i in ids.split(',')]:
+            for part in [i.strip() for i in ids.split(delim)]:
                 id_list.extend(self._parse_ids(part))
 
         # range of numbers
