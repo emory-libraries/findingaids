@@ -64,12 +64,13 @@ the defined Archives will be prepared."""
     # django default verbosity level options --  1 = normal, 0 = minimal, 2 = all
     v_normal = 1
 
-# TODO: report mode that will flag digitized notes where I can't pull an id
-# - include [digitized] with no id here
-# normal operation: error report if ids couldn't be pulled or processed (e.g. out of order range)
+    # TODO: report mode that will flag digitized notes where id isn't recognized
+    # - include [digitized] with no id here
+    # normal operation: error report if ids couldn't be pulled or processed (e.g. out of order range)
 
     # regex for recognizing digitized content
-    digitized_ids = re.compile('\[digitized;?( (Emory|filename)?:?\s*(?P<ids>[0-9a-z-,; ]+)\s*)?\]?\s*$', re.IGNORECASE)
+    digitized_ids = re.compile(ur'\[digitized;?( (Emory|filename)?:?\s*(?P<ids>[0-9a-z-,; ]+)\s*)?\]?\s*$',
+                               re.IGNORECASE)
 
 
     def handle(self, *args, **options):
@@ -113,7 +114,7 @@ the defined Archives will be prepared."""
                     self.stdout.write('\nProcessing %s' % os.path.basename(file))
 
                 ead = load_xmlobject_from_file(file, FindingAid)
-                orig_xml = ead.serializeDocument(pretty=True)  # keep to check if changed
+                orig_xml = ead.serializeDocument()  # keep to check if changed
 
                 for c in self.ead_file_items(ead):
                     # if item already contains any dao tags, skip it (no furher processing needed)
@@ -123,8 +124,6 @@ the defined Archives will be prepared."""
                     match = self.has_digitized_content(unicode(c.did.unittitle))
                     if match:
                         file_items += 1
-                        # print unicode(c.did.unittitle)
-                        # print match.groupdict()
                         try:
                             id_list = self.id_list(match.groupdict()['ids'])
                         except Exception as e:
@@ -150,9 +149,20 @@ the defined Archives will be prepared."""
                             if q.count() == 1:
                                 id_info[i] = q[0]
 
-                        # remove the plain-text digitized ids from unittitle
-                        # FIXME: check if there is a unitdate?
-                        c.did.unittitle.text = re.sub(self.digitized_ids, '', c.did.unittitle.text)
+                        # remove the plain-text digitized ids from unittitle content
+                        # (handle as unicode to preserve any special characters)
+                        # NOTE: because unittitle could contain nested tags (dates,
+                        # titles, names, etc), iterate through the text nodes and
+                        # remove the digitized note wherever it occurs
+                        node = c.did.unittitle.node
+                        # use smart strings to update based on parent nodes
+                        text_nodes = c.did.unittitle.node.xpath('text()')
+                        for txt in text_nodes:
+                            updated_txt = re.sub(self.digitized_ids, u'', txt)
+                            if txt.is_text:
+                                txt.getparent().text = updated_txt
+                            else:
+                                txt.getparent().tail = updated_txt
 
                         for i in id_list:
                             info = id_info.get(id, None)
@@ -179,7 +189,9 @@ the defined Archives will be prepared."""
                             c.did.dao_list.append(eadmap.DigitalArchivalObject(**dao_opts))
                             daos += 1
 
-                if orig_xml == ead.serializeDocument(pretty=True):
+                # NOTE: could use pretty=True, but not used elsewhere in fa_admin,
+                # so leaving off for consistency
+                if orig_xml == ead.serializeDocument():
                     if verbosity > self.v_normal:
                         self.stdout.write("No changes made to %s" % file)
                     unchanged += 1
@@ -187,7 +199,7 @@ the defined Archives will be prepared."""
                     # in dry run, don't actually change the file
                     if not dry_run:
                         with open(file, 'w') as f:
-                            ead.serializeDocument(f, pretty=True)
+                            ead.serializeDocument(f)
                     if verbosity >= self.v_normal:
                         self.stdout.write("Updated %s; found %d item%s with digitized content, added %d <dao>%s" \
                             % (file, file_items, 's' if file_items != 1 else '',
