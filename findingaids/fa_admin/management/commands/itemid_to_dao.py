@@ -16,7 +16,7 @@
 
 import glob
 import httplib2
-from lxml.etree import XMLSyntaxError
+from lxml.etree import XMLSyntaxError, cleanup_namespaces
 from optparse import make_option
 import os
 import re
@@ -191,6 +191,8 @@ the defined Archives will be prepared."""
                             c.did.dao_list.append(eadmap.DigitalArchivalObject(**dao_opts))
                             if href is not None:
                                 c.did.dao_list[-1].href = href
+                            # clean up any extra namespaces (exist-db ns)
+                            cleanup_namespaces(c.did.dao_list[-1].node)
 
                             daos += 1
 
