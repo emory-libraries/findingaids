@@ -10,8 +10,8 @@
 {% block sidebar-left %}{% endblock %} {# suppress sidebar #}
 
 {% block content-header %}
-{{ block.super }}
 <div style="clear:right"></div> {# prevent login info from messing up layout #}
+{{ block.super }}
 {% endblock %}
 
  {% block content-body %}
