@@ -378,6 +378,9 @@ class Series(XmlModel, LocalComponent):
         Configured to use *//c01* as base search path.
     """
 
+    # temporary manual mapping for processinfo, should be incorporated into a release of eulxml
+    process_info = xmlmap.NodeField("e:processinfo", eadmap.Section)
+
     match_count = xmlmap.IntegerField("count(.//exist:match)")
     ":class:`findingaids.fa.models.FindingAid` number of keyword matchs"
 
@@ -421,6 +424,9 @@ class Series(XmlModel, LocalComponent):
             fields.append(self.bibliography)
         if self.related_material:
             fields.append(self.related_material)
+        if self.process_info:
+            fields.append(self.process_info)
+
 
         return fields
 
