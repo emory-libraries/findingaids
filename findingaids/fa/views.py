@@ -652,8 +652,7 @@ def document_search(request, id):
                 # if user can view internal daos, no additional filter is needed
                 # otherwise, restrict to publicly-accessible dao content
                 if not request.user.has_perm('fa_admin.can_view_internal_dao'):
-                    files = files.or_filter(did__dao_list__audience='external',
-                                            did__dao_list__audience__exists=False)
+                    files = files.filter(public_dao_count__gte=1)
 
             files = files.also('parent__id', 'parent__did',
                                'series1__id', 'series1__did', 'series2__id', 'series2__did')
