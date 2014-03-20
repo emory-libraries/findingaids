@@ -453,7 +453,7 @@ class FaViewsTest(TestCase):
 
         # dao with audience=internal displayed as reading room access only with id
         self.assertContains(response,
-            '<a class="dao dao-internal">[Reading Room access only: id dm1234]</a>',
+            '<a class="dao">[Reading Room access only: id dm1234]</a>',
             html=True,
             msg_prefix='internal dao should be displayed as reading room access only')
 
