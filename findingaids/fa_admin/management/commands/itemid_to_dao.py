@@ -143,7 +143,7 @@ the defined Archives will be prepared."""
 
                         # look up each id in the Keep
                         for i in id_list:
-                            q = solr.query(solr.Q(dm1_id="%s" % i) | solr.Q(pid="%s" % i)) \
+                            q = solr.query(solr.Q(dm1_id="%s" % i) | solr.Q(pid="emory:%s" % i)) \
                                     .field_limit(['ark_uri', 'pid'])
                             if q.count() == 1:
                                 id_info[i] = q[0]
@@ -170,11 +170,18 @@ the defined Archives will be prepared."""
                             # append a new dao for each id; audience will always be internal
                             dao_opts = {'audience': 'internal'}
                             href = None
+
                             if info:
-                                href = info['ark_uri']
+                                # in some cases in production, a record is found but no
+                                # ark_uri is indexed in solr (indicates ark_uri not in MODS)
+                                try:
+                                    href = info['ark_uri']
+                                except KeyError:
+                                    self.stdout.write('Warning: Keep record was found for %s but no ARK URI is indexed' \
+                                        % i)
 
                             # if no record was found, *should* be a digital masters id
-                            else:
+                            if href is None:
                                 # if id already starts with dm, don't duplicate the prefix
                                 if i.startswith('dm'):
                                     dao_opts['id'] = i
@@ -183,8 +190,10 @@ the defined Archives will be prepared."""
                                     dao_opts['id'] = 'dm%s' % i
                                 # otherwise, warn and add the id in pid notation
                                 else:
-                                    self.stdout.write('Warning: non-digital masters id %s not found in the Keep' \
-                                                       % i)
+                                    # only warn if we didn't already warn about info without ark uri
+                                    if not info:
+                                        self.stdout.write('Warning: non-digital masters id %s not found in the Keep' \
+                                                           % i)
                                     # generate an ark anyway, since pids don't make valid ids
                                     href = 'http://pid.emory.edu/ark:/25593/%s' % i
 
