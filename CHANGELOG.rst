@@ -8,7 +8,14 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
-1.7 - adminisrative and internal digital archival object support
+1.7.1
+-----
+
+* bugfix: small corrections to itemid_to_dao script for issues
+  encountered in production that were not found in testing
+* bugfix: RDFa collection resource shoudl be URI instead of string
+
+1.7 - administrative and internal digital archival object support
 -----------------------------------------------------------------
 
 * When a logged in administrative user is searching the finding aids
@@ -55,7 +62,7 @@ recent version first.  Upgrade or deployment notes should be found in
 * bugfix: As a researcher, I want to be able to see archivist supplied
   notes about processing at the series and subseries level so that I can
   understand how to locate material within a collection.
-
+* bugfix: correct RDFa relation between collection and creator of the collection.
 
 1.6
 ---
