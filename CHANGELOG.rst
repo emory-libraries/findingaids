@@ -8,6 +8,13 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.7.2
+-----
+
+* Minor text corrections on the site home page.
+* bugfix: updated the ead_load script so it can be used with the subversion
+  architecture for EAD content that we switched to in 1.5
+
 1.7.1
 -----
 
