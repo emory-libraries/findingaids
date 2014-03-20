@@ -8,6 +8,13 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.7.1
+-----
+
+* bugfix: small corrections to itemid_to_dao script for issues
+  encountered in production that were not found in testing
+* bugfix: RDFa collection resource shoudl be URI instead of string
+
 1.7 - administrative and internal digital archival object support
 -----------------------------------------------------------------
 
