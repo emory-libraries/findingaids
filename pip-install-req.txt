@@ -1,6 +1,4 @@
-#eulxml>=0.20.3
-# hotfix eulxml until next release
--e git://github.com/emory-libraries/eulxml.git@hotfix/0.20.3#egg=eulxml
+eulxml>=0.20.3
 eulexistdb>=0.18.0
 eulcommon>=0.18.0
 https://wilson.library.emory.edu/jenkins/job/eullocal-0.20.x/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.20.1.tar.gz
