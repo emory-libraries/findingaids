@@ -50,13 +50,27 @@
 {% endblock %}
 
 {% block message %}
-    {% if messages %}
+  {# if user is logged in, show an indicator and logout link #}
+  {% if user.is_authenticated %}
+  <div style="float:right">
+    Welcome, <strong>{%firstof user.first_name user.username %}</strong>.
+    <a href="{% url 'fa-admin:logout' %}">Logout</a>
+  </div>
+  {% endif %}
+  {# NOTE: cheating a bit by putting login info & logout here,  #}
+  {# but content-header is extended by too many templates #}
+
+  {% if user.is_authenticated and messages %} {# clearfix between login info and messages #}
+  <div style="clear:right"></div>
+  {% endif %}
+
+  {% if messages %}
     <ul class="messages">
         {% for message in messages %}
         <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message|safe }}</li>
         {% endfor %}
     </ul>
-    {% endif %}
+  {% endif %}
 {% endblock %}
 
 {% block content-outer-bottom %}

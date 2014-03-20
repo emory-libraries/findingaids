@@ -1,6 +1,7 @@
 {% extends "fa/base.html" %}
 {% load ead %}
-{% block page-subtitle %}: {{ ead.title }} : Search Results for {{ keywords }} {% endblock %}
+{% block page-subtitle %}: {{ ead.title }} : Search Results for
+   {{ keywords }}{% if keywords and dao %} with {% endif %}{% if dao %} digital resources {% endif %} {% endblock %}
 
 {% block page-head %}
   {{block.super}}  {# direct search engines not to index search pages #}

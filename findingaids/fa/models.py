@@ -31,6 +31,10 @@ from eulexistdb.models import XmlModel
 
 ID_DELIMITER = '_'
 
+class DigitalArchivalObject(eadmap.DigitalArchivalObject):
+    show = xmlmap.StringField("@xlink:show")
+    'attribute to determine how the resource should be displayed'
+
 
 class Name(XmlModel):
     '''XmlObject for a generic name in an EAD document.  Includes common
@@ -173,9 +177,11 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     'origination name, as an instance of :class:`Name`'
 
     # dao anywhere in the ead, to allow filtering on finding aids with daos
-    daos = xmlmap.NodeListField('.//e:dao', eadmap.DigitalArchivalObject)
-    # count of public dao in a record, to support search filtering
-    public_dao_count = xmlmap.IntegerField('count(.//e:dao[not(@audience) or @audience="external"])')
+    daos = xmlmap.NodeListField('.//e:dao', DigitalArchivalObject)
+    #: count of public dao elements in a record, to support search filtering
+    #: "public" is defined as audience external or not set, xlink:href present,
+    #: and show not set to none.
+    public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@xlink:show="none")][not(@audience) or @audience="external"])')
 
     objects = Manager('/e:ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
@@ -374,6 +380,9 @@ class Series(XmlModel, LocalComponent):
         Configured to use *//c01* as base search path.
     """
 
+    # temporary manual mapping for processinfo, should be incorporated into a release of eulxml
+    process_info = xmlmap.NodeField("e:processinfo", eadmap.Section)
+
     match_count = xmlmap.IntegerField("count(.//exist:match)")
     ":class:`findingaids.fa.models.FindingAid` number of keyword matchs"
 
@@ -417,6 +426,9 @@ class Series(XmlModel, LocalComponent):
             fields.append(self.bibliography)
         if self.related_material:
             fields.append(self.related_material)
+        if self.process_info:
+            fields.append(self.process_info)
+
 
         return fields
 
@@ -444,6 +456,10 @@ class Series(XmlModel, LocalComponent):
 eadmap.Component._fields['c'].node_class = Series
 eadmap.SubordinateComponents._fields['c'].node_class = Series
 
+# override DigitalArchivalObject with local version
+eadmap.DescriptiveIdentification._fields['dao_list'].node_class = DigitalArchivalObject
+eadmap.Component._fields['dao_list'].node_class = DigitalArchivalObject
+eadmap.ArchivalDescription._fields['dao_list'].node_class = DigitalArchivalObject
 
 def shortform_id(id, eadid=None):
     """Calculate a short-form id (without eadid prefix) for use in external urls.
@@ -573,6 +589,10 @@ class FileComponent(XmlModel, eadmap.Component):
 
     series2 = xmlmap.NodeField("ancestor::e:c02", Series)
     ":class:`findingaids.fa.models.Series` c02 series this file belongs to, if any."
+
+    #: count of public daos; same as in :attr:`FindingAid.public_dao_count`
+    public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@xlink:show="none")][not(@audience) or @audience="external"])')
+
 
     objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager

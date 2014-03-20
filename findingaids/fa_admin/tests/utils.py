@@ -43,6 +43,7 @@ from findingaids.fa_admin import tasks, utils, auth
 from findingaids.fa_admin.models import Archivist
 from findingaids.fa_admin.management.commands import prep_ead as prep_ead_cmd
 from findingaids.fa_admin.management.commands import unitid_identifier
+from findingaids.fa_admin.management.commands import itemid_to_dao
 from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unused?
 
 
@@ -751,6 +752,63 @@ class UnitidIdentifierCommandTest(TestCase):
                         os.path.getsize(self.files['badlyformed.xml']),
                     'file with errors not modified by unitid_identifier script')
 
+
+class ItemidToDaoCommandTest(TestCase):
+
+    # examples of the different variations of digitized content we need to be able to handle
+    test_content = [
+        {'txt': 'Butler, Jack [1] [digitized; filename 2581-2583]',
+         'has_digital': True, 'expected_ids': ['2581', '2582', '2583']},
+        {'txt': 'Carter, Clarence [digitized; filename 2576, 2679]',
+          'has_digital': True, 'expected_ids': ['2576', '2679']},
+        {'txt': 'Bourke, Eva, July 12, 1999 [digitized; Emory: b7wqd, b7wrj]',
+          'has_digital': True, 'expected_ids': ['b7wqd', 'b7wrj']},
+        {'txt': '3 cassette tapes (use copies) [digitized]',
+          'has_digital': True, 'expected_ids': []},
+        {'txt': 'Tuskegee Choir on the National Broadcasting Corporation, inc. radio broadcast from Tuskegee, Alabama, October 10, 1937 [phonograph record] [digitized; Emory:00000126-00000133]',
+          'has_digital': True, 'expected_ids': ['00000126', '00000127', '00000128', '00000129', '00000130', '00000131', '00000132', '00000133']},
+        # mixed: comma separated and range
+        {'txt': "Wayne State Men's Glee Club, Concert, 1974 [audiocassette] [digitized; Emory:00000028, 6551-6552]",
+          'has_digital': True, 'expected_ids': ['00000028', '6551', '6552']},
+        # semicolon used as delimiter instead of comma
+        {'txt': 'some content [digitized; Emory:btcbh; btcfx]',
+          'has_digital': True, 'expected_ids': ['btcbh', 'btcfx']},
+        {'txt': 'other content [digitized; Emory:00000024-00000025; 6176]',
+          'has_digital': True, 'expected_ids': ['00000024', '00000025', '6176']},
+        # this one should error: non-sequential
+        {'txt': "Wayne State Men's Glee Club, Concert, 1974 [audiocassette] [digitized; Emory:00000028, 6551-6152]",
+          'has_digital': True, 'id_error': True},
+       {'txt': '3 cassette tapes (use copies) [RESTRICTED]',
+          'has_digital': False},
+
+    ]
+
+    def setUp(self):
+        self.cmd = itemid_to_dao.Command()
+
+    def test_has_digitized_content(self):
+        for test_content in self.test_content:
+            if test_content['has_digital']:
+                self.assertTrue(self.cmd.has_digitized_content(test_content['txt']),
+                    'expected digitized content for %(txt)s' % test_content)
+            else:
+                self.assertFalse(self.cmd.has_digitized_content(test_content['txt']),
+                    'expected no digitized content for %(txt)s' % test_content)
+
+    def test_id_list(self):
+        for test_content in self.test_content:
+            if test_content['has_digital']:
+                match = self.cmd.has_digitized_content(test_content['txt'])
+                id_text = match.groupdict()['ids']
+
+                if test_content.get('id_error', False):
+                    self.assertRaises(Exception, self.cmd.id_list, id_text)
+
+                else:
+                    got = self.cmd.id_list(id_text)
+                    expected = test_content['expected_ids']
+                    self.assertEqual(expected, got,
+                        'expected %s from %s, got %s' % (expected, id_text, got))
 
 ## tests for auth decorator
 

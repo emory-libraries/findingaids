@@ -173,6 +173,7 @@
                     <dao xlink:href="http://some.url/item/id2" xlink:title="Photo 1"/>
                     <dao xlink:href="http://some.url/item/id3" xlink:title="Photo 2"/>
                     <dao xlink:href="http://some.url/item/id4" audience="external"/>
+                    <dao xlink:href="http://some.url/item/id7" audience="external" xlink:show="none"/> <!-- show none should override external -->
                 </did>
             </c01>
             <c01 level="file">
@@ -180,6 +181,7 @@
                     <container type="box">MF1</container>
                     <container type="folder">1</container>
                     <unittitle>Poems, photos (page 7-8)</unittitle>
+                    <dao xlink:href="http://some.url/item/id5" audience="internal" xlink:show="none" xlink:title="Hide Me"/>
                 </did>
             </c01>
             <c01 level="file">
@@ -187,6 +189,8 @@
                     <container type="box">MF1</container>
                     <container type="folder">1</container>
                     <unittitle>FLL's "biography" (page 10)</unittitle>
+                    <dao audience="internal" id="dm1234"/>
+                    <dao audience="external" id="dm4567"/> <!-- external with no href -->
                 </did>
             </c01>
             <c01 level="file">

@@ -36,6 +36,7 @@ from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 from findingaids.fa.models import FindingAid, Deleted
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead, XLINK_NAMESPACE
+from findingaids.fa.templatetags.ark_pid import ark_pid
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, ead_etag, \
     collection_lastmodified, exist_datetime_with_timezone, alpha_pagelabels
 
@@ -281,6 +282,11 @@ class IfUrlTestCase(DjangoTestCase):
         self.assertEqual(reverse('fa:findingaid', kwargs=urlopts), url,
             "ifurl correctly stores resulting url in context when 'as' is specified")
 
+class ArkPidTestCase(DjangoTestCase):
+
+    def test_ark_pid(self):
+        self.assertEqual('17kjg', ark_pid('http://pid.emory.edu/ark:/25593/17kjg'))
+        self.assertEqual(None, ark_pid('http://example.com/not/an/ark'))
 
 class BooleanToUpperTest(TestCase):
     def test_boolean_to_upper(self):

@@ -34,6 +34,7 @@ class Findingaids(models.Model):
                 ("can_preview", "Can preview a finding aid"),
                 ("can_delete", "Can delete a finding aid"),
                 ("can_prepare", "Can prepare a finding aid"),
+                ("can_view_internal_dao", "Can view internal digital archival objects"),
         )
 
 class Archivist(models.Model):

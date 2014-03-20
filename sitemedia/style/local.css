@@ -545,3 +545,27 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
 #content .ui-tabs-panel {
   border: 0 !important;
 }
+
+/** style internal DAO links so admins can visually distinguish **/
+
+.dao {
+  display: block;
+  color: #2E5299;
+}
+
+.dao-internal {
+  border-left: 4px solid #f19b62;
+  margin: 2px;
+  padding: 3px;
+  padding-left: 5px;
+  background-color: #f2f3f5;
+}
+
+.dao-hidden {
+  border-left: 4px solid red;
+  margin: 2px;
+  padding: 3px;
+  padding-left: 5px;
+  background-color: #f2f3f5;
+}
+

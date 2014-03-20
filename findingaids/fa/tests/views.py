@@ -41,6 +41,7 @@ exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', '..', '
 
 
 class FaViewsTest(TestCase):
+    fixtures = ['user']
     exist_fixtures = {'directory': exist_fixture_path}
     # NOTE: views that require full-text search tested separately below for response-time reasons
     exist_files = []    # place-holder for any fixtures loaded by individual tests
@@ -398,29 +399,6 @@ class FaViewsTest(TestCase):
             '<li>.*Container List.*</li>', response.content,
             'container list included in top-level table of contents')
 
-        # dao with audience=external converted to html links
-        self.assertContains(
-            response, '<a href="http://some.url/item/id2">Photo 1</a>',
-            html=True,
-            msg_prefix='dao should be converted to html link using href & attribute')
-        self.assertContains(
-            response, '<a href="http://some.url/item/id3">Photo 2</a>',
-            html=True,
-            msg_prefix='multiple daos in the same did should be converted')
-
-        def_link_text = getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
-                                '[Resource available online]')
-        self.assertContains(
-            response,
-            '<a href="http://some.url/item/id4">%s</a>' % def_link_text,
-            html=True,
-            msg_prefix='dao with no title should use configured default')
-
-        self.assertNotContains(
-            response,
-            '<a href="http://some.url/item/id1">Digitized Content</a>',
-            html=True,
-            msg_prefix='dao with audience=internal should not display to anonymous user')
 
         # title with formatting
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'pomerantz890'}))
@@ -450,6 +428,80 @@ class FaViewsTest(TestCase):
         self.assertNotContains(
             response, '<meta name="robots" content="noindex,nofollow"',
             msg_prefix="non-highlighted finding aid does NOT include robots directives noindex, nofollow")
+
+    def test_view_dao(self):
+        fa_url = reverse('fa:findingaid', kwargs={'id': 'leverette135'})
+        response = self.client.get(fa_url)
+
+        # dao with audience=external converted to html links
+        self.assertContains(
+            response, '<a class="dao" href="http://some.url/item/id2">Photo 1</a>',
+            html=True,
+            msg_prefix='dao should be converted to html link using href & attribute')
+        self.assertContains(
+            response, '<a class="dao" href="http://some.url/item/id3">Photo 2</a>',
+            html=True,
+            msg_prefix='multiple daos in the same did should be converted')
+        # external with show=none should be suppressed
+        self.assertNotContains(response, 'http://some.url/item/id7',
+            msg_prefix='external dao with show=none should not be displayed')
+        # external with no href; fallback to reading room display
+        self.assertContains(response,
+            '<a class="dao">[Reading Room access only: id dm4567]</a>',
+            html=True,
+            msg_prefix='external dao with no href should be displayed as reading room access only')
+
+        # dao with audience=internal displayed as reading room access only with id
+        self.assertContains(response,
+            '<a class="dao">[Reading Room access only: id dm1234]</a>',
+            html=True,
+            msg_prefix='internal dao should be displayed as reading room access only')
+
+        def_link_text = getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
+                                '[Resource available online]')
+        self.assertContains(
+            response,
+            '<a class="dao" href="http://some.url/item/id4">%s</a>' % def_link_text,
+            html=True,
+            msg_prefix='dao with no title should use configured default')
+
+        self.assertNotContains(
+            response,
+            '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
+            html=True,
+            msg_prefix='dao with audience=internal should not display to anonymous user')
+        # show=none
+        self.assertNotContains(
+            response,
+            '<a class="dao dao-internal dao-hidden" href="http://some.url/item/id5">Hide Me</a>',
+            html=True,
+            msg_prefix='dao with audience=internal and show=none should not display to anonymous user')
+
+        # when logged in as an admin, internal dao *should* be displayed
+        self.client.login(username='marbl', password='marbl')
+        response = self.client.get(fa_url)
+        self.assertContains(
+            response,
+            '<a class="dao dao-internal" href="http://some.url/item/id1">Digitized Content</a>',
+            html=True,
+            msg_prefix='dao with audience=internal should display for admin user')
+
+        # dao with audience=internal and NO href displayed as reading room access only with id
+        self.assertContains(response,
+           '[Reading Room access only: id dm1234]',
+            msg_prefix='internal dao without href should display as reading room access only to admins')
+        # internal show=none
+        self.assertContains(
+            response,
+            '<a class="dao dao-internal dao-hidden" href="http://some.url/item/id5">Hide Me</a>',
+            html=True,
+            msg_prefix='dao with audience=internal and show=none should display to admin user')
+        # external show=none
+        self.assertContains(response,
+            '<a class="dao dao-hidden" href="http://some.url/item/id7">%s</a>' % def_link_text,
+            html=True,
+            msg_prefix='external dao with show=none should be displayed to admin user')
+
 
     def test_view__fa_with_series(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})
@@ -1274,6 +1326,7 @@ class FaViewsTest(TestCase):
 
 
 class FullTextFaViewsTest(TestCase):
+    fixtures = ['user']
     # test for views that require eXist full-text index
     exist_fixtures = {'index': exist_index_path,
                       'directory': exist_fixture_path}
@@ -1350,6 +1403,21 @@ class FullTextFaViewsTest(TestCase):
         self.assertContains(
             response, "No finding aids matched",
             msg_prefix='search for nonexistent term should indicate no matches found')
+
+        response = self.client.get(search_url, {'dao': 'on'})
+        leverette_url = reverse('fa:findingaid', kwargs={'id': 'leverette135'})
+        abbey_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})
+        self.assertContains(response, leverette_url,
+            msg_prefix='search for digital resources should include Leverette')
+        self.assertNotContains(response, abbey_url,
+            msg_prefix='search for digital resources should not include abbey (internal dao only)')
+
+        # when logged in as an admin, documents with internal dao should also be returned
+
+        self.client.login(username='marbl', password='marbl')
+        response = self.client.get(search_url, {'dao': 'on'})
+        self.assertContains(response, abbey_url,
+            msg_prefix='search for digital resources should include abbey (internal dao only)')
 
     def test_search__exact_phrase(self):
         search_url = reverse('fa:search')
@@ -1816,6 +1884,7 @@ class FullTextFaViewsTest(TestCase):
 
         # simple document with no series/subseries
         search_url = reverse('fa:singledoc-search', kwargs={'id': 'leverette135'})
+
         response = self.client.get(search_url, {'keywords': 'photos'})
         # response should return without an error
         self.assertContains(
@@ -1824,6 +1893,27 @@ class FullTextFaViewsTest(TestCase):
         self.assertNotContains(
             response, "Series",
             msg_prefix='single-document search response in simple finding aid should not include series')
+
+        response = self.client.get(search_url, {'dao': 'on'})
+        self.assertContains(response, 'Photo 1',
+            msg_prefix='search for digital resources in leverette should include photo 1')
+        self.assertNotContains(response, 'Digitized Content',
+            msg_prefix='search for digital resources should not include internal digital content')
+        abbey_search_url = reverse('fa:singledoc-search', kwargs={'id': 'abbey244'})
+        response = self.client.get(abbey_search_url, {'dao': 'on'})
+        self.assertContains(response, 'No matches found',
+            msg_prefix='document with only internal daos returns no matches for guest user')
+
+        # when logged in as an admin, documents with internal dao should also be returned
+
+        self.client.login(username='marbl', password='marbl')
+        response = self.client.get(search_url, {'dao': 'on'})
+        self.assertContains(response, 'Digitized Content',
+            msg_prefix='search for digital resources should include internal digital content if user has access')
+        response = self.client.get(abbey_search_url, {'dao': 'on'})
+        self.assertContains(response, 'Resource available online',
+            msg_prefix='document with only internal daos returns matches for user with access')
+
 
     def test_findingaid_match_count(self):
         # finding aid match_count field can only be tested via eXist return

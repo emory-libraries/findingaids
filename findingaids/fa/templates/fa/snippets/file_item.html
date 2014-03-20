@@ -32,11 +32,22 @@
         {% if component.did.dao_list %}
         <div>
             {% for dao in component.did.dao_list %}
-              {% if dao.audience != 'internal' %} {# audience = external or unset should be publicly viewable #}
-              <a {% if component.unittitle_name %}property="schema:URL" {% endif %}
-                 href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
-              {# NOTE: when we get to internal/admin, not all will have hrefs #}
-              {% endif %}
+              {# show=none should take precedence over anything else (override) #}
+              {% if dao.show == "none" %}
+                {% if perms.fa_admin.can_view_internal_dao %}
+                  {# generate link if possible; otherwise display as reading room access + pid #}
+                  {% include "fa/snippets/dao.html" with show_link=1 %}
+                {% endif %}  {# if no perms to view, display nothing #}
+              {% else %} {# not show=none, so check audience #}
+                 {% if dao.audience == "internal" %}
+                    {# if user can view internal links, show as a link if possible #}
+                    {# otherwise display as reading room access only, even if href is available #}
+                   {% include "fa/snippets/dao.html" with show_link=perms.fa_admin.can_view_internal_dao %}
+                 {% else %}
+                   {# show as link; fallback to reading room access display if href is missing #}
+                   {% include "fa/snippets/dao.html" with show_link=1 %}
+                 {% endif %} {# end audience check #}
+              {% endif %} {# end show none check #}
             {% endfor %}
         </div>
         {% endif %}

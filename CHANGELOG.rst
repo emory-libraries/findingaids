@@ -8,6 +8,55 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.7 - adminisrative and internal digital archival object support
+-----------------------------------------------------------------
+
+* When a logged in administrative user is searching the finding aids
+  database, they can optionally restrict results to all collections with
+  digital objects.
+* Researchers will be able to see identifiers for digitized content that
+  can only be accessed in the reading room, so that they can search for
+  those items in the kiosk.
+* When an administrative user is viewing the web page for a single
+  finding aid, they can search for digital objects within that finding
+  aid either by entering a keyword/keyword phrase in combination with the
+  digital objects only filter or by just searching for all the digital
+  objects in the finding aid.
+* When an administrative user is logged into the finding aids database,
+  they will see an indication that they are logged in on each page of the
+  finding aids website in order to remember which view (administrative or
+  public) they are seeing.
+* When administrative users view webpages for a finding aid with digital
+  archival object references in the EAD document, they can distinguish
+  when the <dao> display in the administrative view is different from the
+  public view and when <dao> information is hidden from the public view
+  completely.
+* A logged in findingaids staff user will be able to see links for
+  internal-only digitized content, including any that are suppressed
+  from display for researchers, so that they can access and manage
+  archival digitized content.
+* When administrative users view webpages for a finding aid with digital
+  archival object references in the EAD document, they can see and click
+  on links in order to access all the digital archival objects created
+  or owned by Emory University, both public and for internal use only.
+* A developer or system administrator can run a script on all EAD finding
+  aids to add digital archival object references for container-level items
+  that include digital filenames in order to provide administrative access
+  to digitized content and prepare for future access options.
+* As a researcher, I want to be able to see archivist supplied notes about
+  processing at the series and subseries level so that I can understand
+  how to locate material within a collection.
+* New banners from the home page.
+
+* bugfix: series titles with quotes break RDFa output
+* bugfix: As a researcher, I want to be able to see any notes associated
+  with index content, so that I have any additional information provided
+  by the archivists.
+* bugfix: As a researcher, I want to be able to see archivist supplied
+  notes about processing at the series and subseries level so that I can
+  understand how to locate material within a collection.
+
+
 1.6
 ---
 

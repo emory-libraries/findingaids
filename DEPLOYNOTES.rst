@@ -401,6 +401,33 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.7
+---
+
+* A new custom permission has been added to allow admins to view internal
+  digital archival object (dao) links.  Run ``python manage.py syncdb``
+  to create the new permission and add it to the Finding Aids Administrator
+  group.
+* Configure **KEEP_SOLR_SERVER_URL** to point to the Solr core used by the
+  instance of the Keep corresponding to the findingaids site (e.g., QA or Production),
+  so that item ids can be looked up and converted to ARK identifiers.
+* Run a script to update findingaids in subversion, converting item ids
+  in text notes to <dao>::
+
+    python manage.py itemid_to_dao -c
+
+  Note that this will update the EAD documents in subversion (the -c specifies
+  to commit changes to subversion when the processing is complete).  Use
+  the -n (dry run) option or run without -c if you wish to test first.
+
+
+1.6
+---
+
+* **CONTENT_RSS_FEEDS** configuration is no longer used and can be removed
+  from localsettings.
+
+
 1.5 - svn admin release
 -----------------------
 

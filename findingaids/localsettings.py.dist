@@ -115,6 +115,10 @@ SVN_WORKING_DIR = ''
 # full path to XSL-FO processor (currently expects Apache Fop)
 XSLFO_PROCESSOR = '/usr/bin/fop'
 
+# url for *Keep* Solr index
+KEEP_SOLR_SERVER_URL = 'https://hostname:9193/solr/'
+
+
 # settings for proxy host and site base url; used to configure cache to reload
 # a PDF when publishing a new or updated EAD
 PROXY_HOST = 'localhost:3128'
@@ -123,12 +127,6 @@ PROXY_ICP_PORT = 3130       # ICP port for checking status of objects in cache
 
 # settings for celery & rabbit-mq for asynchronous task handling
 BROKER_URL = 'amqp://guest:guest@127.0.0.1:5672/'
-
-# URLS for RSS feeds to populate site content pages
-CONTENT_RSS_FEEDS = {
-    'banner': '',
-    'content': '',
-}
 
 # reCAPTCHA keys for your server or domain from https://www.google.com/recaptcha/
 RECAPTCHA_PUBLIC_KEY = ''

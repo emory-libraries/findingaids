@@ -19,7 +19,7 @@
 
 {% block content-title %}
 {# set RDFa name based on same value used in HTML title #}
-<meta property="schema:name" content="{{ ead.title }}; {% firstof series.display_label index.head %}" />
+<meta property="schema:name" content="{{ ead.title|force_escape }}; {% firstof series.display_label|force_escape index.head|force_escape %}" />
 {% if ead.eadid.url %} {# should be set for our content, but don't output if not #}
   <meta property="dcterms:isPartOf" content="{{ ead.eadid.url }}" />
 {% endif %}
