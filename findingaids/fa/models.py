@@ -181,7 +181,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     #: count of public dao elements in a record, to support search filtering
     #: "public" is defined as audience external or not set, xlink:href present,
     #: and show not set to none.
-    public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@show="none")][not(@audience) or @audience="external"])')
+    public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@xlink:show="none")][not(@audience) or @audience="external"])')
 
     objects = Manager('/e:ead')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
@@ -591,7 +591,7 @@ class FileComponent(XmlModel, eadmap.Component):
     ":class:`findingaids.fa.models.Series` c02 series this file belongs to, if any."
 
     #: count of public daos; same as in :attr:`FindingAid.public_dao_count`
-    public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@show="none")][not(@audience) or @audience="external"])')
+    public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@xlink:show="none")][not(@audience) or @audience="external"])')
 
 
     objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
