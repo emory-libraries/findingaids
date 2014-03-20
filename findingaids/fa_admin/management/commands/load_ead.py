@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/management/commands/load_ead.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,11 @@ from django.conf import settings
 from eulxml.xmlmap.core import load_xmlobject_from_file
 from eulexistdb.db import ExistDB, ExistDBException
 
-from findingaids.fa.models import FindingAid
+from findingaids.fa.models import FindingAid, Archive
 from findingaids.fa_admin.utils import check_ead
+from findingaids.fa_admin.svn import svn_client
 from findingaids.fa_admin.tasks import reload_cached_pdf
+
 
 class Command(BaseCommand):
     """Load all or specified EAD xml files in the configured source directory
@@ -69,18 +71,24 @@ directory will be loaded."""
         if not hasattr(settings, 'EXISTDB_ROOT_COLLECTION') or not settings.EXISTDB_ROOT_COLLECTION:
             raise CommandError("EXISTDB_ROOT_COLLECTION setting is missing")
             return
-        if not hasattr(settings, 'FINDINGAID_EAD_SOURCE') or not settings.FINDINGAID_EAD_SOURCE:
-            raise CommandError("FINDINGAID_EAD_SOURCE setting is missing")
-            return
+
+        if len(args):
+            files = args
+        else:
+            # Note: copied from prep_ead manage command; move somewhere common?
+            files = set()
+            svn = svn_client()
+            for archive in Archive.objects.all():
+                # update to make sure we have latest version of everything
+                svn.update(str(archive.svn_local_path))   # apparently can't handle unicode
+                files.update(set(glob.iglob(os.path.join(archive.svn_local_path, '*.xml'))))
 
         if verbosity == v_all:
-            print "Loading documents from configured EAD source directory: %s" \
-                    % settings.FINDINGAID_EAD_SOURCE
             print 'Documents will be loaded to configured eXist collection: %s' \
                     % settings.EXISTDB_ROOT_COLLECTION
             if options['skip_pdf_reload']:
                 print "** Skipping PDFs cache reload"
-                
+
         db = ExistDB()
 
         loaded = 0
@@ -91,12 +99,6 @@ directory will be loaded."""
 
         if not options['pdf_only']:
         # unless PDF reload only has been specified, load files
-
-            if len(args):
-                files = [os.path.join(settings.FINDINGAID_EAD_SOURCE, name) for name in args]
-            else:
-                files = glob.iglob(os.path.join(settings.FINDINGAID_EAD_SOURCE, '*.xml'))
-                self.db = ExistDB()
 
             for file in files:
                 try:
@@ -185,8 +187,8 @@ directory will be loaded."""
         end_time = datetime.now()
         if verbosity >= v_normal:
             print "Ran for %s" % str(end_time - start_time)
-            
-    
+
+
 
 def check_tasks(tasks):
     """Check the status of celery tasks for successful completion.  Expects
