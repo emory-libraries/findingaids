@@ -43,7 +43,7 @@
 <meta property="schema:name" content="{{ ead.title }}" />
 {% if ead.origination_name.authfilenumber %}
   {# the collection is by the originator, but the document is about the originator #}
-  <meta property="schema:about" content="{{ ead.origination_name.uri }}" />
+  <a property="schema:about" href="{{ ead.origination_name.uri }}"> </a>
 {% endif %}
 
 {% with ead.file_desc.publication as publication %}
