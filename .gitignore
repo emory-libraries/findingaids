@@ -11,3 +11,5 @@ dist
 
 # OSX
 .DS_Store
+
+findingaids_rsk.db
