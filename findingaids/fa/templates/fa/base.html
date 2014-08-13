@@ -6,6 +6,8 @@
 {% block body-class %}{% if preview %}preview{% endif %}{% endblock %}
 
 {% block content-header  %}
+
+
     {% if preview and perms.fa_admin.can_publish %}
         <div style="clear:right"></div> {# clearfix between login info & buttons #}
         <form id="preview-publish" action="{% url 'fa-admin:publish-ead' %}" method="post">{% csrf_token %}
@@ -39,7 +41,11 @@
   <div id ="feedback" class="sidebar-search">
       <p>Send us your feedback.</p>
     <a rel="nofollow" href="{% url 'content:feedback' %}?{{feedback_opts}}" class="form-submit">Feedback</a>
+
   </div>
   {% endif %}
-
+  
+  {% if ead.is_at_marbl %}
+    {% include "fa/snippets/aeon-link.html" %}
+  {% endif %}
 {% endblock %}
