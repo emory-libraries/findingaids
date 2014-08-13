@@ -16,6 +16,7 @@
 
 from datetime import datetime
 import os
+import re
 
 from django.conf import settings
 from django.core.cache import cache
@@ -25,6 +26,8 @@ from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
+
+from django.contrib.sites.models import Site
 
 
 # finding aid models
@@ -295,6 +298,22 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             # otherwise use findingaid ARK as base for collection URI
             return '%s#collection' % self.eadid.url
 
+
+    def fulltext_absolute_url(self):
+        '''Generate an absolute url to the xml view for this ead
+        for use with external services such as Aeon'''
+        current_site = Site.objects.get_current()
+        return ''.join(['http://', current_site.domain[:-1]])
+
+    def is_at_marbl(self):
+        '''Remove any extraneous spaces and line breaks from the author tag and comparer'''
+        def strip_spaces_and_newLines(str):
+            str = re.sub(r"\s", "", str)
+            return str
+        MARBL_LABEL = strip_spaces_and_newLines('Manuscript, Archives, and Rare Book Library, Emory University')
+        AUTHOR = strip_spaces_and_newLines(self.author)
+        return AUTHOR == MARBL_LABEL
+    
 
 
 class ListTitle(XmlModel):

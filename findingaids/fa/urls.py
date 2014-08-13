@@ -37,6 +37,10 @@ findingaid_parts = patterns(
     '',
     url(r'^$', fa_views.findingaid, name='findingaid'),
     url(r'^EAD/$', fa_views.eadxml, name='eadxml'),
+
+    #Added ead path with a file extension for testing
+    url(r'^EAD/ead.xml$', fa_views.eadxml, name='eadxml-with-extension'),
+
     # full finding aid as simple html (html version of pdf, for testing)
     url(r'^full/$', fa_views.full_findingaid,
         {'mode': 'html'}, name='full-findingaid'),

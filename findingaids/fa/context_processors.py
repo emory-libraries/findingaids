@@ -33,6 +33,7 @@ def common_settings(request):
         'ENABLE_BETA_WARNING': getattr(settings, 'ENABLE_BETA_WARNING',
                                        False),
         'DEFAULT_DAO_LINK_TEXT': getattr(settings, 'DEFAULT_DAO_LINK_TEXT',
-                                         '[Resource available online]')
+                                         '[Resource available online]'),
+        'AEON_BASE': getattr(settings, 'AEON_BASE',False)
     }
     return context_extras
