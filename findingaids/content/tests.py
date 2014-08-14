@@ -16,6 +16,7 @@
 
 from os import path
 from mock import patch
+from unittest import skip
 
 from django.test import Client, TestCase
 from django.conf import settings
@@ -299,7 +300,13 @@ class ContentViewsTest(EmailTestCase):
             msg_prefix='response should display error message when sending email triggers an exception',
             status_code=500)
 
+
+    @skip
     def test_request_materials(self):
+        # NOTE: this test has been disabled because the request materials edit
+        # form has been disabled as the archives transition to using Aeon
+        # for requesting materials
+
         # GET - display the form
         rqst_materials_url = reverse('content:request-materials')
         response = self.client.get(rqst_materials_url)
