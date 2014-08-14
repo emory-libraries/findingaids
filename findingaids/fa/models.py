@@ -15,12 +15,13 @@
 #   limitations under the License.
 
 from datetime import datetime
+import logging
 import os
-import re
 
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from django.template.defaultfilters import slugify
 
 from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
@@ -28,6 +29,11 @@ from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
 from django.contrib.sites.models import Site
+
+
+# logging
+logger = logging.getLogger(__name__)
+
 
 
 # finding aid models
@@ -299,21 +305,37 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             return '%s#collection' % self.eadid.url
 
 
-    def fulltext_absolute_url(self):
-        '''Generate an absolute url to the xml view for this ead
-        for use with external services such as Aeon'''
-        current_site = Site.objects.get_current()
-        return ''.join(['http://', current_site.domain[:-1]])
+    def request_materials_url(self):
+        ''' Generate an absolute url to the xml view for this ead
+            for use with external services such as Aeon'''
 
-    def is_at_marbl(self):
-        '''Remove any extraneous spaces and line breaks from the author tag and comparer'''
-        def strip_spaces_and_newLines(str):
-            str = re.sub(r"\s", "", str)
-            return str
-        MARBL_LABEL = strip_spaces_and_newLines('Manuscript, Archives, and Rare Book Library, Emory University')
-        AUTHOR = strip_spaces_and_newLines(self.author)
-        return AUTHOR == MARBL_LABEL
-    
+        base = ''
+
+        if hasattr(settings,'REQUEST_MATERIALS_URL'):
+            base = settings.REQUEST_MATERIALS_URL
+        else:
+            logger.warn("Request materials url is not configured.")
+            return False
+
+        current_site = Site.objects.get_current()
+        return ''.join([base,'http://', current_site.domain.rstrip('/')])
+
+    def can_be_requested(self):
+        ''' Determines if the ead should show the request button.'''
+
+        # If the request url is not configured, then the request can't be generated.
+        if not hasattr(settings,'REQUEST_MATERIALS_URL'):
+            return False
+
+        marbl_label = slugify('Manuscript, Archives, and Rare Book Library, Emory University')
+        eua_label = slugify('Emory University Archives, Emory University')
+
+        libraries = {'marbl':marbl_label,'eua':eua_label}
+
+        #If the item is in on of the libraries defined, then it should be displayed.
+        for key, location in libraries.items():
+            if location == slugify(self.author):
+                return True
 
 
 class ListTitle(XmlModel):

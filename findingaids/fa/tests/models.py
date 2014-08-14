@@ -133,6 +133,11 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertFalse(self.findingaid['raoul548'].dsc.c[0].c[0].c[0].first_file_item)
         self.assertTrue(self.findingaid['raoul548'].dsc.c[0].c[0].c[1].first_file_item)
 
+    def test_request_url(self):
+        # configuration for request url
+
+        # requestable repositories
+
 
 class EadRepositoryTestCase(TestCase):
     exist_fixtures = {'files': [path.join(exist_fixture_path, 'pomerantz890.xml')] }

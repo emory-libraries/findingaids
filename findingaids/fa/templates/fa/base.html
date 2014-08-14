@@ -44,8 +44,8 @@
 
   </div>
   {% endif %}
-  
-  {% if ead.is_at_marbl %}
+
+  {% if ead.can_be_requested %}
     {% include "fa/snippets/aeon-link.html" %}
   {% endif %}
 {% endblock %}
