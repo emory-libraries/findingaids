@@ -17,7 +17,9 @@
 from os import path
 from types import ListType
 
+from django.conf import settings
 from django.test import TestCase as DjangoTestCase
+from django.test.utils import override_settings
 
 from eulxml.xmlmap import load_xmlobject_from_file, load_xmlobject_from_string
 from eulexistdb.testutil import TestCase
@@ -39,7 +41,8 @@ class FindingAidTestCase(DjangoTestCase):
                 'abbey244.xml',      # finding aid with series (no subseries), origination is a corporate name
                 'raoul548.xml',      # finding aid with series & subseries, origination is a family name
                 'bailey807.xml',     # finding aid with series, no origination
-                'adams465.xml'
+                'adams465.xml',
+                'pomerantz890.xml'  # finding aid with multiple subareas
                 ]
 
     def setUp(self):
@@ -133,10 +136,52 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertFalse(self.findingaid['raoul548'].dsc.c[0].c[0].c[0].first_file_item)
         self.assertTrue(self.findingaid['raoul548'].dsc.c[0].c[0].c[1].first_file_item)
 
-    def test_request_url(self):
-        # configuration for request url
+    def test_absolute_eadxml_url(self):
+        # test against current site domain
+        url = self.findingaid['abbey244'].absolute_eadxml_url()
+        self.assert_(self.findingaid['abbey244'].eadid.value in url, 
+            'URL should contain the EAD ID for this current document.')
 
-        # requestable repositories
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com')
+    def test_requestable(self):
+        fa = self.findingaid['abbey244']
+        fa2 = self.findingaid['bailey807']
+        fa3 = self.findingaid['pomerantz890'] # EAD with multiple subareas
+
+        with override_settings(REQUEST_MATERIALS_REPOS = [
+            'Manuscript, Archives, and Rare Book Library',
+            'Emory University Archives'
+            ]):
+            self.assertTrue(fa.requestable(),"EAD from Marbl should be able to be requested.")
+
+        # Fail if the REQUEST_MATERIALS_URL is empty
+        with override_settings(REQUEST_MATERIALS_URL = ''):
+            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_URL is not set.") 
+
+        # Fail if the REQUEST_MATERIALS_REPOS is empty
+        with override_settings(REQUEST_MATERIALS_REPOS = ''):
+            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_REPOS is not set.") 
+
+        # Fail if the requested EAD repo is not set in REQUEST_MATERIALS_REPOS
+        with override_settings(REQUEST_MATERIALS_REPOS = [
+            'Manuscript, Archives, and Rare Book Library'
+            ]):
+            self.assertFalse(fa2.requestable(),"EAD from University Archives (not set) shouldn't be able to be requested.")
+
+        # Multiple subareas per one EAD
+        with override_settings(REQUEST_MATERIALS_REPOS = [
+            'Pitts Theology Library'
+            ]):
+            self.assertTrue(fa3.requestable(),"Even if there are multiple subareas, an EAD from the set repos should be able to be requested.")
+
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com')
+    def test_request_materials_url(self):
+        fa = self.findingaid['abbey244']
+        self.assert_(fa.request_materials_url())
+
+        del settings.REQUEST_MATERIALS_URL
+        self.assertFalse(fa.request_materials_url(),'Cannot return a request materials url if the setting is None')
+
 
 
 class EadRepositoryTestCase(TestCase):

@@ -19,7 +19,9 @@ import logging
 import os
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.template.defaultfilters import slugify
 
@@ -28,7 +30,7 @@ from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
-from django.contrib.sites.models import Site
+
 
 
 # logging
@@ -304,39 +306,44 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             # otherwise use findingaid ARK as base for collection URI
             return '%s#collection' % self.eadid.url
 
-
-    def request_materials_url(self):
+    def absolute_eadxml_url(self):
         ''' Generate an absolute url to the xml view for this ead
             for use with external services such as Aeon'''
 
-        base = ''
-
-        if hasattr(settings,'REQUEST_MATERIALS_URL'):
-            base = settings.REQUEST_MATERIALS_URL
-        else:
-            logger.warn("Request materials url is not configured.")
-            return False
-
         current_site = Site.objects.get_current()
-        return ''.join([base,'http://', current_site.domain.rstrip('/')])
+        return ''.join([
+            'http://', 
+            current_site.domain.rstrip('/'), 
+            reverse('fa:eadxml', kwargs={"id":self.eadid.value})
+            ])
 
-    def can_be_requested(self):
-        ''' Determines if the ead should show the request button.'''
+    def request_materials_url(self):
+        ''' Construct the absolute url for use with external services such as Aeon'''
+
+        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+            logger.warn("Request materials url is not configured.")
+            return
+        
+        base = settings.REQUEST_MATERIALS_URL
+        return ''.join([base, self.absolute_eadxml_url()])
+
+    def requestable(self):
+        ''' Determines if the EAD is applicable for the electronic request service.'''
 
         # If the request url is not configured, then the request can't be generated.
-        if not hasattr(settings,'REQUEST_MATERIALS_URL'):
+        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
             return False
 
-        marbl_label = slugify('Manuscript, Archives, and Rare Book Library, Emory University')
-        eua_label = slugify('Emory University Archives, Emory University')
-
-        libraries = {'marbl':marbl_label,'eua':eua_label}
+        if not hasattr(settings,'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
+            return False
 
         #If the item is in on of the libraries defined, then it should be displayed.
-        for key, location in libraries.items():
-            if location == slugify(self.author):
+        for repo in self.repository:
+            if repo in settings.REQUEST_MATERIALS_REPOS:
                 return True
 
+        return False
+           
 
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
