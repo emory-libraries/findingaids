@@ -8,6 +8,12 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.7.4
+-----
+* made related_materials repeatable
+
+
+
 1.7.2
 -----
 
