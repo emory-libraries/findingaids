@@ -37,13 +37,17 @@ SERVER_EMAIL = ''       # email where default messages come from; django default
 EMAIL_SUBJECT_PREFIX = '[EmoryFindingAids] '  # prefix for email subjects
 FEEDBACK_EMAIL = []     # list of email addresses to receive site feedback
 
-#AEON BASE URL - the path Aeon requires to send the XML to the form to reserve the collection
-AEON_BASE = 'https://aeon.library.emory.edu/openurl?value=';
-
 # email addresses & archives repositories for the request materials form
 REQUEST_MATERIALS_CONTACTS = (
     # ('email address', 'name'),
 )
+
+# Used to define the base url needed to send the material to request service
+REQUEST_MATERIALS_URL = ''
+
+# The list of repositories that are able to be requested
+REQUEST_MATERIALS_REPOS = ['']
+
 
 # sites this django app is allowed to serve out
 ALLOWED_HOSTS = ['.library.emory.edu']
