@@ -476,8 +476,8 @@ class Series(XmlModel, LocalComponent):
             fields.append(self.originals_location)
         if self.bibliography:
             fields.append(self.bibliography)
-        for rel_m in self.relatedmaterial_list:
-            fields.append(rel_m)
+        if self.related_material:
+            fields.append(self.related_material)
         if self.process_info:
             fields.append(self.process_info)
 
