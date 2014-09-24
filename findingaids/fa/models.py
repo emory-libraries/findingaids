@@ -17,6 +17,7 @@
 from datetime import datetime
 import logging
 import os
+import re
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -29,6 +30,8 @@ from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
+
+from django.contrib.sites.models import Site
 
 
 
@@ -159,6 +162,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
 
     # is mapped as single in eulxml.eadmap but could be multiple
     separatedmaterial_list = xmlmap.NodeListField("e:archdesc/e:separatedmaterial", eadmap.Section)
+    relatedmaterial_list = xmlmap.NodeListField("e:archdesc/e:relatedmaterial", eadmap.Section)
 
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
@@ -228,8 +232,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             info.append(self.archdesc.use_restriction)
         if self.archdesc.alternate_form:
             info.append(self.archdesc.alternate_form)
-        if self.archdesc.related_material:
-            info.append(self.archdesc.related_material)
+        for rel_m in self.relatedmaterial_list:
+            info.append(rel_m)
         for sep_m in self.separatedmaterial_list:
             info.append(sep_m)
         if self.archdesc.acquisition_info:
@@ -472,8 +476,8 @@ class Series(XmlModel, LocalComponent):
             fields.append(self.originals_location)
         if self.bibliography:
             fields.append(self.bibliography)
-        if self.related_material:
-            fields.append(self.related_material)
+        for rel_m in self.relatedmaterial_list:
+            fields.append(rel_m)
         if self.process_info:
             fields.append(self.process_info)
 
