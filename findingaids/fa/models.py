@@ -15,12 +15,16 @@
 #   limitations under the License.
 
 from datetime import datetime
+import logging
 import os
 import re
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.db import models
+from django.template.defaultfilters import slugify
 
 from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
@@ -28,6 +32,13 @@ from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
 from django.contrib.sites.models import Site
+
+
+
+
+# logging
+logger = logging.getLogger(__name__)
+
 
 
 # finding aid models
@@ -299,23 +310,44 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             # otherwise use findingaid ARK as base for collection URI
             return '%s#collection' % self.eadid.url
 
+    def absolute_eadxml_url(self):
+        ''' Generate an absolute url to the xml view for this ead
+            for use with external services such as Aeon'''
 
-    def fulltext_absolute_url(self):
-        '''Generate an absolute url to the xml view for this ead
-        for use with external services such as Aeon'''
         current_site = Site.objects.get_current()
-        return ''.join(['http://', current_site.domain[:-1]])
+        return ''.join([
+            'http://', 
+            current_site.domain.rstrip('/'), 
+            reverse('fa:eadxml', kwargs={"id":self.eadid.value})
+            ])
 
-    def is_at_marbl(self):
-        '''Remove any extraneous spaces and line breaks from the author tag and comparer'''
-        def strip_spaces_and_newLines(str):
-            str = re.sub(r"\s", "", str)
-            return str
-        MARBL_LABEL = strip_spaces_and_newLines('Manuscript, Archives, and Rare Book Library, Emory University')
-        AUTHOR = strip_spaces_and_newLines(self.author)
-        return AUTHOR == MARBL_LABEL
-    
+    def request_materials_url(self):
+        ''' Construct the absolute url for use with external services such as Aeon'''
 
+        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+            logger.warn("Request materials url is not configured.")
+            return
+        
+        base = settings.REQUEST_MATERIALS_URL
+        return ''.join([base, self.absolute_eadxml_url()])
+
+    def requestable(self):
+        ''' Determines if the EAD is applicable for the electronic request service.'''
+
+        # If the request url is not configured, then the request can't be generated.
+        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+            return False
+
+        if not hasattr(settings,'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
+            return False
+
+        #If the item is in on of the libraries defined, then it should be displayed.
+        for repo in self.repository:
+            if repo in settings.REQUEST_MATERIALS_REPOS:
+                return True
+
+        return False
+           
 
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response

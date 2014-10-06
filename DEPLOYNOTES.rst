@@ -401,6 +401,17 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+
+1.8
+---
+
+* This release adds integrations with Aeon, which requires the 
+  addition of two settings in localsettings.py:
+
+  1. REQUEST_MATERIALS_URL
+  2. REQUEST_MATERIALS_REPOS
+
+
 1.7
 ---
 

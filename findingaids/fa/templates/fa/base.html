@@ -45,4 +45,8 @@
   </div>
   {% endif %}
   
+  {% if ead.requestable %}
+    {% include "fa/snippets/aeon-link.html" %}
+  {% endif %}
+
 {% endblock %}
