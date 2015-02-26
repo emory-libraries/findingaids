@@ -15,18 +15,16 @@
 #   limitations under the License.
 
 from os import path
-from mock import patch
 from unittest import skip
 
-from django.test import Client, TestCase
+from django.test import Client
 from django.conf import settings
-from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
 from eulexistdb.testutil import TestCase as EulexistdbTestCase
 from eullocal.django.forms.tests import MockCaptcha
 
-from findingaids.content import models, forms
+from findingaids.content import forms
 
 # re-using finding aid fixtures from main fa app
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..',
