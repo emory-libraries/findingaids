@@ -189,72 +189,73 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
 
     def test_italics(self):
         self.content.node = etree.fromstring(self.ITALICS)
-        format = format_ead(self.content)
-        self.assert_('<span class="ead-italic">Pitts v. Freeman</span> school desegregation' in format,
+        fmt = format_ead(self.content)
+        self.assert_('<span class="ead-italic">Pitts v. Freeman</span> school desegregation' in fmt,
             "render italic converted correctly to span class ead-italic")
 
     def test_bold(self):
         self.content.node = etree.fromstring(self.BOLD)
-        format = format_ead(self.content)
-        self.assert_('<span class="ead-bold">Pitts v. Freeman</span> school desegregation' in format,
+        fmt = format_ead(self.content)
+        self.assert_('<span class="ead-bold">Pitts v. Freeman</span> school desegregation' in fmt,
             "render bold converted correctly to span class ead-bold")
 
     def test_title(self):
         self.content.node = etree.fromstring(self.TITLE)
-        format = format_ead(self.content)
-        self.assert_('magazine <span class="ead-title">The Smart Set</span> from' in format,
+        fmt = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The Smart Set</span> from' in fmt,
                      "title tag converted correctly to span class ead-title")
 
         # title variants
         # - doublequotes
         self.content.node = etree.fromstring(self.TITLE_QUOT)
-        format = format_ead(self.content)
-        self.assertEqual('"Terminus"', format)
+        fmt = format_ead(self.content)
+        self.assertEqual('"Terminus"', fmt)
         # - multiple
         self.content.node = etree.fromstring(self.TITLE_MULTI)
-        format = format_ead(self.content)
-        self.assertEqual('"Terminus", "Saturday"', format)
+        fmt = format_ead(self.content)
+        self.assertEqual('"Terminus", "Saturday"', fmt)
+
         # - multiple titles + RDFa
-        format = format_ead(self.content, rdfa=True)
+        fmt = format_ead(self.content, rdfa=True)
         self.assertEqual('"<span inlist="inlist" property="dc:title">Terminus</span>", "<span inlist="inlist" property="dc:title">Saturday</span>"',
-                         format)
+                         fmt)
 
     def test_title_emph(self):
         self.content.node = etree.fromstring(self.TITLE_EMPH)
-        format = format_ead(self.content)
-        self.assert_('<em>Biographical source:</em> "Shaw, George' in format,
+        fmt = format_ead(self.content)
+        self.assert_('<em>Biographical source:</em> "Shaw, George' in fmt,
             "emph tag rendered correctly in section with title")
-        self.assert_('<span class="ead-title">Contemporary Authors Online</span>, Gale' in format,
+        self.assert_('<span class="ead-title">Contemporary Authors Online</span>, Gale' in fmt,
             "title rendered correctly in sectino with emph tag")
 
     def test_nested(self):
         self.content.node = etree.fromstring(self.NESTED)
-        format = format_ead(self.content)
-        self.assert_('magazine <span class="ead-title">The "Smart" Set</span>...' in format,
+        fmt = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The "Smart" Set</span>...' in fmt,
             "nested format rendered correctly")
 
     def test_notrans(self):
         self.content.node = etree.fromstring(self.NOTRANS)
-        format = format_ead(self.content)
-        self.assert_('magazine <span class="ead-title">The Smart Set</span>...' in format,
+        fmt = format_ead(self.content)
+        self.assert_('magazine <span class="ead-title">The Smart Set</span>...' in fmt,
             "nested format rendered correctly")
 
     def test_exist_match(self):
         self.content.node = etree.fromstring(self.EXIST_MATCH)
-        format = format_ead(self.content)
+        fmt = format_ead(self.content)
         self.assert_('Pitts v. <span class="exist-match">Freeman</span>'
-            in format, 'exist:match tag converted to span for highlighting')
+            in fmt, 'exist:match tag converted to span for highlighting')
 
     def test_extref(self):
         self.content.node = etree.fromstring(self.EXTREF)
-        format = format_ead(self.content)
+        fmt = format_ead(self.content)
         self.assert_('<a href="http://pid.emory.edu/ark:/25593/8zgst">Irish Literary Miscellany</a>'
-            in format, 'extref tag converted to a href')
+            in fmt, 'extref tag converted to a href')
 
         self.content.node = etree.fromstring(self.EXTREF_NOLINK)
-        format = format_ead(self.content)
+        fmt = format_ead(self.content)
         self.assert_('<a>Irish Literary Miscellany</a>'
-            in format, 'formatter should not fail when extref has no href')
+            in fmt, 'formatter should not fail when extref has no href')
 
 
 # test custom template tag ifurl
