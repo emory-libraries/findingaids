@@ -270,10 +270,23 @@ class RdfaTemplateTest(DjangoTestCase):
         self.item_tmpl = loader.get_template('fa/snippets/file_item.html')
         self.ctxt = Context({'DEFAULT_DAO_LINK_TEXT': 'Resource Available Online'})
 
-    def test_title_rdfa(self):
-        # consider using either beautifulsoup or rdflib to inspect the result
-        # rather than checking for hard-coded strings
+    def _render_item_to_rdf(self, xmlstring):
+        # convenience method for testing ead file component rdf output
 
+        # load xml as an ead series item
+        component = load_xmlobject_from_string(xmlstring, Series)
+        # render with the file_item template used in findingaid display
+        self.ctxt.update({'component': component})
+        result = self.item_tmpl.render(self.ctxt)
+        # parse as RDFa and return the resulting rdflib graph
+        # - patch in namespaces before parsing as rdfa
+        result = '<html xmlns:schema="%s" xmlns:bibo="%s">%s</html>' % \
+            (self.SCHEMA_ORG, self.BIBO, result)
+        g = rdflib.Graph()
+        g.parse(data=result, format='rdfa')
+        return g
+
+    def test_bg_groupsheet(self):
         # sample belfast group sheet from simmons759
         bg_groupsheet = '''<c03 level="file" xmlns="%s" xmlns:xlink="%s">
             <did>
@@ -282,22 +295,14 @@ class RdfaTemplateTest(DjangoTestCase):
               <unittitle>
                 <corpname source="viaf" authfilenumber="123393054">Belfast Group</corpname> Worksheet,
                 <persname authfilenumber="39398205" role="dc:creator" source="viaf">Michael Longley</persname>:
-                  <title render="doublequote">Mountain Swim</title>
+                    <title render="doublequote">To the Poets</title>,
+                    <title render="doublequote">Mountain Swim</title>
                 </unittitle>
                 <dao xlink:href="http://pid.emory.edu/ark:/25593/17m8g"/>
             </did>
         </c03>''' % (EAD_NAMESPACE, XLINK_NAMESPACE)
-        component = load_xmlobject_from_string(bg_groupsheet, Series)
-        self.ctxt.update({'component': component})
-        result = self.item_tmpl.render(self.ctxt)
-        # TODO: possibly pull out render/rdf logic into a reusable method?
 
-        # patch in namespaces before parsing the rdfa
-        result = '<html xmlns:schema="%s" xmlns:bibo="%s">%s</html>' % \
-            (self.SCHEMA_ORG, self.BIBO, result)
-        g = rdflib.Graph()
-        # and parse as RDFa
-        g.parse(data=result, format='rdfa')
+        g = self._render_item_to_rdf(bg_groupsheet)
 
         # there should be a manuscript in the output (blank node)
         ms_triples = list(g.triples((None, rdflib.RDF.type, self.BIBO.Manuscript)))
@@ -314,14 +319,76 @@ class RdfaTemplateTest(DjangoTestCase):
         titles = list(g.triples((ms_node, self.DC.title, None)))
         # manuscript should have a title
         self.assert_(titles, 'manuscript should have a dc:title')
-        # first triple, third term (subject) should be the actual title text
-        self.assertEqual(u'Mountain Swim', unicode(titles[0][2]))
+        # should actually be an RDF sequence
+        # first triple, third term (subject) should be the title node
+        title_node = titles[0][2]
+        self.assert_(isinstance(title_node, rdflib.BNode),
+            'multiple titles should be related via blank node for rdf list')
+        # first title
+        self.assertEqual(u'To the Poets', unicode(g.value(title_node, rdflib.RDF.first)),
+            'first title should be part of rdf list')
+        # rest of the list
+        rest = g.value(title_node, rdflib.RDF.rest)
+        # second title
+        self.assertEqual(u'Mountain Swim', unicode(g.value(rest, rdflib.RDF.first)))
 
-        # test book title
+    def test_book_title(self):
+        # book title
+        book_title = '''<c03 level="file" xmlns="%s">
+            <did>
+              <container type="box">63</container>
+              <container type="folder">6</container>
+              <unittitle>Various poems, <title type="poetry" source="isbn" authfilenumber="0882580159">The Forerunners: Black Poets in America</title>, 1981</unittitle>
+             </did>
+        </c03>''' % EAD_NAMESPACE
+        g = self._render_item_to_rdf(book_title)
 
+        # there should be a book in the output
+        book_triples = list(g.triples((None, rdflib.RDF.type, self.BIBO.Book)))
+
+        self.assert_(book_triples, 'RDFa output should include an item with type bibo:Book')
+        # first element of the first triple should be our book node
+        book_node = book_triples[0][0]
+        self.assertEqual(u'The Forerunners: Black Poets in America',
+            unicode(g.value(book_node, self.DC.title)),
+            'book title should be set as dc:title')
+        self.assertEqual(u'poetry', unicode(g.value(book_node, self.SCHEMA_ORG.genre)),
+            'title type "poetry" should be set as schema.org genre')
+
+    def test_periodical_title(self):
         # test article in a periodical
+        article_title = '''<c03 level="file" xmlns="%s">
+            <did>
+              <container type="box">63</container>
+              <container type="folder">6</container>
+              <unittitle><title type="article" render="doublequote">The Special Wonder of the Theater</title>,
+                <title source="ISSN" authfilenumber="0043-0897">The Washingtonian</title>, February 1966</unittitle>
+             </did>
+        </c03>''' % EAD_NAMESPACE
+        g = self._render_item_to_rdf(article_title)
+
+        # there should be an article in the output
+        article_triples = list(g.triples((None, rdflib.RDF.type, self.BIBO.Article)))
+        self.assert_(article_triples, 'RDFa output should include an item with type bibo:Article')
+        # first element of the first triple should be the article node
+        article_node = article_triples[0][0]
+        self.assertEqual(u'The Special Wonder of the Theater',
+            unicode(g.value(article_node, self.DC.title)),
+            'article title should be set as dc:title')
+
+        # article should be related to a periodical
+        article_rels = list(g.triples((article_node, self.DC.isPartOf, None)))
+        self.assert_(article_rels, 'article should be part of related periodical')
+        # first triple, third term
+        periodical_node = article_rels[0][2]
+        self.assert_((periodical_node, rdflib.RDF.type, self.BIBO.Periodical) in g,
+            'title with an ISSN should be a periodical')
+        self.assertEqual(u'The Washingtonian', unicode(g.value(periodical_node, self.DC.title)),
+            'periodical title should be set as dc:title')
+
 
         # test poem in a periodical?
+        # poster/image ?
 
 
 # test custom template tag ifurl

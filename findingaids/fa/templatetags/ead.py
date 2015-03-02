@@ -78,6 +78,7 @@ def format_date(node, default_rel):
 def format_title(node, default_rel):
     'display a title node as semantic information'
     title_type = node.get('type', None)
+    title_source = node.get('source', None)
 
     start, end = '', ''
 
@@ -93,21 +94,20 @@ def format_title(node, default_rel):
                   namespaces={'e': EAD_NAMESPACE}) or title_type is not None:
         start, end = '<span property="dc:title">', '</span>'
 
-        # use title type if set
+        # title attribute carries genre information
         if title_type is not None:
-            # if there is a type, wrap with a type declaration
-            start = '<span typeof="%s">%s' % (title_type, start)
-            end = end + '</span>'
+            end += '<meta property="schema:genre" content="%s"/>' % title_type
 
-            # infer a relation to context based on type
-            # FIXME/TODO: support other relations?
-            if title_type.endswith('DocumentPart'):
-                rel = 'dcterms:hasPart'
-                start = '<span rel="%s">%s' % (rel, start)
-                end = end + '</span>'
+        # if ISSN with preceding title, assume article in a periodical
+        elif title_source is not None and title_source.upper() == 'ISSN' and \
+            node.xpath('count(preceding-sibling::e:title)', namespaces={'e': EAD_NAMESPACE}) == 1:
 
-        # if no title type and there are multiple titles,
-        # use RDFa list notation to generate a sequence
+            # adapted from schema.org article example: http://schema.org/Article
+            start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"><span property="dc:title">'
+            end = '</span></span>'
+
+        # if no type and there are multiple titles, use RDFa list notation to
+        # generate a sequence
         elif node.xpath('count(parent::e:unittitle/e:title)',
                         namespaces={'e': EAD_NAMESPACE}) > 1:
             start = '<span inlist="inlist" property="dc:title">'
