@@ -14,8 +14,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.conf.urls.defaults import *
+from django.conf.urls import url, patterns, include
+# from django.views.generic.base import RedirectView
 from findingaids.fa import views as fa_views
+
 
 TITLE_LETTERS = '[a-zA-Z]'
 
@@ -37,6 +39,8 @@ findingaid_parts = patterns(
     '',
     url(r'^$', fa_views.findingaid, name='findingaid'),
     url(r'^EAD/$', fa_views.eadxml, name='eadxml'),
+    # TODO: enable this once upgraded to django 1.6+
+    # url(r'^ead/$', RedirectView.as_view(pattern_name='fa:eadxml', permanent=True)),
 
     #Added ead path with a file extension for testing
     url(r'^ead.xml$', fa_views.eadxml, name='eadxml-with-extension'),
