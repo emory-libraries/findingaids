@@ -20,20 +20,21 @@ import re
 from time import sleep
 from lxml import etree
 from mock import patch
+import rdflib
 
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import Http404, HttpRequest
-from django.template import RequestContext, Template
+from django.template import RequestContext, Template, Context, loader
 from django.test import TestCase as DjangoTestCase
 
 from eulexistdb.db import ExistDB
 from eulexistdb.testutil import TestCase
-from eulxml.xmlmap import XmlObject
+from eulxml.xmlmap import XmlObject, load_xmlobject_from_string
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-from findingaids.fa.models import FindingAid, Deleted
+from findingaids.fa.models import FindingAid, Deleted, Series
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead, XLINK_NAMESPACE
 from findingaids.fa.templatetags.ark_pid import ark_pid
@@ -163,7 +164,7 @@ class UtilsTest(TestCase):
 
 
 class FormatEadTestCase(DjangoTestCase):
-# test ead_format template tag explicitly
+    # test ead_format template tag explicitly
     ITALICS = """<titleproper xmlns="%s"><emph render="italic">Pitts v. Freeman</emph> school desegregation case files,
 1969-1993</titleproper>""" % EAD_NAMESPACE
     BOLD = """<titleproper xmlns="%s"><emph render="bold">Pitts v. Freeman</emph> school desegregation case files,
@@ -256,6 +257,71 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
         fmt = format_ead(self.content)
         self.assert_('<a>Irish Literary Miscellany</a>'
             in fmt, 'formatter should not fail when extref has no href')
+
+class RdfaTemplateTest(DjangoTestCase):
+    # test RDFa output for file-level items
+
+    # rdf namespaces for testing
+    DC = rdflib.Namespace('http://purl.org/dc/terms/')
+    BIBO = rdflib.Namespace('http://purl.org/ontology/bibo/')
+    SCHEMA_ORG = rdflib.Namespace('http://schema.org/')
+
+    def setUp(self):
+        self.item_tmpl = loader.get_template('fa/snippets/file_item.html')
+        self.ctxt = Context({'DEFAULT_DAO_LINK_TEXT': 'Resource Available Online'})
+
+    def test_title_rdfa(self):
+        # consider using either beautifulsoup or rdflib to inspect the result
+        # rather than checking for hard-coded strings
+
+        # sample belfast group sheet from simmons759
+        bg_groupsheet = '''<c03 level="file" xmlns="%s" xmlns:xlink="%s">
+            <did>
+              <container type="box">63</container>
+              <container type="folder">6</container>
+              <unittitle>
+                <corpname source="viaf" authfilenumber="123393054">Belfast Group</corpname> Worksheet,
+                <persname authfilenumber="39398205" role="dc:creator" source="viaf">Michael Longley</persname>:
+                  <title render="doublequote">Mountain Swim</title>
+                </unittitle>
+                <dao xlink:href="http://pid.emory.edu/ark:/25593/17m8g"/>
+            </did>
+        </c03>''' % (EAD_NAMESPACE, XLINK_NAMESPACE)
+        component = load_xmlobject_from_string(bg_groupsheet, Series)
+        self.ctxt.update({'component': component})
+        result = self.item_tmpl.render(self.ctxt)
+        # TODO: possibly pull out render/rdf logic into a reusable method?
+
+        # patch in namespaces before parsing the rdfa
+        result = '<html xmlns:schema="%s" xmlns:bibo="%s">%s</html>' % \
+            (self.SCHEMA_ORG, self.BIBO, result)
+        g = rdflib.Graph()
+        # and parse as RDFa
+        g.parse(data=result, format='rdfa')
+
+        # there should be a manuscript in the output (blank node)
+        ms_triples = list(g.triples((None, rdflib.RDF.type, self.BIBO.Manuscript)))
+
+        self.assert_(ms_triples, 'RDFa output should include an item with type manuscript')
+        # first element of the first triple should be our manuscript node
+        ms_node = ms_triples[0][0]
+        # manuscript should be related to BG (right now uses schema.org/mentions, but could change)
+        self.assert_(list(g.triples((ms_node, None, rdflib.URIRef('http://viaf.org/viaf/123393054')))),
+            'manuscript should be related to belfast group')
+        # manuscript should have an author
+        self.assert_((ms_node, self.DC.creator, rdflib.URIRef('http://viaf.org/viaf/39398205')),
+            'manuscript should have author as dc:creator')
+        titles = list(g.triples((ms_node, self.DC.title, None)))
+        # manuscript should have a title
+        self.assert_(titles, 'manuscript should have a dc:title')
+        # first triple, third term (subject) should be the actual title text
+        self.assertEqual(u'Mountain Swim', unicode(titles[0][2]))
+
+        # test book title
+
+        # test article in a periodical
+
+        # test poem in a periodical?
 
 
 # test custom template tag ifurl
