@@ -79,6 +79,10 @@ def format_title(node, default_rel):
     'display a title node as semantic information'
     title_type = node.get('type', None)
     title_source = node.get('source', None)
+    title_authfileno = node.get('authfilenumber', None)
+    # lower-case title source for consistency of checking (isbn/issn/oclc)
+    if title_source is not None:
+        title_source = title_source.lower()
 
     start, end = '', ''
 
@@ -99,18 +103,29 @@ def format_title(node, default_rel):
             end += '<meta property="schema:genre" content="%s"/>' % title_type
 
         # if ISSN with preceding title, assume article in a periodical
-        elif title_source is not None and title_source.upper() == 'ISSN' and \
+        elif title_source == 'issn' and \
             node.xpath('count(preceding-sibling::e:title)', namespaces={'e': EAD_NAMESPACE}) == 1:
+
+            if title_authfileno is not None:
+                # include issn as schema.org property when set
+                issn = '<meta property="schema:issn" content="%s"/>' % title_authfileno
+            else:
+                issn = ''
 
             # adapted from schema.org article example: http://schema.org/Article
             start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"><span property="dc:title">'
-            end = '</span></span>'
+            end = '</span>%s</span>' % issn
 
         # if no type and there are multiple titles, use RDFa list notation to
         # generate a sequence
         elif node.xpath('count(parent::e:unittitle/e:title)',
                         namespaces={'e': EAD_NAMESPACE}) > 1:
             start = '<span inlist="inlist" property="dc:title">'
+
+    # if isbn # is available, add it after title
+    # NOTE: this assumes an item context is set in the template
+    if title_source == 'isbn' and title_authfileno is not None:
+        end += '<meta property="schema:isbn" content="%s"/>' % title_authfileno
 
     return (start, end)
 

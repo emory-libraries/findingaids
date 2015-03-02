@@ -354,6 +354,9 @@ class RdfaTemplateTest(DjangoTestCase):
             'book title should be set as dc:title')
         self.assertEqual(u'poetry', unicode(g.value(book_node, self.SCHEMA_ORG.genre)),
             'title type "poetry" should be set as schema.org genre')
+        self.assertEqual(u'0882580159', unicode(g.value(book_node, self.SCHEMA_ORG.isbn)),
+            'isbn authfilenumber should be set as schema.org/isbn')
+
 
     def test_periodical_title(self):
         # test article in a periodical
@@ -385,6 +388,8 @@ class RdfaTemplateTest(DjangoTestCase):
             'title with an ISSN should be a periodical')
         self.assertEqual(u'The Washingtonian', unicode(g.value(periodical_node, self.DC.title)),
             'periodical title should be set as dc:title')
+        self.assertEqual(u'0043-0897', unicode(g.value(periodical_node, self.SCHEMA_ORG.issn)),
+            'authfilenumber should be set as schema.org/issn')
 
 
         # test poem in a periodical?
