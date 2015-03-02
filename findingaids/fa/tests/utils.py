@@ -349,6 +349,8 @@ class RdfaTemplateTest(DjangoTestCase):
         self.assert_(book_triples, 'RDFa output should include an item with type bibo:Book')
         # first element of the first triple should be our book node
         book_node = book_triples[0][0]
+        self.assertEqual(rdflib.URIRef('urn:ISBN:0882580159'), book_node,
+            'book identifier should be an ISBN URN')
         self.assertEqual(u'The Forerunners: Black Poets in America',
             unicode(g.value(book_node, self.DC.title)),
             'book title should be set as dc:title')
@@ -357,6 +359,31 @@ class RdfaTemplateTest(DjangoTestCase):
         self.assertEqual(u'0882580159', unicode(g.value(book_node, self.SCHEMA_ORG.isbn)),
             'isbn authfilenumber should be set as schema.org/isbn')
 
+        # OCLC book should be treated similarly
+        oclc_title = '''<c02 xmlns="%s" level="file">
+            <did>
+              <container type="box">10</container>
+              <container type="folder">24</container>
+              <unittitle>
+                <title type="scripts" source="OCLC" authfilenumber="434083314">Bayou Legend</title>
+                , notes
+                </unittitle>
+            </did>
+        </c02>''' % EAD_NAMESPACE
+        g = self._render_item_to_rdf(oclc_title)
+        # there should be a book in the output
+        book_triples = list(g.triples((None, rdflib.RDF.type, self.BIBO.Book)))
+
+        self.assert_(book_triples, 'RDFa output should include an item with type bibo:Book')
+        # first element of the first triple should be our book node
+        book_node = book_triples[0][0]
+        self.assertEqual(rdflib.URIRef('http://www.worldcat.org/oclc/434083314'), book_node,
+            'book identifier should be a worldcat URI')
+        self.assertEqual(u'Bayou Legend',
+            unicode(g.value(book_node, self.DC.title)),
+            'book title should be set as dc:title')
+        self.assertEqual(u'scripts', unicode(g.value(book_node, self.SCHEMA_ORG.genre)),
+            'title type "scripts" should be set as schema.org genre')
 
     def test_periodical_title(self):
         # test article in a periodical
@@ -386,6 +413,9 @@ class RdfaTemplateTest(DjangoTestCase):
         periodical_node = article_rels[0][2]
         self.assert_((periodical_node, rdflib.RDF.type, self.BIBO.Periodical) in g,
             'title with an ISSN should be a periodical')
+        self.assertEqual(rdflib.URIRef('urn:ISSN:0043-0897'), periodical_node,
+            'periodical identifier should be an ISSN URN')
+
         self.assertEqual(u'The Washingtonian', unicode(g.value(periodical_node, self.DC.title)),
             'periodical title should be set as dc:title')
         self.assertEqual(u'0043-0897', unicode(g.value(periodical_node, self.SCHEMA_ORG.issn)),

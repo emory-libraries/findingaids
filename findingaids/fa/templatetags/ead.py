@@ -109,11 +109,23 @@ def format_title(node, default_rel):
             if title_authfileno is not None:
                 # include issn as schema.org property when set
                 issn = '<meta property="schema:issn" content="%s"/>' % title_authfileno
+
+                # generate URI/URN for item when possible
+                # NOTE: this logic is duplicated from fa.models.Title
+                if title_source in ['isbn', 'issn']:
+                    resource_id = 'urn:%s:%s' % (title_source.upper(), title_authfileno)
+                elif title_source == 'oclc':
+                    resource_id = 'http://www.worldcat.org/oclc/%s' % title_authfileno
+                else:
+                    resource_id = None
+
             else:
                 issn = ''
 
+            resource = ' resource="%s"' % resource_id if resource_id else ''
+
             # adapted from schema.org article example: http://schema.org/Article
-            start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"><span property="dc:title">'
+            start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"%s><span property="dc:title">' % resource
             end = '</span>%s</span>' % issn
 
         # if no type and there are multiple titles, use RDFa list notation to

@@ -17,7 +17,8 @@
           {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
         {% elif component.has_semantic_data %}
         {# if unittitle has a name, containers may have semantic info also #}
-        <span rel="schema:mentions"><span typeof="{{ component.rdf_type }}">
+        <span rel="schema:mentions"><span typeof="{{ component.rdf_type }}"
+            {% if component.rdf_identifier %}resource="{{ component.rdf_identifier }}"{% endif %}>
           {{ component.did.unittitle|format_ead_rdfa }}
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa|default:'' }}

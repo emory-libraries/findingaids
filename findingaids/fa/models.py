@@ -408,6 +408,16 @@ class Title(xmlmap.XmlObject):
     authfilenumber = xmlmap.StringField('@authfilenumber')
     value = xmlmap.StringField('.', normalize=True)
 
+    @property
+    def rdf_identifier(self):
+        ''''RDF identifier for this title, if source and authfilenumber attributes
+        are present and can be converted into a URI or URN'''
+        src = self.source.lower()
+        if src in ['isbn', 'issn']:  # isbn and issn URNs have same format
+            return 'urn:%s:%s' % (self.source.upper(), self.authfilenumber)
+        elif src == 'oclc':
+            return 'http://www.worldcat.org/oclc/%s' % self.authfilenumber
+
 
 class Series(XmlModel, LocalComponent):
     """
@@ -548,11 +558,19 @@ class Series(XmlModel, LocalComponent):
 
         if rdf_type is None:
             # fallback type for compatibility with Belfast Group
-            # TODO: need a better way to handle this, or fallback to bibo:document
+            # NOTE: better logic forthcoming...
             rdf_type = 'bibo:Manuscript'
 
         return rdf_type
 
+    @property
+    def rdf_identifier(self):
+        # if the item in the unittitle has an rdf identifier, make it available
+        # for use in constructing RDFa in the templates
+
+        # for now, only return when these is on single title
+        if len(self.unittitle_titles) == 1 :
+            return self.unittitle_titles[0].rdf_identifier
 
 
 # override component.c node_class
