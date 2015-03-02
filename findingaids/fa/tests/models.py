@@ -22,9 +22,11 @@ from django.test import TestCase as DjangoTestCase
 from django.test.utils import override_settings
 
 from eulxml.xmlmap import load_xmlobject_from_file, load_xmlobject_from_string
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 from eulexistdb.testutil import TestCase
 
-from findingaids.fa.models import FindingAid, LocalComponent, EadRepository
+from findingaids.fa.models import FindingAid, LocalComponent, EadRepository, \
+    Series
 from findingaids.fa.utils import pages_to_show, ead_lastmodified, \
     collection_lastmodified
 
@@ -139,7 +141,7 @@ class FindingAidTestCase(DjangoTestCase):
     def test_absolute_eadxml_url(self):
         # test against current site domain
         url = self.findingaid['abbey244'].absolute_eadxml_url()
-        self.assert_(self.findingaid['abbey244'].eadid.value in url, 
+        self.assert_(self.findingaid['abbey244'].eadid.value in url,
             'URL should contain the EAD ID for this current document.')
 
     @override_settings(REQUEST_MATERIALS_URL='http://example.com')
@@ -156,11 +158,11 @@ class FindingAidTestCase(DjangoTestCase):
 
         # Fail if the REQUEST_MATERIALS_URL is empty
         with override_settings(REQUEST_MATERIALS_URL = ''):
-            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_URL is not set.") 
+            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_URL is not set.")
 
         # Fail if the REQUEST_MATERIALS_REPOS is empty
         with override_settings(REQUEST_MATERIALS_REPOS = ''):
-            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_REPOS is not set.") 
+            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_REPOS is not set.")
 
         # Fail if the requested EAD repo is not set in REQUEST_MATERIALS_REPOS
         with override_settings(REQUEST_MATERIALS_REPOS = [
@@ -194,4 +196,52 @@ class EadRepositoryTestCase(TestCase):
         self.assert_('Manuscript, Archives, and Rare Book Library' in repos)
 
 
+class SeriesTestCase(DjangoTestCase):
+
+    # plain file item with no semantic tags
+    c1 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+          <did>
+            <container type="box">1</container>
+            <container type="folder">1</container>
+            <unittitle>Acey, J. Earl and Port Scott, July 10, 1991. [Cassette
+                  available]</unittitle>
+          </did>
+         </c02>''' % EAD_NAMESPACE, Series)
+    # simple tagged person name in the unittitle
+    c2 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+          <did>
+            <container type="box">1</container>
+            <container type="folder">1</container>
+            <unittitle><persname>Acey, J. Earl</persname> and Port Scott, July 10, 1991. [Cassette
+                  available]</unittitle>
+          </did>
+        </c02>''' % EAD_NAMESPACE, Series)
+    # tagged title with source & authfilenumber
+    c3 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+        <did>
+          <container type="box">10</container>
+          <container type="folder">24</container>
+          <unittitle>
+            <title type="scripts" source="OCLC" authfilenumber="434083314">Bayou Legend</title>, notes</unittitle>
+        </did>
+    </c02>''' % EAD_NAMESPACE, Series)
+    # issn title
+    c4 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+        <did>
+          <container type="box">19</container>
+          <container type="folder">3</container>
+          <unittitle><title render="doublequote" type="article">Who Has Seen the Wind?</title> <title source="ISSN" authfilenumber="2163-6206">New York Amsterdam News</title>, National Scene Magazine Supplement, November-December 1976</unittitle>
+        </did></c02>''' % EAD_NAMESPACE, Series)
+
+    def test_has_semantic_data(self):
+        self.assertFalse(self.c1.has_semantic_data)
+        self.assertTrue(self.c2.has_semantic_data)
+        self.assertTrue(self.c3.has_semantic_data)
+
+    def test_rdf_type(self):
+        # fall-back type (for now)
+        self.assertEqual('bibo:Manuscript', self.c1.rdf_type)
+        # infer book, article, etc from title attributes
+        self.assertEqual('bibo:Book', self.c3.rdf_type)
+        self.assertEqual('bibo:Article', self.c4.rdf_type)
 

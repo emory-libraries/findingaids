@@ -17,28 +17,21 @@
 from datetime import datetime
 import logging
 import os
-import re
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
-from django.template.defaultfilters import slugify
 
 from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
-from django.contrib.sites.models import Site
-
-
-
 
 # logging
 logger = logging.getLogger(__name__)
-
 
 
 # finding aid models
@@ -316,8 +309,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
 
         current_site = Site.objects.get_current()
         return ''.join([
-            'http://', 
-            current_site.domain.rstrip('/'), 
+            'http://',
+            current_site.domain.rstrip('/'),
             reverse('fa:eadxml', kwargs={"id":self.eadid.value})
             ])
 
@@ -327,7 +320,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
             logger.warn("Request materials url is not configured.")
             return
-        
+
         base = settings.REQUEST_MATERIALS_URL
         return ''.join([base, self.absolute_eadxml_url()])
 
@@ -347,7 +340,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
                 return True
 
         return False
-           
+
 
 class ListTitle(XmlModel):
     # EAD list title - used to retrieve at the title level for better query response
@@ -403,6 +396,19 @@ class LocalComponent(eadmap.Component):
         return len(self.did.container) and len(self.preceding_files) == 0
 
 
+class Title(xmlmap.XmlObject):
+    '''A title in an EAD document, with access to attributes for type of title,
+    render, source, and authfilenumber.
+    '''
+    ROOT_NAMESPACES = {'e': eadmap.EAD_NAMESPACE}
+
+    type = xmlmap.StringField('@type')
+    render = xmlmap.StringField('@render')
+    source = xmlmap.StringField('@source')
+    authfilenumber = xmlmap.StringField('@authfilenumber')
+    value = xmlmap.StringField('.', normalize=True)
+
+
 class Series(XmlModel, LocalComponent):
     """
       Top-level (c01) series.
@@ -442,6 +448,9 @@ class Series(XmlModel, LocalComponent):
                                      for t in ['persname', 'corpname', 'geogname'])
     unittitle_name = xmlmap.NodeField(_unittitle_name_xpath, Name)
     'name in the unittitle, as an instance of :class:`Name`'
+
+    unittitle_titles = xmlmap.NodeListField('e:did/e:unittitle/e:title', Title)
+    'list of titles in the unittitle, as :class:`Title`'
 
     def series_info(self):
         """"
@@ -501,6 +510,50 @@ class Series(XmlModel, LocalComponent):
                 eadid = None
             self._short_id = shortform_id(self.id, eadid)
         return self._short_id
+
+    @property
+    def has_semantic_data(self):
+        '''Does this item contains semantic data that should be rendered with
+        RDFa?  Currently checks the unittitle for a tagged person, corporate, or
+        geographic name or for a title with source and authfilenumber attributes.'''
+        # - if there is a tagged name in the unittitle
+        semantic_tags = [self.unittitle_name]
+        # - if there are titles tagged with source/authfilenumber
+        semantic_tags.extend([t for t in self.unittitle_titles if t.source and t.authfilenumber])
+        return any(semantic_tags)
+
+    @property
+    def rdf_type(self):
+        ''''rdf type to use for a semantically-tagged component item'''
+        # NOTE: initial implementation for Belfast Group sheets assumes manuscript
+        # type; should be refined for other types of content
+        rdf_type = None
+        if len(self.unittitle_titles):
+            # if type of first title is article, return article
+            if self.unittitle_titles[0].type and \
+              self.unittitle_titles[0].type.lower() == 'article':
+                rdf_type = 'bibo:Article'
+
+            # if two titles and the second has an issn, article in a periodical
+            # (TODO: is this close enough for all cases?)
+            elif len(self.unittitle_titles) == 2 and self.unittitle_titles[1].source \
+              and self.unittitle_titles[1].source.upper() == 'ISSN':
+                rdf_type = 'bibo:Article'
+
+            # if title has an isbn, assume it is a book
+            # - for now, also assume OCLC source is book (FIXME: is this accurate?)
+            elif self.unittitle_titles[0].source \
+              and self.unittitle_titles[0].source.upper() in ['ISBN', 'OCLC']:
+                rdf_type = 'bibo:Book'
+
+        if rdf_type is None:
+            # fallback type for compatibility with Belfast Group
+            # TODO: need a better way to handle this, or fallback to bibo:document
+            rdf_type = 'bibo:Manuscript'
+
+        return rdf_type
+
+
 
 # override component.c node_class
 # subcomponents need to be initialized as Series to get display_label, series list...

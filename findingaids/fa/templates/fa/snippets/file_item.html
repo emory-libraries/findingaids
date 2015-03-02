@@ -15,10 +15,9 @@
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa:rdfa_rel|default:'' }}
           {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
-        {% elif component.unittitle_name %}
+        {% elif component.has_semantic_data %}
         {# if unittitle has a name, containers may have semantic info also #}
-        <span rel="schema:mentions"><span typeof="bibo:Manuscript">
-          {# NOTE: assuming manuscript type for now; should be refined for other types of content #}
+        <span rel="schema:mentions"><span typeof="{{ component.rdf_type }}">
           {{ component.did.unittitle|format_ead_rdfa }}
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa|default:'' }}
@@ -51,7 +50,7 @@
             {% endfor %}
         </div>
         {% endif %}
-        {% if not rdfa_rel and component.unittitle_name %}
+        {% if not rdfa_rel and component.has_semantic_data %}
          </span></span>  {# end mentions, manuscript #}
         {% endif %}
     </td>
