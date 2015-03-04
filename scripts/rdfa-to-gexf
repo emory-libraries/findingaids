@@ -1,18 +1,34 @@
 #!/usr/bin/env python
+#
+# Script to harvest RDFa from one or more URLs, and related documents,
+# and generate a GEXF nextwork graph for use with a program such as Gephi.
+#
+# Installation of python dependencies:
+#   pip install rdflib requests networkx
+#
+# Takes a single url or a text file with a list of urls to be harvested.
+# By default, will also harvest RDFa from related urls, which are found using
+# schema.org/relatedLink and dc:hasPart.
 
-# installation dependencies:
-# pip install rdflib requests networkx
-
-from urlparse import urlparse
 import argparse
+from urlparse import urlparse
+import logging.config
 import re
 
-# TODO: catch import error and output install info
-import networkx as nx
-from networkx.readwrite import gexf
-import rdflib
-from rdflib.collection import Collection as RdfCollection
-import requests
+try:
+    import networkx as nx
+    from networkx.readwrite import gexf
+    import rdflib
+    from rdflib.collection import Collection as RdfCollection
+    import requests
+except ImportError:
+    print '''Please install python dependencies for this script:
+pip install rdflib requests networkx'''
+    raise SystemExit
+
+
+# configure logging so rdflib doesn't complain
+logging.config.dictConfig({'version': 1})
 
 
 #: dublin core rdf namespace
@@ -46,7 +62,8 @@ class HarvestRdfa(object):
 
     verbosity = 1
 
-    # progressbar TODO
+    # NOTE: could potentially add a progressbar to give user feedback about
+    # how far along the script is, but that leaving out for now.
 
     def __init__(self, urls, harvest_related, filename, verbosity):
         self.harvest_related = harvest_related
@@ -297,9 +314,9 @@ One of --url or --urls must be specified.''',
 
     if args.url:
         url_list = [args.url]
-    elif args.url:
-        pass
-        # TODO: load urls from file
+    elif args.urls:
+        with open(args.urls) as urlfile:
+            url_list = urlfile.readlines()
 
     if url_list:
         HarvestRdfa(url_list, harvest_related=args.no_related,
