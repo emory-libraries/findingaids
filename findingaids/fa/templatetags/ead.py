@@ -95,7 +95,7 @@ def format_title(node, default_rel):
     meta_tags = ''
     if title_source in ['isbn', 'issn'] and title_authfileno is not None:
         meta_tags += '<meta property="schema:%s" content="%s"/>' % \
-            (title_sourcee, title_authfileno)
+            (title_source, title_authfileno)
     # title attribute carries genre information
     if title_type is not None:
         meta_tags += '<meta property="schema:genre" content="%s"/>' % title_type

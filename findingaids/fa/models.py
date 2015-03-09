@@ -560,10 +560,10 @@ class Series(XmlModel, LocalComponent):
               and self.unittitle_titles[0].source.upper() in ['ISBN', 'OCLC']:
                 rdf_type = 'bibo:Book'
 
-        if rdf_type is None:
-            # fallback type for compatibility with Belfast Group
-            # NOTE: better logic forthcoming...
-            rdf_type = 'bibo:Manuscript'
+            if rdf_type is None:
+                # fallback type for compatibility with Belfast Group
+                # NOTE: better logic forthcoming...
+                rdf_type = 'bibo:Manuscript'
 
         return rdf_type
 

@@ -17,8 +17,10 @@
           {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
         {% elif component.has_semantic_data %}
         {# if unittitle has a name, containers may have semantic info also #}
-        <span rel="schema:mentions"><span typeof="{{ component.rdf_type }}"
-            {% if component.rdf_identifier %}resource="{{ component.rdf_identifier }}"{% endif %}>
+            {% if component.rdf_type %} {# if there is a type, assume the whole unittitle is one thing #}
+            <span rel="schema:mentions"><span typeof="{{ component.rdf_type }}"
+                {% if component.rdf_identifier %}resource="{{ component.rdf_identifier }}"{% endif %}>
+            {% endif %}
           {{ component.did.unittitle|format_ead_rdfa }}
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa|default:'' }}
@@ -51,7 +53,7 @@
             {% endfor %}
         </div>
         {% endif %}
-        {% if not rdfa_rel and component.has_semantic_data %}
+        {% if not rdfa_rel and component.has_semantic_data and component.rdf_type %}
          </span></span>  {# end mentions, manuscript #}
         {% endif %}
     </td>
