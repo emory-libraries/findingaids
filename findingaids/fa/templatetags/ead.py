@@ -91,6 +91,27 @@ def format_title(node, default_rel):
     if default_rel == 'schema:knows arch:correspondedWith':
         return start, end
 
+    # if isbn # or issn is available, include it
+    meta_tags = ''
+    if title_source in ['isbn', 'issn'] and title_authfileno is not None:
+        meta_tags += '<meta property="schema:%s" content="%s"/>' % \
+            (title_sourcee, title_authfileno)
+    # title attribute carries genre information
+    if title_type is not None:
+        meta_tags += '<meta property="schema:genre" content="%s"/>' % title_type
+
+    # generate URI/URN for item when possible
+    resource_id = None
+    if title_authfileno is not None:
+        # NOTE: this logic is duplicated from fa.models.Title
+        if title_source in ['isbn', 'issn']:
+            resource_id = 'urn:%s:%s' % (title_source.upper(), title_authfileno)
+        elif title_source == 'oclc':
+            resource_id = 'http://www.worldcat.org/oclc/%s' % title_authfileno
+
+    # resource attribute for inclusion
+    resource = ' resource="%s"' % resource_id if resource_id else ''
+
     # Only add semantic information if there is a title type OR
     # if title occurs in a file-level unittitle.
     # (in that case, we assume it is title of the item in the container)
@@ -98,35 +119,16 @@ def format_title(node, default_rel):
                   namespaces={'e': EAD_NAMESPACE}) or title_type is not None:
         start, end = '<span property="dc:title">', '</span>'
 
-        # title attribute carries genre information
-        if title_type is not None:
-            end += '<meta property="schema:genre" content="%s"/>' % title_type
 
         # if ISSN with preceding title, assume article in a periodical
-        elif title_source == 'issn' and \
+        if title_source == 'issn' and \
             node.xpath('count(preceding-sibling::e:title)', namespaces={'e': EAD_NAMESPACE}) == 1:
 
-            if title_authfileno is not None:
-                # include issn as schema.org property when set
-                issn = '<meta property="schema:issn" content="%s"/>' % title_authfileno
-
-                # generate URI/URN for item when possible
-                # NOTE: this logic is duplicated from fa.models.Title
-                if title_source in ['isbn', 'issn']:
-                    resource_id = 'urn:%s:%s' % (title_source.upper(), title_authfileno)
-                elif title_source == 'oclc':
-                    resource_id = 'http://www.worldcat.org/oclc/%s' % title_authfileno
-                else:
-                    resource_id = None
-
-            else:
-                issn = ''
-
-            resource = ' resource="%s"' % resource_id if resource_id else ''
 
             # adapted from schema.org article example: http://schema.org/Article
             start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"%s><span property="dc:title">' % resource
-            end = '</span>%s</span>' % issn
+            # include any meta tags (genre, issn) inside the periodical entity
+            end = '</span>%s</span>' % meta_tags
 
         # if no type and there are multiple titles, use RDFa list notation to
         # generate a sequence
@@ -134,10 +136,11 @@ def format_title(node, default_rel):
                         namespaces={'e': EAD_NAMESPACE}) > 1:
             start = '<span inlist="inlist" property="dc:title">'
 
-    # if isbn # is available, add it after title
-    # NOTE: this assumes an item context is set in the template
-    if title_source == 'isbn' and title_authfileno is not None:
-        end += '<meta property="schema:isbn" content="%s"/>' % title_authfileno
+    # if title is inside the bioghist, assume created by the originator
+    elif node.xpath('ancestor::e:bioghist', namespaces={'e': EAD_NAMESPACE}):
+        # mark as a generic document, include whatever meta tags are available
+        start = '<span rel="schema:creator" typeof="bibo:Document"%s><span property="dc:title">' % resource
+        end = '</span>%s</span>' % meta_tags
 
     return (start, end)
 
