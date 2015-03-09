@@ -87,7 +87,7 @@ def format_title(node, default_rel):
     start, end = '', ''
 
     # for now, ignore titles in correspondence series
-    # (getting associated with the person in appropriately)
+    # (getting associated with the person inappropriately)
     if default_rel == 'schema:knows arch:correspondedWith':
         return start, end
 
@@ -169,6 +169,19 @@ semantic_tags = {
     '{%s}occupation' % EAD_NAMESPACE: format_occupation,
 }
 
+# default roles for names in the bioghist, based on type of name
+# and type of origination name
+default_bioghist_roles = {
+    'person': {
+        'schema:Person': 'schema:knows',
+        'schema:Organization': 'schema:affiliation',
+    },
+    'org': {
+        'schema:Person': 'schema:affiliation',
+        'schema:Organization': 'schema:affiliation',
+    }
+}
+
 
 def format_nametag(node, default_role=None):
     '''Convert a supported name tag into corresponding RDFa.
@@ -207,9 +220,6 @@ def format_nametag(node, default_role=None):
         # NOTE: *preliminary* role  / relation to context
         if node.get('role') is not None:
             rel = node.get('role')
-        # elif rdftype == 'schema:Organization':
-        #     # NOTE: this should not be set for control access orgs
-        #     rel = 'schema:affiliation'
 
         # special case: for controlaccess, we can infer name from encodinganalog
         if node.getparent().tag == '{%s}controlaccess' % EAD_NAMESPACE:
@@ -226,6 +236,31 @@ def format_nametag(node, default_role=None):
             # *could* soften this to just schema:mentions
             else:
                 rel = 'schema:about'
+
+        # fallback roles, set based on content
+        if rel is None:
+
+            # if name is in the bioghist, infer relation based on origination type
+            if node.xpath('ancestor::e:bioghist', namespaces={'e': EAD_NAMESPACE}):
+
+                # special case: don't assume anything for geogname with no role
+                if rdftype == 'schema:Place':
+                    return ('', '')
+
+                origination = node.xpath('ancestor::e:archdesc/e:did/e:origination/*',
+                                         namespaces={'e': EAD_NAMESPACE})
+                if origination:
+                    orig_type = None
+                    orig = origination[0]
+                    if orig.tag.endswith('persname'):
+                        orig_type = 'person'
+                    elif orig.tag.endswith('corpname'):
+                        orig_type = 'org'
+
+                    if orig_type is not None:
+                        # determine default role based on origination name and
+                        # type of current name
+                        rel = default_bioghist_roles[orig_type].get(rdftype, None)
 
         # if nothing else, the document obviously mentions this entity
         if rel is None:
