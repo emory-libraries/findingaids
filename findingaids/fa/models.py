@@ -528,8 +528,12 @@ class Series(XmlModel, LocalComponent):
         geographic name or for a title with source and authfilenumber attributes.'''
         # - if there is a tagged name in the unittitle
         semantic_tags = [self.unittitle_name]
-        # - if there are titles tagged with source/authfilenumber
-        semantic_tags.extend([t for t in self.unittitle_titles if t.source and t.authfilenumber])
+        # - if there are titles tagged with source/authfilenumber OR titles
+        # with a type
+        # NOTE: eventually, we will probably want to include all tagged titles,
+        # but for now, restrict to titles that have been enhanced in a particular way
+        semantic_tags.extend([t for t in self.unittitle_titles
+                              if (t.source and t.authfilenumber) or t.title_type])
         return any(semantic_tags)
 
     @property
