@@ -414,7 +414,8 @@ class FaViewsTest(TestCase):
                            response.content)  # abstract
         self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''',
                            response.content)  # admin_info
-        self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''',
+        # Note: titles now include RDFa in bioghist, so multiple tags here
+        self.assertPattern(r'''joined\s+(<[-A-Za-z=:"' ]+>)*The Washington Post''',
                            response.content)  # collection description
 
         # only descriptive information that is present
