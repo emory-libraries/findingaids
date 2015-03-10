@@ -401,6 +401,7 @@ class Title(xmlmap.XmlObject):
     render, source, and authfilenumber.
     '''
     ROOT_NAMESPACES = {'e': eadmap.EAD_NAMESPACE}
+    ROOT_NAME = 'title'
 
     type = xmlmap.StringField('@type')
     render = xmlmap.StringField('@render')
@@ -456,11 +457,23 @@ class Series(XmlModel, LocalComponent):
 
     _unittitle_name_xpath = '|'.join('e:did/e:unittitle/e:%s' % t
                                      for t in ['persname', 'corpname', 'geogname'])
+    #: tagged name in the unittitle; used for RDFa output
     unittitle_name = xmlmap.NodeField(_unittitle_name_xpath, Name)
     'name in the unittitle, as an instance of :class:`Name`'
+    #: list of tagged names in the unittite; used for RDFa output
+    unittitle_names = xmlmap.NodeListField(_unittitle_name_xpath, Name)
+    'names in the unittitle, as a list of :class:`Name`'
 
+    #: list of titles in the unittitle; used for RDFa output
     unittitle_titles = xmlmap.NodeListField('e:did/e:unittitle/e:title', Title)
     'list of titles in the unittitle, as :class:`Title`'
+
+    #: title of the nearest ancestor series;
+    #: used to determine what kind of content this is, for default rdf type
+    series_title = xmlmap.StringField('''ancestor::e:c03[@level="subsubseries"]/e:did/e:unittitle
+        |ancestor::e:c02[@lavel="subseries"]/e:did/e:unittitle
+        |ancestor::e:c01[@level="series"]/e:did/e:unittitle''',
+        normalize=True)
 
     def series_info(self):
         """"
@@ -526,14 +539,14 @@ class Series(XmlModel, LocalComponent):
         '''Does this item contains semantic data that should be rendered with
         RDFa?  Currently checks the unittitle for a tagged person, corporate, or
         geographic name or for a title with source and authfilenumber attributes.'''
-        # - if there is a tagged name in the unittitle
+        # - if there is at least one tagged name in the unittitle
         semantic_tags = [self.unittitle_name]
         # - if there are titles tagged with source/authfilenumber OR titles
         # with a type
         # NOTE: eventually, we will probably want to include all tagged titles,
         # but for now, restrict to titles that have been enhanced in a particular way
         semantic_tags.extend([t for t in self.unittitle_titles
-                              if (t.source and t.authfilenumber) or t.title_type])
+                              if (t.source and t.authfilenumber) or t.type])
         return any(semantic_tags)
 
     @property
@@ -561,9 +574,27 @@ class Series(XmlModel, LocalComponent):
                 rdf_type = 'bibo:Book'
 
             if rdf_type is None:
-                # fallback type for compatibility with Belfast Group
-                # NOTE: better logic forthcoming...
-                rdf_type = 'bibo:Manuscript'
+                series_title = self.series_title.lower()
+                # if in a Printed Material series, assume bibo:Document
+                # - printed material is usually included in text for series and
+                #   subseries names
+                if 'printed material' in series_title:
+                    rdf_type = 'bibo:Document'
+
+                # if in a Photographs series, use bibo:Image
+                elif 'photograph' in series_title:
+                    rdf_type = 'bibo:Image'
+
+                # if in an AudioVisual series, use bibo:AudioVisualDocument
+                elif 'audiovisual' in series_title or \
+                  'audio recordings' in series_title or \
+                  'video recordings' in series_title:
+                   # audiovisual usually used at top-level, audio/video rec. used for subseries
+                    rdf_type = 'bibo:AudioVisualDocument'
+
+                # otherwise, use bibo:Manuscript
+                else:
+                    rdf_type = 'bibo:Manuscript'
 
         return rdf_type
 
@@ -575,6 +606,12 @@ class Series(XmlModel, LocalComponent):
         # for now, only return when these is on single title
         if len(self.unittitle_titles) == 1 :
             return self.unittitle_titles[0].rdf_identifier
+
+    @property
+    def rdf_mentions(self):
+        # names related to the title that should also be related to the collection
+        return self.rdf_type is not None and len(self.unittitle_names)
+
 
 
 # override component.c node_class

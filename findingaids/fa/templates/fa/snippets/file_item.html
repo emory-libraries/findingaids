@@ -56,6 +56,14 @@
         {% if not rdfa_rel and component.has_semantic_data and component.rdf_type %}
          </span></span>  {# end mentions, manuscript #}
         {% endif %}
+        {# additional rdf relationships to be exposed #}
+        {% if component.rdf_mentions %} {# hide but expose as rdfa with rel schema:mentions #}
+            <span style="display:none">
+                {% for name in component.unittitle_names %}
+                    {{ name|format_ead_rdfa:'schema:mentions' }}
+                {% endfor %}
+            </span>
+        {% endif %}
     </td>
     {% endspaceless %}
 </tr>

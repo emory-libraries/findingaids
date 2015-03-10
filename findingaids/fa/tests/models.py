@@ -16,6 +16,7 @@
 
 from os import path
 from types import ListType
+from mock import patch
 
 from django.conf import settings
 from django.test import TestCase as DjangoTestCase
@@ -26,9 +27,9 @@ from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 from eulexistdb.testutil import TestCase
 
 from findingaids.fa.models import FindingAid, LocalComponent, EadRepository, \
-    Series
-from findingaids.fa.utils import pages_to_show, ead_lastmodified, \
-    collection_lastmodified
+    Series, Title
+# from findingaids.fa.utils import pages_to_show, ead_lastmodified, \
+    # collection_lastmodified
 
 
 ## unit tests for model objects in findingaids.fa
@@ -233,15 +234,54 @@ class SeriesTestCase(DjangoTestCase):
           <unittitle><title render="doublequote" type="article">Who Has Seen the Wind?</title> <title source="ISSN" authfilenumber="2163-6206">New York Amsterdam News</title>, National Scene Magazine Supplement, November-December 1976</unittitle>
         </did></c02>''' % EAD_NAMESPACE, Series)
 
+    c5 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+    <did>
+        <container type="box">60</container>
+        <container type="folder">3</container>
+        <unittitle>
+            <persname authfilenumber="109557338" role="dc:creator" source="viaf">Heaney, Seamus</persname>,
+            <date normal="1965-04-27">April 27, 1965</date>:
+            <title render="doublequote">Boy Driving his Father to Confession</title>,
+            <title render="doublequote">To A Wine Jar</title>,
+            <title render="doublequote">On Hogarth's Engraving 'Pit Ticket for the Royal Sport'</title>
+        </unittitle>
+    </did>
+    </c02>''' % EAD_NAMESPACE, Series)
+
     def test_has_semantic_data(self):
         self.assertFalse(self.c1.has_semantic_data)
         self.assertTrue(self.c2.has_semantic_data)
         self.assertTrue(self.c3.has_semantic_data)
+        self.assertTrue(self.c4.has_semantic_data)
+        self.assertTrue(self.c5.has_semantic_data)
 
     def test_rdf_type(self):
-        # fall-back type (for now)
-        self.assertEqual('bibo:Manuscript', self.c1.rdf_type)
+        # not enough information to determine type
+        self.assertEqual(None, self.c1.rdf_type)
         # infer book, article, etc from title attributes
         self.assertEqual('bibo:Book', self.c3.rdf_type)
         self.assertEqual('bibo:Article', self.c4.rdf_type)
 
+        # type inferred based on series; requires access to series, so load from fixtures
+        # - bailey findingaid contains printed material, photographs, and audiovisual
+        bailey = load_xmlobject_from_file(path.join(exist_fixture_path, 'bailey807.xml'),
+            FindingAid)
+
+        # patch in unittitles so it looks as though items have semantic data
+        with patch('findingaids.fa.models.Series.unittitle_titles', new=[Title()]):
+
+            # series 4 is printed material
+            self.assertEqual('bibo:Document', bailey.dsc.c[3].c[0].rdf_type,
+                'items in printed materials series should default to document type')
+
+            # series 5 is photographs
+            self.assertEqual('bibo:Image', bailey.dsc.c[4].c[0].rdf_type,
+                'items in photograph series should default to image type')
+
+            # series 9 is audiovisual
+            self.assertEqual('bibo:AudioVisualDocument', bailey.dsc.c[8].c[0].rdf_type,
+                'items in audiovisual series should default to audiovisualdocument type')
+
+            # fallback type is manuscript
+            self.assertEqual('bibo:Manuscript', bailey.dsc.c[0].c[0].rdf_type,
+                'items in photograph series should default to image type')
