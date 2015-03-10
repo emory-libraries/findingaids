@@ -117,8 +117,9 @@ def format_title(node, default_rel):
     # (in that case, we assume it is title of the item in the container)
     if node.xpath('parent::e:unittitle and ancestor::e:*[@level="file"]',
                   namespaces={'e': EAD_NAMESPACE}) or title_type is not None:
-        start, end = '<span property="dc:title">', '</span>'
-
+        start, end = '<span property="dc:title">', '</span>%s' % meta_tags
+        # include meta tags after the title, since it should be in the
+        # context of the item, which is the whole unitittle
 
         # if ISSN with preceding title, assume article in a periodical
         if title_source == 'issn' and \
@@ -132,7 +133,7 @@ def format_title(node, default_rel):
 
         # if no type and there are multiple titles, use RDFa list notation to
         # generate a sequence
-        elif node.xpath('count(parent::e:unittitle/e:title)',
+        elif title_type is None and node.xpath('count(parent::e:unittitle/e:title)',
                         namespaces={'e': EAD_NAMESPACE}) > 1:
             start = '<span inlist="inlist" property="dc:title">'
 

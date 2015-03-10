@@ -573,7 +573,7 @@ class Series(XmlModel, LocalComponent):
               and self.unittitle_titles[0].source.upper() in ['ISBN', 'OCLC']:
                 rdf_type = 'bibo:Book'
 
-            if rdf_type is None:
+            if rdf_type is None and self.series_title:
                 series_title = self.series_title.lower()
                 # if in a Printed Material series, assume bibo:Document
                 # - printed material is usually included in text for series and
@@ -592,9 +592,9 @@ class Series(XmlModel, LocalComponent):
                    # audiovisual usually used at top-level, audio/video rec. used for subseries
                     rdf_type = 'bibo:AudioVisualDocument'
 
-                # otherwise, use bibo:Manuscript
-                else:
-                    rdf_type = 'bibo:Manuscript'
+            # otherwise, use bibo:Manuscript
+            if rdf_type is None:
+                rdf_type = 'bibo:Manuscript'
 
         return rdf_type
 
