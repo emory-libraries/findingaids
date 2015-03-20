@@ -86,6 +86,15 @@ def format_title(node, default_rel):
 
     start, end = '', ''
 
+
+    # special case we can't do anything with
+    # if a title is inside the bioghist, we can assume it was created by the
+    # originator, *however* there is no inverse relationship to specify
+    # a title was created by a person.  We also can't assume
+    # any relation to the collection.  So, skip these titles for now.
+    if node.xpath('ancestor::e:bioghist', namespaces={'e': EAD_NAMESPACE}):
+        return (start, end)
+
     # for now, ignore titles in correspondence series
     # (getting associated with the person inappropriately)
     if default_rel == 'schema:knows arch:correspondedWith':
