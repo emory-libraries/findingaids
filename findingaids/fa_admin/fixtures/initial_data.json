@@ -1,14 +1,203 @@
-[{
+[
+{
     "pk": 1,
     "model": "auth.group",
     "fields": {
-        "name": "Finding Aids Administrators",
+        "name": "Editors",
         "permissions": [
-            ["can_delete", "fa_admin", "findingaids"],
-            ["can_preview", "fa_admin", "findingaids"],
-            ["can_publish", "fa_admin", "findingaids"],
-            ["can_prepare", "fa_admin", "findingaids"],
-            ["can_view_internal_dao", "fa_admin", "findingaids"]
+            [
+                "can_delete",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_prepare",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_preview",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_publish",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_view_internal_dao",
+                "fa_admin",
+                "findingaids"
+            ]
         ]
     }
-}]
+},
+{
+    "pk": 2,
+    "model": "auth.group",
+    "fields": {
+        "name": "Publishers",
+        "permissions": [
+            [
+                "can_prepare",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_preview",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_publish",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_view_internal_dao",
+                "fa_admin",
+                "findingaids"
+            ]
+        ]
+    }
+},
+{
+    "pk": 3,
+    "model": "auth.group",
+    "fields": {
+        "name": "Administrators",
+        "permissions": [
+            [
+                "add_group",
+                "auth",
+                "group"
+            ],
+            [
+                "change_group",
+                "auth",
+                "group"
+            ],
+            [
+                "delete_group",
+                "auth",
+                "group"
+            ],
+            [
+                "add_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "change_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "delete_permission",
+                "auth",
+                "permission"
+            ],
+            [
+                "add_emoryldapuserprofile",
+                "emory_ldap",
+                "emoryldapuserprofile"
+            ],
+            [
+                "change_emoryldapuserprofile",
+                "emory_ldap",
+                "emoryldapuserprofile"
+            ],
+            [
+                "delete_emoryldapuserprofile",
+                "emory_ldap",
+                "emoryldapuserprofile"
+            ],
+            [
+                "add_archive",
+                "fa",
+                "archive"
+            ],
+            [
+                "change_archive",
+                "fa",
+                "archive"
+            ],
+            [
+                "delete_archive",
+                "fa",
+                "archive"
+            ],
+            [
+                "add_deleted",
+                "fa",
+                "deleted"
+            ],
+            [
+                "change_deleted",
+                "fa",
+                "deleted"
+            ],
+            [
+                "delete_deleted",
+                "fa",
+                "deleted"
+            ],
+            [
+                "add_archivist",
+                "fa_admin",
+                "archivist"
+            ],
+            [
+                "change_archivist",
+                "fa_admin",
+                "archivist"
+            ],
+            [
+                "delete_archivist",
+                "fa_admin",
+                "archivist"
+            ],
+            [
+                "can_delete",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_prepare",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_preview",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_publish",
+                "fa_admin",
+                "findingaids"
+            ],
+            [
+                "can_view_internal_dao",
+                "fa_admin",
+                "findingaids"
+            ]
+        ]
+    }
+},
+{
+    "pk": 4,
+    "model": "auth.group",
+    "fields": {
+        "name": "Staff",
+        "permissions": [
+            [
+                "can_view_internal_dao",
+                "fa_admin",
+                "findingaids"
+            ]
+        ]
+    }
+}
+]
