@@ -86,7 +86,6 @@ def format_title(node, default_rel):
 
     start, end = '', ''
 
-
     # special case we can't do anything with
     # if a title is inside the bioghist, we can assume it was created by the
     # originator, *however* there is no inverse relationship to specify
@@ -121,10 +120,17 @@ def format_title(node, default_rel):
     # resource attribute for inclusion
     resource = ' resource="%s"' % resource_id if resource_id else ''
 
-    # Only add semantic information if there is a title type OR
+    # if title is inside the scopecontent, it needs to be wrapped as a document
+    # just use the generic "mentions" relation
+    if node.xpath('ancestor::e:scopecontent', namespaces={'e': EAD_NAMESPACE}):
+        # mark as a generic document, include whatever meta tags are available
+        start = '<span rel="schema:mentions" typeof="bibo:Document"%s><span property="dc:title">' % resource
+        end = '</span>%s</span>' % meta_tags
+
+    # Otherwise, only add semantic information if there is a title type OR
     # if title occurs in a file-level unittitle.
     # (in that case, we assume it is title of the item in the container)
-    if node.xpath('parent::e:unittitle and ancestor::e:*[@level="file"]',
+    elif node.xpath('parent::e:unittitle and ancestor::e:*[@level="file"]',
                   namespaces={'e': EAD_NAMESPACE}) or title_type is not None:
         start, end = '<span property="dc:title">', '</span>%s' % meta_tags
         # include meta tags after the title, since it should be in the
@@ -145,12 +151,6 @@ def format_title(node, default_rel):
         elif title_type is None and node.xpath('count(parent::e:unittitle/e:title)',
                         namespaces={'e': EAD_NAMESPACE}) > 1:
             start = '<span inlist="inlist" property="dc:title">'
-
-    # if title is inside the bioghist, assume created by the originator
-    elif node.xpath('ancestor::e:bioghist', namespaces={'e': EAD_NAMESPACE}):
-        # mark as a generic document, include whatever meta tags are available
-        start = '<span rel="schema:creator" typeof="bibo:Document"%s><span property="dc:title">' % resource
-        end = '</span>%s</span>' % meta_tags
 
     return (start, end)
 
