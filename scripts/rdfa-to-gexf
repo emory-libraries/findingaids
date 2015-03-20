@@ -65,7 +65,8 @@ class HarvestRdfa(object):
     # NOTE: could potentially add a progressbar to give user feedback about
     # how far along the script is, but that leaving out for now.
 
-    def __init__(self, urls, harvest_related, filename, verbosity):
+    def __init__(self, urls, harvest_parts, harvest_related, filename, verbosity):
+        self.harvest_parts = harvest_parts
         self.harvest_related = harvest_related
         self.verbosity = int(verbosity)
 
@@ -120,7 +121,7 @@ class HarvestRdfa(object):
                 print '% 4d triples - %s' % (len(g), url)
             self.harvested += 1
 
-            if self.harvest_related:
+            if self.harvest_parts or self.harvest_related:
                 self.queue_related(url, g)
 
         except Exception as err:
@@ -131,18 +132,21 @@ class HarvestRdfa(object):
 
         orig_url = rdflib.URIRef(url)
         queued = 0
-        # find all sub parts of the current url
-        # (e.g., series, subseries, and indexes in a findingaid)
-        for subj, obj in graph.subject_objects(predicate=DC.hasPart):
-            if subj == orig_url or \
-               (subj, rdflib.OWL.sameAs, rdflib.URIRef(url)) in graph:
-                related_url = unicode(obj)
-                # add to queue if not already queued or processed
-                if related_url not in self.url_queue or self.processed_urls:
-                    self.url_queue.add(related_url)
-                    queued += 1
 
-            # also follow all related link relations
+        # if requested, find all sub parts of the current url
+        # (e.g., series, subseries, and indexes in a findingaid)
+        if self.harvest_parts:
+            for subj, obj in graph.subject_objects(predicate=DC.hasPart):
+                if subj == orig_url or \
+                        (subj, rdflib.OWL.sameAs, rdflib.URIRef(url)) in graph:
+                    related_url = unicode(obj)
+                    # add to queue if not already queued or processed
+                    if related_url not in self.url_queue or self.processed_urls:
+                        self.url_queue.add(related_url)
+                        queued += 1
+
+        # also follow all related link relations
+        if self.harvest_related:
             for subj, obj in graph.subject_objects(predicate=SCHEMA_ORG.relatedLink):
                 related_url = unicode(obj)
                 if related_url not in self.url_queue or self.processed_urls:
@@ -302,7 +306,18 @@ One of --url or --urls must be specified.''',
                         help='URL from which RDFa should be harvested')
     parser.add_argument('-l', '--urls', metavar='URL_FILE',
                         help='Text file with a list of URLs to be harvested, one per line')
-    parser.add_argument('--no-related', action='store_false', default=True,
+    parser.add_argument('--parts', action='store_true', default=True,
+                        dest='harvest_parts',
+                        help='Harvest URLs related as part of requested URLs (e.g. series/subseries) [default: true]')
+    parser.add_argument('--no-parts', action='store_false',
+                        dest='harvest_parts',
+                        help='Do not harvest URLs related as part of requested URLs')
+
+    parser.add_argument('--related', action='store_true', default=False,
+                        dest='harvest_related',
+                        help='Harvest RDFa from related urls [default: False]')
+    parser.add_argument('--no-related', action='store_false',
+                        dest='harvest_related',
                         help='Do not harvest RDFa from related urls')
     parser.add_argument('-o', '--output', metavar='FILENAME',
                         help='filename for GEXF file to be generated',
@@ -319,8 +334,10 @@ One of --url or --urls must be specified.''',
             url_list = urlfile.readlines()
 
     if url_list:
-        HarvestRdfa(url_list, harvest_related=args.no_related,
-                    filename=args.output, verbosity=args.verbosity)
+        HarvestRdfa(url_list,
+            harvest_parts=args.harvest_parts,
+            harvest_related=args.harvest_related,
+            filename=args.output, verbosity=args.verbosity)
 
     else:
         parser.print_help()
