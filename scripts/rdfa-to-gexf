@@ -331,7 +331,7 @@ One of --url or --urls must be specified.''',
         url_list = [args.url]
     elif args.urls:
         with open(args.urls) as urlfile:
-            url_list = urlfile.readlines()
+            url_list = [u.strip() for u in urlfile.readlines()]
 
     if url_list:
         HarvestRdfa(url_list,
