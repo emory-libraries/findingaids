@@ -82,7 +82,10 @@ def format_title(node, default_rel):
     title_authfileno = node.get('authfilenumber', None)
     # lower-case title source for consistency of checking (isbn/issn/oclc)
     if title_source is not None:
-        title_source = title_source.lower()
+        title_source = title_source.strip().lower()
+    # strip space from authfileno, to avoid any issues due to human error
+    if title_authfileno is not None:
+        title_authfileno = title_authfileno.strip()
 
     start, end = '', ''
 
@@ -99,7 +102,6 @@ def format_title(node, default_rel):
     if node.xpath('ancestor::e:scopecontent/preceding-sibling::e:did/e:unittitle[e:corpname or e:persname]',
       namespaces={'e': EAD_NAMESPACE}):
         return (start, end)
-
 
     # for now, ignore titles in correspondence series
     # (getting associated with the person inappropriately)
@@ -145,20 +147,35 @@ def format_title(node, default_rel):
         # include meta tags after the title, since it should be in the
         # context of the item, which is the whole unitittle
 
-        # if ISSN with preceding title, assume article in a periodical
-        if title_source == 'issn' and \
-            node.xpath('count(preceding-sibling::e:title)', namespaces={'e': EAD_NAMESPACE}) == 1:
+        # special case: no good way to relate more than two titles in a unittitle,
+        # so just skip them when generating rdfa
+        if node.xpath('count(preceding-sibling::e:title)', namespaces={'e': EAD_NAMESPACE}) >= 2:
+            start, end = '', ''
 
+        # if ISSN with preceding title, assume article in a periodical
+        elif title_source == 'issn' and \
+            node.xpath('count(preceding-sibling::e:title)', namespaces={'e': EAD_NAMESPACE}) == 1:
 
             # adapted from schema.org article example: http://schema.org/Article
             start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"%s><span property="dc:title">' % resource
             # include any meta tags (genre, issn) inside the periodical entity
             end = '</span>%s</span>' % meta_tags
 
-        # if no type and there are multiple titles, use RDFa list notation to
-        # generate a sequence
+        # otherwise, if current title has an id or no type and follows a title with a type,
+        # assume generic part/whole relationship
+        elif title_authfileno is not None or title_type is None and \
+            node.xpath('count(preceding-sibling::e:title[@type])', namespaces={'e': EAD_NAMESPACE}) == 1:
+            start = '<span property="dcterms:isPartOf" typeof="bibo:Document"%s><span property="dc:title">' % resource
+            # include any meta tags (e.g. isbn) inside the document entity
+            end = '</span>%s</span>' % meta_tags
+
+        # if no type and there are multiple titles, AND there is a persname
+        # tagged with a role (i.e. this is a Belfast Group sheet),
+        # then use RDFa list notation to generate a sequence
         elif title_type is None and node.xpath('count(parent::e:unittitle/e:title)',
-                        namespaces={'e': EAD_NAMESPACE}) > 1:
+                                               namespaces={'e': EAD_NAMESPACE}) > 1 \
+                                and node.xpath('preceding-sibling::e:persname[@role]',
+                                               namespaces={'e': EAD_NAMESPACE}):
             start = '<span inlist="inlist" property="dc:title">'
 
     return (start, end)
@@ -286,7 +303,13 @@ def format_nametag(node, default_role=None):
 
         # if nothing else, the document obviously mentions this entity
         if rel is None:
-            rel = 'schema:mentions'
+            # *unless* we are in in a file-level unitittle that is elsewhere
+            # assumed to be "about" a title, which cannot *mention* a person
+            if node.xpath('ancestor::e:*[@level="file"] and parent::e:unittitle[e:title[@type] or e:title[@source and @authfilenumber]]',
+                         namespaces={'e': EAD_NAMESPACE}):
+                rel = None
+            else:
+                rel = 'schema:mentions'
 
     if rel is not None:
         start = '<span rel="%s">%s' % (rel, start)
