@@ -93,6 +93,13 @@ def format_title(node, default_rel):
     # any relation to the collection.  So, skip these titles for now.
     if node.xpath('ancestor::e:bioghist', namespaces={'e': EAD_NAMESPACE}):
         return (start, end)
+    # similar special case: if a title is inside a series scopecontent note
+    # which is related to a series unititle person (see note on series_section_rdfa),
+    # do not generate any RDFa for that title
+    if node.xpath('ancestor::e:scopecontent/preceding-sibling::e:did/e:unittitle[e:corpname or e:persname]',
+      namespaces={'e': EAD_NAMESPACE}):
+        return (start, end)
+
 
     # for now, ignore titles in correspondence series
     # (getting associated with the person inappropriately)
@@ -123,8 +130,10 @@ def format_title(node, default_rel):
     # if title is inside the scopecontent, it needs to be wrapped as a document
     # just use the generic "mentions" relation
     if node.xpath('ancestor::e:scopecontent', namespaces={'e': EAD_NAMESPACE}):
-        # mark as a generic document, include whatever meta tags are available
-        start = '<span rel="schema:mentions" typeof="bibo:Document"%s><span property="dc:title">' % resource
+        # mark as a generic document or periodical and include whatever meta tags are available
+        itemtype = 'bibo:Periodical' if title_source == 'issn' else 'bibo:Document'
+        start = '<span rel="schema:mentions" typeof="%s"%s><span property="dc:title">' \
+                 % (itemtype, resource)
         end = '</span>%s</span>' % meta_tags
 
     # Otherwise, only add semantic information if there is a title type OR
@@ -401,11 +410,16 @@ EAD_BIOGHIST = '{%s}bioghist' % EAD_NAMESPACE
 @register.assignment_tag(takes_context=True)
 def series_section_rdfa(context, series, section):
     # determine rdf wrapping info for a series info section
-    # - if we have an origination name or series name,
-    #   assumes bioghits or scopecontent is *about*
-    #   the person or organization
-    name = series.unittitle_name or \
-        series.ead.origination_name or None
+
+    # NOTE: technically anything in the scopecontent not should
+    # relate to the *collection* and not to any individual.
+    # However, initial RDFa implementation for Belfast project
+    # assumed a relationship between series scopecontent notes and the
+    # origination entity or a tagged name in the series title.
+    # This does not generalize well OR work with titles (no way to relate
+    # an author to a title); for now only expose RDFa for series
+    # content when there is a series unittitle name.
+    name = series.unittitle_name
 
     type = None
     if name is not None:
@@ -423,7 +437,6 @@ def series_section_rdfa(context, series, section):
     # the name
     if name is not None and type is not None and name.uri is not None \
        and section.node.tag in [EAD_SCOPECONTENT, EAD_BIOGHIST]:
-               # FIXME: do we need to check that the name has a URI ?
         rdfa = True
 
     # is section is scopecontent or bioghist, then assume it is about
