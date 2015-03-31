@@ -53,13 +53,16 @@
 
 <h2><a name="collection_description">Collection Description</a></h2>
  {% for section in ead.collection_description %}
-{#} {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}<div rel="schema:about">{% endif %}  {# or rel=creator ? #}
   {# NOTE: schema is about origination of a person or org (or MAYBE a family.) #}
    <div {% if section == ead.archdesc.biography_history and ead.origination_name.authfilenumber %}about="{{ ead.origination_name.uri }}"{% endif %}>
-   	<h3>{{ section.head|default:'' }}</h3>
-  	{% for para in section.content %}
+    <h3>{{ section.head|default:'' }}</h3>
+    {% for para in section.content %}
+      {% if section == ead.archdesc.biography_history and not ead.origination_name.authfilenumber %}
+      <p>{{ para|format_ead }}</p>
+      {% else %}
       <p>{{ para|format_ead_rdfa }}</p>
-	  {% endfor %}
+      {% endif %}
+    {% endfor %}
 
     {# grab occupation from controlled access #}
     {# NOTE: in local encoding practice, any controlled access occupation refers to origination/main entry person #}
