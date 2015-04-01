@@ -118,6 +118,7 @@ def format_title(node, default_rel):
         meta_tags += '<meta property="schema:genre" content="%s"/>' % title_type
 
     # generate URI/URN for item when possible
+    # TODO: abstract into reusable function
     resource_id = None
     if title_authfileno is not None:
         # NOTE: this logic is duplicated from fa.models.Title
@@ -134,6 +135,41 @@ def format_title(node, default_rel):
     if node.xpath('ancestor::e:scopecontent', namespaces={'e': EAD_NAMESPACE}):
         # mark as a generic document or periodical and include whatever meta tags are available
         itemtype = 'bibo:Periodical' if title_source == 'issn' else 'bibo:Document'
+        start = '<span rel="schema:mentions" typeof="%s"%s><span property="dc:title">' \
+                 % (itemtype, resource)
+        end = '</span>%s</span>' % meta_tags
+
+    # if default rel is set to mention, assume we are patching in extra titles
+    # after file item unittitle context
+    elif default_rel == 'schema:mentions':
+        if title_source == 'issn':
+            itemtype = 'bibo:Periodical'
+        elif title_source in ['isbn', 'oclc']:
+            itemtype = 'bibo:Document'
+        else:
+            # technically we should be checking if this is a printed materials series...
+            itemtype = 'bibo:Manuscript'
+
+        # TODO: needs ispart of rel in certain cases
+        # TODO: make e namespace more reusable
+
+        # if this title has a type but no authfilenumber and there is a
+        # sibling title with an id, relate them
+        if title_type is not None and title_authfileno is None \
+                      and node.xpath('parent::e:unittitle/e:title[@authfilenumber]', namespaces={'e': EAD_NAMESPACE}):
+            rel_id = None
+            rel_authfileno = node.xpath('normalize-space(parent::e:unittitle/e:title/@authfilenumber)', namespaces={'e': EAD_NAMESPACE}).strip()
+            rel_source = node.xpath('normalize-space(parent::e:unittitle/e:title/@source)', namespaces={'e': EAD_NAMESPACE}).lower()
+
+            # NOTE: this logic is duplicated from above
+            if rel_source in ['isbn', 'issn']:
+                rel_id = 'urn:%s:%s' % (rel_source.upper(), rel_authfileno)
+            elif rel_source == 'oclc':
+                rel_id = 'http://www.worldcat.org/oclc/%s' % rel_authfileno
+
+            if rel_id is not None:
+                meta_tags += '<meta property="dcterms:isPartOf" content="%s"/>' % rel_id
+
         start = '<span rel="schema:mentions" typeof="%s"%s><span property="dc:title">' \
                  % (itemtype, resource)
         end = '</span>%s</span>' % meta_tags
