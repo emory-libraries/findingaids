@@ -396,6 +396,16 @@ class LocalComponent(eadmap.Component):
         return len(self.did.container) and len(self.preceding_files) == 0
 
 
+def title_rdf_identifier(src, idno):
+    ''''Generate an RDF identifier for a title, based on source and id
+    attributes.  Currently supports ISSN, ISBN, and OCLC.'''
+    src = src.lower()
+    if src in ['isbn', 'issn']:  # isbn and issn URNs have same format
+        return 'urn:%s:%s' % (src.upper(), idno)
+    elif src == 'oclc':
+        return 'http://www.worldcat.org/oclc/%s' % idno
+
+
 class Title(xmlmap.XmlObject):
     '''A title in an EAD document, with access to attributes for type of title,
     render, source, and authfilenumber.
@@ -413,11 +423,7 @@ class Title(xmlmap.XmlObject):
     def rdf_identifier(self):
         ''''RDF identifier for this title, if source and authfilenumber attributes
         are present and can be converted into a URI or URN'''
-        src = self.source.lower()
-        if src in ['isbn', 'issn']:  # isbn and issn URNs have same format
-            return 'urn:%s:%s' % (self.source.upper(), self.authfilenumber)
-        elif src == 'oclc':
-            return 'http://www.worldcat.org/oclc/%s' % self.authfilenumber
+        return title_rdf_identifier(self.source, self.authfilenumber)
 
 
 class Series(XmlModel, LocalComponent):

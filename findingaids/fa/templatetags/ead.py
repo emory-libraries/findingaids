@@ -23,6 +23,7 @@ from django.utils.html import conditional_escape, escape
 from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
+from findingaids.fa.models import title_rdf_identifier
 
 __all__ = ['format_ead', 'format_ead_rdfa', 'series_section_rdfa']
 
@@ -124,11 +125,7 @@ def format_title(node, default_rel):
     # TODO: abstract into reusable function
     resource_id = None
     if title_authfileno is not None:
-        # NOTE: this logic is duplicated from fa.models.Title
-        if title_source in ['isbn', 'issn']:
-            resource_id = 'urn:%s:%s' % (title_source.upper(), title_authfileno)
-        elif title_source == 'oclc':
-            resource_id = 'http://www.worldcat.org/oclc/%s' % title_authfileno
+        resource_id = title_rdf_identifier(title_source, title_authfileno)
 
     # resource attribute for inclusion
     resource = ' resource="%s"' % resource_id if resource_id else ''
@@ -167,11 +164,7 @@ def format_title(node, default_rel):
             rel_source = node.xpath('normalize-space(parent::e:unittitle/e:title/@source)',
                                     **eadns).lower()
 
-            # NOTE: this logic is duplicated from above
-            if rel_source in ['isbn', 'issn']:
-                rel_id = 'urn:%s:%s' % (rel_source.upper(), rel_authfileno)
-            elif rel_source == 'oclc':
-                rel_id = 'http://www.worldcat.org/oclc/%s' % rel_authfileno
+            rel_id = title_rdf_identifier(rel_source, rel_authfileno)
 
             if rel_id is not None:
                 meta_tags += '<meta property="dcterms:isPartOf" content="%s"/>' % rel_id
