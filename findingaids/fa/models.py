@@ -610,7 +610,9 @@ class Series(XmlModel, LocalComponent):
     @property
     def rdf_mentions(self):
         # names related to the title that should also be related to the collection
-        return self.rdf_type is not None and len(self.unittitle_names)
+        # titles after the first two need to be handled separately here also
+        return self.rdf_type is not None and len(self.unittitle_names) \
+          or len(self.unittitle_titles) > 1
 
 
 
