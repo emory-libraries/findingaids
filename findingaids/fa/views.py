@@ -331,8 +331,10 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                           archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath) \
                 .using(collection).get()
     else:
-        # when no highlighting, use partial ead retrieved with main item
-        ead = result.ead
+        # when no highlighting, get ead retrieved with main item
+        fa = FindingAid.objects.filter(eadid=eadid).using(collection)
+        
+        ead = fa.get()
 
     # info needed to construct navigation links within this ead
     # - summary info for all top-level series in this finding aid
