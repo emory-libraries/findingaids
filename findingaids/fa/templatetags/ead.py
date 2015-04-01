@@ -150,9 +150,6 @@ def format_title(node, default_rel):
             # technically we should be checking if this is a printed materials series...
             itemtype = 'bibo:Manuscript'
 
-        # TODO: needs ispart of rel in certain cases
-        # TODO: make e namespace more reusable
-
         # if this title has a type but no authfilenumber and there is a
         # sibling title with an id, relate them
         if title_type is not None and title_authfileno is None \
