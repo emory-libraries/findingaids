@@ -164,7 +164,7 @@ def format_title(node, default_rel):
             rel_id = title_rdf_identifier(rel_source, rel_authfileno)
 
             if rel_id is not None:
-                meta_tags += '<meta property="dcterms:isPartOf" content="%s"/>' % rel_id
+                meta_tags += '<span property="dcterms:isPartOf" resource="%s"/>' % rel_id
 
         start = '<span rel="schema:mentions" typeof="%s"%s><span property="dc:title">' \
                  % (itemtype, resource)
