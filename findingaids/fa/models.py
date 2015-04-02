@@ -29,6 +29,8 @@ from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
+from findingaids.fa.utils import normalize_whitespace
+
 
 # logging
 logger = logging.getLogger(__name__)
@@ -334,9 +336,9 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         if not hasattr(settings,'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
             return False
 
-        #If the item is in on of the libraries defined, then it should be displayed.
+        # If the item is in on of the libraries defined, then it should be displayed.
         for repo in self.repository:
-            if repo in settings.REQUEST_MATERIALS_REPOS:
+            if normalize_whitespace(repo) in settings.REQUEST_MATERIALS_REPOS:
                 return True
 
         return False
