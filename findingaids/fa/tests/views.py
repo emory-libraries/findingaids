@@ -1763,6 +1763,8 @@ class FullTextFaViewsTest(TestCase):
             response, 'Index of Selected Correspondents',
             msg_prefix="index without search terms is still returned normally")
 
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com',
+        REQUEST_MATERIALS_REPOS = ['Manuscript, Archives, and Rare Book Library'])
     def test_document_search(self):
         search_url = reverse('fa:singledoc-search', kwargs={'id': 'raoul548'})
         response = self.client.get(search_url, {'keywords': 'correspondence'})
@@ -1848,6 +1850,11 @@ class FullTextFaViewsTest(TestCase):
             response, '%s?keywords=correspondence' %
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             msg_prefix='links to finding aid series include search terms')
+
+        # ead should be requestable from series
+        # (testing that response includes enough data for requestable method)
+        self.assertTrue(response.context['ead'].requestable(),
+            'Finding aid should be requestable from document search page')
 
         # no matches
         response = self.client.get(search_url, {'keywords': 'bogus'})

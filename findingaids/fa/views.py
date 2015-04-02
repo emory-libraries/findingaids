@@ -629,7 +629,7 @@ def document_search(request, id):
     query_error = False
     # get the findingaid - will 404 if not found
     # document/collection name required to generate document path
-    ead = get_findingaid(id, only=['eadid', 'title',
+    ead = get_findingaid(id, only=['eadid', 'title', 'repository',
                                    'document_name', 'collection_name'])
     if form.is_valid():
         search_terms = form.cleaned_data['keywords']
