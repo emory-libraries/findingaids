@@ -29,7 +29,7 @@ from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
-from findingaids.fa.utils import normalize_whitespace
+from findingaids.utils import normalize_whitespace
 
 
 # logging
@@ -337,11 +337,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             return False
 
         # If the item is in on of the libraries defined, then it should be displayed.
-        for repo in self.repository:
-            if normalize_whitespace(repo) in settings.REQUEST_MATERIALS_REPOS:
-                return True
-
-        return False
+        return any([normalize_whitespace(repo) in settings.REQUEST_MATERIALS_REPOS
+                    for repo in self.repository])
 
 
 class ListTitle(XmlModel):
