@@ -629,12 +629,12 @@ class Series(XmlModel, LocalComponent):
         # if we have a multiple titles with an author, the titles
         # are being treated as a list and should not be exposed
         # (i.e., belfast group sheets)
-        if self.unittitle_names and any(n.role for n in self.unittitle_names):
+        if self.unittitle_names and any(n.role for n in self.unittitle_names)  \
+          or len(self.unittitle_titles) <= 1:
             return []
         else:
-            # return all but the first
+            # return all but the first title
             return list(self.unittitle_titles)[1:]
-
 
 
 # override component.c node_class
