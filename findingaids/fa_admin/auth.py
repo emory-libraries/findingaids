@@ -19,7 +19,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from eulexistdb.exceptions import DoesNotExist
 
 from findingaids.fa.models import FindingAid, Archive
-from findingaids.fa.utils import normalize_whitespace
+from findingaids.utils import normalize_whitespace
 
 
 def archive_access(user, archive=None, *args, **kwargs):
