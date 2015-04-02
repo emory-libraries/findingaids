@@ -196,7 +196,8 @@ def format_title(node, default_rel):
         # if ISSN with preceding title, assume article in a periodical
         elif title_source == 'issn' and \
             node.xpath('count(preceding-sibling::e:title)', **eadns) == 1:
-
+            print node.xpath('text()')
+            print '*** ISSN, preceding title count is 1'
             # adapted from schema.org article example: http://schema.org/Article
             start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"%s><span property="dc:title">' % resource
             # include any meta tags (genre, issn) inside the periodical entity
@@ -204,8 +205,10 @@ def format_title(node, default_rel):
 
         # otherwise, if current title has an id or no type and follows a title with a type,
         # assume generic part/whole relationship
-        elif title_authfileno is not None or title_type is None and \
-            node.xpath('count(preceding-sibling::e:title[@type])', **eadns) == 1:
+        elif (title_authfileno is not None or title_type is None) and \
+            node.xpath('count(./preceding-sibling::e:title[@type])', **eadns) == 1:
+            print node.xpath('text()')
+            print '*** preceding title count is ', node.xpath('count(./preceding-sibling::e:title[@type])', **eadns)
             start = '<span property="dcterms:isPartOf" typeof="bibo:Document"%s><span property="dc:title">' % resource
             # include any meta tags (e.g. isbn) inside the document entity
             end = '</span>%s</span>' % meta_tags
