@@ -54,6 +54,7 @@ class Name(XmlModel):
         'e': eadmap.EAD_NAMESPACE,
     }
     source = xmlmap.StringField('@source')
+    role = xmlmap.StringField('@role')
     authfilenumber = xmlmap.StringField('@authfilenumber')
     encodinganalog = xmlmap.StringField('@encodinganalog')
     value = xmlmap.StringField(".", normalize=True)
@@ -620,6 +621,19 @@ class Series(XmlModel, LocalComponent):
         # titles after the first two need to be handled separately here also
         return self.rdf_type is not None and len(self.unittitle_names) \
           or len(self.unittitle_titles) > 1
+
+    @property
+    def mention_titles(self):
+        # list of secondary titles that should be mentioned
+
+        # if we have a multiple titles with an author, the titles
+        # are being treated as a list and should not be exposed
+        # (i.e., belfast group sheets)
+        if self.unittitle_names and any(n.role for n in self.unittitle_names):
+            return []
+        else:
+            # return all but the first
+            return list(self.unittitle_titles)[1:]
 
 
 

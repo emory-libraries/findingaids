@@ -298,7 +298,8 @@ class RdfaTemplateTest(DjangoTestCase):
                 <corpname source="viaf" authfilenumber="123393054">Belfast Group</corpname> Worksheet,
                 <persname authfilenumber="39398205" role="dc:creator" source="viaf">Michael Longley</persname>:
                     <title render="doublequote">To the Poets</title>,
-                    <title render="doublequote">Mountain Swim</title>
+                    <title render="doublequote">Mountain Swim</title>,
+                    <title render="doublequote">Gathering Mushrooms</title>
                 </unittitle>
                 <dao xlink:href="http://pid.emory.edu/ark:/25593/17m8g"/>
             </did>
@@ -333,6 +334,10 @@ class RdfaTemplateTest(DjangoTestCase):
         rest = g.value(title_node, rdflib.RDF.rest)
         # second title
         self.assertEqual(u'Mountain Swim', unicode(g.value(rest, rdflib.RDF.first)))
+        # second rest of the list
+        rest2 = g.value(rest, rdflib.RDF.rest)
+        # third title
+        self.assertEqual(u'Gathering Mushrooms', unicode(g.value(rest2, rdflib.RDF.first)))
 
     def test_book_title(self):
         # book title

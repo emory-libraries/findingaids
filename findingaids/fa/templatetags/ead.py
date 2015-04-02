@@ -179,9 +179,18 @@ def format_title(node, default_rel):
         # include meta tags after the title, since it should be in the
         # context of the item, which is the whole unitittle
 
+        # check for special case: multiple titles with an author
+        # (persname tagged with a role, i.e. this is a Belfast Group sheet),
+        multiple_with_author = title_type is None \
+                and node.xpath('count(parent::e:unittitle/e:title)',
+                               **eadns) > 1 \
+                and node.xpath('preceding-sibling::e:persname[@role]',
+                               **eadns)
+
         # special case: no good way to relate more than two titles in a unittitle,
         # so just skip them when generating rdfa
-        if node.xpath('count(preceding-sibling::e:title)', **eadns) >= 2:
+        if node.xpath('count(preceding-sibling::e:title)', **eadns) >= 2 \
+          and not multiple_with_author:
             start, end = '', ''
 
         # if ISSN with preceding title, assume article in a periodical

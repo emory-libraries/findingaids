@@ -62,11 +62,9 @@
                 {% for name in component.unittitle_names %}
                     {{ name|format_ead_rdfa:'schema:mentions' }}
                 {% endfor %}
-                {# expose secondary titles included in a unittitle #}
-                {% for t in component.unittitle_titles %}
-                   {% if forloop.counter != 1 %} {# skip first title, should already be handled in item display #}
-                     {{ t|format_ead_rdfa:'schema:mentions' }}
-                   {% endif %}
+                {# expose any secondary titles included in a unittitle that should be mentiond #}
+                {% for t in component.mention_titles %}
+                   {{ t|format_ead_rdfa:'schema:mentions' }}
                 {% endfor %}
             </span>
         {% endif %}
