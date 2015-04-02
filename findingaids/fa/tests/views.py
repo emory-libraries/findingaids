@@ -24,6 +24,7 @@ from urllib import quote as urlquote
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB, ExistDBException
 from eulexistdb.testutil import TestCase
@@ -679,8 +680,11 @@ class FaViewsTest(TestCase):
 
         # FIXME: test also not listed in top-level table of contents?
 
-    # view single series in a finding aid
+
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com',
+        REQUEST_MATERIALS_REPOS = ['Manuscript, Archives, and Rare Book Library'])
     def test_view_series__bailey_series1(self):
+        # view single series in a finding aid
         series_url = reverse('fa:series-or-index', kwargs={'id': 'bailey807',
                              'series_id': 'series1'})
         response = self.client.get(series_url)
@@ -763,6 +767,11 @@ class FaViewsTest(TestCase):
         self.assertPattern(
             '<div class="fa-title">.* >\s+Interview transcripts\s+</div>', response.content,
             msg_prefix='short series title in breadcrumb displays text without date')
+
+        # ead should be requestable from series
+        # (testing that response includes enough data for requestable method)
+        self.assertTrue(response.context['ead'].requestable(),
+            'Finding aid should be requestable from series page')
 
     def test_view_subseries__raoul_series1_6(self):
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',

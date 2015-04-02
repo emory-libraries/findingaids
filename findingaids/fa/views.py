@@ -331,6 +331,8 @@ def _view_series(request, eadid, *series_ids, **kwargs):
                           archdesc__controlaccess__match_count=FindingAid.controlaccess_matches_xpath) \
                 .using(collection).get()
     else:
+        # when no highlighting, get ead retrieved with main item
+        fa = FindingAid.objects.filter(eadid=eadid).using(collection)
         # when no highlighting, use partial ead retrieved with main item
         ead = result.ead
 
@@ -409,6 +411,7 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
                      'ead__archdesc__origination',
                      'ead__archdesc__controlaccess__head', 'ead__dsc__head',
                      'ead__origination_name',
+                     'ead__repository',  # needed to determine if requestable
                      'ead__collection_id']
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid': eadid, 'id': series_ids[-1]}

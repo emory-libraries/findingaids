@@ -29,6 +29,8 @@ from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
 
+from findingaids.utils import normalize_whitespace
+
 
 # logging
 logger = logging.getLogger(__name__)
@@ -334,12 +336,9 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         if not hasattr(settings,'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
             return False
 
-        #If the item is in on of the libraries defined, then it should be displayed.
-        for repo in self.repository:
-            if repo in settings.REQUEST_MATERIALS_REPOS:
-                return True
-
-        return False
+        # If the item is in on of the libraries defined, then it should be displayed.
+        return any([normalize_whitespace(repo) in settings.REQUEST_MATERIALS_REPOS
+                    for repo in self.repository])
 
 
 class ListTitle(XmlModel):
@@ -401,6 +400,7 @@ def title_rdf_identifier(src, idno):
     attributes.  Currently supports ISSN, ISBN, and OCLC.'''
     src = src.lower()
     idno = idno.strip()  # remove whitespace, just in case of errors in entry
+
     if src in ['isbn', 'issn']:  # isbn and issn URNs have same format
         return 'urn:%s:%s' % (src.upper(), idno)
     elif src == 'oclc':
@@ -815,7 +815,3 @@ class Archive(models.Model):
     @property
     def svn_local_path(self):
         return os.path.join(settings.SVN_WORKING_DIR, self.slug)
-
-
-
-
