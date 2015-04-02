@@ -34,7 +34,8 @@ from eulexistdb.testutil import TestCase
 from eulxml.xmlmap import XmlObject, load_xmlobject_from_string
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 
-from findingaids.fa.models import FindingAid, Deleted, Series
+from findingaids.fa.models import FindingAid, Deleted, Series, \
+    title_rdf_identifier
 from findingaids.fa.forms import boolean_to_upper, AdvancedSearchForm
 from findingaids.fa.templatetags.ead import format_ead, XLINK_NAMESPACE
 from findingaids.fa.templatetags.ark_pid import ark_pid
@@ -174,7 +175,8 @@ class FormatEadTestCase(DjangoTestCase):
     TITLE_EMPH = """<bibref xmlns="%s"><emph>Biographical source:</emph> "Shaw, George Bernard."
     <title>Contemporary Authors Online</title>, Gale, 2003</bibref>""" % EAD_NAMESPACE
     TITLE_QUOT = """<unittitle xmlns="%s"><title render="doublequote">Terminus</title></unittitle>""" % EAD_NAMESPACE
-    TITLE_MULTI = """<unittitle xmlns="%s" level="file"><title render="doublequote">Terminus</title>, <title render="doublequote">Saturday</title></unittitle>""" % EAD_NAMESPACE
+    # NOTE: multi-title mode is now only triggered when a persname with a role is present
+    TITLE_MULTI = """<unittitle xmlns="%s" level="file"><persname role="dc:creator">Some Author</persname>: <title render="doublequote">Terminus</title>, <title render="doublequote">Saturday</title></unittitle>""" % EAD_NAMESPACE
     NESTED = """<abstract xmlns="%s">magazine <title>The <emph render="doublequote">Smart</emph> Set</title>...</abstract>""" % EAD_NAMESPACE
     NOTRANS = """<abstract xmlns="%s">magazine <title>The <bogus>Smart</bogus> Set</title>...</abstract>""" % EAD_NAMESPACE
     EXIST_MATCH = """<abstract xmlns="%s">Pitts v. <exist:match xmlns:exist="http://exist.sourceforge.net/NS/exist">Freeman</exist:match>
@@ -214,11 +216,11 @@ school desegregation case files</abstract>""" % EAD_NAMESPACE
         # - multiple
         self.content.node = etree.fromstring(self.TITLE_MULTI)
         fmt = format_ead(self.content)
-        self.assertEqual('"Terminus", "Saturday"', fmt)
+        self.assertEqual('Some Author: "Terminus", "Saturday"', fmt)
 
         # - multiple titles + RDFa
         fmt = format_ead(self.content, rdfa=True)
-        self.assertEqual('"<span inlist="inlist" property="dc:title">Terminus</span>", "<span inlist="inlist" property="dc:title">Saturday</span>"',
+        self.assertEqual('<span rel="dc:creator"><span typeof="schema:Person"><span property="schema:name">Some Author</span></span></span>: "<span inlist="inlist" property="dc:title">Terminus</span>", "<span inlist="inlist" property="dc:title">Saturday</span>"',
                          fmt)
 
     def test_title_emph(self):
@@ -421,9 +423,102 @@ class RdfaTemplateTest(DjangoTestCase):
         self.assertEqual(u'0043-0897', unicode(g.value(periodical_node, self.SCHEMA_ORG.issn)),
             'authfilenumber should be set as schema.org/issn')
 
+    def test_related_titles(self):
+        # if two titles, one with a type and the other with an id, first should
+        # be part of the second
+        # sample from hughes-edwards1145
+        two_titles = '''<c01 level="file" xmlns="%s">
+            <did>
+                <container type="box">1</container>
+                <container type="folder">6</container>
+                <unittitle><title type="poetry" render="doublequote">Mother to Son</title>,
+                        poem in
+                        <title source="oclc" authfilenumber="10870853">The People's Voice</title>,
+                        May 9, 1942
+                </unittitle>
+            </did>
+        </c01>''' % EAD_NAMESPACE
+        g = self._render_item_to_rdf(two_titles)
 
-        # test poem in a periodical?
-        # poster/image ?
+        # there should be a manuscript in the output
+        ms_triples = list(g.triples((None, rdflib.RDF.type, self.BIBO.Manuscript)))
+        self.assert_(ms_triples, 'RDFa output should include an item with type bibo:Manuscript')
+        # first element of the first triple should be the article node
+        ms_node = ms_triples[0][0]
+        self.assertEqual(u'Mother to Son',
+            unicode(g.value(ms_node, self.DC.title)),
+            'poem title should be set as dc:title')
+        self.assertEqual(u'poetry',
+            unicode(g.value(ms_node, self.SCHEMA_ORG.genre)),
+            'genre should be set as poetry')
+        book_uriref = rdflib.URIRef(title_rdf_identifier('oclc', '10870853'))
+        self.assertTrue((ms_node, self.DC.isPartOf, book_uriref) in  g,
+            'poem should be part of document with an id')
+        self.assertTrue((book_uriref, rdflib.RDF.type, self.BIBO.Document),
+            'document with id should be a bibo:Document')
+        self.assert_(g.triples((None, self.SCHEMA_ORG.mentions, book_uriref)),
+            'document with id should be mentioned by context (i.e. collection)')
+
+    def test_extra_titles(self):
+        # more than two titles in a unittitle
+        # sample from hughes-edwards1145
+        two_titles = '''<c01 level="file" xmlns="%s">
+            <did>
+                <container type="box">1</container>
+                <container type="folder">7</container>
+                <unittitle><title type="essays" render="doublequote">The Need for Heroes</title>,
+                   essay in <title source="ISSN" authfilenumber=" 2169-1010">The Crisis</title>,
+                   June 1941 [includes pages in which poems
+                   <title type="poetry" render="doublequote">The Negro Speaks of Rivers</title>
+                   and <title type="poetry" render="doublequote">NAACP</title> appear]
+                </unittitle>
+            </did>
+        </c01>''' % EAD_NAMESPACE
+        g = self._render_item_to_rdf(two_titles)
+
+        # first two titles should work roughly as related title does above
+
+        # there should be *three* manuscripts in the output
+        ms_triples = list(g.triples((None, rdflib.RDF.type, self.BIBO.Manuscript)))
+        self.assertEqual(3, len(ms_triples),
+            'RDFa output should include three items with type bibo:Manuscript')
+
+        # since rdf is unsorted, we have to find them by title
+        ms_by_title = {}
+        for ms in ms_triples:
+            s, p, o = ms
+            if unicode(g.value(s, self.DC.title)) == unicode('The Need for Heroes'):
+                ms_by_title['Need'] = s
+            if unicode(g.value(s, self.DC.title)) == unicode('The Negro Speaks of Rivers'):
+                ms_by_title['Negro'] = s
+            if unicode(g.value(s, self.DC.title)) == unicode('NAACP'):
+                ms_by_title['NAACP'] = s
+
+        self.assertEqual(u'essays',
+            unicode(g.value(ms_by_title['Need'], self.SCHEMA_ORG.genre)),
+            'essay title genre should be set as essays')
+        self.assertEqual(u'poetry',
+            unicode(g.value(ms_by_title['Negro'], self.SCHEMA_ORG.genre)),
+            'poem title genre should be set as poetry')
+        self.assertEqual(u'poetry',
+            unicode(g.value(ms_by_title['NAACP'], self.SCHEMA_ORG.genre)),
+            'poem title genre should be set as poetry')
+        book_uriref = rdflib.URIRef(title_rdf_identifier('issn', '2169-1010'))
+
+        # things that should be consistent for each of the typed titles
+        for ms_node in ms_by_title.itervalues():
+            # each item should be part of the book with title
+            self.assertTrue((ms_node, self.DC.isPartOf, book_uriref) in  g,
+                'item should be part of document with an id')
+            # each item should be mentioned in context (i.e. collection)
+            self.assert_(g.triples((None, self.SCHEMA_ORG.mentions, ms_node)),
+                'item should be mentioned by context (i.e. collection)')
+
+        self.assertTrue((book_uriref, rdflib.RDF.type, self.BIBO.Periodical),
+            'document with issn should be a bibo:Periodical')
+        self.assert_(g.triples((None, self.SCHEMA_ORG.mentions, book_uriref)),
+            'document with id should be mentioned by context (i.e. collection)')
+
 
 
 # test custom template tag ifurl

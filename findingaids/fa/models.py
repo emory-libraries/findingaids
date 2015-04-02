@@ -400,6 +400,7 @@ def title_rdf_identifier(src, idno):
     ''''Generate an RDF identifier for a title, based on source and id
     attributes.  Currently supports ISSN, ISBN, and OCLC.'''
     src = src.lower()
+    idno = idno.strip()  # remove whitespace, just in case of errors in entry
     if src in ['isbn', 'issn']:  # isbn and issn URNs have same format
         return 'urn:%s:%s' % (src.upper(), idno)
     elif src == 'oclc':
