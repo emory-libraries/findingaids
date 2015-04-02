@@ -345,7 +345,8 @@ def format_nametag(node, default_role=None):
         if rel is None:
             # *unless* we are in in a file-level unitittle that is elsewhere
             # assumed to be "about" a title, which cannot *mention* a person
-            if node.xpath('ancestor::e:*[@level="file"] and parent::e:unittitle[e:title[@type] or e:title[@source and @authfilenumber]]',
+            # if node.xpath('ancestor::e:*[@level="file"] and parent::e:unittitle[e:title[@type] or e:title[@source and @authfilenumber]]',
+            if node.xpath('ancestor::e:*[@level="file"] and parent::e:unittitle[e:title]',
                          **eadns):
                 rel = None
             else:

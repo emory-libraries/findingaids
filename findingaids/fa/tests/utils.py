@@ -295,7 +295,7 @@ class RdfaTemplateTest(DjangoTestCase):
               <container type="box">63</container>
               <container type="folder">6</container>
               <unittitle>
-                <corpname source="viaf" authfilenumber="123393054">Belfast Group</corpname> Worksheet,
+                <corpname source="viaf" authfilenumber="123393054" role="schema:publisher">Belfast Group</corpname> Worksheet,
                 <persname authfilenumber="39398205" role="dc:creator" source="viaf">Michael Longley</persname>:
                     <title render="doublequote">To the Poets</title>,
                     <title render="doublequote">Mountain Swim</title>,
