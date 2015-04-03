@@ -185,7 +185,7 @@ class Rdf2Gexf(object):
 
                 # make sure subject and object are added to the graph as nodes,
                 # if appropriate
-                self.add_nodes(triple)
+                self.add_nodes(triple, cx)
 
                 # get the short-hand name for property or edge label
                 name = self.edge_label(pred)
@@ -220,13 +220,15 @@ class Rdf2Gexf(object):
 
         gexf.write_gexf(self.network, self.outfile)
 
-    def node_label(self, res):
+    def node_label(self, res, ctx):
+        # ctx = context graph, to avoid blank node collisions
+
         # NOTE: consider adding/calculating a preferredlabel
         # for important nodes in our data
         name = None
 
         # *first* use preferred label if available
-        names = self.graph.preferredLabel(res)
+        names = ctx.preferredLabel(res)
         # returns list of labelprop (preflabel or label), value
         # if we got any matches, grab the first value
         if names:
@@ -234,16 +236,16 @@ class Rdf2Gexf(object):
 
         # second check for schema.org name, if we have one
         if not name:
-            name = self.graph.value(res, SCHEMA_ORG.name)
+            name = ctx.value(res, SCHEMA_ORG.name)
 
         if name:
             return normalize_whitespace(name)
 
-        title = self.graph.value(res, DC.title)
+        title = ctx.value(res, DC.title)
         if title:
             # if title is a bnode, convert from list/collection
             if isinstance(title, rdflib.BNode):
-                title_list = RdfCollection(self.graph, title)
+                title_list = RdfCollection(ctx, title)
                 title = '; '.join(title_list)
                 # truncate list if too long
                 if len(title) > 50:
@@ -253,7 +255,7 @@ class Rdf2Gexf(object):
             return normalize_whitespace(title)
 
         # as a fall-back, use type for a label
-        nodetype = self.graph.value(res, rdflib.RDF.type)
+        nodetype = ctx.value(res, rdflib.RDF.type)
         if nodetype:
             ns, short_type = rdflib.namespace.split_uri(nodetype)
             return short_type
@@ -263,11 +265,11 @@ class Rdf2Gexf(object):
         ns, name = rdflib.namespace.split_uri(pred)
         return name
 
-    def add_nodes(self, triple):
+    def add_nodes(self, triple, ctx):
         subj, pred, obj = triple
 
         if self.include_as_node(subj) and subj not in self.network:
-            self.add_node(subj)
+            self.add_node(subj, ctx)
 
         # special case: don't treat title list as a node in the network
         if pred == DC.title and isinstance(obj, rdflib.BNode):
@@ -275,7 +277,7 @@ class Rdf2Gexf(object):
 
         if pred != rdflib.RDF.type and self.include_as_node(obj) \
            and obj not in self.network:
-            self.add_node(obj)
+            self.add_node(obj, ctx)
 
     def include_as_node(self, res):
         # determine if a URI should be included in the network graph
@@ -288,10 +290,10 @@ class Rdf2Gexf(object):
         # but gexf reader borks when trying to load
         return unicode(uri).encode('ascii', 'ignore')
 
-    def add_node(self, res):
+    def add_node(self, res, ctx):
         # add an rdf term to the network as a node
         attrs = {}
-        label = self.node_label(res)
+        label = self.node_label(res, ctx)
         if label is not None:
             attrs['label'] = label
         self.network.add_node(self.uri_to_node_id(res), **attrs)
