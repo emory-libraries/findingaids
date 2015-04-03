@@ -61,14 +61,17 @@ class HarvestRdfa(object):
     total = harvested = errors = 0
 
     verbosity = 1
+    allow_cache = True
 
     # NOTE: could potentially add a progressbar to give user feedback about
     # how far along the script is, but that leaving out for now.
 
-    def __init__(self, urls, harvest_parts, harvest_related, filename, verbosity):
+    def __init__(self, urls, harvest_parts, harvest_related, filename, verbosity,
+                 allow_cache):
         self.harvest_parts = harvest_parts
         self.harvest_related = harvest_related
         self.verbosity = int(verbosity)
+        self.allow_cache = allow_cache
 
         # create new rdflib conjunctive graph to hold the harvested RDF data
         self.graph = rdflib.graph.ConjunctiveGraph()
@@ -95,7 +98,11 @@ class HarvestRdfa(object):
 
     def harvest(self, url):
         try:
-            response = requests.get(url, allow_redirects=False)
+            headers = {}
+            # if --no-cache is requested, explicitly request no cache from server
+            if not self.allow_cache:
+                headers['cache-control'] = 'no-cache'
+            response = requests.get(url, allow_redirects=False, headers=headers)
         except Exception as err:
             print 'Error attempting to access %s (%s)' % (url, err)
             self.errors += 1
@@ -321,6 +328,9 @@ One of --url or --urls must be specified.''',
     parser.add_argument('--no-related', action='store_false',
                         dest='harvest_related',
                         help='Do not harvest RDFa from related urls')
+    parser.add_argument('--no-cache', action='store_false',
+                        dest='allow_cache', default=True,
+                        help='Explicitly request uncached content')
     parser.add_argument('-o', '--output', metavar='FILENAME',
                         help='filename for GEXF file to be generated',
                         required=True)
@@ -339,7 +349,8 @@ One of --url or --urls must be specified.''',
         HarvestRdfa(url_list,
             harvest_parts=args.harvest_parts,
             harvest_related=args.harvest_related,
-            filename=args.output, verbosity=args.verbosity)
+            filename=args.output, verbosity=args.verbosity,
+            allow_cache=args.allow_cache)
 
     else:
         parser.print_help()
