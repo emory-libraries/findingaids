@@ -611,9 +611,16 @@ class Series(XmlModel, LocalComponent):
         # if the item in the unittitle has an rdf identifier, make it available
         # for use in constructing RDFa in the templates
 
-        # for now, only return when these is on single title
-        if len(self.unittitle_titles) == 1 :
-            return self.unittitle_titles[0].rdf_identifier
+        # for now, assuming that the first title listed is the *thing*
+        # in the collection.  If we can generate an id for it (i.e.,
+        # it has a source & authfilenumber), use that
+        return self.unittitle_titles[0].rdf_identifier
+
+        # NOTE: previously, was only returning an rdf identifier for a
+        # single title
+        # for now, only return when these is one single title
+        # if len(self.unittitle_titles) == 1 :
+            # return self.unittitle_titles[0].rdf_identifier
 
     @property
     def rdf_mentions(self):
