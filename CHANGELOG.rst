@@ -8,11 +8,27 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.8 - RDFa enhancements
+-----------------------
+
+* As a researcher, I want to export title information from a finding
+  aid so that I can analyze and organize the works in a person’s papers
+  according to genre.
+* As a researcher, I want to export titles' ISBN, ISSN, or OCLC numbers
+  from a finding aid so that I can access the data associated with those
+  publications.
+* As a researcher, I want to export semantic, relational data from EAD
+  so that I can analyze it in network graph software like Gephi.
+  [See the new script in scripts/rdfa-to-gexf]
+* bugfix: PDF generation display issue for long numbers in box/folder
+* bugfix: Request materials button not appearing for appropriate series.
+* Replaced current finding aids logo with the standard LITS logo.
+* Update Database Group initial fixture data to avoid overwriting
+  new production group definitions
+
 1.7.4
 -----
 * made related_materials repeatable
-
-
 
 1.7.2
 -----

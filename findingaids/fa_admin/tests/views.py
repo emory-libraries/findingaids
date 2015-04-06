@@ -20,6 +20,7 @@ import os
 import tempfile
 from shutil import rmtree, copyfile
 import time
+import unittest
 
 from django.test import Client
 from django.conf import settings
@@ -42,6 +43,9 @@ from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unu
 
 # note: tests for publish view are in a separate test case because
 # publish makes use of a celery task, which requires additional setup for testing
+
+skipIf_no_proxy = unittest.skipIf('HTTP_PROXY' not in os.environ,
+    'Schema validation test requires an HTTP_PROXY')
 
 
 class BaseAdminViewsTest(TestCase):
@@ -310,6 +314,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # check that order was stored as expected
         self.assertEqual('%d,%d' % (eua.id, theo.id), user.archivist.order)
 
+    @skipIf_no_proxy
     def test_preview(self):
         arch = Archive.objects.all()[0]
         preview_url = reverse('fa-admin:preview-ead', kwargs={'archive': arch.slug})
@@ -862,6 +867,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # restore the real celery task
         views.reload_cached_pdf = self.real_reload
 
+    @skipIf_no_proxy
     def test_publish(self):
         # publish from file no longer supported; publish from preview only
         self.client.login(**self.credentials['admin'])

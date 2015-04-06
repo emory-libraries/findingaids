@@ -1,9 +1,10 @@
 # Makefile for Finding Aids Sphinx documentation
 
-export PYTHONPATH=.:..:../external/django-modules
 # sphinx needs django settings while loading findingaids.* to introspect
 # those modules for autodocs
-export DJANGO_SETTINGS_MODULE=doc_djangosettings
+export PYTHONPATH:=$(PYTHONPATH):..
+export DJANGO_SETTINGS_MODULE=findingaids.settings
+
 
 # You can set these variables from the command line.
 SPHINXOPTS    =
