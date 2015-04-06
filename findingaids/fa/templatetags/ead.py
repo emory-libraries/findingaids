@@ -349,6 +349,9 @@ def format_nametag(node, default_role=None):
             if node.xpath('ancestor::e:*[@level="file"] and parent::e:unittitle[e:title]',
                          **eadns):
                 rel = None
+                # not only do we not want a relation, we do not want the
+                # names exposed here because then we end up with two versions
+                start, end = '', ''
             else:
                 rel = 'schema:mentions'
 
