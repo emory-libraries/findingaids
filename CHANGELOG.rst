@@ -30,6 +30,14 @@ recent version first.  Upgrade or deployment notes should be found in
 -----
 * made related_materials repeatable
 
+1.7.3 - Aeon integration
+------------------------
+
+* As a user viewing individual finding aids in the finding aids
+  database, I can click on a button in a finding aid that takes me into
+  the Aeon system in order to request boxes I want to use.
+
+
 1.7.2
 -----
 
@@ -42,7 +50,7 @@ recent version first.  Upgrade or deployment notes should be found in
 
 * bugfix: small corrections to itemid_to_dao script for issues
   encountered in production that were not found in testing
-* bugfix: RDFa collection resource shoudl be URI instead of string
+* bugfix: RDFa collection resource should be URI instead of string
 
 1.7 - administrative and internal digital archival object support
 -----------------------------------------------------------------
