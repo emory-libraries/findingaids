@@ -1,0 +1,356 @@
+#!/usr/bin/env python
+#
+# Script to harvest RDFa from one or more URLs, and related documents,
+# and generate a GEXF nextwork graph for use with a program such as Gephi.
+#
+# Installation of python dependencies:
+#   pip install rdflib requests networkx
+#
+# Takes a single url or a text file with a list of urls to be harvested.
+# By default, will also harvest RDFa from related urls, which are found using
+# schema.org/relatedLink and dc:hasPart.
+
+import argparse
+from urlparse import urlparse
+import logging.config
+import re
+
+try:
+    import networkx as nx
+    from networkx.readwrite import gexf
+    import rdflib
+    from rdflib.collection import Collection as RdfCollection
+    import requests
+except ImportError:
+    print '''Please install python dependencies for this script:
+pip install rdflib requests networkx'''
+    raise SystemExit
+
+
+# configure logging so rdflib doesn't complain
+logging.config.dictConfig({'version': 1})
+
+
+#: dublin core rdf namespace
+DC = rdflib.Namespace('http://purl.org/dc/terms/')
+#: schema.org namespace
+SCHEMA_ORG = rdflib.Namespace('http://schema.org/')
+
+
+def absolute_url(url):
+    # argparse type helper to validate url input
+    parsed_url = urlparse(url)
+    if not parsed_url.scheme or not parsed_url.netloc:
+        msg = 'Please provide an absolute URL (i.e., starting with http:// or https://).'
+        raise argparse.ArgumentTypeError(msg)
+    return parsed_url.geturl()
+
+def normalize_whitespace(s):
+    'utility method to normalize whitespace'
+    return unicode(re.sub(r'\s+', u' ', s.strip(), flags=re.UNICODE | re.MULTILINE))
+
+class HarvestRdfa(object):
+
+    # harvest logic borrowed largely from belfast
+    # https://github.com/emory-libraries-ecds/belfast-group-site/blob/develop/belfast/rdf/harvest.py
+
+    # using sets to avoid duplication
+    url_queue = set()
+    processed_urls = set()
+    harvest_related = True
+    total = harvested = errors = 0
+
+    verbosity = 1
+    allow_cache = True
+
+    # NOTE: could potentially add a progressbar to give user feedback about
+    # how far along the script is, but that leaving out for now.
+
+    def __init__(self, urls, harvest_parts, harvest_related, filename, verbosity,
+                 allow_cache):
+        self.harvest_parts = harvest_parts
+        self.harvest_related = harvest_related
+        self.verbosity = int(verbosity)
+        self.allow_cache = allow_cache
+
+        # create new rdflib conjunctive graph to hold the harvested RDF data
+        self.graph = rdflib.graph.ConjunctiveGraph()
+
+        # populate url queue with initial list of urls
+        self.url_queue.update(set(urls))
+
+        while self.url_queue:
+            url = self.url_queue.pop()
+            self.harvest(url)
+            self.processed_urls.add(url)
+
+        # output harvest summary totals
+        if self.verbosity >= 1:
+            print 'Harvested %d triple%s from %d url%s with %d error%s' % \
+                (len(self.graph), 's' if len(self.graph) != 1 else '',
+                 len(self.processed_urls),
+                 's' if len(self.processed_urls) != 1 else '',
+                 self.errors, 's' if self.errors != 1 else '')
+
+        # generate gexf from graph
+        Rdf2Gexf(self.graph, filename)
+
+
+    def harvest(self, url):
+        try:
+            headers = {}
+            # if --no-cache is requested, explicitly request no cache from server
+            if not self.allow_cache:
+                headers['cache-control'] = 'no-cache'
+            response = requests.get(url, allow_redirects=False, headers=headers)
+        except Exception as err:
+            print 'Error attempting to access %s (%s)' % (url, err)
+            self.errors += 1
+            return
+
+        # if this is a redirect, don't follow but add the real
+        # url to the queue; this avoids an issue where related
+        # links are generated relative to the initial url rather
+        #  than the actual, resolved url
+        if response.status_code in [requests.codes.moved,
+                                    requests.codes.see_other,
+                                    requests.codes.found]:
+            self.url_queue.add(response.headers['location'])
+            return
+
+        try:
+            # get a new graph context for the requested url
+            g = self.graph.get_context(url)
+            # triple count *should* be 0 before harvesting, unless we are
+            # mistakenly harvesting the same content twice
+            g.parse(data=response.content, location=url, format='rdfa')
+            if self.verbosity > 1:
+                print '% 4d triples - %s' % (len(g), url)
+            self.harvested += 1
+
+            if self.harvest_parts or self.harvest_related:
+                self.queue_related(url, g)
+
+        except Exception as err:
+            self.errors += 1
+            print 'Error parsing %s (%s)' % (url, err)
+
+    def queue_related(self, url, graph):
+
+        orig_url = rdflib.URIRef(url)
+        queued = 0
+
+        # if requested, find all sub parts of the current url
+        # (e.g., series, subseries, and indexes in a findingaid)
+        if self.harvest_parts:
+            for subj, obj in graph.subject_objects(predicate=DC.hasPart):
+                if subj == orig_url or \
+                        (subj, rdflib.OWL.sameAs, rdflib.URIRef(url)) in graph:
+                    related_url = unicode(obj)
+                    # add to queue if not already queued or processed
+                    if related_url not in self.url_queue or self.processed_urls:
+                        self.url_queue.add(related_url)
+                        queued += 1
+
+        # also follow all related link relations
+        if self.harvest_related:
+            for subj, obj in graph.subject_objects(predicate=SCHEMA_ORG.relatedLink):
+                related_url = unicode(obj)
+                if related_url not in self.url_queue or self.processed_urls:
+                    self.url_queue.add(related_url)
+                    queued += 1
+
+        if queued and self.verbosity > 1:
+            print 'Queued %d related URL%s to be harvested' % \
+                  (queued, 's' if queued != 1 else '')
+
+
+
+class Rdf2Gexf(object):
+    '''Generate a :class:`networkx.MultiDiGraph` from an :class:`rdflib.rdf.Graph`
+    and output in GEXF format.'''
+
+    # NOTE: this class adapted with very little modification from belfast.rdf.nx
+    # https://github.com/emory-libraries-ecds/belfast-group-site/blob/develop/belfast/rdf/nx.py
+
+    def __init__(self, graph, outfile):
+        self.outfile = outfile
+        self.graph = graph
+
+        self.network = nx.MultiDiGraph()
+        edge_labels = set()
+
+        # iterate through the graph by contexts and add to the network graph
+        for cx in self.graph.contexts():
+            for triple in cx.triples((None, None, None)):
+                subj, pred, obj = triple
+
+                # NOTE: skipping rdf sequences here because treating
+                # as normal triples makes for weird results
+                if pred == rdflib.RDF.first or pred == rdflib.RDF.rest:
+                    continue
+
+                # make sure subject and object are added to the graph as nodes,
+                # if appropriate
+                self.add_nodes(triple, cx)
+
+                # get the short-hand name for property or edge label
+                name = self.edge_label(pred)
+
+                # if the object is a literal, add it to the node as a property of the subject
+                if self.uri_to_node_id(subj) in self.network and \
+                  isinstance(obj, rdflib.Literal) \
+                  or pred == rdflib.RDF.type:
+                    # simplify rdf types for better display
+                    if pred == rdflib.RDF.type:
+                        ns, val = rdflib.namespace.split_uri(obj)
+                    else:
+                        val = unicode(obj)
+
+                    self.network.node[self.uri_to_node_id(subj)][name] = normalize_whitespace(val)
+
+                # otherwise, add an edge between the two resource nodes
+                else:
+                    # NOTE: gephi doesn't support multiple edges, and
+                    # the d3/json output probably elides them also.
+                    # Consider instead: if an edge already exists,
+                    # add to the strength of the existing edge
+                    edge_labels.add(name)
+                    self.network.add_edge(self.uri_to_node_id(subj),
+                                          self.uri_to_node_id(obj),
+                                          label=name)
+                    # NOTE: not worrying about connection weights
+
+
+        print 'Generated network graph with %d nodes and %d edges' % \
+            (self.network.number_of_nodes(), self.network.number_of_edges())
+
+        gexf.write_gexf(self.network, self.outfile)
+
+    def node_label(self, res, ctx):
+        # ctx = context graph, to avoid blank node collisions
+
+        # NOTE: consider adding/calculating a preferredlabel
+        # for important nodes in our data
+        name = None
+
+        # *first* use preferred label if available
+        names = ctx.preferredLabel(res)
+        # returns list of labelprop (preflabel or label), value
+        # if we got any matches, grab the first value
+        if names:
+            name = names[0][1]
+
+        # second check for schema.org name, if we have one
+        if not name:
+            name = ctx.value(res, SCHEMA_ORG.name)
+
+        if name:
+            return normalize_whitespace(name)
+
+        title = ctx.value(res, DC.title)
+        if title:
+            # if title is a bnode, convert from list/collection
+            if isinstance(title, rdflib.BNode):
+                title_list = RdfCollection(ctx, title)
+                title = '; '.join(title_list)
+                # truncate list if too long
+                if len(title) > 50:
+                    title = title[:50] + ' ...'
+
+            # otherwise, title should be a literal (no conversion needed)
+            return normalize_whitespace(title)
+
+        # as a fall-back, use type for a label
+        nodetype = ctx.value(res, rdflib.RDF.type)
+        if nodetype:
+            ns, short_type = rdflib.namespace.split_uri(nodetype)
+            return short_type
+
+    def edge_label(self, pred):
+        # get the short-hand name for property or edge label
+        ns, name = rdflib.namespace.split_uri(pred)
+        return name
+
+    def add_nodes(self, triple, ctx):
+        subj, pred, obj = triple
+
+        if self.include_as_node(subj) and subj not in self.network:
+            self.add_node(subj, ctx)
+
+        # special case: don't treat title list as a node in the network
+        if pred == DC.title and isinstance(obj, rdflib.BNode):
+            return
+
+        if pred != rdflib.RDF.type and self.include_as_node(obj) \
+           and obj not in self.network:
+            self.add_node(obj, ctx)
+
+    def include_as_node(self, res):
+        # determine if a URI should be included in the network graph
+        # as a node
+        if isinstance(res, rdflib.URIRef) or isinstance(res, rdflib.BNode):
+            return True
+
+    def uri_to_node_id(self, uri):
+        # at least one dbpedia URI contains accents; not sure if this is valid,
+        # but gexf reader borks when trying to load
+        return unicode(uri).encode('ascii', 'ignore')
+
+    def add_node(self, res, ctx):
+        # add an rdf term to the network as a node
+        attrs = {}
+        label = self.node_label(res, ctx)
+        if label is not None:
+            attrs['label'] = label
+        self.network.add_node(self.uri_to_node_id(res), **attrs)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description='''Harvest RDFa from one or more URLs and generate a network graph file.
+One of --url or --urls must be specified.''',
+    formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-u', '--url', metavar='URL', type=absolute_url,
+                        help='URL from which RDFa should be harvested')
+    parser.add_argument('-l', '--urls', metavar='URL_FILE',
+                        help='Text file with a list of URLs to be harvested, one per line')
+    parser.add_argument('--parts', action='store_true', default=True,
+                        dest='harvest_parts',
+                        help='Harvest URLs related as part of requested URLs (e.g. series/subseries) [default: true]')
+    parser.add_argument('--no-parts', action='store_false',
+                        dest='harvest_parts',
+                        help='Do not harvest URLs related as part of requested URLs')
+
+    parser.add_argument('--related', action='store_true', default=False,
+                        dest='harvest_related',
+                        help='Harvest RDFa from related urls [default: False]')
+    parser.add_argument('--no-related', action='store_false',
+                        dest='harvest_related',
+                        help='Do not harvest RDFa from related urls')
+    parser.add_argument('--no-cache', action='store_false',
+                        dest='allow_cache', default=True,
+                        help='Explicitly request uncached content')
+    parser.add_argument('-o', '--output', metavar='FILENAME',
+                        help='filename for GEXF file to be generated',
+                        required=True)
+    parser.add_argument('-v', '--verbosity', metavar='VERBOSITY', type=int,
+                        choices=[0, 1, 2], default=1,
+                        help='Verbosity level; 0=minimal, 1=normal, 2=verbose')
+    args = parser.parse_args()
+
+    if args.url:
+        url_list = [args.url]
+    elif args.urls:
+        with open(args.urls) as urlfile:
+            url_list = [u.strip() for u in urlfile.readlines()]
+
+    if url_list:
+        HarvestRdfa(url_list,
+            harvest_parts=args.harvest_parts,
+            harvest_related=args.harvest_related,
+            filename=args.output, verbosity=args.verbosity,
+            allow_cache=args.allow_cache)
+
+    else:
+        parser.print_help()

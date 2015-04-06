@@ -16,15 +16,20 @@
 
 from os import path
 from types import ListType
+from mock import patch
 
+from django.conf import settings
 from django.test import TestCase as DjangoTestCase
+from django.test.utils import override_settings
 
 from eulxml.xmlmap import load_xmlobject_from_file, load_xmlobject_from_string
+from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 from eulexistdb.testutil import TestCase
 
-from findingaids.fa.models import FindingAid, LocalComponent, EadRepository
-from findingaids.fa.utils import pages_to_show, ead_lastmodified, \
-    collection_lastmodified
+from findingaids.fa.models import FindingAid, LocalComponent, EadRepository, \
+    Series, Title
+# from findingaids.fa.utils import pages_to_show, ead_lastmodified, \
+    # collection_lastmodified
 
 
 ## unit tests for model objects in findingaids.fa
@@ -39,7 +44,8 @@ class FindingAidTestCase(DjangoTestCase):
                 'abbey244.xml',      # finding aid with series (no subseries), origination is a corporate name
                 'raoul548.xml',      # finding aid with series & subseries, origination is a family name
                 'bailey807.xml',     # finding aid with series, no origination
-                'adams465.xml'
+                'adams465.xml',
+                'pomerantz890.xml'  # finding aid with multiple subareas
                 ]
 
     def setUp(self):
@@ -133,6 +139,53 @@ class FindingAidTestCase(DjangoTestCase):
         self.assertFalse(self.findingaid['raoul548'].dsc.c[0].c[0].c[0].first_file_item)
         self.assertTrue(self.findingaid['raoul548'].dsc.c[0].c[0].c[1].first_file_item)
 
+    def test_absolute_eadxml_url(self):
+        # test against current site domain
+        url = self.findingaid['abbey244'].absolute_eadxml_url()
+        self.assert_(self.findingaid['abbey244'].eadid.value in url,
+            'URL should contain the EAD ID for this current document.')
+
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com')
+    def test_requestable(self):
+        fa = self.findingaid['abbey244']
+        fa2 = self.findingaid['bailey807']
+        fa3 = self.findingaid['pomerantz890'] # EAD with multiple subareas
+
+        with override_settings(REQUEST_MATERIALS_REPOS = [
+            'Manuscript, Archives, and Rare Book Library',
+            'Emory University Archives'
+            ]):
+            self.assertTrue(fa.requestable(),"EAD from Marbl should be able to be requested.")
+
+        # Fail if the REQUEST_MATERIALS_URL is empty
+        with override_settings(REQUEST_MATERIALS_URL = ''):
+            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_URL is not set.")
+
+        # Fail if the REQUEST_MATERIALS_REPOS is empty
+        with override_settings(REQUEST_MATERIALS_REPOS = ''):
+            self.assertFalse(fa.requestable(),"Cannot request EAD if the REQUEST_MATERIALS_REPOS is not set.")
+
+        # Fail if the requested EAD repo is not set in REQUEST_MATERIALS_REPOS
+        with override_settings(REQUEST_MATERIALS_REPOS = [
+            'Manuscript, Archives, and Rare Book Library'
+            ]):
+            self.assertFalse(fa2.requestable(),"EAD from University Archives (not set) shouldn't be able to be requested.")
+
+        # Multiple subareas per one EAD
+        with override_settings(REQUEST_MATERIALS_REPOS = [
+            'Pitts Theology Library'
+            ]):
+            self.assertTrue(fa3.requestable(),"Even if there are multiple subareas, an EAD from the set repos should be able to be requested.")
+
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com')
+    def test_request_materials_url(self):
+        fa = self.findingaid['abbey244']
+        self.assert_(fa.request_materials_url())
+
+        del settings.REQUEST_MATERIALS_URL
+        self.assertFalse(fa.request_materials_url(),'Cannot return a request materials url if the setting is None')
+
+
 
 class EadRepositoryTestCase(TestCase):
     exist_fixtures = {'files': [path.join(exist_fixture_path, 'pomerantz890.xml')] }
@@ -144,4 +197,91 @@ class EadRepositoryTestCase(TestCase):
         self.assert_('Manuscript, Archives, and Rare Book Library' in repos)
 
 
+class SeriesTestCase(DjangoTestCase):
 
+    # plain file item with no semantic tags
+    c1 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+          <did>
+            <container type="box">1</container>
+            <container type="folder">1</container>
+            <unittitle>Acey, J. Earl and Port Scott, July 10, 1991. [Cassette
+                  available]</unittitle>
+          </did>
+         </c02>''' % EAD_NAMESPACE, Series)
+    # simple tagged person name in the unittitle
+    c2 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+          <did>
+            <container type="box">1</container>
+            <container type="folder">1</container>
+            <unittitle><persname>Acey, J. Earl</persname> and Port Scott, July 10, 1991. [Cassette
+                  available]</unittitle>
+          </did>
+        </c02>''' % EAD_NAMESPACE, Series)
+    # tagged title with source & authfilenumber
+    c3 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+        <did>
+          <container type="box">10</container>
+          <container type="folder">24</container>
+          <unittitle>
+            <title type="scripts" source="OCLC" authfilenumber="434083314">Bayou Legend</title>, notes</unittitle>
+        </did>
+    </c02>''' % EAD_NAMESPACE, Series)
+    # issn title
+    c4 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+        <did>
+          <container type="box">19</container>
+          <container type="folder">3</container>
+          <unittitle><title render="doublequote" type="article">Who Has Seen the Wind?</title> <title source="ISSN" authfilenumber="2163-6206">New York Amsterdam News</title>, National Scene Magazine Supplement, November-December 1976</unittitle>
+        </did></c02>''' % EAD_NAMESPACE, Series)
+
+    c5 = load_xmlobject_from_string('''<c02 xmlns="%s" level="file">
+    <did>
+        <container type="box">60</container>
+        <container type="folder">3</container>
+        <unittitle>
+            <persname authfilenumber="109557338" role="dc:creator" source="viaf">Heaney, Seamus</persname>,
+            <date normal="1965-04-27">April 27, 1965</date>:
+            <title render="doublequote">Boy Driving his Father to Confession</title>,
+            <title render="doublequote">To A Wine Jar</title>,
+            <title render="doublequote">On Hogarth's Engraving 'Pit Ticket for the Royal Sport'</title>
+        </unittitle>
+    </did>
+    </c02>''' % EAD_NAMESPACE, Series)
+
+    def test_has_semantic_data(self):
+        self.assertFalse(self.c1.has_semantic_data)
+        self.assertTrue(self.c2.has_semantic_data)
+        self.assertTrue(self.c3.has_semantic_data)
+        self.assertTrue(self.c4.has_semantic_data)
+        self.assertTrue(self.c5.has_semantic_data)
+
+    def test_rdf_type(self):
+        # not enough information to determine type
+        self.assertEqual(None, self.c1.rdf_type)
+        # infer book, article, etc from title attributes
+        self.assertEqual('bibo:Book', self.c3.rdf_type)
+        self.assertEqual('bibo:Article', self.c4.rdf_type)
+
+        # type inferred based on series; requires access to series, so load from fixtures
+        # - bailey findingaid contains printed material, photographs, and audiovisual
+        bailey = load_xmlobject_from_file(path.join(exist_fixture_path, 'bailey807.xml'),
+            FindingAid)
+
+        # patch in unittitles so it looks as though items have semantic data
+        with patch('findingaids.fa.models.Series.unittitle_titles', new=[Title()]):
+
+            # series 4 is printed material
+            self.assertEqual('bibo:Document', bailey.dsc.c[3].c[0].rdf_type,
+                'items in printed materials series should default to document type')
+
+            # series 5 is photographs
+            self.assertEqual('bibo:Image', bailey.dsc.c[4].c[0].rdf_type,
+                'items in photograph series should default to image type')
+
+            # series 9 is audiovisual
+            self.assertEqual('bibo:AudioVisualDocument', bailey.dsc.c[8].c[0].rdf_type,
+                'items in audiovisual series should default to audiovisualdocument type')
+
+            # fallback type is manuscript
+            self.assertEqual('bibo:Manuscript', bailey.dsc.c[0].c[0].rdf_type,
+                'items in photograph series should default to image type')

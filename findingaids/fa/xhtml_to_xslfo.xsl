@@ -361,6 +361,25 @@
    </fo:table-cell>
  </xsl:template>
 
+ <xsl:template match="td[@class='bf']/text()">
+  <!-- special case for box/folder text contents -->
+  <xsl:choose>
+      <!-- in some cases, hyphenated number ranges are too large for the
+         table cell space, but xsl-fo/fop doesn't detect the hyphen as a
+         character it can wrap on.  Add a zero-width space to all hyphenated
+         box/folder listings to allow word wrapping. -->
+    <xsl:when test="contains(., '-')">
+      <xsl:value-of select="concat(
+        substring-before(., '-'),
+        '-&#x200b;',
+        substring-after(., '-'))"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="."/>
+    </xsl:otherwise>
+  </xsl:choose>
+ </xsl:template>
+
  <xsl:template match="div[@class='indexentry']">
    <fo:block margin-top="10pt">
      <xsl:apply-templates/>

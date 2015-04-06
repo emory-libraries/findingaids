@@ -21,9 +21,6 @@ import time
 
 from subvertpy import wc
 
-from django.shortcuts import get_object_or_404
-
-from findingaids.fa.models import Archive
 from findingaids.fa_admin.models import EadFile
 from findingaids.fa_admin.svn import svn_client, svn_remote
 

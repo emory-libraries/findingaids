@@ -23,6 +23,7 @@ from django.utils.html import conditional_escape, escape
 from django.utils.safestring import mark_safe
 
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
+from findingaids.fa.models import title_rdf_identifier
 
 __all__ = ['format_ead', 'format_ead_rdfa', 'series_section_rdfa']
 
@@ -30,6 +31,9 @@ register = template.Library()
 
 XLINK_NAMESPACE = 'http://www.w3.org/1999/xlink'
 EXIST_NAMESPACE = 'http://exist.sourceforge.net/NS/exist'
+
+# namespace info to pass to xpath to allow referencing ead ns
+eadns = {'namespaces': {'e': EAD_NAMESPACE}}
 
 # render attributes which can be converted to simple tags
 # - key is render attribute, value is tuple of start/end tag or
@@ -56,7 +60,7 @@ def format_extref(node,):
     rel = ''
     # special case: links in separated/related material should be relatedLink
     if node.xpath('ancestor::e:separatedmaterial or ancestor::e:relatedmaterial',
-                  namespaces={'e': EAD_NAMESPACE}):
+                  **eadns):
         rel = ' property="schema:relatedLink" '
 
     return ('<a%s%s>' % (rel, href), '</a>')
@@ -78,38 +82,140 @@ def format_date(node, default_rel):
 def format_title(node, default_rel):
     'display a title node as semantic information'
     title_type = node.get('type', None)
+    title_source = node.get('source', None)
+    title_authfileno = node.get('authfilenumber', None)
+    # lower-case title source for consistency of checking (isbn/issn/oclc)
+    if title_source is not None:
+        title_source = title_source.strip().lower()
+    # strip space from authfileno, to avoid any issues due to human error
+    if title_authfileno is not None:
+        title_authfileno = title_authfileno.strip()
 
     start, end = '', ''
 
+    # special case we can't do anything with
+    # if a title is inside the bioghist, we can assume it was created by the
+    # originator, *however* there is no inverse relationship to specify
+    # a title was created by a person.  We also can't assume
+    # any relation to the collection.  So, skip these titles for now.
+    if node.xpath('ancestor::e:bioghist', **eadns):
+        return (start, end)
+    # similar special case: if a title is inside a series scopecontent note
+    # which is related to a series unititle person (see note on series_section_rdfa),
+    # do not generate any RDFa for that title
+    if node.xpath('ancestor::e:scopecontent/preceding-sibling::e:did/e:unittitle[e:corpname or e:persname]',
+                  **eadns):
+        return (start, end)
+
     # for now, ignore titles in correspondence series
-    # (getting associated with the person in appropriately)
+    # (getting associated with the person inappropriately)
     if default_rel == 'schema:knows arch:correspondedWith':
         return start, end
 
-    # Only add semantic information if there is a title type OR
+    # if isbn # or issn is available, include it
+    meta_tags = ''
+    if title_source in ['isbn', 'issn'] and title_authfileno is not None:
+        meta_tags += '<meta property="schema:%s" content="%s"/>' % \
+            (title_source, title_authfileno)
+    # title attribute carries genre information
+    if title_type is not None:
+        meta_tags += '<meta property="schema:genre" content="%s"/>' % title_type
+
+    # generate URI/URN for item when possible
+    # TODO: abstract into reusable function
+    resource_id = None
+    if title_authfileno is not None:
+        resource_id = title_rdf_identifier(title_source, title_authfileno)
+
+    # resource attribute for inclusion
+    resource = ' resource="%s"' % resource_id if resource_id else ''
+
+    # if title is inside the scopecontent, it needs to be wrapped as a document
+    # just use the generic "mentions" relation
+    if node.xpath('ancestor::e:scopecontent', **eadns):
+        # mark as a generic document or periodical and include whatever meta tags are available
+        itemtype = 'bibo:Periodical' if title_source == 'issn' else 'bibo:Document'
+        start = '<span rel="schema:mentions" typeof="%s"%s><span property="dc:title">' \
+                 % (itemtype, resource)
+        end = '</span>%s</span>' % meta_tags
+
+    # if default rel is set to mention, assume we are patching in extra titles
+    # after file item unittitle context
+    elif default_rel == 'schema:mentions':
+        if title_source == 'issn':
+            itemtype = 'bibo:Periodical'
+        elif title_source in ['isbn', 'oclc']:
+            itemtype = 'bibo:Document'
+        else:
+            # technically we should be checking if this is a printed materials series...
+            itemtype = 'bibo:Manuscript'
+
+        # if this title has a type but no authfilenumber and there is a
+        # sibling title with an id, relate them
+        if title_type is not None and title_authfileno is None \
+                      and node.xpath('parent::e:unittitle/e:title[@authfilenumber]',
+                                     **eadns):
+            rel_id = None
+            rel_authfileno = node.xpath('normalize-space(parent::e:unittitle/e:title/@authfilenumber)',
+                                        **eadns).strip()
+            rel_source = node.xpath('normalize-space(parent::e:unittitle/e:title/@source)',
+                                    **eadns).lower()
+
+            rel_id = title_rdf_identifier(rel_source, rel_authfileno)
+
+            if rel_id is not None:
+                meta_tags += '<span property="dcterms:isPartOf" resource="%s"/>' % rel_id
+
+        start = '<span rel="schema:mentions" typeof="%s"%s><span property="dc:title">' \
+                 % (itemtype, resource)
+        end = '</span>%s</span>' % meta_tags
+
+    # Otherwise, only add semantic information if there is a title type OR
     # if title occurs in a file-level unittitle.
     # (in that case, we assume it is title of the item in the container)
-    if node.xpath('parent::e:unittitle and ancestor::e:*[@level="file"]',
-                  namespaces={'e': EAD_NAMESPACE}) or title_type is not None:
-        start, end = '<span property="dc:title">', '</span>'
+    elif node.xpath('parent::e:unittitle and ancestor::e:*[@level="file"]',
+                  **eadns) or title_type is not None:
+        start, end = '<span property="dc:title">', '</span>%s' % meta_tags
+        # include meta tags after the title, since it should be in the
+        # context of the item, which is the whole unitittle
 
-        # use title type if set
-        if title_type is not None:
-            # if there is a type, wrap with a type declaration
-            start = '<span typeof="%s">%s' % (title_type, start)
-            end = end + '</span>'
+        # check for special case: multiple titles with an author
+        # (persname tagged with a role, i.e. this is a Belfast Group sheet),
+        multiple_with_author = title_type is None \
+                and node.xpath('count(parent::e:unittitle/e:title)',
+                               **eadns) > 1 \
+                and node.xpath('preceding-sibling::e:persname[@role]',
+                               **eadns)
 
-            # infer a relation to context based on type
-            # FIXME/TODO: support other relations?
-            if title_type.endswith('DocumentPart'):
-                rel = 'dcterms:hasPart'
-                start = '<span rel="%s">%s' % (rel, start)
-                end = end + '</span>'
+        # special case: no good way to relate more than two titles in a unittitle,
+        # so just skip them when generating rdfa
+        if node.xpath('count(preceding-sibling::e:title)', **eadns) >= 2 \
+          and not multiple_with_author:
+            start, end = '', ''
 
-        # if no title type and there are multiple titles,
-        # use RDFa list notation to generate a sequence
-        elif node.xpath('count(parent::e:unittitle/e:title)',
-                        namespaces={'e': EAD_NAMESPACE}) > 1:
+        # if ISSN with preceding title, assume article in a periodical
+        elif title_source == 'issn' and \
+            node.xpath('count(preceding-sibling::e:title)', **eadns) == 1:
+            # adapted from schema.org article example: http://schema.org/Article
+            start = '<span property="dcterms:isPartOf" typeof="bibo:Periodical"%s><span property="dc:title">' % resource
+            # include any meta tags (genre, issn) inside the periodical entity
+            end = '</span>%s</span>' % meta_tags
+
+        # otherwise, if current title has an id or no type and follows a title with a type,
+        # assume generic part/whole relationship
+        elif (title_authfileno is not None or title_type is None) and \
+            node.xpath('count(./preceding-sibling::e:title[@type])', **eadns) == 1:
+            start = '<span property="dcterms:isPartOf" typeof="bibo:Document"%s><span property="dc:title">' % resource
+            # include any meta tags (e.g. isbn) inside the document entity
+            end = '</span>%s</span>' % meta_tags
+
+        # if no type and there are multiple titles, AND there is a persname
+        # tagged with a role (i.e. this is a Belfast Group sheet),
+        # then use RDFa list notation to generate a sequence
+        elif title_type is None and node.xpath('count(parent::e:unittitle/e:title)',
+                                               **eadns) > 1 \
+                                and node.xpath('preceding-sibling::e:persname[@role]',
+                                               **eadns):
             start = '<span inlist="inlist" property="dc:title">'
 
     return (start, end)
@@ -140,6 +246,19 @@ semantic_tags = {
     '{%s}date' % EAD_NAMESPACE: format_date,
     '{%s}title' % EAD_NAMESPACE: format_title,
     '{%s}occupation' % EAD_NAMESPACE: format_occupation,
+}
+
+# default roles for names in the bioghist, based on type of name
+# and type of origination name
+default_bioghist_roles = {
+    'person': {
+        'schema:Person': 'schema:knows',
+        'schema:Organization': 'schema:affiliation',
+    },
+    'org': {
+        'schema:Person': 'schema:affiliation',
+        'schema:Organization': 'schema:affiliation',
+    }
 }
 
 
@@ -180,9 +299,6 @@ def format_nametag(node, default_role=None):
         # NOTE: *preliminary* role  / relation to context
         if node.get('role') is not None:
             rel = node.get('role')
-        # elif rdftype == 'schema:Organization':
-        #     # NOTE: this should not be set for control access orgs
-        #     rel = 'schema:affiliation'
 
         # special case: for controlaccess, we can infer name from encodinganalog
         if node.getparent().tag == '{%s}controlaccess' % EAD_NAMESPACE:
@@ -200,9 +316,44 @@ def format_nametag(node, default_role=None):
             else:
                 rel = 'schema:about'
 
+        # fallback roles, set based on content
+        if rel is None:
+
+            # if name is in the bioghist, infer relation based on origination type
+            if node.xpath('ancestor::e:bioghist', **eadns):
+
+                # special case: don't assume anything for geogname with no role
+                if rdftype == 'schema:Place':
+                    return ('', '')
+
+                origination = node.xpath('ancestor::e:archdesc/e:did/e:origination/*',
+                                         **eadns)
+                if origination:
+                    orig_type = None
+                    orig = origination[0]
+                    if orig.tag.endswith('persname'):
+                        orig_type = 'person'
+                    elif orig.tag.endswith('corpname'):
+                        orig_type = 'org'
+
+                    if orig_type is not None:
+                        # determine default role based on origination name and
+                        # type of current name
+                        rel = default_bioghist_roles[orig_type].get(rdftype, None)
+
         # if nothing else, the document obviously mentions this entity
         if rel is None:
-            rel = 'schema:mentions'
+            # *unless* we are in in a file-level unitittle that is elsewhere
+            # assumed to be "about" a title, which cannot *mention* a person
+            # if node.xpath('ancestor::e:*[@level="file"] and parent::e:unittitle[e:title[@type] or e:title[@source and @authfilenumber]]',
+            if node.xpath('ancestor::e:*[@level="file"] and parent::e:unittitle[e:title]',
+                         **eadns):
+                rel = None
+                # not only do we not want a relation, we do not want the
+                # names exposed here because then we end up with two versions
+                start, end = '', ''
+            else:
+                rel = 'schema:mentions'
 
     if rel is not None:
         start = '<span rel="%s">%s' % (rel, start)
@@ -326,11 +477,16 @@ EAD_BIOGHIST = '{%s}bioghist' % EAD_NAMESPACE
 @register.assignment_tag(takes_context=True)
 def series_section_rdfa(context, series, section):
     # determine rdf wrapping info for a series info section
-    # - if we have an origination name or series name,
-    #   assumes bioghits or scopecontent is *about*
-    #   the person or organization
-    name = series.unittitle_name or \
-        series.ead.origination_name or None
+
+    # NOTE: technically anything in the scopecontent not should
+    # relate to the *collection* and not to any individual.
+    # However, initial RDFa implementation for Belfast project
+    # assumed a relationship between series scopecontent notes and the
+    # origination entity or a tagged name in the series title.
+    # This does not generalize well OR work with titles (no way to relate
+    # an author to a title); for now only expose RDFa for series
+    # content when there is a series unittitle name.
+    name = series.unittitle_name
 
     type = None
     if name is not None:
@@ -348,7 +504,6 @@ def series_section_rdfa(context, series, section):
     # the name
     if name is not None and type is not None and name.uri is not None \
        and section.node.tag in [EAD_SCOPECONTENT, EAD_BIOGHIST]:
-               # FIXME: do we need to check that the name has a URI ?
         rdfa = True
 
     # is section is scopecontent or bioghist, then assume it is about

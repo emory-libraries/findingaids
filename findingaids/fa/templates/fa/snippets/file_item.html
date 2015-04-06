@@ -15,10 +15,12 @@
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa:rdfa_rel|default:'' }}
           {{ component.did.note|format_ead_rdfa:rdfa_rel|default:'' }}
-        {% elif component.unittitle_name %}
+        {% elif component.has_semantic_data %}
         {# if unittitle has a name, containers may have semantic info also #}
-        <span rel="schema:mentions"><span typeof="bibo:Manuscript">
-          {# NOTE: assuming manuscript type for now; should be refined for other types of content #}
+            {% if component.rdf_type %} {# if there is a type, assume the whole unittitle is one thing #}
+            <span rel="schema:mentions"><span typeof="{{ component.rdf_type }}"
+                {% if component.rdf_identifier %}resource="{{ component.rdf_identifier }}"{% endif %}>
+            {% endif %}
           {{ component.did.unittitle|format_ead_rdfa }}
           {{ component.did.physdesc|default:'' }}
           {{ component.did.abstract|format_ead_rdfa|default:'' }}
@@ -51,8 +53,20 @@
             {% endfor %}
         </div>
         {% endif %}
-        {% if not rdfa_rel and component.unittitle_name %}
+        {% if not rdfa_rel and component.has_semantic_data and component.rdf_type %}
          </span></span>  {# end mentions, manuscript #}
+        {% endif %}
+        {# additional rdf relationships to be exposed #}
+        {% if component.rdf_mentions %} {# hide but expose as rdfa with rel schema:mentions #}
+            <span style="display:none">
+                {% for name in component.unittitle_names %}
+                    {{ name|format_ead_rdfa:'schema:mentions' }}
+                {% endfor %}
+                {# expose any secondary titles included in a unittitle that should be mentiond #}
+                {% for t in component.mention_titles %}
+                   {{ t|format_ead_rdfa:'schema:mentions' }}
+                {% endfor %}
+            </span>
         {% endif %}
     </td>
     {% endspaceless %}

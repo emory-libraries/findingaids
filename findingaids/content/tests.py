@@ -15,17 +15,16 @@
 #   limitations under the License.
 
 from os import path
-from mock import patch
+from unittest import skip
 
-from django.test import Client, TestCase
+from django.test import Client
 from django.conf import settings
-from django.core.cache import cache
 from django.core.urlresolvers import reverse
 
 from eulexistdb.testutil import TestCase as EulexistdbTestCase
 from eullocal.django.forms.tests import MockCaptcha
 
-from findingaids.content import models, forms
+from findingaids.content import forms
 
 # re-using finding aid fixtures from main fa app
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..',
@@ -299,7 +298,13 @@ class ContentViewsTest(EmailTestCase):
             msg_prefix='response should display error message when sending email triggers an exception',
             status_code=500)
 
+
+    @skip
     def test_request_materials(self):
+        # NOTE: this test has been disabled because the request materials edit
+        # form has been disabled as the archives transition to using Aeon
+        # for requesting materials
+
         # GET - display the form
         rqst_materials_url = reverse('content:request-materials')
         response = self.client.get(rqst_materials_url)

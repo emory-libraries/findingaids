@@ -24,6 +24,7 @@ from urllib import quote as urlquote
 from django.conf import settings
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB, ExistDBException
 from eulexistdb.testutil import TestCase
@@ -414,7 +415,8 @@ class FaViewsTest(TestCase):
                            response.content)  # abstract
         self.assertPattern(r'''\[after identification of item\(s\)\],\s+<[-A-Za-z="' ]+>Where Peachtree''',
                            response.content)  # admin_info
-        self.assertPattern(r'''joined\s+<[-A-Za-z="' ]+>The Washington Post''',
+        # Note: titles now include RDFa in bioghist, so multiple tags here
+        self.assertPattern(r'''joined\s+(<[-A-Za-z=:"' ]+>)*The Washington Post''',
                            response.content)  # collection description
 
         # only descriptive information that is present
@@ -678,8 +680,11 @@ class FaViewsTest(TestCase):
 
         # FIXME: test also not listed in top-level table of contents?
 
-    # view single series in a finding aid
+
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com',
+        REQUEST_MATERIALS_REPOS = ['Manuscript, Archives, and Rare Book Library'])
     def test_view_series__bailey_series1(self):
+        # view single series in a finding aid
         series_url = reverse('fa:series-or-index', kwargs={'id': 'bailey807',
                              'series_id': 'series1'})
         response = self.client.get(series_url)
@@ -762,6 +767,11 @@ class FaViewsTest(TestCase):
         self.assertPattern(
             '<div class="fa-title">.* >\s+Interview transcripts\s+</div>', response.content,
             msg_prefix='short series title in breadcrumb displays text without date')
+
+        # ead should be requestable from series
+        # (testing that response includes enough data for requestable method)
+        self.assertTrue(response.context['ead'].requestable(),
+            'Finding aid should be requestable from series page')
 
     def test_view_subseries__raoul_series1_6(self):
         subseries_url = reverse('fa:series2', kwargs={'id': 'raoul548',
@@ -1753,6 +1763,8 @@ class FullTextFaViewsTest(TestCase):
             response, 'Index of Selected Correspondents',
             msg_prefix="index without search terms is still returned normally")
 
+    @override_settings(REQUEST_MATERIALS_URL='http://example.com',
+        REQUEST_MATERIALS_REPOS = ['Manuscript, Archives, and Rare Book Library'])
     def test_document_search(self):
         search_url = reverse('fa:singledoc-search', kwargs={'id': 'raoul548'})
         response = self.client.get(search_url, {'keywords': 'correspondence'})
@@ -1838,6 +1850,11 @@ class FullTextFaViewsTest(TestCase):
             response, '%s?keywords=correspondence' %
             reverse('fa:findingaid', kwargs={'id': 'raoul548'}),
             msg_prefix='links to finding aid series include search terms')
+
+        # ead should be requestable from series
+        # (testing that response includes enough data for requestable method)
+        self.assertTrue(response.context['ead'].requestable(),
+            'Finding aid should be requestable from document search page')
 
         # no matches
         response = self.client.get(search_url, {'keywords': 'bogus'})

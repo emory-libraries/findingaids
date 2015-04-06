@@ -15,16 +15,25 @@
 #   limitations under the License.
 
 from datetime import datetime
+import logging
 import os
 
 from django.conf import settings
+from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
 from django.db import models
 
 from eulxml import xmlmap
 from eulxml.xmlmap import eadmap
 from eulexistdb.manager import Manager
 from eulexistdb.models import XmlModel
+
+from findingaids.utils import normalize_whitespace
+
+
+# logging
+logger = logging.getLogger(__name__)
 
 
 # finding aid models
@@ -45,6 +54,7 @@ class Name(XmlModel):
         'e': eadmap.EAD_NAMESPACE,
     }
     source = xmlmap.StringField('@source')
+    role = xmlmap.StringField('@role')
     authfilenumber = xmlmap.StringField('@authfilenumber')
     encodinganalog = xmlmap.StringField('@encodinganalog')
     value = xmlmap.StringField(".", normalize=True)
@@ -148,6 +158,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
 
     # is mapped as single in eulxml.eadmap but could be multiple
     separatedmaterial_list = xmlmap.NodeListField("e:archdesc/e:separatedmaterial", eadmap.Section)
+    relatedmaterial_list = xmlmap.NodeListField("e:archdesc/e:relatedmaterial", eadmap.Section)
 
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
@@ -217,8 +228,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             info.append(self.archdesc.use_restriction)
         if self.archdesc.alternate_form:
             info.append(self.archdesc.alternate_form)
-        if self.archdesc.related_material:
-            info.append(self.archdesc.related_material)
+        for rel_m in self.relatedmaterial_list:
+            info.append(rel_m)
         for sep_m in self.separatedmaterial_list:
             info.append(sep_m)
         if self.archdesc.acquisition_info:
@@ -295,6 +306,40 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             # otherwise use findingaid ARK as base for collection URI
             return '%s#collection' % self.eadid.url
 
+    def absolute_eadxml_url(self):
+        ''' Generate an absolute url to the xml view for this ead
+            for use with external services such as Aeon'''
+
+        current_site = Site.objects.get_current()
+        return ''.join([
+            'http://',
+            current_site.domain.rstrip('/'),
+            reverse('fa:eadxml', kwargs={"id":self.eadid.value})
+            ])
+
+    def request_materials_url(self):
+        ''' Construct the absolute url for use with external services such as Aeon'''
+
+        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+            logger.warn("Request materials url is not configured.")
+            return
+
+        base = settings.REQUEST_MATERIALS_URL
+        return ''.join([base, self.absolute_eadxml_url()])
+
+    def requestable(self):
+        ''' Determines if the EAD is applicable for the electronic request service.'''
+
+        # If the request url is not configured, then the request can't be generated.
+        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+            return False
+
+        if not hasattr(settings,'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
+            return False
+
+        # If the item is in on of the libraries defined, then it should be displayed.
+        return any([normalize_whitespace(repo) in settings.REQUEST_MATERIALS_REPOS
+                    for repo in self.repository])
 
 
 class ListTitle(XmlModel):
@@ -351,6 +396,38 @@ class LocalComponent(eadmap.Component):
         return len(self.did.container) and len(self.preceding_files) == 0
 
 
+def title_rdf_identifier(src, idno):
+    ''''Generate an RDF identifier for a title, based on source and id
+    attributes.  Currently supports ISSN, ISBN, and OCLC.'''
+    src = src.lower()
+    idno = idno.strip()  # remove whitespace, just in case of errors in entry
+
+    if src in ['isbn', 'issn']:  # isbn and issn URNs have same format
+        return 'urn:%s:%s' % (src.upper(), idno)
+    elif src == 'oclc':
+        return 'http://www.worldcat.org/oclc/%s' % idno
+
+
+class Title(xmlmap.XmlObject):
+    '''A title in an EAD document, with access to attributes for type of title,
+    render, source, and authfilenumber.
+    '''
+    ROOT_NAMESPACES = {'e': eadmap.EAD_NAMESPACE}
+    ROOT_NAME = 'title'
+
+    type = xmlmap.StringField('@type')
+    render = xmlmap.StringField('@render')
+    source = xmlmap.StringField('@source')
+    authfilenumber = xmlmap.StringField('@authfilenumber')
+    value = xmlmap.StringField('.', normalize=True)
+
+    @property
+    def rdf_identifier(self):
+        ''''RDF identifier for this title, if source and authfilenumber attributes
+        are present and can be converted into a URI or URN'''
+        return title_rdf_identifier(self.source, self.authfilenumber)
+
+
 class Series(XmlModel, LocalComponent):
     """
       Top-level (c01) series.
@@ -388,8 +465,23 @@ class Series(XmlModel, LocalComponent):
 
     _unittitle_name_xpath = '|'.join('e:did/e:unittitle/e:%s' % t
                                      for t in ['persname', 'corpname', 'geogname'])
+    #: tagged name in the unittitle; used for RDFa output
     unittitle_name = xmlmap.NodeField(_unittitle_name_xpath, Name)
     'name in the unittitle, as an instance of :class:`Name`'
+    #: list of tagged names in the unittite; used for RDFa output
+    unittitle_names = xmlmap.NodeListField(_unittitle_name_xpath, Name)
+    'names in the unittitle, as a list of :class:`Name`'
+
+    #: list of titles in the unittitle; used for RDFa output
+    unittitle_titles = xmlmap.NodeListField('e:did/e:unittitle/e:title', Title)
+    'list of titles in the unittitle, as :class:`Title`'
+
+    #: title of the nearest ancestor series;
+    #: used to determine what kind of content this is, for default rdf type
+    series_title = xmlmap.StringField('''ancestor::e:c03[@level="subsubseries"]/e:did/e:unittitle
+        |ancestor::e:c02[@lavel="subseries"]/e:did/e:unittitle
+        |ancestor::e:c01[@level="series"]/e:did/e:unittitle''',
+        normalize=True)
 
     def series_info(self):
         """"
@@ -449,6 +541,108 @@ class Series(XmlModel, LocalComponent):
                 eadid = None
             self._short_id = shortform_id(self.id, eadid)
         return self._short_id
+
+    @property
+    def has_semantic_data(self):
+        '''Does this item contains semantic data that should be rendered with
+        RDFa?  Currently checks the unittitle for a tagged person, corporate, or
+        geographic name or for a title with source and authfilenumber attributes.'''
+        # - if there is at least one tagged name in the unittitle
+        semantic_tags = [self.unittitle_name]
+        # - if there are titles tagged with source/authfilenumber OR titles
+        # with a type
+        # NOTE: eventually, we will probably want to include all tagged titles,
+        # but for now, restrict to titles that have been enhanced in a particular way
+        semantic_tags.extend([t for t in self.unittitle_titles
+                              if (t.source and t.authfilenumber) or t.type])
+        return any(semantic_tags)
+
+    @property
+    def rdf_type(self):
+        ''''rdf type to use for a semantically-tagged component item'''
+        # NOTE: initial implementation for Belfast Group sheets assumes manuscript
+        # type; should be refined for other types of content
+        rdf_type = None
+        if len(self.unittitle_titles):
+            # if type of first title is article, return article
+            if self.unittitle_titles[0].type and \
+              self.unittitle_titles[0].type.lower() == 'article':
+                rdf_type = 'bibo:Article'
+
+            # if two titles and the second has an issn, article in a periodical
+            # (TODO: is this close enough for all cases?)
+            elif len(self.unittitle_titles) == 2 and self.unittitle_titles[1].source \
+              and self.unittitle_titles[1].source.upper() == 'ISSN':
+                rdf_type = 'bibo:Article'
+
+            # if title has an isbn, assume it is a book
+            # - for now, also assume OCLC source is book (FIXME: is this accurate?)
+            elif self.unittitle_titles[0].source \
+              and self.unittitle_titles[0].source.upper() in ['ISBN', 'OCLC']:
+                rdf_type = 'bibo:Book'
+
+            if rdf_type is None and self.series_title:
+                series_title = self.series_title.lower()
+                # if in a Printed Material series, assume bibo:Document
+                # - printed material is usually included in text for series and
+                #   subseries names
+                if 'printed material' in series_title:
+                    rdf_type = 'bibo:Document'
+
+                # if in a Photographs series, use bibo:Image
+                elif 'photograph' in series_title:
+                    rdf_type = 'bibo:Image'
+
+                # if in an AudioVisual series, use bibo:AudioVisualDocument
+                elif 'audiovisual' in series_title or \
+                  'audio recordings' in series_title or \
+                  'video recordings' in series_title:
+                   # audiovisual usually used at top-level, audio/video rec. used for subseries
+                    rdf_type = 'bibo:AudioVisualDocument'
+
+            # otherwise, use bibo:Manuscript
+            if rdf_type is None:
+                rdf_type = 'bibo:Manuscript'
+
+        return rdf_type
+
+    @property
+    def rdf_identifier(self):
+        # if the item in the unittitle has an rdf identifier, make it available
+        # for use in constructing RDFa in the templates
+
+        # for now, assuming that the first title listed is the *thing*
+        # in the collection.  If we can generate an id for it (i.e.,
+        # it has a source & authfilenumber), use that
+        return self.unittitle_titles[0].rdf_identifier
+
+        # NOTE: previously, was only returning an rdf identifier for a
+        # single title
+        # for now, only return when these is one single title
+        # if len(self.unittitle_titles) == 1 :
+            # return self.unittitle_titles[0].rdf_identifier
+
+    @property
+    def rdf_mentions(self):
+        # names related to the title that should also be related to the collection
+        # titles after the first two need to be handled separately here also
+        return self.rdf_type is not None and len(self.unittitle_names) \
+          or len(self.unittitle_titles) > 1
+
+    @property
+    def mention_titles(self):
+        # list of secondary titles that should be mentioned
+
+        # if we have a multiple titles with an author, the titles
+        # are being treated as a list and should not be exposed
+        # (i.e., belfast group sheets)
+        if self.unittitle_names and any(n.role for n in self.unittitle_names)  \
+          or len(self.unittitle_titles) <= 1:
+            return []
+        else:
+            # return all but the first title
+            return list(self.unittitle_titles)[1:]
+
 
 # override component.c node_class
 # subcomponents need to be initialized as Series to get display_label, series list...
@@ -642,7 +836,3 @@ class Archive(models.Model):
     @property
     def svn_local_path(self):
         return os.path.join(settings.SVN_WORKING_DIR, self.slug)
-
-
-
-

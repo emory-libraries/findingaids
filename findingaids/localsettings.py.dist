@@ -42,6 +42,13 @@ REQUEST_MATERIALS_CONTACTS = (
     # ('email address', 'name'),
 )
 
+# Used to define the base url needed to send the material to request service
+REQUEST_MATERIALS_URL = ''
+
+# The list of repositories that are able to be requested
+REQUEST_MATERIALS_REPOS = ['']
+
+
 # sites this django app is allowed to serve out
 ALLOWED_HOSTS = ['.library.emory.edu']
 

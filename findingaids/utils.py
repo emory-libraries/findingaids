@@ -1,6 +1,6 @@
-# file findingaids/__init__.py
+# file findingaids/utils.py
 #
-#   Copyright 2012 Emory University Library
+#   Copyright 2015 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -14,9 +14,11 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-__version_info__ = (1, 8, 0, None)
+import re
 
-# Dot-connect all but the last. Last is dash-connected if not None.
-__version__ = '.'.join(str(i) for i in __version_info__[:-1])
-if __version_info__[-1] is not None:
-    __version__ += ('-%s' % (__version_info__[-1],))
+# compiled regular expression for normalizing whitespace
+_normalize_ws_re = re.compile(r'\s+')
+
+def normalize_whitespace(txt):
+    'Normalize whitespace in a string'
+    return re.sub(_normalize_ws_re, ' ', txt)

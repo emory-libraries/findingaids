@@ -8,9 +8,22 @@
     <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}style/local.css" />
 {% endblock %}
 
+{% block site-logo %}
+<div id="logo">
+  <img src="{{ STATIC_URL}}images/LITS_EmoryFindingAids.png" alt="EmoryFindingAids"
+       usemap="#logomap"/>
+  <map name="logomap">
+    <area shape="rect" coords="0,0,165,70" href="http://www.emory.edu/" alt="Emory University"/>
+    <area shape="rect" coords="168,0,316,70" href="{% url 'site-index' %}" alt="EmoryFindingAids" />
+  </map>
+
+</div>
+{% endblock %}
+{% comment %}
 {% block site-name %}
 <img src="{{ STATIC_URL}}images/EmoryFindingAids-logo.png" alt="EmoryFindingAids"/>
 {% endblock %}
+{% endcomment %}
 
 {% block navbar %}   {# override the whole block #}
     <a class="first" href="{% url 'site-index' %}">Home</a>

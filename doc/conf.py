@@ -1,5 +1,5 @@
 # file doc/conf.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ release = findingaids.__version__
 
 pygments_style = 'sphinx'
 
-#html_theme = 'default'
+html_theme = 'alabaster'
 #html_static_path = ['static']
 htmlhelp_basename = 'fadoc'
 
