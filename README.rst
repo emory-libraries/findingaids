@@ -8,6 +8,14 @@ This project is a Django web application for providing access to and limited
 administration for Archival Finding Aid XML documents in the Encoded Archival
 Description format (`EAD <http://www.loc.gov/ead/>`_ ).
 
+License
+-------
+
+This software is distributed under the `Apache 2.0 License`_.
+
+.. _Apache: http://www.apache.org/licenses/LICENSE-2.0.html
+
+
 Components
 ----------
 
