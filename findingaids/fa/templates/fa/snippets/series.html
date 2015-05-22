@@ -12,11 +12,6 @@
   </a>
 </h2>
 
-{% if series.contains_correspondence and series.ead.origination_name.authfilenumber|default:'' %}
-  {% with name=series.ead.origination_name %}
-  <div typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
-  {% endwith %}
-{% endif %}
 
 {% for section in series.series_info %}
 {% comment %} Use template tag to determine if RDFa should be used for this section,
@@ -39,7 +34,11 @@
 {% comment %}If this is a correspondence series and findingaid origination is tagged,
 repeat the scopecontent note to expose tagged names as correspondents.{% endcomment %}
 {% if series.contains_correspondence and series.ead.origination_name.authfilenumber %}
- <div style="display:none">{{ series.scope_content|format_ead_rdfa:'schema:knows arch:correspondedWith' }}</div>
+  {% with name=series.ead.origination_name %}
+  <div style="display:none" typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
+     {{ series.scope_content|format_ead_rdfa:'schema:knows arch:correspondedWith' }}
+   </div>
+  {% endwith %}
 {% endif %}
 
 {# container list or series/subseries listing #}
@@ -65,7 +64,8 @@ repeat the scopecontent note to expose tagged names as correspondents.{% endcomm
 {% else %}
 
 {% if series.contains_correspondence and series.ead.origination_name.authfilenumber %}
-  {% with rdfa_rel="schema:knows arch:correspondedWith" %}
+  {% with name=series.ead.origination_name rdfa_rel="schema:knows arch:correspondedWith" %}
+  <div typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
     {% include "fa/snippets/containerlist.html" %}
   {% endwith %}
 {% else %}
@@ -77,8 +77,4 @@ repeat the scopecontent note to expose tagged names as correspondents.{% endcomm
     </div>
   </div>
 {% endif %}
-{% endif %}
-
-{% if 'correspondence' in series.did.unittitle|format_ead|slugify and series.ead.origination_name.authfilenumber|default:'' %}
-  </div> <!-- close correspondence about -->
 {% endif %}
