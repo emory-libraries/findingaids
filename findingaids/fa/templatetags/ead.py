@@ -488,6 +488,7 @@ def series_section_rdfa(context, series, section):
     # content when there is a series unittitle name.
     name = series.unittitle_name
 
+    # tagged name in the series title
     type = None
     if name is not None:
         if name.is_personal_name:
@@ -509,7 +510,7 @@ def series_section_rdfa(context, series, section):
     # is section is scopecontent or bioghist, then assume it is about
     # closest named person/organization
 
-    if rdfa and 'correspondence' in unicode(series.did.unittitle).lower():
+    if rdfa and series.contains_correspondence:
         default_rel = 'schema:knows arch:correspondedWith'
 
     # if there is semantic information to display, the web page

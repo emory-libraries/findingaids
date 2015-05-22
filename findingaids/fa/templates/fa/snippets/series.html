@@ -12,19 +12,21 @@
   </a>
 </h2>
 
-{# TODO: shift some of this semantic logic to the view? case-insensitive comparison ? #}
-{% if 'correspondence' in series.did.unittitle|format_ead|slugify and series.ead.origination_name.authfilenumber|default:'' %}
+{% if series.contains_correspondence and series.ead.origination_name.authfilenumber|default:'' %}
   {% with name=series.ead.origination_name %}
   <div typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
   {% endwith %}
 {% endif %}
 
 {% for section in series.series_info %}
-
+{% comment %} Use template tag to determine if RDFa should be used for this section,
+ and if there should be ae default rel.
+ Returns start/end div tags, and sets use_rdfa, and default_rel in template context. {% endcomment %}
 {% series_section_rdfa series section as divinfo %}
 {{ divinfo.start }} {# start tag, with any semantic information determined by series_section_rdaf #}
    	<h3>{{ section.head|default:'' }}</h3>
 	{% for para in section.content %}
+
      {% if use_rdfa %}
        <p>{{ para|format_ead_rdfa:default_rel }}</p>
      {% else %}
@@ -33,6 +35,12 @@
 	{% endfor %}
 {{ divinfo.end }}
 {% endfor %}
+
+{% comment %}If this is a correspondence series and findingaid origination is tagged,
+repeat the scopecontent note to expose tagged names as correspondents.{% endcomment %}
+{% if series.contains_correspondence and series.ead.origination_name.authfilenumber %}
+ <div style="display:none">{{ series.scope_content|format_ead_rdfa:'schema:knows arch:correspondedWith' }}</div>
+{% endif %}
 
 {# container list or series/subseries listing #}
 {% if series.hasSubseries %}
@@ -56,7 +64,7 @@
     {% endif %}
 {% else %}
 
-{% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
+{% if series.contains_correspondence and series.ead.origination_name.authfilenumber %}
   {% with rdfa_rel="schema:knows arch:correspondedWith" %}
     {% include "fa/snippets/containerlist.html" %}
   {% endwith %}
