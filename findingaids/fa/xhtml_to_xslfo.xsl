@@ -117,6 +117,9 @@
     <xsl:apply-templates/>
  </xsl:template>
 
+ <!-- explicitly ignore hidden content used for RDFa output -->
+ <xsl:template match="*[@style='display:none']"/>
+
  <xsl:template match="h1[a/@name]|h2[a/@name]" mode="bookmark">
    <fo:bookmark>
      <xsl:attribute name="internal-destination"><xsl:value-of select="a/@name"/></xsl:attribute>
