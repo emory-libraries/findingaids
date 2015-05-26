@@ -67,6 +67,7 @@ repeat the scopecontent note to expose tagged names as correspondents.{% endcomm
   {% with name=series.ead.origination_name rdfa_rel="schema:knows arch:correspondedWith" %}
   <div typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
     {% include "fa/snippets/containerlist.html" %}
+  </div>
   {% endwith %}
 {% else %}
   <div rel="schema:about">
