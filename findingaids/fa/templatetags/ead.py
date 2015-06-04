@@ -271,6 +271,17 @@ def format_nametag(node, default_role=None):
     if rdftype is None:
         return ('', '')
 
+    # handle special cases for correspondence relations
+    if default_role == 'schema:knows arch:correspondedWith':
+        # if the type is a place, ignore entirely since a person
+        # can't know or correspond with a place
+        if rdftype == 'schema:Place':
+            return ('', '')
+        # if the type is an organization and default rel is knows/correspondedwith,
+        # drop the 'knows' since a person can't 'know' an organization
+        if rdftype == 'schema:Organization':
+            default_role = 'arch:correspondedWith'
+
     about = ''
     uri = None
     if node.get('authfilenumber') is not None:
