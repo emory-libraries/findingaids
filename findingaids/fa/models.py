@@ -558,6 +558,11 @@ class Series(XmlModel, LocalComponent):
         return any(semantic_tags)
 
     @property
+    def contains_correspondence(self):
+        'Boolean property indicating if this series containes correspondence.'
+        return 'correspondence' in unicode(self.did.unittitle).lower()
+
+    @property
     def rdf_type(self):
         ''''rdf type to use for a semantically-tagged component item'''
         # NOTE: initial implementation for Belfast Group sheets assumes manuscript

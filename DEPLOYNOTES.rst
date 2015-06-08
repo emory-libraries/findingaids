@@ -402,10 +402,10 @@ Upgrade Notes
 -------------
 
 
-1.8
----
+1.7.3
+-----
 
-* This release adds integrations with Aeon, which requires the 
+* This release adds integrations with Aeon, which requires the
   addition of two settings in localsettings.py:
 
   1. REQUEST_MATERIALS_URL

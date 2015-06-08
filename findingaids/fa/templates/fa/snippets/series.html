@@ -12,19 +12,16 @@
   </a>
 </h2>
 
-{# TODO: shift some of this semantic logic to the view? case-insensitive comparison ? #}
-{% if 'correspondence' in series.did.unittitle|format_ead|slugify and series.ead.origination_name.authfilenumber|default:'' %}
-  {% with name=series.ead.origination_name %}
-  <div typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
-  {% endwith %}
-{% endif %}
 
 {% for section in series.series_info %}
-
+{% comment %} Use template tag to determine if RDFa should be used for this section,
+ and if there should be ae default rel.
+ Returns start/end div tags, and sets use_rdfa, and default_rel in template context. {% endcomment %}
 {% series_section_rdfa series section as divinfo %}
 {{ divinfo.start }} {# start tag, with any semantic information determined by series_section_rdaf #}
    	<h3>{{ section.head|default:'' }}</h3>
 	{% for para in section.content %}
+
      {% if use_rdfa %}
        <p>{{ para|format_ead_rdfa:default_rel }}</p>
      {% else %}
@@ -33,6 +30,16 @@
 	{% endfor %}
 {{ divinfo.end }}
 {% endfor %}
+
+{% comment %}If this is a correspondence series and findingaid origination is tagged,
+repeat the scopecontent note to expose tagged names as correspondents.{% endcomment %}
+{% if series.contains_correspondence and series.ead.origination_name.authfilenumber %}
+  {% with name=series.ead.origination_name %}
+  <div style="display:none" typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
+     {{ series.scope_content|format_ead_rdfa:'schema:knows arch:correspondedWith' }}
+   </div>
+  {% endwith %}
+{% endif %}
 
 {# container list or series/subseries listing #}
 {% if series.hasSubseries %}
@@ -56,9 +63,11 @@
     {% endif %}
 {% else %}
 
-{% if 'correspondence' in series.did.unittitle|format_ead or 'Correspondence' in series.did.unittitle|format_ead and series.ead.origination_name.authfilenumber %}
-  {% with rdfa_rel="schema:knows arch:correspondedWith" %}
+{% if series.contains_correspondence and series.ead.origination_name.authfilenumber %}
+  {% with name=series.ead.origination_name rdfa_rel="schema:knows arch:correspondedWith" %}
+  <div typeof="{% if name.is_person %}schema:Person{% elif name.is_corporate %}schema:Organization{% endif %}" about="{{ series.ead.origination_name.uri}}">
     {% include "fa/snippets/containerlist.html" %}
+  </div>
   {% endwith %}
 {% else %}
   <div rel="schema:about">
@@ -69,8 +78,4 @@
     </div>
   </div>
 {% endif %}
-{% endif %}
-
-{% if 'correspondence' in series.did.unittitle|format_ead|slugify and series.ead.origination_name.authfilenumber|default:'' %}
-  </div> <!-- close correspondence about -->
 {% endif %}

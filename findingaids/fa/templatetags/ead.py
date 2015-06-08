@@ -271,6 +271,17 @@ def format_nametag(node, default_role=None):
     if rdftype is None:
         return ('', '')
 
+    # handle special cases for correspondence relations
+    if default_role == 'schema:knows arch:correspondedWith':
+        # if the type is a place, ignore entirely since a person
+        # can't know or correspond with a place
+        if rdftype == 'schema:Place':
+            return ('', '')
+        # if the type is an organization and default rel is knows/correspondedwith,
+        # drop the 'knows' since a person can't 'know' an organization
+        if rdftype == 'schema:Organization':
+            default_role = 'arch:correspondedWith'
+
     about = ''
     uri = None
     if node.get('authfilenumber') is not None:
@@ -488,6 +499,7 @@ def series_section_rdfa(context, series, section):
     # content when there is a series unittitle name.
     name = series.unittitle_name
 
+    # tagged name in the series title
     type = None
     if name is not None:
         if name.is_personal_name:
@@ -509,7 +521,7 @@ def series_section_rdfa(context, series, section):
     # is section is scopecontent or bioghist, then assume it is about
     # closest named person/organization
 
-    if rdfa and 'correspondence' in unicode(series.did.unittitle).lower():
+    if rdfa and series.contains_correspondence:
         default_rel = 'schema:knows arch:correspondedWith'
 
     # if there is semantic information to display, the web page
