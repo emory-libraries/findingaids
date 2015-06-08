@@ -8,6 +8,13 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.8.1
+-----
+
+* bugfix: repeating biographical note in PDFs for documents with RDFa
+* bugfix: Names in correspondence series <scopecontent> are no longer
+  linked to <origination> in the RDF.
+
 1.8 - RDFa enhancements
 -----------------------
 
