@@ -568,7 +568,7 @@ class Series(XmlModel, LocalComponent):
         # NOTE: initial implementation for Belfast Group sheets assumes manuscript
         # type; should be refined for other types of content
         rdf_type = None
-        if len(self.unittitle_titles):
+        if self.unittitle_titles:
             # if type of first title is article, return article
             if self.unittitle_titles[0].type and \
               self.unittitle_titles[0].type.lower() == 'article':
@@ -586,30 +586,44 @@ class Series(XmlModel, LocalComponent):
               and self.unittitle_titles[0].source.upper() in ['ISBN', 'OCLC']:
                 rdf_type = 'bibo:Book'
 
-            if rdf_type is None and self.series_title:
-                series_title = self.series_title.lower()
-                # if in a Printed Material series, assume bibo:Document
-                # - printed material is usually included in text for series and
-                #   subseries names
-                if 'printed material' in series_title:
-                    rdf_type = 'bibo:Document'
+            else:
+                rdf_type = self.generic_rdf_type_by_series()
 
-                # if in a Photographs series, use bibo:Image
-                elif 'photograph' in series_title:
-                    rdf_type = 'bibo:Image'
-
-                # if in an AudioVisual series, use bibo:AudioVisualDocument
-                elif 'audiovisual' in series_title or \
-                  'audio recordings' in series_title or \
-                  'video recordings' in series_title:
-                   # audiovisual usually used at top-level, audio/video rec. used for subseries
-                    rdf_type = 'bibo:AudioVisualDocument'
-
-            # otherwise, use bibo:Manuscript
-            if rdf_type is None:
-                rdf_type = 'bibo:Manuscript'
+        # if there are no titles but there is a name with a role of creator,
+        # the component describes some kind of entity, so set the type
+        # based on series
+        elif self.unittitle_names and 'dc:creator' in [n.role for n in self.unittitle_names]:
+            rdf_type = self.generic_rdf_type_by_series()
 
         return rdf_type
+
+    def generic_rdf_type_by_series(self):
+        '''Calculate a generic RDF type based on the series an item belongs to.
+        Using bibo:Document for printed material, bibo:Image for photographs,
+        bibo:AudioVisualDocument for audio/visual materials, with a fallback
+        of bibo:Manuscript.'''
+        if self.series_title:
+            series_title = self.series_title.lower()
+            # if in a Printed Material series, assume bibo:Document
+            # - printed material is usually included in text for series and
+            #   subseries names
+            if 'printed material' in series_title:
+                return 'bibo:Document'
+
+            # if in a Photographs series, use bibo:Image
+            elif 'photograph' in series_title:
+                return 'bibo:Image'
+
+            # if in an AudioVisual series, use bibo:AudioVisualDocument
+            elif 'audiovisual' in series_title or \
+              'audio recordings' in series_title or \
+              'video recordings' in series_title:
+               # audiovisual usually used at top-level, audio/video rec. used for subseries
+                return 'bibo:AudioVisualDocument'
+
+        # otherwise, use bibo:Manuscript
+        return 'bibo:Manuscript'
+
 
     @property
     def rdf_identifier(self):
@@ -619,7 +633,8 @@ class Series(XmlModel, LocalComponent):
         # for now, assuming that the first title listed is the *thing*
         # in the collection.  If we can generate an id for it (i.e.,
         # it has a source & authfilenumber), use that
-        return self.unittitle_titles[0].rdf_identifier
+        if self.unittitle_titles:
+            return self.unittitle_titles[0].rdf_identifier
 
         # NOTE: previously, was only returning an rdf identifier for a
         # single title
