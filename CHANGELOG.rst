@@ -8,6 +8,12 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.8.2
+-----
+
+* bugfix: correct RDFa for untitled container-level contents with tagged
+  creator name.
+
 1.8.1
 -----
 
