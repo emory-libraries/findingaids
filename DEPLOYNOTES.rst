@@ -443,8 +443,9 @@ Upgrade Notes
 -----------------------
 
 * This release adds a dependency on subversion python bindings; installation
-  requires that subversion libraries be installed on the system (e.g., libsvn-dev
-  on debian/ubuntu systems).
+  requires that subversion libraries be installed on the system (on
+  debian/ubuntu installe the ``libsvn-dev`` package; on OSX running
+  ``brew install subversion`` should be sufficient).
 * Run ``python manage.py migrate emory_ldap`` to convert the user accounts
   in the database to the new custom user model.
 * Run ``python manage.py syncdb`` to create new database tables and update
