@@ -8,6 +8,13 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.8.3
+-----
+
+* Text content changes for MARBL rename to Rose Library, along with
+  other contact and name updates.
+* Updated home page banner image for Pitts.
+
 1.8.2
 -----
 
