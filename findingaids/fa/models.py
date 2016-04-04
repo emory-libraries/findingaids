@@ -808,7 +808,9 @@ class FileComponent(XmlModel, eadmap.Component):
     public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@xlink:show="none")][not(@audience) or @audience="external"])')
 
 
-    objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
+    # objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
+    # eXist can query *much* more efficiently on generic paths
+    objects = Manager('''//*[@level="file"]''')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c-series file objects
         in eXist.
