@@ -29,7 +29,7 @@ class Findingaids(models.Model):
     admin portion of the site.
     """
     class Meta:
-        permissions =(
+        permissions = (
                 ("can_publish", "Can publish a finding aid"),
                 ("can_preview", "Can preview a finding aid"),
                 ("can_delete", "Can delete a finding aid"),
