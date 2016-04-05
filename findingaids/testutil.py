@@ -1,6 +1,6 @@
 import sys
 from django.conf import settings
-from eulexistdb import db ,testutil
+from eulexistdb import db, testutil
 
 
 class ExistDBSetUp(testutil.ExistDBSetUp):
