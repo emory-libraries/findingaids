@@ -14,7 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.conf.urls.defaults import url, include, patterns
+from django.conf.urls import url, include, patterns
 from django.contrib import admin
 from django.contrib.sitemaps import views as sitemaps_views
 from django.views.generic import TemplateView

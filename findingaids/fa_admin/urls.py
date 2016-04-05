@@ -14,7 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.conf.urls.defaults import *
+from django.conf.urls import url, patterns, include
 from findingaids.fa.urls import EADID_URL_REGEX, findingaid_urlpatterns
 
 urlpatterns = patterns('findingaids.fa_admin.views',

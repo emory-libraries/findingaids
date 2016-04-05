@@ -1,4 +1,5 @@
 # file findingaids/fa_admin/tests/views.py
+# -*- coding: utf-8 -*-
 #
 #   Copyright 2012 Emory University Library
 #
@@ -343,7 +344,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # GET should just list files available for preview
-        # FIXME: preview list view doesn't currently use archive; this functionality
+        # NOTE: preview list view doesn't currently use archive; this functionality
         # needs to either be removed, separated, or filter on archive
         response = self.client.get(preview_url, {'archive': arch.slug})
         code = response.status_code
@@ -354,7 +355,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix="preview summary should list title of document loaded for preview")
         self.assertContains(response, reverse('fa-admin:preview:findingaid', kwargs={'id': 'hartsfield558'}),
             msg_prefix="preview summary should link to preview page for document loaded to preview")
-        self.assertContains(response, 'last modified: 0 minutes ago',
+        self.assertContains(response, 'last modified: 0 minutes ago',
             msg_prefix="preview summary listing includes modification time")
 
         # preview page should include publish form for users with permission to publish
