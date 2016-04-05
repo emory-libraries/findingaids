@@ -270,7 +270,7 @@ def publish(request):
         ead = get_findingaid(id, preview=True)
         ead_docname = get_findingaid(id, preview=True, only=['document_name'])
         filename = ead_docname.document_name
-    except Http404:     # not found in exist
+    except (ExistDBException, Http404):     # not found in exist OR permission denied
         messages.error(request,
             '''Publish failed. Could not retrieve <b>%s</b> from preview collection.
             Please reload and try again.''' % id)
@@ -332,8 +332,8 @@ def publish(request):
             # re-raise and let outer exception handling take care of it
             raise e
 
-    except ExistDBException, e:
-        errors.append(e.message())
+    except ExistDBException as err:
+        errors.append(err.message())
         success = False
 
     if success:
@@ -353,7 +353,7 @@ def publish(request):
         return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
     else:
         return render(request, 'fa_admin/publish-errors.html',
-            {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e})
+            {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': err})
 
 @permission_required_with_403('fa_admin.can_preview')
 @user_passes_test_with_ajax(archive_access)
@@ -364,6 +364,7 @@ def preview(request, archive):
         filename = request.POST['filename']
 
         errors = []
+        err = None
 
         try:
             # only load to exist if document passes publication check
@@ -377,9 +378,9 @@ def preview(request, archive):
             preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename
             # make sure the preview collection exists, but don't complain if it's already there
             success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
-        except ExistDBException, e:
+        except ExistDBException as err:
             success = False
-            errors.append(e.message())
+            errors.append(err.message())
 
         if success:
             # load the file as a FindingAid object so we can generate the preview url
@@ -388,11 +389,17 @@ def preview(request, archive):
             # redirect to document preview page with code 303 (See Other)
             return HttpResponseSeeOtherRedirect(reverse('fa-admin:preview:findingaid', kwargs={'id': ead.eadid}))
         else:
-            return render(request, 'fa_admin/publish-errors.html',
-                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e})
+            # no exception but no success means the load failed;
+            # *probably* due to insufficient permissions
+            if errors == [] and success == False:
+                errors.append('Failed to load the document to the preview collection')
 
-    # TODO: preview list needs to either go away (not currently used)
-    # or be filtered by archive
+            return render(request, 'fa_admin/publish-errors.html',
+                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': err})
+
+    # NOTE: preview list is not used anymore; functionality is handled
+    # by main admin view; if we revisit preview list, to be more usable it
+    # should be filterable by archive
     else:
         fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
                             order_by='last_modified')

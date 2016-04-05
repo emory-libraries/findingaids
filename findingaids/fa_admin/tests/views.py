@@ -387,20 +387,16 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual({}, docinfo, "invalid xml document not loaded to exist preview")
 
         # exist save errors should be caught & handled gracefully
-        # - force an error by setting preview collection to a non-existent collection
-        with override_settings(EXISTDB_PREVIEW_COLLECTION='/bogus/doesntexist'):
-            with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-                response = self.client.post(preview_url, {'filename': 'hartsfield558.xml',
-                    'archive': arch.slug})
-                self.assertContains(response, "Could not preview")
-                self.assertContains(response,
-                    "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)
-                self.assertContains(response, "Database Error",
-                    msg_prefix="error page displays explanation and instructions to user")
+
+        # NOTE: previously using a non-existent preview collection would
+        # cause an error, but now eXist creates the collection automatically
 
         # simulate incorrect eXist permissions by not specifying username/password
         # ensure guest account cannot update
-        self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-update')
+        # self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-write,update')
+        # NOTE: string syntax should still be valid according to the docs,
+        # but it results in an error where this does not
+        self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 0774)
 
         fake_collection = '/bogus/doesntexist'
         with override_settings(EXISTDB_SERVER_USER=None,
@@ -410,10 +406,8 @@ class AdminViewsTest(BaseAdminViewsTest):
                 response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
 
         self.assertContains(response, "Could not preview")
-        self.assertContains(response, "Database Error",
+        self.assertContains(response, "Failed to load the document",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "Collection %s not found" % fake_collection,
-                msg_prefix="error page displays specific eXist permission message")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
         with override_settings(EXISTDB_SERVER_URL='http://localhost:9191/not-exist',
@@ -424,7 +418,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "I/O Error: Connection refused",
+        self.assertContains(response, "Service Unavailable",
                 msg_prefix="error page displays specific connection error message")
 
     def test_logout(self):
@@ -946,16 +940,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 {'filename': filename})
 
         # publish to non-existent collection
-        with override_settings(EXISTDB_ROOT_COLLECTION='/bogus/doesntexist'):
-            response = self.client.post(publish_url, {'preview_id': document_id})
-
-            self.assertContains(response, "Could not publish",
-                msg_prefix="exist save error on publish displays error to user")
-            self.assertContains(response,
-                "Collection %s not found" % settings.EXISTDB_ROOT_COLLECTION,
-                msg_prefix="specific exist save error displayed to user")
-            self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
+        # - doesn't cause an error on existdb 2.2 / using rest api
 
         # NOTE: formerly included tests for publish invalid or badly formed xml
         # these cases are no longer possible since it is impossible
@@ -963,15 +948,15 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
 
         # simulate incorrect eXist permissions by not specifying username/password
         # ensure guest account cannot update
-        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+        # self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 0774)
         with override_settings(EXISTDB_SERVER_USER=None,
                                EXISTDB_SERVER_PASSWORD=None):
-            response = self.client.post(publish_url, {'preview_id': document_id})
-            self.assertContains(response, "Could not publish")
-            self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-            self.assertContains(response, "Insufficient privileges",
-                msg_prefix="error page displays specific exist permissions message")
+            response = self.client.post(publish_url, {'preview_id': document_id},
+                follow=True)
+            self.assertContains(response, "Publish failed")
+            self.assertContains(response, "Could not retrieve",
+                msg_prefix="error message displays explanation and instructions to user")
 
         # NOTE: formerly included test for exist not running, but not testable
         # because publish now requires preview database be accessible

@@ -1632,8 +1632,9 @@ class FullTextFaViewsTest(TestCase):
         self.assertPattern(
             r'<li>.*Descriptive Summary.*4 matches.*</li>', response.content,
             msg_prefix="descriptive summary has match count in ToC")
+        # NOTE: previously was 51; in existdb 2.2 with same  index, returns 48
         self.assertPattern(
-            r'<li>.*Collection Description.*51 matches.*</li>', response.content,
+            r'<li>.*Collection Description.*48 matches.*</li>', response.content,
             msg_prefix="collection description has match count in ToC")
         self.assertPattern(
             r'<li>.*Selected Search Terms.*30 matches.*</li>', response.content,
@@ -1693,8 +1694,9 @@ class FullTextFaViewsTest(TestCase):
         self.assertPattern(
             r'<li>.*Descriptive Summary.*4 matches.*</li>', response.content,
             msg_prefix="descriptive summary has match count in ToC")
+        # NOTE: as above; previously 51, now 48 matches in existdb 2.2
         self.assertPattern(
-            r'<li>.*Collection Description.*51 matches.*</li>', response.content,
+            r'<li>.*Collection Description.*48 matches.*</li>', response.content,
             msg_prefix="collection description has match count in ToC")
         self.assertPattern(
             r'<li>.*Selected Search Terms.*30 matches.*</li>', response.content,
