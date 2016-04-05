@@ -320,7 +320,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     def request_materials_url(self):
         ''' Construct the absolute url for use with external services such as Aeon'''
 
-        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+        if not hasattr(settings, 'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
             logger.warn("Request materials url is not configured.")
             return
 
@@ -331,10 +331,10 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         ''' Determines if the EAD is applicable for the electronic request service.'''
 
         # If the request url is not configured, then the request can't be generated.
-        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+        if not hasattr(settings, 'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
             return False
 
-        if not hasattr(settings,'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
+        if not hasattr(settings, 'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
             return False
 
         # If the item is in on of the libraries defined, then it should be displayed.

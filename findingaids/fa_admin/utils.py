@@ -62,10 +62,10 @@ def check_ead(filename, dbpath, xml=None):
 
     try:
         ead = load_xml(content, FindingAid)
-    except XMLSyntaxError, e:
+    except XMLSyntaxError as err:
         # if this fails, document is not well-formed xml
         # can't do any further processing, so return
-        errors.append(e)
+        errors.append(err)
         return errors
 
     # schema validation
@@ -128,7 +128,7 @@ def check_eadxml(ead):
     for index in ead.archdesc.index:
         if not index.id:
             errors.append("%(node)s id attribute is not set for %(label)s"
-                % { 'node' : local_name(index.node), 'label' : unicode(index.head) })
+                % {'node': local_name(index.node), 'label': unicode(index.head)})
 
     # eadid matches appropriate site URL regex
     if not re.match('^%s$' % EADID_URL_REGEX, ead.eadid.value):   # entire eadid should match regex
@@ -142,7 +142,7 @@ def check_eadxml(ead):
     # - check for at most one top-level origination
     origination_count = ead.node.xpath('count(e:archdesc/e:did/e:origination)',
                                        namespaces={'e': EAD_NAMESPACE})
-    if int(origination_count)  > 1:
+    if int(origination_count) > 1:
         errors.append("Site expects only one archdesc/did/origination; found %d" \
                         % origination_count)
 
@@ -163,7 +163,7 @@ def check_eadxml(ead):
         errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
 
     # - no leading whitespace in list title
-    # FIXME: this first test may be redundant - possibly use only the first_letter check,
+    # NOTE: this first test may be redundant - possibly use only the first_letter check,
     # now that the first_letter xpath uses normalize-space
     title_node = ead.node.xpath("%s/text()" % ead.list_title_xpath,
                                 namespaces={'e': EAD_NAMESPACE})
@@ -177,20 +177,20 @@ def check_eadxml(ead):
     elif re.match('\s+', title_text):
         # using node.text because unicode() normalizes, which obscures whitespace problems
         errors.append("Found leading whitespace in list title field (%s): '%s'" % \
-                        (list_title_path, ead.list_title.node.text) )
+                        (list_title_path, ead.list_title.node.text))
         # report with enough context that they can find the appropriate element to fix
 
     # - first letter of title matches regex   -- only check if whitespace test fails
     elif not re.match(TITLE_LETTERS, ead.first_letter):
         errors.append("First letter ('%s') of list title field %s does not match browse letter URL regex '%s'" % \
-                      (ead.first_letter, list_title_path, TITLE_LETTERS) )
+                      (ead.first_letter, list_title_path, TITLE_LETTERS))
 
     # leading whitespace in control access fields (if any)
     if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:
         for ca in ead.archdesc.controlaccess.controlaccess:
             for term in ca.terms:
                 # NOTE: using node text because term.value is now normalized
-                if re.match('\s+', unicode(term.node.text)):
+                if re.match(r'\s+', unicode(term.node.text)):
                     errors.append("Found leading whitespace in controlaccess term '%s' (%s)" \
                                  % (term.node.text, local_name(term.node)))
 
@@ -222,9 +222,9 @@ def check_series_ids(series):
     errors = []
     if not series.id:
         errors.append("%(level)s %(node)s id attribute is not set for %(label)s"
-                % { 'node' : local_name(series.node),
-                    'level' : series.level,
-                    'label' : series.display_label() })
+                % {'node': local_name(series.node),
+                   'level': series.level,
+                   'label': series.display_label()})
     if series.hasSubseries():
         for c in series.c:
             errors.extend(check_series_ids(c))
@@ -307,7 +307,7 @@ def generate_ark(ead):
 
     # generate absolute url for ARK target
     ead_url = settings.SITE_BASE_URL.rstrip('/') + reverse('fa:findingaid',
-                                               kwargs={'id' : ead.eadid.value })
+                                               kwargs={'id': ead.eadid.value })
 
     try:
         # search for an existing ARK first, in case one was already created for this ead
@@ -318,8 +318,8 @@ def generate_ark(ead):
         if found and found['results_count']:
             if found['results_count'] > 1:
                 # uh-oh - this shouldn't happen; warn the user
-                logger.warning("Found %d ARKs when searching for an existing ARK for %s" \
-                    % (found['results_count'], ead.eadid.value))
+                logger.warning("Found %d ARKs when searching for an existing ARK for %s",
+                    found['results_count'], ead.eadid.value)
 
             # use existing pid
             pid = found['results'][0]
@@ -328,7 +328,7 @@ def generate_ark(ead):
                 if 'qualifier' not in t or not t['qualifier']:
                     ark_url = t['access_uri']
 
-            logger.info("Using existing ARK %s for %s" % (ark_url, ead.eadid.value))
+            logger.info("Using existing ARK %s for %s", ark_url, ead.eadid.value)
 
             # what if no default target is not found? (unlikely but possible...)
             return ark_url
