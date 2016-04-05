@@ -27,7 +27,7 @@ from eulxml.xmlmap.eadmap import EAD_NAMESPACE
 from eulexistdb.testutil import TestCase
 
 from findingaids.fa.models import FindingAid, LocalComponent, EadRepository, \
-    Series, Title
+    Series, Title, PhysicalDescription
 # from findingaids.fa.utils import pages_to_show, ead_lastmodified, \
     # collection_lastmodified
 
@@ -285,3 +285,26 @@ class SeriesTestCase(DjangoTestCase):
             # fallback type is manuscript
             self.assertEqual('bibo:Manuscript', bailey.dsc.c[0].c[0].rdf_type,
                 'items in photograph series should default to image type')
+
+
+class PhysicalDescriptionTestCase(DjangoTestCase):
+
+    # multiple extents with separating text
+    physdesc1 = load_xmlobject_from_string('''<physdesc xmlns="%s" encodinganalog="300"><extent>5.25 linear ft.</extent>
+    <extent> (7 boxes)</extent>,
+    <extent>2 bound volumes (BV)</extent>, and
+    <extent>11 oversized papers (OP)</extent></physdesc>''' % EAD_NAMESPACE, PhysicalDescription)
+
+    # extents with only space, no punctuation
+    physdesc2 = load_xmlobject_from_string('''<physdesc xmlns="%s" encodinganalog="300"><extent>4 linear ft.</extent>
+        <extent>(8 boxes)</extent></physdesc>'''  % EAD_NAMESPACE, PhysicalDescription)
+    # extents with no space, no punctuation
+    physdesc3 = load_xmlobject_from_string('''<physdesc xmlns="%s" encodinganalog="300"><extent>4 linear ft.</extent><extent>(8 boxes)</extent></physdesc>'''  % EAD_NAMESPACE, PhysicalDescription)
+
+    def test_unicode(self):
+        self.assertEqual(u'5.25 linear ft. (7 boxes), 2 bound volumes (BV), and 11 oversized papers (OP)',
+            unicode(self.physdesc1))
+
+        # should have a space between extents, whether or not it is present in the xml
+        self.assertEqual(u'4 linear ft. (8 boxes)', unicode(self.physdesc2))
+        self.assertEqual(u'4 linear ft. (8 boxes)', unicode(self.physdesc3))

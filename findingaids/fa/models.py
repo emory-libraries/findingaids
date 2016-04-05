@@ -94,6 +94,41 @@ class Name(XmlModel):
             return 'http://dbpedia.org/resource/%s' % self.authfilenumber
 
 
+class PhysicalDescription(eadmap._EadBase):
+    '''Custom `physdesc` object, to handle customized display of
+    extent tags.
+
+    Extent tags can be repeated and some of them may provide parallel or
+    equivalent information, but there is no way to indicate this in
+    EAD2.  Other extents provide additional information, and thus are
+    separated in the text with commas or a text string such as "and".
+    In some cases (i.e., highlighted search results) empty text nodes
+    are omitted by eXist, but required for display.
+    '''
+    ROOT_NAME = 'physdesc'
+    #: extents or text nodes, in order
+    elements = xmlmap.NodeListField('e:extent|text()', xmlmap.XmlObject)
+
+    extent_tag = '{%s}extent' % eadmap.EAD_NAMESPACE
+
+    def __unicode__(self):
+        count = 0
+        text = []   # list of text segments to be combined
+        for element in self.elements:
+            # due to spacing issues / missing text nodes in certain
+            # cases (particularly when search term highlighting is
+            # enabled), force a space before any extent tag
+            if getattr(element.node, 'tag', None) == self.extent_tag:
+                if count > 0:
+                    text.append(' ')
+                count += 1
+
+            # add current node text content
+            text.append(unicode(element))
+
+        return normalize_whitespace(''.join(text))
+
+
 class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     """
     Customized version of :class:`eulxml.EncodedArchivalDescription` EAD object.
@@ -113,7 +148,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     # in the constructed return object returned from eXist for search/browse
     unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', eadmap.UnitTitle)
     abstract = xmlmap.NodeField('.//e:abstract[not(ancestor::e:dsc)]', xmlmap.XmlObject)
-    physical_descriptions = xmlmap.StringListField('.//e:physdesc[not(ancestor::e:dsc)]', normalize=True)
+    physical_descriptions = xmlmap.NodeListField('.//e:physdesc[not(ancestor::e:dsc)]',
+        PhysicalDescription)
 
     list_title_xpaths = [
         "e:archdesc/e:did/e:origination/e:corpname",
