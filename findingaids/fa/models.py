@@ -861,7 +861,7 @@ class Deleted(models.Model):
     """
     eadid = models.CharField('EAD Identifier', max_length=50, unique=True)
     title = models.CharField(max_length=200)
-    date = models.DateTimeField('Date removed', default=datetime.now())
+    date = models.DateTimeField('Date removed', auto_now_add=True)
     note = models.CharField(
         max_length=400, blank=True,
         help_text="Optional: Enter the reason this document is being deleted. " +

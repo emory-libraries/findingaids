@@ -171,7 +171,6 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.humanize',
     'djcelery',
-    'south',
     'eullocal.django.emory_ldap',
     'eullocal.django.taskresult',
     'eullocal.django.util',
@@ -235,5 +234,3 @@ if django_nose is not None:
 else:
     TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
 
-# disable south migrations in unit tests
-SOUTH_TESTS_MIGRATE = False
