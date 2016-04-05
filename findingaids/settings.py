@@ -225,7 +225,7 @@ if django_nose is not None:
     INSTALLED_APPS.append('django_nose')
     TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
     NOSE_PLUGINS = [
-    'eulexistdb.testutil.ExistDBSetUp',
+        'findingaids.testutil.ExistDBSetUp',
         # ...
     ]
     NOSE_ARGS = ['--with-existdbsetup']
