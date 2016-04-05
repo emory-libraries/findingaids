@@ -150,7 +150,6 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
                            'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
 
-AUTH_USER_MODEL = 'emory_ldap.EmoryLDAPUser'
 
 LOGIN_URL = "/admin/accounts/login/"
 LOGIN_REDIRECT_URL = "/admin/"

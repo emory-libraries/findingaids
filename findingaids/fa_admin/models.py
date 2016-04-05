@@ -17,6 +17,7 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db import models
 
 from findingaids.fa.models import Archive
@@ -38,7 +39,7 @@ class Findingaids(models.Model):
         )
 
 class Archivist(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(get_user_model())
     archives = models.ManyToManyField(Archive, blank=True, null=True)
     order = models.CommaSeparatedIntegerField(max_length=255, blank=True,
         null=True)
@@ -59,7 +60,7 @@ class Archivist(models.Model):
 
         return archives
 
-class EadFile:
+class EadFile(object):
     """Information about an EAD file available to be published or previewed."""
     def __init__(self, filename, modified, archive=None):
         self.filename = filename

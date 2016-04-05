@@ -1,8 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-# from django.contrib.auth.admin import UserAdmin
-# from django.contrib.auth.models import User
-from eullocal.django.emory_ldap.admin import EmoryLDAPUserAdmin
+from django.contrib.auth.admin import UserAdmin
 
 from findingaids.fa_admin.models import Archivist
 
@@ -14,8 +12,8 @@ class ArchivistInline(admin.StackedInline):
     verbose_name_plural = 'archivist'
     fields = ('archives', )
 
-# Define a new User admin
-class UserAdmin(EmoryLDAPUserAdmin):
+# Customize user admin to include archivist information
+class UserAdmin(UserAdmin):
     inlines = (ArchivistInline, )
     list_filter = ('archivist__archives', 'is_staff', 'is_superuser',
                    'is_active', 'groups')
