@@ -39,10 +39,17 @@ class Findingaids(models.Model):
         )
 
 class Archivist(models.Model):
-    user = models.OneToOneField(get_user_model())
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     archives = models.ManyToManyField(Archive, blank=True, null=True)
     order = models.CommaSeparatedIntegerField(max_length=255, blank=True,
         null=True)
+
+    def __repr__(self):
+        return '<Archivist %s: %s>' % (self.user.username,
+            ', '.join(arch.label for arch in self.archives.all()))
+
+    def __unicode__(self):
+        return u'Archivist %s' % unicode(self.user)
 
     def sorted_archives(self):
         '''List of archives this user is associated with, in order if

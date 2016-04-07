@@ -2,12 +2,13 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
-from django.db import models, migrations
+from django.db import models, migrations, transaction
+from django.db.utils  import IntegrityError
 from django.conf import settings
 
 # fields common to emory ldap user and auth user
 common_fields = ['username', 'password', 'first_name', 'last_name',
-   'email', 'is_staff', 'is_active', 'is_superuser', 'last_login']
+   'email', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined']
 
 def copy_user_to_user(a, b):
     # copy common fields, groups, and permissions from user a to user b
@@ -22,19 +23,35 @@ def copy_user_to_user(a, b):
     for perm in a.user_permissions.all():
         b.user_permissions.add(perm)
 
-    # TODO: copy archives here as well!
-
+    # NOTE: archivist is related to user
 
 def migrate_ldap_users(apps, schema_editor):
     # get ldap user and standard auth user models
     ldap_user = apps.get_model('emory_ldap', 'EmoryLDAPUser')
     auth_user = apps.get_model('auth', 'user')
+    Archivist = apps.get_model('fa_admin', 'archivist')
+
+    id_map = {}
+    # create dictionary of archivists by username here?
+
     # for each ldap user, make sure there is an equivalent auth user
     for ldapuser in ldap_user.objects.all():
         user, created = auth_user.objects.get_or_create(username=ldapuser.username)
         copy_user_to_user(ldapuser, user)
         user.save()
+        # keep track ldap user id and corresponding auth user id
+        id_map[ldapuser.id] = user.id
         ldapuser.delete()
+
+    # update all archivist ids
+    with transaction.atomic():
+        # NOTE: because, for the scope of this migration, archivist.user
+        # is an integer instead of a one-to-one, referencing user id
+        # as user instead of user_id
+        for archivist in Archivist.objects.all():
+            archivist.user = id_map[archivist.user]
+            archivist.save()
+
 
 def unmigrate_ldap_users(apps, schema_editor):
     ldap_user = apps.get_model('emory_ldap', 'EmoryLDAPUser')
@@ -42,10 +59,7 @@ def unmigrate_ldap_users(apps, schema_editor):
     for user in auth_user.objects.all():
         ldapuser, created = ldap_user.objects.get_or_create(username=user.username,
             last_login=datetime.now())
-        print 'last login = ', ldapuser.last_login
-        print 'auth user last login = ', auth_user.last_login
         copy_user_to_user(user, ldapuser)
-
         ldapuser.save()
 
 
@@ -55,10 +69,22 @@ class Migration(migrations.Migration):
         ('fa_admin', '0002_user'),
         ('auth', '0001_initial'),
         ('contenttypes', '0001_initial'),
-        ('emory_ldap', '0001_initial')
+        ('emory_ldap', '0002_add_lastlogin_datejoined')
     ]
 
     operations = [
+        # temporarily make archivist user id not unique
+        migrations.AlterField(
+            model_name='archivist',
+            name='user',
+            field=models.IntegerField(unique=False),
+        ),
         migrations.RunPython(migrate_ldap_users,
-            reverse_code=unmigrate_ldap_users, atomic=False)
+            reverse_code=unmigrate_ldap_users, atomic=False),
+        # restore archivist user id unique
+        migrations.AlterField(
+            model_name='archivist',
+            name='user',
+            field=models.OneToOneField(to=settings.AUTH_USER_MODEL),
+        ),
     ]
