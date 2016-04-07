@@ -40,7 +40,8 @@ class Findingaids(models.Model):
         )
 
 class Archivist(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE)  # if user is deleted, delete archivist too
     archives = models.ManyToManyField(Archive, blank=True)
     order = models.CommaSeparatedIntegerField(max_length=255, blank=True,
         null=True)

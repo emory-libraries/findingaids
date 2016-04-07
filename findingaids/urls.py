@@ -52,9 +52,11 @@ sitemap_cfg = {'content': ContentSitemap}
 sitemap_cfg.update(FINDINGAID_SITEMAPS)
 
 urlpatterns += [
-    url(r'^sitemap\.xml$', sitemaps_views.index, {'sitemaps': sitemap_cfg}),
+    url(r'^sitemap\.xml$', sitemaps_views.index, {'sitemaps': sitemap_cfg},
+       name='django.contrib.sitemaps.views.sitemap'),
     url(r'^sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap,
-     {'sitemaps': sitemap_cfg}),
+       {'sitemaps': sitemap_cfg},
+       name='django.contrib.sitemaps.views.sitemap'),
 ]
 
 # enable serving static files for development (DEBUG mode only)

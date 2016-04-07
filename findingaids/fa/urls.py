@@ -15,7 +15,7 @@
 #   limitations under the License.
 
 from django.conf.urls import url, include
-# from django.views.generic.base import RedirectView
+from django.views.generic.base import RedirectView
 from findingaids.fa import views as fa_views
 
 
@@ -37,11 +37,8 @@ series_id = "[a-zA-Z0-9-._]+"
 findingaid_parts = [
     url(r'^$', fa_views.findingaid, name='findingaid'),
     url(r'^EAD/$', fa_views.eadxml, name='eadxml'),
-    # TODO: enable this once upgraded to django 1.6+
-    # url(r'^ead/$', RedirectView.as_view(pattern_name='fa:eadxml', permanent=True)),
-
-    #Added ead path with a file extension for testing
-    url(r'^ead.xml$', fa_views.eadxml, name='eadxml-with-extension'),
+    # alternate paths to access ead
+    url(r'^ead|ead.xml|xml|XML$', RedirectView.as_view(pattern_name='fa:eadxml', permanent=True)),
 
     # full finding aid as simple html (html version of pdf, for testing)
     url(r'^full/$', fa_views.full_findingaid,
