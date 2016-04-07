@@ -435,6 +435,9 @@ class LocalComponent(eadmap.Component):
 def title_rdf_identifier(src, idno):
     ''''Generate an RDF identifier for a title, based on source and id
     attributes.  Currently supports ISSN, ISBN, and OCLC.'''
+    # if either src or idno is None, bail out right away
+    if src is None or idno is None:
+        return
     src = src.lower()
     idno = idno.strip()  # remove whitespace, just in case of errors in entry
 

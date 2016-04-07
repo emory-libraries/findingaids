@@ -31,6 +31,10 @@ class Migration(migrations.Migration):
         ('auth', '0001_initial'),
     ]
 
+    run_before = [
+        ('auth', '0003_alter_user_email_max_length'),
+    ]
+
     operations = [
         CreateModelIfNeeded(
             name='User',
@@ -43,7 +47,7 @@ class Migration(migrations.Migration):
                 ('first_name', models.CharField(max_length=30, verbose_name='first name', blank=True)),
                 ('last_name', models.CharField(max_length=30, verbose_name='last name', blank=True)),
                 ('email', models.EmailField(max_length=75, verbose_name='email address', blank=True)),
-                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this admin site.', verbose_name='staff status')),
+                ('is_staff', models.BooleanField(default=False, help_text='Designates whether the user can log into this activedmin site.', verbose_name='staff status')),
                 ('is_active', models.BooleanField(default=True, help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.', verbose_name='active')),
                 ('date_joined', models.DateTimeField(default=django.utils.timezone.now, verbose_name='date joined')),
                 ('groups', models.ManyToManyField(related_query_name='user', related_name='user_set', to='auth.Group', blank=True, help_text='The groups this user belongs to. A user will get all permissions granted to each of his/her group.', verbose_name='groups')),

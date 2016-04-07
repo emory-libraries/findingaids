@@ -401,6 +401,24 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.8
+---
+
+* Upgrade to Django 1.8 includes a switch from South to Django migrations.
+  For a brand new deploy, you should run ``python manage.py migrate``
+  normally.  To update an **existing** database, you will need to run
+  migrations in this order::
+
+    # migrate content types, required by everything else
+    python manage.py migrate contenttypes --fake-initial
+    # explicitly fake initial auth migration
+    # (can't use fake initial fails because auth_user doesn't exist yet)
+    python manage.py migrate auth 0001 --fake
+    # fake emory_ldap migrations to avoid blanking out existing content
+    python manage.py migrate emory_ldap --fake
+    # run all other migrations, faking initial migrations where tables exist
+    python manage.py migrate --fake-initial
+
 
 1.7.3
 -----
