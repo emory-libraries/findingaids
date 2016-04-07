@@ -47,16 +47,15 @@ directory will be loaded."""
 
     args = '[<filename filename ... >]'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--skip-pdf-reload', '-s',
+    def add_arguments(self, parser):
+        parser.add_argument('--skip-pdf-reload', '-s',
             action='store_true',
             dest='skip_pdf_reload',
-            help='Skip reloading PDFs in the cache.'),
-        make_option('--pdf-only', '-p',
+            help='Skip reloading PDFs in the cache.')
+        parser.add_argument('--pdf-only', '-p',
             action='store_true',
             dest='pdf_only',
-            help='Only reload PDFs in the cache; do not load EAD files to eXist.'),
-        )
+            help='Only reload PDFs in the cache; do not load EAD files to eXist.')
 
 
     def handle(self, *args, **options):

@@ -6,7 +6,7 @@ eulcommon>=0.18.0
 https://wilson.library.emory.edu/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
 https://wilson.library.emory.edu/jenkins/job/pidman-rest-client_1.1.x/lastSuccessfulBuild/artifact/pidmanclient/dist/pidservices-1.1.2.tar.gz
 # pin to before 1.6 for now, until we update to be compatible
-Django>=1.8,<1.9
+Django>=1.9,<1.10
 python-dateutil
 # pin ldap to 2.4.10 because 2.4.11 is causing errors
 python-ldap==2.4.10

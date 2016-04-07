@@ -77,7 +77,7 @@ def titles_by_letter(request, letter):
     """
 
     # set last browse letter and page in session
-    page = request.REQUEST.get('page', 1)
+    page = request.GET.get('page', 1)
     last_search = "%s?page=%s" % (reverse("fa:titles-by-letter", kwargs={'letter': letter}), page)
     last_search = {"url": last_search, "txt": "Return to Browse Results"}
     request.session['last_search'] = last_search
@@ -491,7 +491,7 @@ def search(request):
         keywords = form.cleaned_data['keywords']
         repository = form.cleaned_data['repository']
         dao = form.cleaned_data['dao']
-        page = request.REQUEST.get('page', 1)
+        page = request.GET.get('page', 1)
 
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects

@@ -18,6 +18,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from findingaids.fa.models import Archive
@@ -40,7 +41,7 @@ class Findingaids(models.Model):
 
 class Archivist(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    archives = models.ManyToManyField(Archive, blank=True, null=True)
+    archives = models.ManyToManyField(Archive, blank=True)
     order = models.CommaSeparatedIntegerField(max_length=255, blank=True,
         null=True)
 
