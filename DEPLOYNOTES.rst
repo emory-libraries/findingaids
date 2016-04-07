@@ -401,7 +401,7 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
-1.8
+1.9
 ---
 
 * Upgrade to Django 1.8 includes a switch from South to Django migrations.
@@ -422,6 +422,8 @@ Upgrade Notes
 * **SEND_BROKEN_LINK_EMAILS** setting has been removed in Django 1.8
   and should be removed from ``localsettings.py``.
 
+* The configuration for LDAP has changed; update ``localsettings.py``
+  based on the example LDAP configuration in ``localsettings.py.dist``.
 
 1.7.3
 -----

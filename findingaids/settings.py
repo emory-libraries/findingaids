@@ -147,8 +147,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 # Enable additional backends.
 # Enable this for LDAP and see ReadMe for install dependencies.
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
-                           'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_ldap.backend.LDAPBackend'
+)
 
 
 LOGIN_URL = "/admin/accounts/login/"

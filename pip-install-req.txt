@@ -13,8 +13,9 @@ python-ldap==2.4.10
 zc.icp
 recaptcha-client
 mimeparse
-django-celery>=3.0
+django-celery>=3.1.17
 rdflib
 subvertpy
 httplib2
 sunburnt
+django_auth_ldap
