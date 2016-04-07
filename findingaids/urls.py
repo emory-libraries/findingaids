@@ -14,7 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.conf.urls import url, include, patterns
+from django.conf.urls import url, include
 from django.contrib import admin
 from django.contrib.sitemaps import views as sitemaps_views
 from django.views.generic import TemplateView
@@ -26,11 +26,11 @@ from findingaids.content.sitemaps import ContentSitemap
 
 admin.autodiscover()
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt',
         content_type='text/plain')),
-    (r'^favicon\.ico$', RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)),
+    url(r'^favicon\.ico$', RedirectView.as_view(url='/static/images/favicon.ico',
+        permanent=True)),
 
     # embedded url on non-library Emory sites that gets picked up by search bots
     url(r'^-Libraries-EmoryFindingAids$',
@@ -45,18 +45,17 @@ urlpatterns = patterns(
                               namespace='content')),
     # everything else should fall through to the main app
     url(r'^', include('findingaids.fa.urls', namespace='fa')),
-)
+]
 
 # xml sitemaps for search-engine discovery
 sitemap_cfg = {'content': ContentSitemap}
 sitemap_cfg.update(FINDINGAID_SITEMAPS)
 
-urlpatterns += patterns(
-    '',
-    (r'^sitemap\.xml$', sitemaps_views.index, {'sitemaps': sitemap_cfg}),
-    (r'^sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap,
+urlpatterns += [
+    url(r'^sitemap\.xml$', sitemaps_views.index, {'sitemaps': sitemap_cfg}),
+    url(r'^sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap,
      {'sitemaps': sitemap_cfg}),
-)
+]
 
 # enable serving static files for development (DEBUG mode only)
 urlpatterns += staticfiles_urlpatterns()
