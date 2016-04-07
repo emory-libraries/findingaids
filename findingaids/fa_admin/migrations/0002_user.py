@@ -3,10 +3,26 @@ from __future__ import unicode_literals
 
 import django
 from django.db import models, migrations
+from django.db.utils import OperationalError
 
 # Create auth user if it does not already exist, i.e. if migrating
 # from an existing database with emory_ldap users.
 # In any other cases, this migration can be skipped.
+
+class CreateModelIfNeeded(migrations.CreateModel):
+    # extend default createmodel migration action
+    # to catch and allow error when the table already exists
+
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
+        try:
+            super(CreateModelIfNeeded, self).database_forwards(app_label, schema_editor,
+                from_state, to_state)
+        except OperationalError as err:
+            # if the table already exists, then everything is fine
+            # otherwise, re-raise the error
+            if 'table "auth_user" already exists' not in unicode(err):
+                raise
+
 
 class Migration(migrations.Migration):
 
@@ -16,7 +32,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
+        CreateModelIfNeeded(
             name='User',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
