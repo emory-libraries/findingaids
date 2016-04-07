@@ -49,7 +49,8 @@ class Archivist(models.Model):
             ', '.join(arch.label for arch in self.archives.all()))
 
     def __unicode__(self):
-        return u'Archivist %s' % unicode(self.user)
+        return u'Archivist %s (%s)' % (unicode(self.user),
+            ', '.join(arch.label for arch in self.archives.all()))
 
     def sorted_archives(self):
         '''List of archives this user is associated with, in order if

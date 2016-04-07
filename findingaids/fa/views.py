@@ -137,7 +137,7 @@ def eadxml(request, id, preview=False):
     """
     fa = get_findingaid(id, preview=preview)
     xml_ead = fa.serialize(pretty=True)
-    return HttpResponse(xml_ead, mimetype='application/xml')
+    return HttpResponse(xml_ead, content_type='application/xml')
 
 
 @ead_gone_or_404
@@ -219,7 +219,7 @@ def full_findingaid(request, id, mode, preview=False):
         return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid.value)
     elif mode == 'xsl-fo':
         xslfo = html_to_xslfo(template, template_args)
-        return HttpResponse(etree.tostring(xslfo), mimetype='application/xml')
+        return HttpResponse(etree.tostring(xslfo), content_type='application/xml')
 
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)

@@ -445,7 +445,7 @@ def prepared_eadxml(request, archive, filename):
     # on GET, display the xml and make available for download
     if request.method == 'GET':
         prepped_xml = ead.serializeDocument()
-        response = HttpResponse(prepped_xml, mimetype='application/xml')
+        response = HttpResponse(prepped_xml, content_type='application/xml')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
 
