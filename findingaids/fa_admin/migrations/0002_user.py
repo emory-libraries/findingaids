@@ -20,7 +20,9 @@ class CreateModelIfNeeded(migrations.CreateModel):
         except OperationalError as err:
             # if the table already exists, then everything is fine
             # otherwise, re-raise the error
-            if 'table "auth_user" already exists' not in unicode(err):
+            # mysql: OperationalError: (1050, "Table 'auth_user' already exists")
+            # sqlite: table "auth_user" already exists
+            if 'already exists' not in unicode(err):
                 raise
 
 
