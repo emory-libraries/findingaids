@@ -59,7 +59,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('fa_admin', '0002_user'),
-        ('auth', '0001_initial'),
+        ('auth', '0005_alter_user_last_login_null'),
         ('contenttypes', '0001_initial'),
         ('emory_ldap', '0002_add_lastlogin_datejoined')
     ]
