@@ -899,3 +899,9 @@ class Archive(models.Model):
     @property
     def svn_local_path(self):
         return os.path.join(settings.SVN_WORKING_DIR, self.slug)
+
+    def contact_names(self):
+        return ', '.join([contact.get_full_name() for contact in self.contacts.all()])
+
+    ''' label for the contact_names method (consumed in the list display table header)'''
+    contact_names.short_description = "Contacts"
