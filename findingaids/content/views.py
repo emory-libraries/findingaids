@@ -21,9 +21,8 @@ from django.template import RequestContext
 
 from findingaids.content.models import BANNER_IMAGES
 from findingaids.content.forms import FeedbackForm, RequestMaterialsForm
-from findingaids.fa.models import title_letters
+from findingaids.fa.models import Archive, title_letters
 from findingaids.fa.utils import get_findingaid
-
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
@@ -108,9 +107,10 @@ def request_materials(request):
         form = RequestMaterialsForm()
 
     captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
+    archives = Archive.objects.exclude(contacts=None).order_by("name")
 
     return render(request, 'content/request-materials.html', {
             'form': form,
             'captcha_theme': captcha_theme,
+            'archives': archives
         })
-
