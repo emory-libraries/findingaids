@@ -890,6 +890,8 @@ class Archive(models.Model):
         help_text='URL to subversion repository containing EAD for this archive')
     slug = models.SlugField(help_text='''shorthand id
         (auto-generated from label; do not modify after initial archive definition)''')
+    contacts = models.ManyToManyField(settings.AUTH_USER_MODEL,
+        help_text='contact person for an archive person to be displayed on the request materials page')
 
     def __unicode__(self):
         return self.label
