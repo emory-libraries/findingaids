@@ -58,6 +58,15 @@ class Migration(migrations.Migration):
             options={
                 'db_table': 'auth_user',
             },
-           bases=(models.Model,),
+            bases=(models.Model,),
+        ),
+
+        # NOTE: because auth_user model is being created here (optionally,
+        # for migrated databases), django migrations associates it with
+        # fa_admin and wants to remove it.  Removing the (non0existent)
+        # fa_admin User model here resolves that problem.
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[migrations.DeleteModel('User')]
         )
     ]
