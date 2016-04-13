@@ -147,9 +147,9 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 # Enable additional backends.
 # Enable this for LDAP and see ReadMe for install dependencies.
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
-                           'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
-
+# AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
+#                            'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
+# 
 
 LOGIN_URL = "/admin/accounts/login/"
 LOGIN_REDIRECT_URL = "/admin/"
@@ -232,4 +232,3 @@ if django_nose is not None:
 # against non-test configured existdb collection
 else:
     TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
-
