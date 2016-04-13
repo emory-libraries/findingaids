@@ -1,7 +1,7 @@
 eulxml>=0.20.3
 #eulexistdb>=0.18.0
 # existdb 2.2 feature branch until next release
-git+https://github.com/emory-libraries/eulexistdb.git@feature/existdb2.2#egg=eulexistdb
+git+https://github.com/emory-libraries/eulexistdb.git@feature/chunked-results#egg=eulexistdb
 eulcommon>=0.18.0
 https://wilson.library.emory.edu/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
 https://wilson.library.emory.edu/jenkins/job/pidman-rest-client_1.1.x/lastSuccessfulBuild/artifact/pidmanclient/dist/pidservices-1.1.2.tar.gz
@@ -13,8 +13,9 @@ python-ldap==2.4.10
 zc.icp
 recaptcha-client
 mimeparse
-django-celery>=3.0
+django-celery>=3.1.17
 rdflib
 subvertpy
 httplib2
 sunburnt
+django_auth_ldap

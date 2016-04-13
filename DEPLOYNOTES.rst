@@ -401,13 +401,15 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
-1.8
+1.9
 ---
 
 * Upgrade to Django 1.8 includes a switch from South to Django migrations.
   For a brand new deploy, you should run ``python manage.py migrate``
   normally.  To update an **existing** database, you will need to run
-  migrations in this order::
+  migrations in this order (if you are prompted to remove
+  `emory_ldap | emoryldapuserprofile` say no until after migrations
+  are complete)::
 
       # migrate content types, required by everything else
       python manage.py migrate contenttypes --fake-initial
@@ -416,12 +418,18 @@ Upgrade Notes
       python manage.py migrate auth 0001 --fake
       # fake emory_ldap migrations to avoid blanking out existing content
       python manage.py migrate emory_ldap --fake
+      # fake-initial not working on fa_admin migrations
+      python manage.py migrate fa_admin 0001 --fake
+      # repeat if you get an error the first time
+      python manage.py migrate fa_admin
       # run all other migrations, faking initial migrations where tables exist
       python manage.py migrate --fake-initial
 
 * **SEND_BROKEN_LINK_EMAILS** setting has been removed in Django 1.8
   and should be removed from ``localsettings.py``.
 
+* The configuration for LDAP has changed; update ``localsettings.py``
+  based on the example LDAP configuration in ``localsettings.py.dist``.
 
 1.7.3
 -----

@@ -92,17 +92,25 @@ EXISTDB_TIMEOUT = 30
 from dateutil import tz
 EXISTDB_SERVER_TIMEZONE = tz.tzlocal()
 
+# django-auth-ldap config
+# https://pythonhosted.org/django-auth-ldap/authentication.html#server-config
+import ldap
+from django_auth_ldap.config import LDAPSearch
 
-# EULCORE LDAP SETTINGS
-# LDAP login settings. These are configured for emory, but you'll need
-# to get a base user DN and password elsewhere.
-AUTH_LDAP_SERVER = ''  # i.e. 'ldaps://vlad.service.emory.edu'
-AUTH_LDAP_BASE_USER = ''  # i.e. 'uid=USERNAME,ou=services,o=emory.edu'
-AUTH_LDAP_BASE_PASS = ''  # password for USERNAME above
-AUTH_LDAP_SEARCH_SUFFIX = ''  # i.e. 'o=emory.edu'
-AUTH_LDAP_SEARCH_FILTER = ''  # i.e. '(uid=%s)'
-AUTH_LDAP_CHECK_SERVER_CERT = False  # ALWAYS SET True in production.
-AUTH_LDAP_CA_CERT_PATH = ''  # absolute path of cert
+AUTH_LDAP_SERVER_URI = 'ldaps://ldap.co'
+AUTH_LDAP_BIND_DN = ''     # DN of the  base LDAP user (e.g., 'uid=foo,ou=bar,o=emory.edu')
+AUTH_LDAP_BIND_PASSWORD = ''           # password for that user
+AUTH_LDAP_USER_SEARCH = LDAPSearch("o=...",   ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
+
+AUTH_LDAP_USER_ATTR_MAP = {
+    'first_name': 'givenName',
+    'last_name': 'sn',
+    'email': 'mail',
+    # 'phone': 'telephoneNumber',
+    # 'dept_num': 'departmentNumber',
+    # 'full_name': 'cn',
+    'title': 'title',
+}
 
 # PID manager settings
 PIDMAN_HOST = ''  # base url for PID manager - use SSL if possible, e.g. https://pid.emory.edu/

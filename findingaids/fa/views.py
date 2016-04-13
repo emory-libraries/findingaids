@@ -610,6 +610,7 @@ def search(request):
     return response
 
 
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def document_search(request, id):
     "Keyword search on file-level items in a single Finding Aid."
 
@@ -662,19 +663,19 @@ def document_search(request, id):
                 'url_params': url_params,
                 'docsearch_form': KeywordSearchForm(),
             })
-        except ExistDBTimeout as e:
+        except ExistDBTimeout:
             # error for exist db timeout
             messages.error(request, "Your search has resulted in too many hits, \
                 please make your terms more specific by using a direct phrase \
                 search (e.g. \"Martin Luther King\").")
-        except ExistDBException as e:
+        except ExistDBException as err:
             # for an invalid full-text query (e.g., missing close quote), eXist
             # error reports 'Cannot parse' and 'Lexical error'
             # NOTE: some duplicate logic from error handling in main keyword search
             query_error = True
-            if 'Cannot parse' in e.message():
+            if 'Cannot parse' in err.message():
                 messages.error(request,
-                               'Your search query could not be parsed.  ' +
+                               'Your search query could not be parsed. ' +
                                'Please revise your search and try again.')
             else:
                 # generic error message for any other exception

@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('order', models.CommaSeparatedIntegerField(max_length=255, null=True, blank=True)),
-                ('archives', models.ManyToManyField(to='fa.Archive', null=True, blank=True)),
+                ('archives', models.ManyToManyField(to='fa.Archive', blank=True)),
                 ('user', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
             options={
