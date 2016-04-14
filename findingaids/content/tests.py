@@ -233,8 +233,8 @@ class RequestMaterialsFormTest(EmailTestCase):
 
 
 class ContentViewsTest(EmailTestCase):
-    exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
-    fixtures = ['archives.json', 'contacts.json']
+    exist_fixtures = {'files': [path.join(exist_fixture_path, 'abbey244.xml')]}
+    fixtures = ['archive_contacts.json', 'contacts.json']
 
     def setUp(self):
         self.client = Client()
