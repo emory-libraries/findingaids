@@ -686,7 +686,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.get(arch_published_url)
         self.assertContains(response, "Published Finding Aids for %s" % archive.name)
 
-        print response
         fa = response.context['findingaids']
 
         self.assert_(fa, "findingaids result is set in response context")
