@@ -891,6 +891,7 @@ class Archive(models.Model):
     slug = models.SlugField(help_text='''shorthand id
         (auto-generated from label; do not modify after initial archive definition)''')
 
+
     def __unicode__(self):
         return self.label
 
