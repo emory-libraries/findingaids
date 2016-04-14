@@ -14,6 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cStringIO import StringIO
 from os import path
 from types import ListType
 from lxml import etree
@@ -1199,8 +1200,9 @@ class FaViewsTest(TestCase):
         # load httpresponse body into an XmlObject to compare with findingaid doc
         ead = load_xmlobject_from_string(response.content)
         abbey = FindingAid.objects.get(eadid='abbey244')
+
         self.assertEqual(
-            ead.serialize(), abbey.serialize(),
+            ead.serialize().strip(), abbey.serialize().strip(),
             "response content should be the full, valid XML content of the requested EAD document")
 
     def test_content_negotiation(self):

@@ -893,6 +893,7 @@ class Archive(models.Model):
     contacts = models.ManyToManyField(settings.AUTH_USER_MODEL,
         help_text='contact person for an archive person to be displayed on the request materials page')
 
+
     def __unicode__(self):
         return self.label
 

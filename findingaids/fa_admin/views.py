@@ -24,7 +24,7 @@ from django.http import HttpResponse, HttpResponseServerError, Http404, \
     HttpResponseBadRequest
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -34,7 +34,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_POST
 
-
+from django_auth_ldap.backend import LDAPBackend
 from eulcommon.djangoextras.auth import permission_required_with_403, \
    login_required_with_ajax, user_passes_test_with_ajax
 from eulexistdb.db import ExistDB, ExistDBException
@@ -630,3 +630,26 @@ def delete_ead(request, id, archive=None):
     else:
         url = reverse('fa-admin:list-published')
     return HttpResponseSeeOtherRedirect(url)
+
+
+@permission_required('user.add_user')
+def init_ldap_user(request):
+    '''Use django-auth-ldap to initialize a new user account from LDAP.'''
+    netid = request.POST.get('netid', None)
+    if netid is None:
+        messages.error(request, 'No netid found in request')
+    else:
+        # use django-auth-ldap to create an ldap-based user acccount
+        user = LDAPBackend().populate_user(netid)
+        if user is None:
+            messages.error(request, 'User %s not found' % netid)
+        else:
+            # NOTE: using "populate" here because could be a new
+            # record OR an updated one
+            messages.success(request, 'Populated user %s (%s)' % \
+                             (netid, user.get_full_name()))
+
+    # redirect to user changelist
+    app, model = settings.AUTH_USER_MODEL.lower().split('.')
+    location = reverse('admin:%s_%s_changelist' % (app, model))
+    return HttpResponseSeeOtherRedirect(location)
