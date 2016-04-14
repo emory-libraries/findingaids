@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^(?P<archive>[a-z0-9-]+)/files/', views.list_files, name='files'),
     url(r'^archives/order/', views.archive_order, name='archive-order'),
     url(r'^archives/current/', views.current_archive, name='current-archive'),
-    url(r'^accounts/$', views.list_staff, name="list-staff"),
     url(r'^accounts/logout$', views.logout, name="logout"),
     url(r'^publish/$', views.publish, name="publish-ead"),
     url(r'^(?P<archive>[a-z0-9-]+)/preview/$', views.preview, name="preview-ead"),

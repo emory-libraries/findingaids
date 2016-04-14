@@ -16,11 +16,37 @@ class ArchivistInline(admin.StackedInline):
     fields = ('archives', )
 
 
+# patch some custom properties onto User for display in admin site
+User = get_user_model()
+
+
+def is_ldap(self):
+    return self.password == '!'
+is_ldap.short_description = 'LDAP'
+is_ldap.boolean = True
+
+
+def group_list(self):
+    return ', '.join(group.name for group in self.groups.all())
+group_list.short_description = 'Groups'
+
+
+def archive_list(self):
+    return ', '.join(archive.label for archive in self.archivist.archives.all())
+archive_list.short_description = 'Archives'
+
+User.is_ldap = is_ldap
+User.group_list = group_list
+User.archive_list = archive_list
+
+
 # Customize user admin to include archivist information
 class ArchivistUserAdmin(UserAdmin):
     inlines = (ArchivistInline, )
     list_filter = ('archivist__archives', 'is_staff', 'is_superuser',
                    'is_active', 'groups')
+    list_display = ('username', 'first_name', 'last_name',
+        'is_ldap', 'group_list', 'archive_list', 'is_superuser')
 
     def get_urls(self):
         return [
@@ -29,5 +55,5 @@ class ArchivistUserAdmin(UserAdmin):
 
 
 # Re-register UserAdmin
-admin.site.unregister(get_user_model())
-admin.site.register(get_user_model(), ArchivistUserAdmin)
+admin.site.unregister(User)
+admin.site.register(User, ArchivistUserAdmin)
