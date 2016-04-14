@@ -27,8 +27,6 @@ from eullocal.django.forms.tests import MockCaptcha
 from findingaids.content import forms
 from findingaids.fa.models import Archive
 
-from django.core.management import call_command
-
 # re-using finding aid fixtures from main fa app
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..',
     'fa', 'tests', 'fixtures')
@@ -236,12 +234,11 @@ class RequestMaterialsFormTest(EmailTestCase):
 
 class ContentViewsTest(EmailTestCase):
     exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
+    fixtures = ['archives.json', 'contacts.json']
 
     def setUp(self):
         self.client = Client()
         super(ContentViewsTest, self).setUp()
-        call_command('loaddata', 'findingaids/content/fixtures/archives.json', verbosity=0)
-        call_command('loaddata', 'findingaids/content/fixtures/contacts.json', verbosity=0)
 
     def test_site_index_banner(self):
         index_url = reverse('site-index')
