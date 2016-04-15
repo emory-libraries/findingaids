@@ -20,12 +20,6 @@ class ArchivistInline(admin.StackedInline):
 User = get_user_model()
 
 
-def is_ldap(self):
-    return self.password == '!'
-is_ldap.short_description = 'LDAP'
-is_ldap.boolean = True
-
-
 def group_list(self):
     return ', '.join(group.name for group in self.groups.all())
 group_list.short_description = 'Groups'
@@ -35,9 +29,23 @@ def archive_list(self):
     return ', '.join(archive.label for archive in self.archivist.archives.all())
 archive_list.short_description = 'Archives'
 
-User.is_ldap = is_ldap
+
+def is_admin(self):
+    return self.is_superuser
+is_admin.short_description = 'Admin'
+is_admin.boolean = True
+
+
+def staff_status(self):
+    return self.is_staff
+staff_status.short_description = 'Staff'
+staff_status.boolean = True
+
+
 User.group_list = group_list
 User.archive_list = archive_list
+User.is_admin = is_admin
+User.staff_status = staff_status
 
 
 # Customize user admin to include archivist information
@@ -45,8 +53,9 @@ class ArchivistUserAdmin(UserAdmin):
     inlines = (ArchivistInline, )
     list_filter = ('archivist__archives', 'is_staff', 'is_superuser',
                    'is_active', 'groups')
-    list_display = ('username', 'first_name', 'last_name',
-        'is_ldap', 'group_list', 'archive_list', 'is_superuser')
+    list_display = ('username', 'first_name', 'last_name', 'group_list',
+                    'archive_list', 'is_active', 'staff_status',
+                    'is_admin')
 
     def get_urls(self):
         return [
