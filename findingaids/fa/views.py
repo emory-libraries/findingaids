@@ -22,7 +22,7 @@ from django.http import HttpResponse, Http404, HttpResponsePermanentRedirect
 from django.conf import settings
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 from django.views.decorators.http import condition
 
@@ -59,15 +59,13 @@ RDFA_NAMESPACES = {
 
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
-    return render_to_response('fa/index.html', {'letters': title_letters()},
-                              context_instance=RequestContext(request))
+    return render(request, 'fa/index.html', {'letters': title_letters()})
 
 
 def browse_titles(request):
     "List all first letters in finding aid list title, with a link to browse by letter."
-    return render_to_response('fa/browse_letters.html',
-                              {'letters': title_letters()},
-                              context_instance=RequestContext(request))
+    return render(request, 'fa/browse_letters.html',
+                  {'letters': title_letters()})
 
 
 @condition(last_modified_func=collection_lastmodified)
@@ -77,7 +75,7 @@ def titles_by_letter(request, letter):
     """
 
     # set last browse letter and page in session
-    page = request.REQUEST.get('page', 1)
+    page = request.GET.get('page', 1)
     last_search = "%s?page=%s" % (reverse("fa:titles-by-letter", kwargs={'letter': letter}), page)
     last_search = {"url": last_search, "txt": "Return to Browse Results"}
     request.session['last_search'] = last_search
@@ -105,9 +103,7 @@ def titles_by_letter(request, letter):
 
     # no special first/last page label is required, since we are displaying all labels (not limiting to 9)
 
-    return render_to_response('fa/titles_list.html',
-                              response_context,
-                              context_instance=RequestContext(request))
+    return render(request, 'fa/titles_list.html', response_context)
 
 
 @condition(last_modified_func=collection_lastmodified)
@@ -122,9 +118,7 @@ def xml_titles(request):
         'findingaids': fa,
     }
 
-    return render_to_response('fa/xml.html',
-                              response_context,
-                              context_instance=RequestContext(request))
+    return render(request, 'fa/xml.html', response_context)
 
 
 @ead_gone_or_404
@@ -137,7 +131,7 @@ def eadxml(request, id, preview=False):
     """
     fa = get_findingaid(id, preview=preview)
     xml_ead = fa.serialize(pretty=True)
-    return HttpResponse(xml_ead, mimetype='application/xml')
+    return HttpResponse(xml_ead, content_type='application/xml')
 
 
 @ead_gone_or_404
@@ -183,8 +177,8 @@ def findingaid(request, id, preview=False):
     if url_params and not preview:
         context['series_noparam'] = _subseries_links(fa.dsc, url_ids=[fa.eadid])
 
-    response = render_to_response('fa/findingaid.html', context,
-        context_instance=RequestContext(request, current_app='preview'))
+    response = render(request, 'fa/findingaid.html', context,
+                      current_app='preview')
     # Set Cache-Control to private when there is a last_search
     if "last_search" in request.session:
         response['Cache-Control'] = 'private'
@@ -214,12 +208,12 @@ def full_findingaid(request, id, mode, preview=False):
                                                       '[Resource available online]')
                      }
     if mode == 'html':
-        return render_to_response(template, template_args)
+        return render(request, template, template_args)
     elif mode == 'pdf':
         return render_to_pdf(template, template_args, filename='%s.pdf' % fa.eadid.value)
     elif mode == 'xsl-fo':
         xslfo = html_to_xslfo(template, template_args)
-        return HttpResponse(etree.tostring(xslfo), mimetype='application/xml')
+        return HttpResponse(etree.tostring(xslfo), content_type='application/xml')
 
 
 @condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
@@ -377,7 +371,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     # include any keyword args in template parameters (preview mode)
     render_opts.update(kwargs)
 
-    if (isinstance(result, Index)):
+    if isinstance(result, Index):
         render_opts['index'] = result
     else:
         render_opts['series'] = result
@@ -387,10 +381,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         if url_params and not preview_mode:
             render_opts['subseries_noparam'] = _subseries_links(result)
 
-
-    response = render_to_response('fa/series_or_index.html',
-                                  render_opts,
-                                  context_instance=RequestContext(request))
+    response = render(request, 'fa/series_or_index.html', render_opts)
 
     #Cache-Control to private when there is a last_search
     if "last_search" in request.session:
@@ -491,7 +482,7 @@ def search(request):
         keywords = form.cleaned_data['keywords']
         repository = form.cleaned_data['repository']
         dao = form.cleaned_data['dao']
-        page = request.REQUEST.get('page', 1)
+        page = request.GET.get('page', 1)
 
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
@@ -591,11 +582,9 @@ def search(request):
                 response_context['first_page_label'] = page_labels[1]
                 response_context['last_page_label'] = page_labels[paginator.num_pages]
 
-            return render_to_response('fa/search_results.html',
-                                      response_context,
-                                      context_instance=RequestContext(request))
+            return render(request, 'fa/search_results.html', response_context)
 
-        except ExistDBException, e:
+        except ExistDBException as e:
             # for an invalid full-text query (e.g., missing close quote), eXist
             # error reports 'Cannot parse' and 'Lexical error'
             # FIXME: could/should this be a custom eXist exception class?
@@ -613,15 +602,15 @@ def search(request):
         form = AdvancedSearchForm()
 
     # if form is invalid (no search terms) or there was an error, display search form
-    response = render_to_response('fa/search_form.html',
-                                  {'form': form, 'request': request},
-                                  context_instance=RequestContext(request))
+    response = render(request, 'fa/search_form.html',
+                      {'form': form, 'request': request})
     # if query could not be parsed, set a 'Bad Request' status code on the response
     if query_error:
         response.status_code = 400
     return response
 
 
+@condition(etag_func=ead_etag, last_modified_func=ead_lastmodified)
 def document_search(request, id):
     "Keyword search on file-level items in a single Finding Aid."
 
@@ -665,7 +654,7 @@ def document_search(request, id):
             if search_terms:
                 url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
 
-            return render_to_response('fa/document_search.html', {
+            return render(request, 'fa/document_search.html', {
                 'files': files,
                 'ead': ead,
                 'querytime': [files.queryTime(), ead.queryTime()],
@@ -673,20 +662,20 @@ def document_search(request, id):
                 'dao': form.cleaned_data['dao'],
                 'url_params': url_params,
                 'docsearch_form': KeywordSearchForm(),
-            }, context_instance=RequestContext(request))
-        except ExistDBTimeout, e:
+            })
+        except ExistDBTimeout:
             # error for exist db timeout
             messages.error(request, "Your search has resulted in too many hits, \
                 please make your terms more specific by using a direct phrase \
                 search (e.g. \"Martin Luther King\").")
-        except ExistDBException, e:
+        except ExistDBException as err:
             # for an invalid full-text query (e.g., missing close quote), eXist
             # error reports 'Cannot parse' and 'Lexical error'
             # NOTE: some duplicate logic from error handling in main keyword search
             query_error = True
-            if 'Cannot parse' in e.message():
+            if 'Cannot parse' in err.message():
                 messages.error(request,
-                               'Your search query could not be parsed.  ' +
+                               'Your search query could not be parsed. ' +
                                'Please revise your search and try again.')
             else:
                 # generic error message for any other exception
@@ -695,11 +684,11 @@ def document_search(request, id):
         # invalid form
         messages.error(request, 'Please enter a search term.')
     # display empty search results
-    response = render_to_response('fa/document_search.html', {
+    response = render(request, 'fa/document_search.html', {
         'files': [],
         'ead': ead,
         'docsearch_form': KeywordSearchForm(),
-    }, context_instance=RequestContext(request))
+    })
      # if query could not be parsed, set a 'Bad Request' status code on the response
     if query_error:
         response.status_code = 400

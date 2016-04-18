@@ -1,4 +1,5 @@
 # file findingaids/fa_admin/tests/views.py
+# -*- coding: utf-8 -*-
 #
 #   Copyright 2012 Emory University Library
 #
@@ -24,12 +25,12 @@ import unittest
 
 from django.test import Client
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB
-from eullocal.django.emory_ldap.models import EmoryLDAPUser
 from eullocal.django.taskresult.models import TaskResult
 from eulexistdb.testutil import TestCase
 from eulxml.xmlmap import load_xmlobject_from_file
@@ -46,6 +47,8 @@ from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unu
 
 skipIf_no_proxy = unittest.skipIf('HTTP_PROXY' not in os.environ,
     'Schema validation test requires an HTTP_PROXY')
+
+User = get_user_model()
 
 
 class BaseAdminViewsTest(TestCase):
@@ -156,7 +159,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix='response for non-superuser FA admin does not link to all published docs')
 
         # archive-specific published lists only
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         for archive in user.archivist.archives.all():
             self.assertContains(response, reverse('fa-admin:published-by-archive',
                 kwargs={'archive': archive.slug}),
@@ -310,7 +313,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             'Expected %s but returned %s for POST on %s with valid data'
             % (expected, code, order_url))
 
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         # check that order was stored as expected
         self.assertEqual('%d,%d' % (eua.id, theo.id), user.archivist.order)
 
@@ -343,7 +346,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # GET should just list files available for preview
-        # FIXME: preview list view doesn't currently use archive; this functionality
+        # NOTE: preview list view doesn't currently use archive; this functionality
         # needs to either be removed, separated, or filter on archive
         response = self.client.get(preview_url, {'archive': arch.slug})
         code = response.status_code
@@ -354,7 +357,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix="preview summary should list title of document loaded for preview")
         self.assertContains(response, reverse('fa-admin:preview:findingaid', kwargs={'id': 'hartsfield558'}),
             msg_prefix="preview summary should link to preview page for document loaded to preview")
-        self.assertContains(response, 'last modified: 0 minutes ago',
+        self.assertContains(response, 'last modified: 0 minutes ago',
             msg_prefix="preview summary listing includes modification time")
 
         # preview page should include publish form for users with permission to publish
@@ -600,7 +603,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         }
         # use django test client to login and setup session
         self.client.login(**self.credentials['admin'])
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         arch = user.archivist.archives.all()[0]
 
         # use a fixture that does not have an ARK
@@ -711,7 +714,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         title, note = 'William Berry Hartsfield papers', 'Moved to another archive.'
 
         # temporarily remove access to archive to test permission logic
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         marbl = Archive.objects.get(slug='marbl')
         user.archivist.archives.remove(marbl)
         user.save()
@@ -969,7 +972,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 {'filename': filename}, follow=True)
 
         # update user to remove marbl access
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         marbl = Archive.objects.get(slug='marbl')
         user.archivist.archives.remove(marbl)
         user.save()

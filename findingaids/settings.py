@@ -147,10 +147,11 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 # Enable additional backends.
 # Enable this for LDAP and see ReadMe for install dependencies.
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
-                           'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_ldap.backend.LDAPBackend'
+)
 
-AUTH_USER_MODEL = 'emory_ldap.EmoryLDAPUser'
 
 LOGIN_URL = "/admin/accounts/login/"
 LOGIN_REDIRECT_URL = "/admin/"
@@ -171,7 +172,6 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.humanize',
     'djcelery',
-    'south',
     'eullocal.django.emory_ldap',
     'eullocal.django.taskresult',
     'eullocal.django.util',
@@ -235,5 +235,3 @@ if django_nose is not None:
 else:
     TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
 
-# disable south migrations in unit tests
-SOUTH_TESTS_MIGRATE = False

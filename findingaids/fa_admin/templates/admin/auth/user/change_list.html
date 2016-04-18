@@ -1,0 +1,18 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{# override auth.User change list to add form to init ldap users #}
+{% block object-tools %}
+  {{ block.super }}
+  {% if has_add_permission %}
+    <div class='addlink-form'>
+      <form action='{% url 'admin:init-ldap-user' %}' method='post'>
+        Create or update an account from LDAP.
+        <label for="netid" style="font-weight:bold">Username:</label>
+        <input name='netid' id='netid' />
+        <input type='submit' value='Add' />
+        {% csrf_token %}
+      </form>
+    </div>
+  {% endif %}
+{% endblock %}

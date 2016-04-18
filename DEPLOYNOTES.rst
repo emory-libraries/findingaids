@@ -307,7 +307,7 @@ Initialize/Update the Database
 After all settings have been configured, initialize the relational db with all
 needed tables and initial data using::
 
-    $ python manage.py syncdb
+    $ python manage.py migrate
 
 When an upgrade requires new database tables, the same command should be used.
 
@@ -401,6 +401,35 @@ on configuring celery to run as a daemon.
 Upgrade Notes
 -------------
 
+1.9
+---
+
+* Upgrade to Django 1.8 includes a switch from South to Django migrations.
+  For a brand new deploy, you should run ``python manage.py migrate``
+  normally.  To update an **existing** database, you will need to run
+  migrations in this order (if you are prompted to remove
+  `emory_ldap | emoryldapuserprofile` say no until after migrations
+  are complete)::
+
+      # migrate content types, required by everything else
+      python manage.py migrate contenttypes --fake-initial
+      # explicitly fake initial auth migration
+      # (can't use fake initial fails because auth_user doesn't exist yet)
+      python manage.py migrate auth 0001 --fake
+      # fake emory_ldap migrations to avoid blanking out existing content
+      python manage.py migrate emory_ldap --fake
+      # fake-initial not working on fa_admin migrations
+      python manage.py migrate fa_admin 0001 --fake
+      # repeat if you get an error the first time
+      python manage.py migrate fa_admin
+      # run all other migrations, faking initial migrations where tables exist
+      python manage.py migrate --fake-initial
+
+* **SEND_BROKEN_LINK_EMAILS** setting has been removed in Django 1.8
+  and should be removed from ``localsettings.py``.
+
+* The configuration for LDAP has changed; update ``localsettings.py``
+  based on the example LDAP configuration in ``localsettings.py.dist``.
 
 1.7.3
 -----
@@ -698,7 +727,7 @@ documentation in the `Configuration`_ instructions).
 
 The Finding Aids site now requires a sql database for user
 management and tracking deleted finding aids.  You should set up a
-database, configure it in localsettings.py, and run ``syncdb`` to
+database, configure it in localsettings.py, and run ``migrate`` to
 initialize required tables, as documented in `Initialize/Update the Database`_.
 
 There are new manage.py scripts to clean up EAD documents and load them to eXist.

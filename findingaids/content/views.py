@@ -16,7 +16,7 @@
 
 from django.conf import settings
 from django.http import Http404
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.template import RequestContext
 
 from findingaids.content.models import BANNER_IMAGES
@@ -28,11 +28,11 @@ from findingaids.fa.utils import get_findingaid
 def site_index(request):
     "Site home page.  Currently includes browse letter links."
 
-    return render_to_response('content/site_index.html', {
+    return render(request, 'content/site_index.html', {
                 'letters': title_letters(),
                  # images rotating home page banner
                 'banner': BANNER_IMAGES,
-            }, context_instance=RequestContext(request))
+            })
 
 
 def feedback(request):
@@ -52,10 +52,10 @@ def feedback(request):
                 err = ex
                 email_ok = False
             # display a success/thank you page
-            response = render_to_response('content/feedback.html', {
+            response = render(request, 'content/feedback.html', {
                     'email_sent': email_ok,
                     'err': err,
-                }, context_instance=RequestContext(request))
+                })
             # if the email didn't go through, don't return a 200 ok status
             if not email_ok:
                 response.status_code = 500
@@ -75,11 +75,11 @@ def feedback(request):
 
     captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
 
-    return render_to_response('content/feedback.html', {
+    return render(request, 'content/feedback.html', {
                 'form': form,
                 'findingaid': ead,
                 'captcha_theme': captcha_theme,
-            }, context_instance=RequestContext(request))
+            })
 
 
 def request_materials(request):
@@ -95,10 +95,10 @@ def request_materials(request):
                 email_ok = False
             # TODO: use separate result page for request materials
             # display a success/thank you page
-            response = render_to_response('content/request-materials.html', {
+            response = render(request, 'content/request-materials.html', {
                     'email_sent': email_ok,
                     'err': err,
-                }, context_instance=RequestContext(request))
+                })
             # if the email didn't go through, don't return a 200 ok status
             if not email_ok:
                 response.status_code = 500
@@ -109,8 +109,8 @@ def request_materials(request):
 
     captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
 
-    return render_to_response('content/request-materials.html', {
+    return render(request, 'content/request-materials.html', {
             'form': form,
             'captcha_theme': captcha_theme,
-        }, context_instance=RequestContext(request))
+        })
 

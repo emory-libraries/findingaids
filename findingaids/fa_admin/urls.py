@@ -14,37 +14,39 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.conf.urls.defaults import *
+from django.conf.urls import url, patterns, include
+from django.contrib.auth import views as authviews
 from findingaids.fa.urls import EADID_URL_REGEX, findingaid_urlpatterns
+from findingaids.fa_admin import views
 
-urlpatterns = patterns('findingaids.fa_admin.views',
-    url(r'^$', 'main', name="index"),
-    url(r'^(?P<archive>[a-z0-9-]+)/files/', 'list_files', name='files'),
-    url(r'^archives/order/', 'archive_order', name='archive-order'),
-    url(r'^archives/current/', 'current_archive', name='current-archive'),
-    url(r'^accounts/$', 'list_staff', name="list-staff"),
-    url(r'^accounts/logout$', 'logout', name="logout"),
-    url(r'^publish/$', 'publish', name="publish-ead"),
-    url(r'^(?P<archive>[a-z0-9-]+)/preview/$', 'preview', name="preview-ead"),
-    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/$', 'prepared_eadxml', name="prep-ead"),
-    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/diff/', 'prepared_ead', {'mode': 'diff'},
-            name="prep-ead-diff"),
-    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/about/', 'prepared_ead', {'mode': 'summary'},
-            name="prep-ead-about"),
+urlpatterns = [
+    url(r'^$', views.main, name="index"),
+    url(r'^(?P<archive>[a-z0-9-]+)/files/', views.list_files, name='files'),
+    url(r'^archives/order/', views.archive_order, name='archive-order'),
+    url(r'^archives/current/', views.current_archive, name='current-archive'),
+    url(r'^accounts/$', views.list_staff, name="list-staff"),
+    url(r'^accounts/logout$', views.logout, name="logout"),
+    url(r'^publish/$', views.publish, name="publish-ead"),
+    url(r'^(?P<archive>[a-z0-9-]+)/preview/$', views.preview, name="preview-ead"),
+    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/$',
+        views.prepared_eadxml, name="prep-ead"),
+    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/diff/',
+        views.prepared_ead, {'mode': 'diff'}, name="prep-ead-diff"),
+    url(r'^(?P<archive>[a-z0-9-]+)/(?P<filename>[^/]+)/prep/about/',
+        views.prepared_ead, {'mode': 'summary'}, name="prep-ead-about"),
     # include finding aid document urls in preview mode
     url(r'^preview/documents/', include(findingaid_urlpatterns, namespace='preview'),
             {'preview': True}),
-    url(r'^documents/$', 'list_published', name="list-published"),
-    url(r'^(?P<archive>[a-z0-9-]+)/documents/$', 'list_published', name="published-by-archive"),
-    url(r'^documents/%s/delete/$' % EADID_URL_REGEX, 'delete_ead', name="delete-ead"),
-    url(r'^(?P<archive>[a-z0-9-]+)/documents/%s/delete/$' % EADID_URL_REGEX, 'delete_ead',
+    url(r'^documents/$', views.list_published, name="list-published"),
+    url(r'^(?P<archive>[a-z0-9-]+)/documents/$', views.list_published, name="published-by-archive"),
+    url(r'^documents/%s/delete/$' % EADID_URL_REGEX, views.delete_ead, name="delete-ead"),
+    url(r'^(?P<archive>[a-z0-9-]+)/documents/%s/delete/$' % EADID_URL_REGEX, views.delete_ead,
         name="delete-ead-by-archive"),
-)
 
-# contrib views
-urlpatterns += patterns('django.contrib.auth.views',
-    url(r'^accounts/login/$', 'login', name='login'),
+    # contrib auth login
     # note: could use contrib logout; custom view simply adds a message
-    #url(r'^accounts/logout$', 'logout_then_login', name="logout"),
-)
+    url(r'^accounts/login/$', authviews.login, name='login'),
+    # url(r'^accounts/logout$', authviews.logout_then_login, name="logout"),
+]
+
 

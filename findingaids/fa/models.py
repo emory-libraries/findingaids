@@ -435,6 +435,9 @@ class LocalComponent(eadmap.Component):
 def title_rdf_identifier(src, idno):
     ''''Generate an RDF identifier for a title, based on source and id
     attributes.  Currently supports ISSN, ISBN, and OCLC.'''
+    # if either src or idno is None, bail out right away
+    if src is None or idno is None:
+        return
     src = src.lower()
     idno = idno.strip()  # remove whitespace, just in case of errors in entry
 
@@ -861,7 +864,7 @@ class Deleted(models.Model):
     """
     eadid = models.CharField('EAD Identifier', max_length=50, unique=True)
     title = models.CharField(max_length=200)
-    date = models.DateTimeField('Date removed', default=datetime.now())
+    date = models.DateTimeField('Date removed', auto_now_add=True)
     note = models.CharField(
         max_length=400, blank=True,
         help_text="Optional: Enter the reason this document is being deleted. " +
@@ -887,6 +890,7 @@ class Archive(models.Model):
         help_text='URL to subversion repository containing EAD for this archive')
     slug = models.SlugField(help_text='''shorthand id
         (auto-generated from label; do not modify after initial archive definition)''')
+
 
     def __unicode__(self):
         return self.label

@@ -47,20 +47,6 @@ the defined Archives will be prepared."""
 
     args = '[<filename filename ... >]'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--dry-run', '-n',
-            dest='dryrun',
-            action='store_true',
-            default=False,
-            help='''Report on what would be done, but don't make any actual changes'''),
-        make_option('--commit', '-c',
-            dest='commit',
-            action='store_true',
-            default=False,
-            help='''Commit changes to subversion after processing is finished'''),
-    )
-
-
     # django default verbosity level options --  1 = normal, 0 = minimal, 2 = all
     v_normal = 1
 
@@ -72,6 +58,19 @@ the defined Archives will be prepared."""
     digitized_ids = re.compile(ur'\[digitized;?( (Emory|filename)?:?\s*(?P<ids>[0-9a-z-,; ]+)\s*)?\]?\s*$',
                                re.IGNORECASE)
 
+
+    def add_arguments(self, parser):
+
+        parser.add_argument('--dry-run', '-n',
+            dest='dryrun',
+            action='store_true',
+            default=False,
+            help='''Report on what would be done, but don't make any actual changes''')
+        parser.add_argument('--commit', '-c',
+            dest='commit',
+            action='store_true',
+            default=False,
+            help='''Commit changes to subversion after processing is finished''')
 
     def handle(self, *args, **options):
         verbosity = int(options.get('verbosity', self.v_normal))

@@ -55,7 +55,7 @@ def render_to_pdf(template_src, context_dict, filename=None):
     :param template_src: name of the template to render
     :param context_dict: dictionary to pass to the template for rendering
     :param filename: optional filename, to specify to the browser in the response
-    :returns: :class:`django.http.HttpResponse` with PDF content, mimetype,
+    :returns: :class:`django.http.HttpResponse` with PDF content, content-type,
             and, if a filename was specified, a content-disposition header to
             prompt the browser to download the response as the filename specified
     """
@@ -83,7 +83,7 @@ log4j.appender.CONSOLE.layout.ConversionPattern=%-5p %3x - %m%n
         logger.debug("Calling XSL-FO processor: %s" % ' '.join(cmd_parts))
         rval = subprocess.call(cmd_parts, cwd=tmpdir)
         if rval is 0:       # success!
-            response = http.HttpResponse(pdf_file.read(), mimetype='application/pdf')
+            response = http.HttpResponse(pdf_file.read(), content_type='application/pdf')
             if filename:
                 response['Content-Disposition'] = "inline; filename=%s" % filename
             return response

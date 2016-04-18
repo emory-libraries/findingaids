@@ -485,7 +485,7 @@ EAD_SCOPECONTENT = '{%s}scopecontent' % EAD_NAMESPACE
 EAD_BIOGHIST = '{%s}bioghist' % EAD_NAMESPACE
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def series_section_rdfa(context, series, section):
     # determine rdf wrapping info for a series info section
 
