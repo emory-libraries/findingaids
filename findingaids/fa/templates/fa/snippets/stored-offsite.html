@@ -1,0 +1,11 @@
+{# banner to indicate if this findingaid includes digital content #}
+{% load static %}
+{% if ead.stored_offsite %}
+<div id="stored-offsite" class="collection-banner">
+    <i class="fa fa-4x fa-truck icon" aria-hidden="true"></i>
+  <p>Collection Stored Off-Site</p>
+  <p class="detail">All or portions of this collection may be housed off-site.
+   There may be up to a 2 business day delay in obtaining these materials.</p>
+   <div class="clearfix"></div>
+</div>
+{% endif %}

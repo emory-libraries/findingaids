@@ -487,31 +487,45 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
     clear: both;
 }
 
-#digital-materials {
-  background-color: #002878;
+.collection-banner {
   color: white;
   width: 5in;
-  height: 0.35in;
+  min-height: 45px;
   text-align: center;
   vertical-align: middle;
   margin: auto;
 }
-#digital-materials img {
+
+.collection-banner .icon {
     float: left;
-    padding-left: 15px;
-    padding-top: 5px;
+    padding: 5px 15px;
     border: 0;
 }
-#digital-materials p {
+.collection-banner p {
     font-size: 12pt;
     line-height: 0.25in;
     margin: 5px 0 0;
     padding-top: 5px;
 }
-#digital-materials p.detail {
-    font-size: 10pt;
-    padding-top: 2px;
+.collection-banner p.detail {
+    font-size: 90%;
+    margin: 0 10px;
+    padding-bottom: 5px;
+    line-height: 125%;
+    text-align: left;
 }
+
+#digital-materials {
+  background-color: #002878;
+  height: 4em;
+}
+
+#stored-offsite {
+  background-color: #f19b62;
+}
+
+#stored-offsite .icon {
+  padding: 15px;
 
 .search-tips blockquote {
   margin: 0;

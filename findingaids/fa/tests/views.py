@@ -505,6 +505,44 @@ class FaViewsTest(TestCase):
             html=True,
             msg_prefix='external dao with show=none should be displayed to admin user')
 
+    def test_stored_offsite(self):
+        # pomerantz fixture has offsite access text
+        fa_url = reverse('fa:findingaid', kwargs={'id': 'pomerantz890'})
+        response = self.client.get(fa_url)
+        self.assertContains(response, "Collection Stored Off-Site",
+            msg_prefix='Main findingaid page should include off-site banner when' +
+                       'offsite text is in access restriction note')
+
+        # no other fixture has offsite text
+        fa_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})
+        response = self.client.get(fa_url)
+        self.assertNotContains(response, "Collection Stored Off-Site",
+            msg_prefix='off-site banner should not display for findingaids without' +
+                       'offsite text in access restriction')
+
+        # offsite should also display on series pages
+        series_url = reverse('fa:series-or-index', kwargs={'id': 'pomerantz890',
+                     'series_id': 'series1'})
+        response = self.client.get(series_url)
+        self.assertContains(response, "Collection Stored Off-Site",
+            msg_prefix='series page should display off-site banner for ' +
+                       'collections with offsite restriction note')
+
+        # offsite should display on index pages too
+        response = self.client.get(reverse('fa:findingaid',
+            kwargs={'id': 'raoul548'}))
+        self.assertContains(response, "Collection Stored Off-Site",
+            msg_prefix='index page should display off-site banner for ' +
+                       'collections with offsite restriction note')
+
+        # offsite banner should display once on full view (used for pdf)
+        response = self.client.get(reverse('fa:full-findingaid',
+            kwargs={'id': 'raoul548'}))
+        self.assertContains(response, "<p>Collection Stored Off-Site</p>",
+            count=1,
+            msg_prefix='index page should display off-site banner for ' +
+                       'collections with offsite restriction note')
+
 
     def test_view__fa_with_series(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})

@@ -316,7 +316,10 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         # fields needed for top-level display (some redundancy with list in _get_series_or_index)
         return_fields = ['eadid', 'title', 'archdesc__controlaccess__head',
                          'archdesc__origination',
-                         'dsc__head', 'archdesc__did']
+                         'dsc__head', 'archdesc__did',
+                         # required to determine off-site access
+                         'archdesc__access_restriction',
+                         ]
         fa = FindingAid.objects.filter(eadid=eadid).filter(**filter).using(collection)
         # using raw xpaths for exist-specific logic to expand and count matches
         ead = fa.only(*return_fields) \
@@ -403,7 +406,10 @@ def _get_series_or_index(eadid, *series_ids, **kwargs):
                      'ead__archdesc__controlaccess__head', 'ead__dsc__head',
                      'ead__origination_name',
                      'ead__repository',  # needed to determine if requestable
-                     'ead__collection_id']
+                     'ead__collection_id',
+                     # needed to determine if collection is stored off-site
+                     'ead__archdesc__access_restriction',
+                     ]
     # common search parameters - last series id should be requested series, of whatever type
     search_fields = {'ead__eadid': eadid, 'id': series_ids[-1]}
 
