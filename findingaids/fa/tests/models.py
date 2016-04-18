@@ -86,6 +86,18 @@ class FindingAidTestCase(DjangoTestCase):
         self.assert_(u'Thurman, Howard, 1900-1981.' in self.findingaid['bailey807'].dc_contributors)
         self.assert_(u'Thurman, Sue Bailey.' in self.findingaid['bailey807'].dc_contributors)
 
+    def test_has_digital_content(self):
+        # abbey has a dao, but audience is internal
+        self.assertFalse(self.findingaid['abbey244'].has_digital_content)
+        # no dao in adams
+        self.assertFalse(self.findingaid['adams465'].has_digital_content)
+        # daos have been added to leverette fixture
+        self.assertTrue(self.findingaid['leverette135'].has_digital_content)
+
+    def test_stored_offsite(self):
+        self.assertFalse(self.findingaid['abbey244'].stored_offsite)
+        self.assertTrue(self.findingaid['pomerantz890'].stored_offsite)
+
     def test_series_info(self):
         info = self.findingaid['raoul548'].dsc.c[0].series_info()
         self.assert_(isinstance(info, ListType))

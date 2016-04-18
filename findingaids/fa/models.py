@@ -240,9 +240,28 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
 
     @property
     def has_digital_content(self):
-        'boolean to indicate whether or not this EAD includes public digital content'
+        '''boolean to indicate whether or not this EAD includes public
+        digital content.
+
+        .. Note::
+            If using partial xml return, requires that `public_dao_count`
+            is included.
+
+        '''
         return self.public_dao_count >= 1
-        # NOTE: if using partial xml return, requires that public_dao_count is included
+
+    @property
+    def stored_offsite(self):
+        '''boolean to indicate if collection materials are stored offsite,
+        based on text in the collection access restriction note.
+
+        .. Note::
+
+            If using partial xml return, requires that
+            `archdesc__access_restriction` is included.
+        '''
+        return 'collection stored off-site' in \
+            unicode(self.archdesc.access_restriction)
 
     def admin_info(self):
         """
