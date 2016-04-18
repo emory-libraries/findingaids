@@ -147,7 +147,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # TODO: resolve preview list view (going away? archive specific)
         # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}), 0,
         #     msg_prefix='response for user with no permissions does not include link to preview docs')
-        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
+        self.assertContains(response, 'href="%s"' % reverse('admin:auth_user_changelist'), 0,
             msg_prefix='response for user with no permissions does not include link to list/edit staff')
         self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
             msg_prefix='response for user with no permissions does not include link to django db admin')
@@ -167,7 +167,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # TODO: resolve preview list view (going away? archive specific)
         # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}),
         #     msg_prefix='response for FA admin includes link to preview docs')
-        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
+        self.assertContains(response, 'href="%s"' % reverse('admin:auth_user_changelist'), 0,
             msg_prefix='response for (non super) FA admin does not include link to list/edit staff')
         self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
             msg_prefix='response for (non super) FA admin does not include link to django db admin')
@@ -175,7 +175,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # superuser
         self.client.login(**self.credentials['superuser'])
         response = self.client.get(admin_index)
-        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'),
+        self.assertContains(response, 'href="%s"' % reverse('admin:auth_user_changelist'),
             msg_prefix='response for superuser includes link to list/edit staff')
         self.assertContains(response, reverse('admin:index'),
             msg_prefix='response for superuser includes link to django db admin')
@@ -432,16 +432,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         msgs = [str(msg) for msg in response.context['messages']]
         self.assert_('You are now logged out' in msgs[0])
 
-    def test_list_staff(self):
-        list_staff = reverse('fa-admin:list-staff')
-        # test as an admin with permissions to edit accounts
-        self.client.login(**self.credentials['superuser'])
-        response = self.client.get(list_staff)
-        self.assertContains(response, "Current users")
-        # should list users from fixture
-        self.assertContains(response, "marbl")
-        self.assertContains(response, "peon")
-
     def test_prep_ead(self):
         # use fixture directory to test publication
         arch = Archive.objects.all()[0]
@@ -686,7 +676,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.get(arch_published_url)
         self.assertContains(response, "Published Finding Aids for %s" % archive.name)
 
-        print response
         fa = response.context['findingaids']
 
         self.assert_(fa, "findingaids result is set in response context")

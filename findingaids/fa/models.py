@@ -890,6 +890,8 @@ class Archive(models.Model):
         help_text='URL to subversion repository containing EAD for this archive')
     slug = models.SlugField(help_text='''shorthand id
         (auto-generated from label; do not modify after initial archive definition)''')
+    contacts = models.ManyToManyField(settings.AUTH_USER_MODEL,
+        help_text='contact person for an archive person to be displayed on the request materials page')
 
 
     def __unicode__(self):
@@ -898,3 +900,9 @@ class Archive(models.Model):
     @property
     def svn_local_path(self):
         return os.path.join(settings.SVN_WORKING_DIR, self.slug)
+
+    def contact_names(self):
+        return ', '.join([contact.get_full_name() for contact in self.contacts.all()])
+
+    ''' label for the contact_names method (consumed in the list display table header)'''
+    contact_names.short_description = "Contacts"

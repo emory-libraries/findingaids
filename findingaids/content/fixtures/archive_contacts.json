@@ -1,0 +1,35 @@
+[
+	{
+		"model": "fa.archive",
+		"pk": 1,
+		"fields": {
+			"label": "MARBL",
+			"name": "Stuart A. Rose Manuscript, Archives, and Rare Book Library",
+			"svn": "https://svn.library.emory.edu/svn/ead-marbl/trunk",
+			"slug": "marbl",
+			"contacts": [1,3]
+		}
+	},
+	{
+		"model": "fa.archive",
+		"pk": 2,
+		"fields": {
+			"label": "EUA",
+			"name": "Emory University Archives",
+			"svn": "https://svn.library.emory.edu/svn/ead-eua/trunk",
+			"slug": "eua",
+			"contacts": [1,2]
+		}
+	},
+	{
+		"model": "fa.archive",
+		"pk": 3,
+		"fields": {
+			"label": "Pitts",
+			"name": "Pitts Theology Library",
+			"svn": "https://svn.library.emory.edu/svn/ead-pitts/trunk",
+			"slug": "pitts",
+			"contacts": []
+		}
+	}
+]

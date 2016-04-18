@@ -188,20 +188,6 @@ def logout(request):
     return logout_then_login(request)
 
 
-@permission_required_with_403('auth.user.can_change')
-def list_staff(request):
-    """
-    Displays a list of user accounts, with summary information about each user
-    and a link to edit each user account.
-    """
-    users = get_user_model().objects.all()
-    app, model = settings.AUTH_USER_MODEL.lower().split('.')
-    change_url = 'admin:%s_%s_change' % (app, model)
-
-    return render(request, 'fa_admin/list-users.html',
-        {'users': users, 'user_change_url': change_url})
-
-
 def _prepublication_check(request, filename, archive, mode='publish', xml=None):
     """
     Pre-publication check logic common to :meth:`publish` and :meth:`preview`.

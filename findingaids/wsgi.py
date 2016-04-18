@@ -3,7 +3,6 @@ import djcelery
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'findingaids.settings')
 os.environ['PYTHON_EGG_CACHE'] = '/tmp'
-
 os.environ['VIRTUAL_ENV'] = '/home/httpd/findingaids/env/'
 
 djcelery.setup_loader()

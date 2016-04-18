@@ -1,0 +1,74 @@
+[
+	{
+		"model": "auth.user",
+		"pk": 1,
+		"fields": {
+			"password": "!",
+			"last_login": "2011-03-14T16:18:36",
+			"is_superuser": true,
+			"username": "test1",
+			"first_name": "One",
+			"last_name": "Test",
+			"email": "test1@domain.com",
+			"is_staff": true,
+			"is_active": true,
+			"date_joined": "2011-03-10T16:16:02",
+			"groups": [],
+			"user_permissions": []
+		}
+	},
+	{
+		"model": "auth.user",
+		"pk": 2,
+		"fields": {
+			"password": "!",
+			"last_login": "2016-04-07T17:25:19.359",
+			"is_superuser": true,
+			"username": "test2",
+			"first_name": "Two",
+			"last_name": "Test",
+			"email": "test2@domain.com",
+			"is_staff": true,
+			"is_active": true,
+			"date_joined": "2011-03-14T11:03:18",
+			"groups": [],
+			"user_permissions": []
+		}
+	},
+	{
+		"model": "auth.user",
+		"pk": 3,
+		"fields": {
+			"password": "!",
+			"last_login": "2014-02-04T09:16:10",
+			"is_superuser": false,
+			"username": "test3",
+			"first_name": "Three",
+			"last_name": "Test",
+			"email": "test3@domain.com",
+			"is_staff": false,
+			"is_active": true,
+			"date_joined": "2011-03-14T11:03:31",
+			"groups": [],
+			"user_permissions": []
+		}
+	},
+	{
+		"model": "auth.user",
+		"pk": 4,
+		"fields": {
+			"password": "!",
+			"last_login": "2016-03-23T11:43:00",
+			"is_superuser": true,
+			"username": "test4",
+			"first_name": "Four",
+			"last_name": "Test",
+			"email": "test4@domain.com",
+			"is_staff": true,
+			"is_active": true,
+			"date_joined": "2011-03-16T11:15:39",
+			"groups": [],
+			"user_permissions": []
+		}
+	}
+]

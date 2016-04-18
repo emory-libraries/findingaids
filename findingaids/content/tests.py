@@ -25,6 +25,7 @@ from eulexistdb.testutil import TestCase as EulexistdbTestCase
 from eullocal.django.forms.tests import MockCaptcha
 
 from findingaids.content import forms
+from findingaids.fa.models import Archive
 
 # re-using finding aid fixtures from main fa app
 exist_fixture_path = path.join(path.dirname(path.abspath(__file__)), '..',
@@ -232,7 +233,8 @@ class RequestMaterialsFormTest(EmailTestCase):
 
 
 class ContentViewsTest(EmailTestCase):
-    exist_fixtures = {'files' : [path.join(exist_fixture_path, 'abbey244.xml')]}
+    exist_fixtures = {'files': [path.join(exist_fixture_path, 'abbey244.xml')]}
+    fixtures = ['archive_contacts.json', 'contacts.json']
 
     def setUp(self):
         self.client = Client()
@@ -298,12 +300,9 @@ class ContentViewsTest(EmailTestCase):
             msg_prefix='response should display error message when sending email triggers an exception',
             status_code=500)
 
-
-    @skip
     def test_request_materials(self):
-        # NOTE: this test has been disabled because the request materials edit
-        # form has been disabled as the archives transition to using Aeon
-        # for requesting materials
+        # NOTE: this is a test for request_materials page
+        # The PT ID is #117174547
 
         # GET - display the form
         rqst_materials_url = reverse('content:request-materials')
@@ -312,26 +311,56 @@ class ContentViewsTest(EmailTestCase):
         self.assertEqual(response.status_code, expected,
             'Expected %s but returned %s for GET on %s'
              % (expected, response.status_code, rqst_materials_url))
-        self.assert_(isinstance(response.context['form'], forms.RequestMaterialsForm),
-            'request materials form should be set in template context for GET on %s' % rqst_materials_url)
 
-        # POST - send an email
-        data = {
-            'repo': [settings.REQUEST_MATERIALS_CONTACTS[0][0]],
-            'name': 'A. Scholar',
-            'date': 'tomorrow',
-            'email': 'a.scholar@gmail.com',
-            'phone': '7-1234',
-            'request': 'MSS644 Ted Hughes Box 1 Box 5 OP12',
-            # captcha fields required for form to be valid
-            'recaptcha_challenge_field': 'boo',
-            'recaptcha_response_field': 'hiss',
-            'remote_ip': '0.0.0.0',
-        }
-        response = self.client.post(rqst_materials_url, data)
-        expected = 200
-        self.assertEqual(response.status_code, expected,
-            'Expected %s but returned %s for POST on %s'
-             % (expected, response.status_code, rqst_materials_url))
-        self.assertContains(response, 'request for materials has been sent',
-            msg_prefix='success message should be displayed on result page after sending feedback')
+        '''Check if the MARBL archive has two contacts'''
+        self.assertEqual(Archive.objects.filter(label="MARBL")[0].contacts.count(), 2)
+
+        '''Check if the EUA archive has two contacts'''
+        self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.count(), 2)
+
+        '''Check if the Pitts archive has zero contacts'''
+        self.assertEqual(Archive.objects.filter(label="Pitts")[0].contacts.count(), 0)
+
+        '''Check if the MARBL contains the contact name "test1"'''
+        self.assertEqual(Archive.objects.filter(label="MARBL")[0].contacts.filter(username="test1").count(), 1)
+
+        '''Check if the EUA contains the contact name "test2"'''
+        self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.filter(username="test2").count(), 1)
+
+    #
+    # @skip
+    # def test_request_materials(self):
+    #     # NOTE: this test has been disabled because the request materials edit
+    #     # form has been disabled as the archives transition to using Aeon
+    #     # for requesting materials
+    #
+    #     # GET - display the form
+    #     rqst_materials_url = reverse('content:request-materials')
+    #     response = self.client.get(rqst_materials_url)
+    #     expected = 200
+    #     self.assertEqual(response.status_code, expected,
+    #         'Expected %s but returned %s for GET on %s'
+    #          % (expected, response.status_code, rqst_materials_url))
+    #     self.assert_(isinstance(response.context['form'], forms.RequestMaterialsForm),
+    #         'request materials form should be set in template context for GET on %s' % rqst_materials_url)
+    #
+    #     # POST - send an email
+    #     data = {
+    #         'repo': [settings.REQUEST_MATERIALS_CONTACTS[0][0]],
+    #         'name': 'A. Scholar',
+    #         'date': 'tomorrow',
+    #         'email': 'a.scholar@gmail.com',
+    #         'phone': '7-1234',
+    #         'request': 'MSS644 Ted Hughes Box 1 Box 5 OP12',
+    #         # captcha fields required for form to be valid
+    #         'recaptcha_challenge_field': 'boo',
+    #         'recaptcha_response_field': 'hiss',
+    #         'remote_ip': '0.0.0.0',
+    #     }
+    #     response = self.client.post(rqst_materials_url, data)
+    #     expected = 200
+    #     self.assertEqual(response.status_code, expected,
+    #         'Expected %s but returned %s for POST on %s'
+    #          % (expected, response.status_code, rqst_materials_url))
+    #     self.assertContains(response, 'request for materials has been sent',
+    #         msg_prefix='success message should be displayed on result page after sending feedback')

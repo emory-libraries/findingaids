@@ -1,4 +1,6 @@
-eulxml>=0.20.3
+# eulxml>=0.20.3
+# eulxml 1.1 with xml catalog for schemas
+git+https://github.com/emory-libraries/eulxml.git@feature/loading_schemas#egg=eulxml
 #eulexistdb>=0.18.0
 # existdb 2.2 feature branch until next release
 git+https://github.com/emory-libraries/eulexistdb.git@feature/chunked-results#egg=eulexistdb

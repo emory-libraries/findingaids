@@ -152,7 +152,6 @@ AUTHENTICATION_BACKENDS = (
     'django_auth_ldap.backend.LDAPBackend'
 )
 
-
 LOGIN_URL = "/admin/accounts/login/"
 LOGIN_REDIRECT_URL = "/admin/"
 
@@ -234,4 +233,3 @@ if django_nose is not None:
 # against non-test configured existdb collection
 else:
     TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
-
