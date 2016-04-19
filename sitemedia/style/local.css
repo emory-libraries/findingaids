@@ -526,6 +526,7 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
 
 #stored-offsite .icon {
   padding: 15px;
+}
 
 .search-tips blockquote {
   margin: 0;
@@ -622,3 +623,13 @@ a.request.btn {}
   background-color: #f2f3f5;
 }
 
+/* folder-level scope-content note */
+.scopenote {
+  background-color: #f2f3f5;
+  margin: 5px 0;
+  padding: 5px;
+}
+
+.scopenote p {
+  margin: 0 0 3px;
+}

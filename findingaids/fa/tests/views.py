@@ -807,6 +807,13 @@ class FaViewsTest(TestCase):
             '<div class="fa-title">.* >\s+Interview transcripts\s+</div>', response.content,
             msg_prefix='short series title in breadcrumb displays text without date')
 
+        # folder-level scope content note should be displayed
+        self.assertContains(response, 'Test scope note about this cassette',
+            msg_prefix='folder-level scope content note should be displayed')
+        self.assertContains(response, '<div class="scopenote">',
+            msg_prefix='scope note section should be present if any folders ' +
+                       'include scopecontent note')
+
         # ead should be requestable from series
         # (testing that response includes enough data for requestable method)
         self.assertTrue(response.context['ead'].requestable(),

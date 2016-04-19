@@ -53,6 +53,21 @@
             {% endfor %}
         </div>
         {% endif %}
+        {# folder-level scope and content note #}
+        {% if component.scope_content %}
+        <div class="scopenote">
+          {# optional heading #}
+          {% if component.scope_content.head %}<h3>{{ component.scope_content.head|format_ead }}</h3>{% endif %}
+          {% for para in component.scope_content.content %}
+            <p>{{ para|format_ead }}</p>
+          {% endfor %}
+          {# optional note #}
+          {% if component.scope_content.note %}
+            <p class="note">{{ component.scope_content.note|format_ead }}</p>
+          {% endif %}
+        </div>
+        {% endif %}
+
         {% if not rdfa_rel and component.has_semantic_data and component.rdf_type %}
          </span></span>  {# end mentions, manuscript #}
         {% endif %}
