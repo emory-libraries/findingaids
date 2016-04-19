@@ -179,15 +179,15 @@ table#descriptive_summary th {
     padding-right:5px;
     width:150px;
 }
-div.fa li {
+div.findingaid li {
    list-style-type:none;
    background: none !important;
 }
 
-.fa h3 {
+.findingaid h3 {
     padding: 0px;   /* override 8px top-padding from html-elements.css */
 }
-.fa table, table#descriptive_summary td {
+.findingaid table, table#descriptive_summary td {
     border: none;
     margin: 0px;
 }
