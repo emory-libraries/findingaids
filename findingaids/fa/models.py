@@ -261,7 +261,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             `archdesc__access_restriction` is included.
         '''
         return 'collection stored off-site' in \
-            unicode(self.archdesc.access_restriction)
+            unicode(self.archdesc.access_restriction).lower()
 
     def admin_info(self):
         """
