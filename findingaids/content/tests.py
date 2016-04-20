@@ -328,7 +328,7 @@ class ContentViewsTest(EmailTestCase):
         self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.filter(username="test2").count(), 1)
 
         '''Check if a user without names would be displayed on request materials page with email "test5@domain.com"'''
-        self.assertContains(response, 'test5@domain.com')
+        self.assertContains(response, '<a href="mailto:test5@domain.com">test5@domain.com</a>', html=True)
 
     #
     # @skip
