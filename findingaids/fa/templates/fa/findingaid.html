@@ -57,11 +57,13 @@
    </span> {# end publisher #}
     <p>Permanent link: <a property="schema:url" rel="bookmark" href="{{ ead.eadid.url }}">{{ ead.eadid.url }}</a></p>
   </div>
-  {% include "fa/snippets/digital-content.html" %}
-  {% include "fa/snippets/stored-offsite.html" %}
+
   <div id="sidebar-right">
       <a class="printable" href="{% ifurl preview 'fa-admin:preview:printable' 'fa:printable' id=ead.eadid %}" rel="alternate">Printable PDF</a>
   </div>
+
+  {% include "fa/snippets/digital-content.html" %}
+  {% include "fa/snippets/stored-offsite.html" %}
 
 {% endwith %}
 <meta property="schema:dateCreated" content="{{ ead.profiledesc.date.normalized }}"/>

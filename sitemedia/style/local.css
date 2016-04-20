@@ -489,7 +489,7 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
 
 .collection-banner {
   color: white;
-  width: 5in;
+  width: 5.25in;
   min-height: 45px;
   text-align: center;
   vertical-align: middle;
@@ -522,6 +522,7 @@ a.icon-printable, a.printable { background:url(images/icon-print.gif) no-repeat 
 
 #stored-offsite {
   background-color: #f19b62;
+  margin-bottom: 15px;
 }
 
 #stored-offsite .icon {
