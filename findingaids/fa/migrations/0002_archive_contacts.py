@@ -17,6 +17,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='archive',
             name='contacts',
-            field=models.ManyToManyField(blank=True, help_text=b'contact person for an archive person to be displayed on the request materials page', to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(blank=True, help_text=b'Contact person for display on the Request Materials page (email required)', to=settings.AUTH_USER_MODEL),
         ),
     ]

@@ -910,7 +910,8 @@ class Archive(models.Model):
     slug = models.SlugField(help_text='''shorthand id
         (auto-generated from label; do not modify after initial archive definition)''')
     contacts = models.ManyToManyField(settings.AUTH_USER_MODEL,
-        help_text='contact person for an archive person to be displayed on the request materials page', blank=True)
+        help_text='Contact person for display on the Request Materials page (email required)',
+        blank=True)
 
 
     def __unicode__(self):
@@ -921,7 +922,8 @@ class Archive(models.Model):
         return os.path.join(settings.SVN_WORKING_DIR, self.slug)
 
     def contact_names(self):
-        return ', '.join([contact.get_full_name() for contact in self.contacts.all()])
-
-    ''' label for the contact_names method (consumed in the list display table header)'''
+        '''List of contact names method for display in django admin list
+        display.  Shows email if user has no full name.'''
+        return ', '.join([contact.get_full_name() or contact.email
+                          for contact in self.contacts.all()])
     contact_names.short_description = "Contacts"
