@@ -313,19 +313,19 @@ class ContentViewsTest(EmailTestCase):
              % (expected, response.status_code, rqst_materials_url))
 
         '''Check if the MARBL archive has two contacts'''
-        self.assertEqual(Archive.objects.filter(label="MARBL")[0].contacts.count(), 2)
+        self.assertEqual(Archive.objects.get(label="MARBL").contacts.count(), 2)
 
         '''Check if the EUA archive has two contacts'''
-        self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.count(), 3)
+        self.assertEqual(Archive.objects.get(label="EUA").contacts.count(), 3)
 
         '''Check if the Pitts archive has zero contacts'''
-        self.assertEqual(Archive.objects.filter(label="Pitts")[0].contacts.count(), 0)
+        self.assertEqual(Archive.objects.get(label="Pitts").contacts.count(), 0)
 
         '''Check if the MARBL contains the contact name "test1"'''
-        self.assertEqual(Archive.objects.filter(label="MARBL")[0].contacts.filter(username="test1").count(), 1)
+        self.assertEqual(Archive.objects.get(label="MARBL").contacts.filter(username="test1").count(), 1)
 
         '''Check if the EUA contains the contact name "test2"'''
-        self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.filter(username="test2").count(), 1)
+        self.assertEqual(Archive.objects.get(label="EUA").contacts.filter(username="test2").count(), 1)
 
         '''Check if a user without names would be displayed on request materials page with email "test5@domain.com"'''
         self.assertContains(response, '<a href="mailto:test5@domain.com">test5@domain.com</a>', html=True)
