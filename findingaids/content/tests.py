@@ -316,7 +316,7 @@ class ContentViewsTest(EmailTestCase):
         self.assertEqual(Archive.objects.filter(label="MARBL")[0].contacts.count(), 2)
 
         '''Check if the EUA archive has two contacts'''
-        self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.count(), 2)
+        self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.count(), 3)
 
         '''Check if the Pitts archive has zero contacts'''
         self.assertEqual(Archive.objects.filter(label="Pitts")[0].contacts.count(), 0)
@@ -326,6 +326,9 @@ class ContentViewsTest(EmailTestCase):
 
         '''Check if the EUA contains the contact name "test2"'''
         self.assertEqual(Archive.objects.filter(label="EUA")[0].contacts.filter(username="test2").count(), 1)
+
+        '''Check if a user without names would be displayed on request materials page with email "test5@domain.com"'''
+        self.assertContains(response, 'test5@domain.com')
 
     #
     # @skip
