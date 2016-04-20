@@ -910,7 +910,7 @@ class Archive(models.Model):
     slug = models.SlugField(help_text='''shorthand id
         (auto-generated from label; do not modify after initial archive definition)''')
     contacts = models.ManyToManyField(settings.AUTH_USER_MODEL,
-        help_text='contact person for an archive person to be displayed on the request materials page')
+        help_text='contact person for an archive person to be displayed on the request materials page', blank=True)
 
 
     def __unicode__(self):
