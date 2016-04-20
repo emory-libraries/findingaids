@@ -107,7 +107,9 @@ def request_materials(request):
         form = RequestMaterialsForm()
 
     captcha_theme = getattr(settings, 'RECAPTCHA_THEME', None)
-    archives = Archive.objects.exclude(contacts=None).order_by("name")
+
+    # Filter to remove archives whose contacts include members without an email (null) or with an empty email field
+    archives = Archive.objects.filter(contacts__email__isnull=False).exclude(contacts__email__exact='').distinct().order_by("name")
 
     return render(request, 'content/request-materials.html', {
             'form': form,
