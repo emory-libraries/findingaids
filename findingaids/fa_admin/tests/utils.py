@@ -63,10 +63,10 @@ class UtilsTest(TestCase):
 
         # save pid config settings to restore in teardown
         self._pid_config = {
-            'PIDMAN_HOST': settings.PIDMAN_HOST,
-            'PIDMAN_USER': settings.PIDMAN_USER,
-            'PIDMAN_PASSWORD': settings.PIDMAN_PASSWORD,
-            'PIDMAN_DOMAIN': settings.PIDMAN_DOMAIN
+            'PIDMAN_HOST': getattr(settings, 'PIDMAN_HOST', None),
+            'PIDMAN_USER': getattr(settings, 'PIDMAN_USER', None),
+            'PIDMAN_PASSWORD': getattr(settings, 'PIDMAN_PASSWORD', None),
+            'PIDMAN_DOMAIN': getattr(settings, 'PIDMAN_DOMAIN', None)
             }
 
         # initialize valid and invalid ead fixtures
