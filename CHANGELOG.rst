@@ -8,6 +8,12 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.9.0
+-----
+
+* Now configured to use django-debug-toolbar for development, with
+  a panel for viewing existdb xqueries.
+
 1.8.3
 -----
 

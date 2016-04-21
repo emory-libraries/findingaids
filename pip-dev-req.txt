@@ -3,3 +3,4 @@ coverage
 MySQL-python
 mock
 django-nose
+django-debug-toolbar
