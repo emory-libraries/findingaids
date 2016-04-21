@@ -421,8 +421,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "Service Unavailable",
-                msg_prefix="error page displays specific connection error message")
 
     def test_logout(self):
         admin_logout = reverse('fa-admin:logout')
