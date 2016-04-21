@@ -23,6 +23,8 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from findingaids.fa.sitemaps import FINDINGAID_SITEMAPS
 from findingaids.content.sitemaps import ContentSitemap
+from findingaids.content import views as contentviews
+
 
 admin.autodiscover()
 
@@ -39,8 +41,7 @@ urlpatterns = [
     url(r'^db-admin/', include(admin.site.urls)),
     url(r'^admin/', include('findingaids.fa_admin.urls',
                             namespace='fa-admin')),
-    url(r'^$', 'findingaids.content.views.site_index',
-        name='site-index'),
+    url(r'^$', contentviews.site_index, name='site-index'),
     url(r'^content/', include('findingaids.content.urls',
                               namespace='content')),
     # everything else should fall through to the main app
