@@ -49,6 +49,12 @@ fa_listfields = ['eadid', 'list_title', 'archdesc__did']
 # and FindingAid.abstract
 
 
+# NOTE: exist query time reporting is disabled for now; as of
+# eulexistdb 0.20 it is not available, but leaving the lines commented out
+# because it may be enabled again for future versions of eXist.
+# In the meantime, it is recommended to use django-debug-toolbar instead.
+
+
 RDFA_NAMESPACES = {
     'schema': 'http://schema.org/',
     'dcmitype': 'http://purl.org/dc/dcmitype/',
@@ -91,7 +97,7 @@ def titles_by_letter(request, letter):
 
     response_context = {
         'findingaids': fa_subset,
-        'querytime': [fa.queryTime()],
+        # 'querytime': [fa.queryTime()],
         'letters': title_letters(),
         'current_letter': letter,
         'show_pages': page_labels,
@@ -347,9 +353,9 @@ def _view_series(request, eadid, *series_ids, **kwargs):
     prev = index - 1
     next = index + 1
 
-    query_times = [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()]
-    if hasattr(ead, 'queryTime'):
-        query_times.append(ead.queryTime())
+    # query_times = [result.queryTime(), all_series.queryTime(), all_indexes.queryTime()]
+    # if hasattr(ead, 'queryTime'):
+        # query_times.append(ead.queryTime())
 
     extra_ns = RDFA_NAMESPACES.copy()
     # add any non-default namespaces from the EAD document
@@ -360,7 +366,7 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         'ead': ead,
         'all_series': all_series,
         'all_indexes': all_indexes,
-        'querytime': query_times,
+        # 'querytime': query_times,
         'prev': prev,
         'next': next,
         'url_params': url_params,
@@ -543,7 +549,7 @@ def search(request):
             else:
                 page_labels = {}
             show_pages = pages_to_show(paginator, result_subset.number, page_labels)
-            query_times = findingaids.queryTime()
+            # query_times = findingaids.queryTime()
 
             # select non-empty form values for use in template
             search_params = dict((key, value) for key, value in form.cleaned_data.iteritems()
@@ -580,7 +586,7 @@ def search(request):
                 'search_params': search_params,    # actual search terms, for display
                 'url_params': url_params,   # url opts for pagination
                 'highlight_params': highlight_params,  # keyword highlighting
-                'querytime': [query_times],
+                # 'querytime': [query_times],
                 'show_pages': show_pages
             }
             if page_labels:     # if there are page labels to show, add to context
@@ -663,7 +669,7 @@ def document_search(request, id):
             return render(request, 'fa/document_search.html', {
                 'files': files,
                 'ead': ead,
-                'querytime': [files.queryTime(), ead.queryTime()],
+                # 'querytime': [files.queryTime(), ead.queryTime()],
                 'keywords': search_terms,
                 'dao': form.cleaned_data['dao'],
                 'url_params': url_params,

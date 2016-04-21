@@ -390,7 +390,8 @@ def preview(request, archive):
         fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
                             order_by='last_modified')
         return render(request, 'fa_admin/preview_list.html',
-                {'findingaids': fa, 'querytime': [fa.queryTime()]})
+                {'findingaids': fa, #'querytime': [fa.queryTime()]
+                })
 
 
 @permission_required_with_403('fa_admin.can_prepare')
@@ -543,7 +544,8 @@ def list_published(request, archive=None):
     show_pages = pages_to_show(paginator, fa_subset.number)
 
     return render(request, 'fa_admin/published_list.html', {'findingaids': fa_subset,
-        'querytime': [fa.queryTime()], 'show_pages': show_pages, 'archive': arch})
+        # 'querytime': [fa.queryTime()],
+        'show_pages': show_pages, 'archive': arch})
 
 @permission_required_with_403('fa_admin.can_delete')
 @user_passes_test_with_ajax(archive_access)
