@@ -188,6 +188,9 @@ class FeedbackFormTest(EmailTestCase):
         self.assert_(ead_url in self.sent_mail['message'],
             'when url is specified on form, it should be included in message text')
 
+# disabling tests here because request materials form is no longer used
+# (superseded by aeon)
+
 
 class RequestMaterialsFormTest(EmailTestCase):
 
@@ -197,6 +200,7 @@ class RequestMaterialsFormTest(EmailTestCase):
     def tearDown(self):
         super(RequestMaterialsFormTest, self).tearDown()
 
+    @skip
     def test_send_email(self):
         # form data with message only
         data = {
