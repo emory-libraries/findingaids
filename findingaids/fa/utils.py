@@ -196,7 +196,7 @@ def alpha_pagelabels(paginator, objects, label_attribute):
         for j in range(1, len(labels[i])+1):
             # start with one letter, go up to full length of the label if necessary
             abbr = labels[i][:j]
-            next_label = labels[i+1] if i+1 < len(labels)  else ''
+            next_label = labels[i+1] if i+1 < len(labels) else ''
             prev_label = labels[i-1] if i > 0 else ''
             if abbr != next_label[:j] and abbr != prev_label[:j]:
                 # at current length, abbreviation is different from neighboring labels
@@ -210,6 +210,13 @@ def alpha_pagelabels(paginator, objects, label_attribute):
                 label = re.sub(r', \d{4}-?(\d{4})?.?$', '', labels[i])
                 abbreviated_labels.append(label)
                 break
+            elif j == len(labels[i]):
+                # If we get to the end of the label and have not met another
+                # case, just use the whole label.
+                # Only happens in rare cases, e.g. when there is a nearly
+                # complete match like variant titles with and without
+                # trailing period.
+                abbreviated_labels.append(abbr)
 
     for i in range(0, len(abbreviated_labels), 2):
         page_index = (i+2) / 2
