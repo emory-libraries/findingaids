@@ -1,6 +1,4 @@
-#eulxml>=1.0.1
-# eulxml 1.1
-git+https://github.com/emory-libraries/eulxml.git@feature/loading_schemas#egg=eulxml
+eulxml>=1.1
 eulexistdb>=0.20.1
 eulcommon>=0.18.0
 https://wilson.library.emory.edu/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
