@@ -147,10 +147,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 # Enable additional backends.
 # Enable this for LDAP and see ReadMe for install dependencies.
-AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',
-                           'eullocal.django.emory_ldap.backends.EmoryLDAPBackend')
-
-AUTH_USER_MODEL = 'emory_ldap.EmoryLDAPUser'
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
+    'django_auth_ldap.backend.LDAPBackend'
+)
 
 LOGIN_URL = "/admin/accounts/login/"
 LOGIN_REDIRECT_URL = "/admin/"
@@ -171,7 +171,6 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.humanize',
     'djcelery',
-    'south',
     'eullocal.django.emory_ldap',
     'eullocal.django.taskresult',
     'eullocal.django.util',
@@ -210,7 +209,6 @@ except ImportError:
     pass
 
 # django_nose configurations
-
 django_nose = None
 try:
     # NOTE: errors if DATABASES is not configured (in some cases),
@@ -219,13 +217,12 @@ try:
 except ImportError:
     pass
 
-
 # - only if django_nose is installed, so it is only required for development
 if django_nose is not None:
     INSTALLED_APPS.append('django_nose')
     TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
     NOSE_PLUGINS = [
-    'eulexistdb.testutil.ExistDBSetUp',
+        'findingaids.testutil.ExistDBSetUp',
         # ...
     ]
     NOSE_ARGS = ['--with-existdbsetup']
@@ -235,5 +232,27 @@ if django_nose is not None:
 else:
     TEST_RUNNER = 'eulexistdb.testutil.ExistDBTextTestSuiteRunner'
 
-# disable south migrations in unit tests
-SOUTH_TESTS_MIGRATE = False
+# enable django-debug-toolbar when available & in debug/dev modes
+if DEBUG or DEV_ENV:
+    try:
+        import debug_toolbar
+        INSTALLED_APPS.append('debug_toolbar')
+    except ImportError:
+        pass
+
+# configure: default toolbars + existdb query panel
+DEBUG_TOOLBAR_PANELS = [
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'eulexistdb.debug_panel.ExistDBPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+    'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    'debug_toolbar.panels.templates.TemplatesPanel',
+    'debug_toolbar.panels.cache.CachePanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
+    'debug_toolbar.panels.redirects.RedirectsPanel',
+]

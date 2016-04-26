@@ -60,17 +60,15 @@
 <p>
 For access to collections at other campus repositories, please contact the archivist for that library directly:
 </p>
-<p>
-Health Sciences: <a href="mailto:clayton.mcgahee@emory.edu">Clayton McGahee</a>
-</p>
-<p>
-Law: <a href="mailto:vaking@emory.edu">Vanessa King</a>
-</p>
-<p>
-Oxford: <a href="mailto:libjkh@emory.edu">Jennifer Sirotkin</a>
-</p>
-<p>
-Pitts: <a href="mailto:dmadera@emory.edu">Debra Madera</a> or <a href="mailto:brandon.wason@emory.edu">Brandon Wason</a>
-</p>
+
+<ul>
+{% for archive in archives %}
+  <li>{{archive.name}}:
+    {%for contact in archive.contacts.all %}
+      <a href="mailto:{{contact.email}}">{% firstof contact.get_full_name contact.email %}</a>{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+  </li>
+{% endfor %}
+</ul>
 
 {% endblock %}

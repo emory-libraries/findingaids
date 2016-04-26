@@ -22,6 +22,9 @@ from django.forms import ModelForm
 class DeleteForm(ModelForm):
     class Meta:
         model = Deleted
+        # django 1.8 requires explicit field list or exclude list;
+        # include all fields for now
+        exclude = []
         # NOTE: not excluding date from edit form because on an update it MAY
         # need to be changed, but only a person can determine that
         widgets = {

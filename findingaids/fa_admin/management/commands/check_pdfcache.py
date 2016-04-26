@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/management/commands/check_pdfcache.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -34,7 +34,7 @@ ICP_HIT = 'ICP_OP_HIT'
 ICP_MISS = 'ICP_OP_MISS'
 
 class Command(BaseCommand):
-    """Check status of Finding Aid PDFs in the configured cache.  If any eadids 
+    """Check status of Finding Aid PDFs in the configured cache.  If any eadids
 are specified, checks only those documents; otherwise, checks all published
 Finding Aids, up to any maximum number specified.
 
@@ -43,13 +43,12 @@ In verbose mode, reports the cache age and any warnings for cached items."""
 
     args = '[<eadid eadid ... >]'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--max', '-m',
+    def add_arguments(self, parser):
+        parser.add_argument('--max', '-m',
             dest='max',
             metavar='##',
-            type='int',
-            help='Check only the specified number of PDFs'),
-        )
+            type=int,
+            help='Check only the specified number of PDFs')
 
     def handle(self, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
@@ -83,7 +82,7 @@ In verbose mode, reports the cache age and any warnings for cached items."""
         if verbosity > v_normal:
             print "Connecting to cache ICP on %s:%s" % (proxy_host, settings.PROXY_ICP_PORT)
         s.connect((proxy_host, settings.PROXY_ICP_PORT))
-      
+
         count = 0
         hit = 0
         miss = 0
@@ -101,7 +100,7 @@ In verbose mode, reports the cache age and any warnings for cached items."""
             # ead printable url to check in the cache
             pdf_url = reverse('fa:printable', kwargs={'id': eadid })
             url = "%s%s" % (base_url, pdf_url)
-            # construct ICP query 
+            # construct ICP query
             query = icp.HEADER_LAYOUT + icp.QUERY_LAYOUT
             # url in ICP struct must be null-terminated
             q_url =  "%s\0" % url
@@ -132,12 +131,12 @@ In verbose mode, reports the cache age and any warnings for cached items."""
                 return
             elif code == ICP_ERROR:
                 print "Error: got response code %s -- script may not be querying URLs correctly" % code
-                return          
-                
+                return
+
             # display eadid and response code returned from cache
             # normal verbosity: display non-hits only; verbose: print all
             if verbosity > v_normal or (verbosity == v_normal and code != ICP_HIT):
-                print result_fmt % {'eadid': eadid, 'status': code}            
+                print result_fmt % {'eadid': eadid, 'status': code}
 
             if code == ICP_HIT:
                 hit += 1
@@ -159,7 +158,7 @@ In verbose mode, reports the cache age and any warnings for cached items."""
                         #connection = httplib.HTTPConnection(settings.PROXY_HOST)
             elif code == ICP_MISS:
                 miss += 1
-            # ignoring other codes for now            
+            # ignoring other codes for now
             count += 1
             if options['max'] and count >= options['max']:
                 break

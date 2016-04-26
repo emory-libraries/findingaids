@@ -24,7 +24,7 @@
       </publicationstmt>
     </filedesc>
     <profiledesc>
-      <creation>Finding aid encoded, 
+      <creation>Finding aid encoded,
 		  <date calendar="gregorian" encodinganalog="Date" era="ce" normal="2007-11-30">November 30,
 			 2007</date></creation>
       <langusage>
@@ -64,6 +64,8 @@
       <p>Use copies have not been made for all of the audiovisual series at
 		  this time. Researchers must contact MARBL in advance for access to these
 		  materials.</p>
+      <!-- added to test stored-offsite functionality -->
+      <p>collection stored off-site</p>
     </accessrestrict>
     <userestrict encodinganalog="540">
       <head>Terms Governing Use and Reproduction</head>
@@ -72,7 +74,7 @@
     </userestrict>
     <prefercite encodinganalog="524">
       <head>Citation</head>
-      <p>[after identification of item(s)], 
+      <p>[after identification of item(s)],
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Where Peachtree Meets Sweet Auburn</title> research files and
 		interviews, Manuscript, Archives, and Rare Book Library, Emory University.</p>
     </prefercite>
@@ -89,11 +91,11 @@
     <bioghist encodinganalog="545">
       <head>Biographical Note</head>
       <p>Gary M. Pomerantz is an award-winning journalist and author. After
-		  graduating from the University of California (Berkeley), Pomerantz joined 
+		  graduating from the University of California (Berkeley), Pomerantz joined
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">The Washington Post</title> as a sports reporter. In the 1990s, he
-		moved to 
+		moved to
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">The Atlanta Journal-Constitution</title> where he wrote feature
-		stories, and penned columns and editorials. His first book was 
+		stories, and penned columns and editorials. His first book was
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Where Peachtree Meets Sweet Auburn: A Saga of Race and Family
 		  </title>(1996). It tells the story of race relations in 20th century Atlanta
 		through the history of two families: the Allens and the Dobbs. Ivan Allen, Sr.,
@@ -103,21 +105,21 @@
 		of these families produced future mayors of Atlanta: Ivan Allen, Jr., who was
 		the only southern politician to go to Washington, D.C. to speak in favor of the
 		1964 Civil Rights Act, and Maynard H. Jackson, the first African American mayor
-		of a southern city. 
+		of a southern city.
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Where Peachtree Meets Sweet Auburn</title> explores the origins
 		and the workings of Atlanta's racial détente. It was named a "Notable Book of
-		the Year" by 
+		the Year" by
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">The New York Times</title> and it was included in The Georgia
-		Center for the Book's "Georgia Top 25 Reading List." His other books include 
+		Center for the Book's "Georgia Top 25 Reading List." His other books include
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Nine Minutes, Twenty Seconds: A True Story of Tragedy &amp;
-		  Triumph</title> (2001) and 
+		  Triumph</title> (2001) and
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Wilt, 1962: The Night of 100 Points and the Dawn of a New
 		  Era</title> (2005). </p>
     </bioghist>
     <scopecontent encodinganalog="520">
       <head>Scope and Content Note</head>
       <p>This collection consists of materials relating to Pomerantz's first
-		  book, 
+		  book,
 		<title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Where Peachtree Meets Sweet Auburn: A Saga of Race and
 		  Family</title> (New York : Scribner, c1996). It includes interviews, interview
 		transcripts, research materials, notebooks and audiovisual materials relating
@@ -170,7 +172,7 @@
       <c01 id="pomerantz890_series1" level="series">
         <did>
           <unitid>Series 1</unitid>
-          <unittitle encodinganalog="245$a">Interview transcripts, 
+          <unittitle encodinganalog="245$a">Interview transcripts,
 				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" normal="1991/1995"> 1991-1995</unitdate></unittitle>
           <physdesc encodinganalog="300">Boxes 1-5</physdesc>
         </did>
@@ -199,6 +201,7 @@
             <unittitle>Acey, J. Earl and Port Scott, July 10, 1991. [Cassette
 				  available]</unittitle>
           </did>
+          <scopecontent><p>Test scope note about this cassette.</p></scopecontent>
         </c02>
         <c02 level="file">
           <did>
@@ -1742,7 +1745,7 @@
             <did>
               <container type="box">17</container>
               <container type="folder">7</container>
-              <unittitle>"Atlanta Story," 1961, 
+              <unittitle>"Atlanta Story," 1961,
 					 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Pittsburgh Courier</title></unittitle>
             </did>
           </c03>
@@ -2035,7 +2038,7 @@
       <c01 id="pomerantz890_series4" level="series">
         <did>
           <unitid>Series 4</unitid>
-          <unittitle encodinganalog="245$a">Audiovisual, 
+          <unittitle encodinganalog="245$a">Audiovisual,
 				<unitdate calendar="gregorian" encodinganalog="245$f" era="ce" normal="1991/1999" type="inclusive">1991-1995,
 				  1999</unitdate></unittitle>
           <physdesc encodinganalog="300">Boxes 21-26, CD1-2</physdesc>
@@ -2870,8 +2873,8 @@
             <did>
               <container type="box">23</container>
               <container type="folder">33</container>
-              <unittitle>Kasten, Stan, "for 
-					 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">AJC</title> [ 
+              <unittitle>Kasten, Stan, "for
+					 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">AJC</title> [
 					 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Atlanta Journal Constitution</title>]," 1988 or
 					 1989.</unittitle>
             </did>
@@ -3028,8 +3031,8 @@
             <did>
               <container type="box">24</container>
               <container type="folder">18</container>
-              <unittitle>Missing and Murdered Children Parents, "for 
-					 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">AJC</title>" [ 
+              <unittitle>Missing and Murdered Children Parents, "for
+					 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">AJC</title>" [
 					 <title xmlns:xlink="http://www.w3.org/1999/xlink" xlink:type="simple" xlink:href="">Atlanta Journal Constitution</title>].</unittitle>
             </did>
           </c03>

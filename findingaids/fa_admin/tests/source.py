@@ -75,10 +75,11 @@ class SvnXmlFilesTest(TestCase):
             'earlier.xml': Mock(cmt_date=earlier * 1000000)
         }
         info = xml_info.copy()
-        info['nonxml.txt'] =  Mock(cmt_date=now * 1000000)
-        mocksvnwc.WorkingCopy.return_value.entries_read.return_value = info
+        info['nonxml.txt'] = Mock(cmt_date=now * 1000000)
+        svnwc = mocksvnwc.WorkingCopy.return_value
+        svnwc.entries_read.return_value = info
         files = svn_xml_files(arch)
-        mocksvnwc.WorkingCopy.return_value.entries_read.assert_called()
+        svnwc.entries_read.assert_called_with()
         # should consist of all xml files in svn info
         self.assertEqual(len(xml_info.keys()), len(files))
         self.assert_(isinstance(files[0], EadFile))

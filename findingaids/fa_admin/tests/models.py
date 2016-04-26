@@ -15,11 +15,14 @@
 #   limitations under the License.
 
 from django.test import TestCase
-
-from eullocal.django.emory_ldap.models import EmoryLDAPUser
+from django.contrib.auth import get_user_model
 
 from findingaids.fa.models import Archive
 from findingaids.fa_admin.models import Archivist
+
+
+User = get_user_model()
+
 
 class ArchivistTestCase(TestCase):
     fixtures = ['user']
@@ -38,7 +41,7 @@ class ArchivistTestCase(TestCase):
         # NOTE: consider making this a fixture?
 
         # no archives or order = empty list, no errors
-        arc = Archivist(user=EmoryLDAPUser.objects.get(username='testadmin'))
+        arc = Archivist(user=User.objects.get(username='testadmin'))
         arc.save()
         # because admin is super, should see all archives
         self.assertEqual(3, arc.sorted_archives().count())

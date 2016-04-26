@@ -36,18 +36,20 @@ class Command(BaseCommand):
     """
     help = __doc__
 
-    _args = ['browse', 'search', 'pages']
-    args = ' | '.join(_args)
-    option_list = BaseCommand.option_list + (
-        make_option('--pages', '-p',
+    modes = ['browse', 'search', 'pages']
+
+    def add_arguments(self, parser):
+        parser.add_argument('mode', choices=self.modes)
+
+        parser.add_argument('--pages', '-p',
             action='store_true',
             dest='pages_only',
-            help='Only test page load times'),
-        make_option('--xqueries', '-q',
+            help='Only test page load times')
+        parser.add_argument('--xqueries', '-q',
             action='store_true',
             dest='xquery_only',
-            help='Only test xquery times'),
-        )
+            help='Only test xquery times')
+
 
     threshold = 5000
     "warning-level threshold, in ms (queries that take longer than this will generate warnings)"
@@ -75,19 +77,19 @@ class Command(BaseCommand):
         '/documents/ormsby805/items/?keywords=belfast+group',
     )
 
-    def handle(self, cmd=None, *args, **options):
+    def handle(self, mode, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
         v_all = 2
 
-        if cmd not in self._args:
-            print "Command '%s' not recognized\n" % cmd
-            print self.help
-            return
+        # if cmd not in self._args:
+        #     print "Command '%s' not recognized\n" % cmd
+        #     print self.help
+        #     return
 
 
         # BROWSE
-        if cmd == 'browse':
+        if mode == 'browse':
             first_letters = title_letters()
 
             if not options['pages_only']:
@@ -121,7 +123,7 @@ class Command(BaseCommand):
                     uri = reverse('fa:titles-by-letter', kwargs={'letter': letter})
                     if verbosity == v_all:
                         print letter
-                    for page in range(1,11):
+                    for page in range(1, 11):
                         start_time = datetime.now()
                         response = client.get(uri, {'page': page})
                         end_time = datetime.now()
@@ -145,7 +147,7 @@ class Command(BaseCommand):
                 max_min_avg(query_times.values(), zero=timedelta())
 
         # SEARCH
-        elif cmd == 'search':
+        elif mode == 'search':
             client = Client()
             query_times = {}
 
@@ -207,7 +209,7 @@ class Command(BaseCommand):
                 max_min_avg(query_times.values(), zero=timedelta())
 
         # PAGES
-        elif cmd == 'pages':
+        elif mode == 'pages':
             client = Client()
             query_times = {}
 

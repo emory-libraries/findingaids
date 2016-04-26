@@ -1,5 +1,5 @@
 # file findingaids/fa_admin/management/commands/ead_to_xsd.py
-# 
+#
 #   Copyright 2012 Emory University Library
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,12 +33,6 @@ directory will be converted."""
 
     args = '[<filename filename ... >]'
 
-    option_list = BaseCommand.option_list + (
-        make_option('--dry-run', '-n',
-            dest='dryrun',
-            action='store_true',
-            help='''Report on what would be done, but don't make any actual changes'''),
-        )
 
     # canonical location of the EAD XSD schema
     schema_url = 'http://www.loc.gov/ead/ead.xsd'
@@ -54,11 +48,19 @@ directory will be converted."""
         'pretty_print': True
     }
 
+    def add_arguments(self, parser):
+
+        parser.add_argument('--dry-run', '-n',
+            dest='dryrun',
+            action='store_true',
+            help='''Report on what would be done, but don't make any actual changes''')
+
+
     def handle(self, *args, **options):
         verbosity = int(options['verbosity'])    # 1 = normal, 0 = minimal, 2 = all
         v_normal = 1
         v_all = 2
-        
+
         # check for required settings
         if not hasattr(settings, 'FINDINGAID_EAD_SOURCE') or not settings.FINDINGAID_EAD_SOURCE:
             raise CommandError("FINDINGAID_EAD_SOURCE setting is missing")
@@ -84,7 +86,7 @@ directory will be converted."""
 
         for file in files:
             base_filename = path.basename(file)
-            try:       
+            try:
                 # load file as xml
                 doc = etree.parse(file)
                 # check for schema definition in the file
@@ -95,10 +97,10 @@ directory will be converted."""
                     # don't re-process files that have already been converted
                     unchanged += 1
                     continue
-                    
+
                 # run xslt
                 result = self.dtd2schema(doc)
-                # clean up details not handled by the XSLT conversion                
+                # clean up details not handled by the XSLT conversion
                 #  @normal on <unitdate> and <date>: constrained to date and date range subset of ISO 8601
                 #  @repositorycode: constrained to ISO 15511 (ISIL)
                 #  @mainagencycode: same as @repositorycode
@@ -150,4 +152,4 @@ directory will be converted."""
         print "%d document%s updated" % (updated, 's' if updated != 1 else '')
         print "%d document%s unchanged" % (unchanged, 's' if unchanged != 1 else '')
         print "%d document%s with errors" % (errored, 's' if errored != 1 else '')
-            
+

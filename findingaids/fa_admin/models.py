@@ -17,6 +17,8 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from findingaids.fa.models import Archive
@@ -29,7 +31,7 @@ class Findingaids(models.Model):
     admin portion of the site.
     """
     class Meta:
-        permissions =(
+        permissions = (
                 ("can_publish", "Can publish a finding aid"),
                 ("can_preview", "Can preview a finding aid"),
                 ("can_delete", "Can delete a finding aid"),
@@ -38,10 +40,19 @@ class Findingaids(models.Model):
         )
 
 class Archivist(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL)
-    archives = models.ManyToManyField(Archive, blank=True, null=True)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE)  # if user is deleted, delete archivist too
+    archives = models.ManyToManyField(Archive, blank=True)
     order = models.CommaSeparatedIntegerField(max_length=255, blank=True,
         null=True)
+
+    def __repr__(self):
+        return '<Archivist %s: %s>' % (self.user.username,
+            ', '.join(arch.label for arch in self.archives.all()))
+
+    def __unicode__(self):
+        return u'Archivist %s (%s)' % (unicode(self.user),
+            ', '.join(arch.label for arch in self.archives.all()))
 
     def sorted_archives(self):
         '''List of archives this user is associated with, in order if
@@ -59,7 +70,7 @@ class Archivist(models.Model):
 
         return archives
 
-class EadFile:
+class EadFile(object):
     """Information about an EAD file available to be published or previewed."""
     def __init__(self, filename, modified, archive=None):
         self.filename = filename

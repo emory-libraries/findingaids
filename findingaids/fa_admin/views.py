@@ -24,7 +24,7 @@ from django.http import HttpResponse, HttpResponseServerError, Http404, \
     HttpResponseBadRequest
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.views import logout_then_login
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
@@ -34,7 +34,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_POST
 
-
+from django_auth_ldap.backend import LDAPBackend
 from eulcommon.djangoextras.auth import permission_required_with_403, \
    login_required_with_ajax, user_passes_test_with_ajax
 from eulexistdb.db import ExistDB, ExistDBException
@@ -188,20 +188,6 @@ def logout(request):
     return logout_then_login(request)
 
 
-@permission_required_with_403('auth.user.can_change')
-def list_staff(request):
-    """
-    Displays a list of user accounts, with summary information about each user
-    and a link to edit each user account.
-    """
-    users = get_user_model().objects.all()
-    app, model = settings.AUTH_USER_MODEL.lower().split('.')
-    change_url = 'admin:%s_%s_change' % (app, model)
-
-    return render(request, 'fa_admin/list-users.html',
-        {'users': users, 'user_change_url': change_url})
-
-
 def _prepublication_check(request, filename, archive, mode='publish', xml=None):
     """
     Pre-publication check logic common to :meth:`publish` and :meth:`preview`.
@@ -270,7 +256,7 @@ def publish(request):
         ead = get_findingaid(id, preview=True)
         ead_docname = get_findingaid(id, preview=True, only=['document_name'])
         filename = ead_docname.document_name
-    except Http404:     # not found in exist
+    except (ExistDBException, Http404):     # not found in exist OR permission denied
         messages.error(request,
             '''Publish failed. Could not retrieve <b>%s</b> from preview collection.
             Please reload and try again.''' % id)
@@ -332,8 +318,8 @@ def publish(request):
             # re-raise and let outer exception handling take care of it
             raise e
 
-    except ExistDBException, e:
-        errors.append(e.message())
+    except ExistDBException as err:
+        errors.append(err.message())
         success = False
 
     if success:
@@ -353,7 +339,7 @@ def publish(request):
         return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
     else:
         return render(request, 'fa_admin/publish-errors.html',
-            {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': e})
+            {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': err})
 
 @permission_required_with_403('fa_admin.can_preview')
 @user_passes_test_with_ajax(archive_access)
@@ -364,6 +350,7 @@ def preview(request, archive):
         filename = request.POST['filename']
 
         errors = []
+        err = None
 
         try:
             # only load to exist if document passes publication check
@@ -377,9 +364,9 @@ def preview(request, archive):
             preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename
             # make sure the preview collection exists, but don't complain if it's already there
             success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
-        except ExistDBException, e:
+        except ExistDBException as err:
             success = False
-            errors.append(e.message())
+            errors.append(err.message())
 
         if success:
             # load the file as a FindingAid object so we can generate the preview url
@@ -388,16 +375,23 @@ def preview(request, archive):
             # redirect to document preview page with code 303 (See Other)
             return HttpResponseSeeOtherRedirect(reverse('fa-admin:preview:findingaid', kwargs={'id': ead.eadid}))
         else:
-            return render(request, 'fa_admin/publish-errors.html',
-                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': e})
+            # no exception but no success means the load failed;
+            # *probably* due to insufficient permissions
+            if errors == [] and success == False:
+                errors.append('Failed to load the document to the preview collection')
 
-    # TODO: preview list needs to either go away (not currently used)
-    # or be filtered by archive
+            return render(request, 'fa_admin/publish-errors.html',
+                    {'errors': errors, 'filename': filename, 'mode': 'preview', 'exception': err})
+
+    # NOTE: preview list is not used anymore; functionality is handled
+    # by main admin view; if we revisit preview list, to be more usable it
+    # should be filterable by archive
     else:
         fa = get_findingaid(preview=True, only=['eadid', 'list_title', 'last_modified'],
                             order_by='last_modified')
         return render(request, 'fa_admin/preview_list.html',
-                {'findingaids': fa, 'querytime': [fa.queryTime()]})
+                {'findingaids': fa, #'querytime': [fa.queryTime()]
+                })
 
 
 @permission_required_with_403('fa_admin.can_prepare')
@@ -438,7 +432,7 @@ def prepared_eadxml(request, archive, filename):
     # on GET, display the xml and make available for download
     if request.method == 'GET':
         prepped_xml = ead.serializeDocument()
-        response = HttpResponse(prepped_xml, mimetype='application/xml')
+        response = HttpResponse(prepped_xml, content_type='application/xml')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
 
@@ -550,7 +544,8 @@ def list_published(request, archive=None):
     show_pages = pages_to_show(paginator, fa_subset.number)
 
     return render(request, 'fa_admin/published_list.html', {'findingaids': fa_subset,
-        'querytime': [fa.queryTime()], 'show_pages': show_pages, 'archive': arch})
+        # 'querytime': [fa.queryTime()],
+        'show_pages': show_pages, 'archive': arch})
 
 @permission_required_with_403('fa_admin.can_delete')
 @user_passes_test_with_ajax(archive_access)
@@ -623,3 +618,26 @@ def delete_ead(request, id, archive=None):
     else:
         url = reverse('fa-admin:list-published')
     return HttpResponseSeeOtherRedirect(url)
+
+
+@permission_required('user.add_user')
+def init_ldap_user(request):
+    '''Use django-auth-ldap to initialize a new user account from LDAP.'''
+    netid = request.POST.get('netid', None)
+    if netid is None:
+        messages.error(request, 'No netid found in request')
+    else:
+        # use django-auth-ldap to create an ldap-based user acccount
+        user = LDAPBackend().populate_user(netid)
+        if user is None:
+            messages.error(request, 'User %s not found' % netid)
+        else:
+            # NOTE: using "populate" here because could be a new
+            # record OR an updated one
+            messages.success(request, 'Populated user %s (%s)' % \
+                             (netid, user.get_full_name()))
+
+    # redirect to user changelist
+    app, model = settings.AUTH_USER_MODEL.lower().split('.')
+    location = reverse('admin:%s_%s_changelist' % (app, model))
+    return HttpResponseSeeOtherRedirect(location)

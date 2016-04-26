@@ -14,17 +14,18 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from django.conf.urls.defaults import *
+from django.conf.urls import url
 from django.views.generic import TemplateView
+from findingaids.content import views
 
 
-urlpatterns = patterns('findingaids.content.views',
-    url(r'^request-materials/$', 'request_materials', name='request-materials'),
-    url(r'^feedback/$', 'feedback', name='feedback'),
+urlpatterns = [
+    url(r'^request-materials/$', views.request_materials, name='request-materials'),
+    url(r'^feedback/$', views.feedback, name='feedback'),
     url(r'^faq/$', TemplateView.as_view(template_name='content/faq.html'),
         name='faq'),
     url(r'^search-tips/$', TemplateView.as_view(template_name='content/search_tips.html'),
         name='search-tips'),
     url(r'^institutions/$', TemplateView.as_view(template_name='content/contributors.html'),
         name='contributors'),
-)
+]

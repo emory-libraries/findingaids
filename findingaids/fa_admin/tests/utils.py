@@ -63,10 +63,10 @@ class UtilsTest(TestCase):
 
         # save pid config settings to restore in teardown
         self._pid_config = {
-            'PIDMAN_HOST': settings.PIDMAN_HOST,
-            'PIDMAN_USER': settings.PIDMAN_USER,
-            'PIDMAN_PASSWORD': settings.PIDMAN_PASSWORD,
-            'PIDMAN_DOMAIN': settings.PIDMAN_DOMAIN
+            'PIDMAN_HOST': getattr(settings, 'PIDMAN_HOST', None),
+            'PIDMAN_USER': getattr(settings, 'PIDMAN_USER', None),
+            'PIDMAN_PASSWORD': getattr(settings, 'PIDMAN_PASSWORD', None),
+            'PIDMAN_DOMAIN': getattr(settings, 'PIDMAN_DOMAIN', None)
             }
 
         # initialize valid and invalid ead fixtures
@@ -503,7 +503,7 @@ class ReloadCachedPdfTestCase(TestCase):
 
 
 # test task/signal for archive svn checkout
-@override_settings(CELERY_ALWAYS_EAGER=True)
+@override_settings(CELERY_ALWAYS_EAGER=True, BROKER_BACKEND='memory')
 @patch('findingaids.fa_admin.tasks.svn_client')
 class ArchiveSvnCheckoutTestCase(TestCase):
 
@@ -545,8 +545,18 @@ class ArchiveSvnCheckoutTestCase(TestCase):
                 arch.svn_local_path, 'HEAD')
             mocksvnclient.reset_mock()
 
-            # not create and svn checkout not changed
+            # not create and svn checkout not changed, but dir doesn't exist
             mocksvnclient.return_value.info.return_value = {'trunk': Mock(url=arch.svn)}
+            tasks.archive_save_hook('sender', arch, created=False, raw=None, using=None,
+                update_fields=[])
+            # should checkout on udate if dir doesn't exist
+            mocksvnclient.return_value.checkout.assert_called_with(arch.svn,
+                arch.svn_local_path, 'HEAD')
+            mocksvnclient.reset_mock()
+
+            # not create, svn checkout not changed, and dir exists
+            mocksvnclient.return_value.info.return_value = {'trunk': Mock(url=arch.svn)}
+            os.mkdir(arch.svn_local_path)
             tasks.archive_save_hook('sender', arch, created=False, raw=None, using=None,
                 update_fields=[])
             mocksvnclient.return_value.checkout.assert_not_called()
@@ -554,7 +564,6 @@ class ArchiveSvnCheckoutTestCase(TestCase):
 
             # svn checkout changed - should checkout again
             # - directory exists and svn info doesn't match the archive object svn
-            os.mkdir(arch.svn_local_path)
             mocksvnclient.return_value.info.return_value = {'trunk': Mock(url='something else')}
             tasks.archive_save_hook('sender', arch, created=False, raw=None, using=None,
                 update_fields=[])

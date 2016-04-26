@@ -8,6 +8,30 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.9.0
+-----
+
+* As a user, I can see a banner on individual finding aids where
+  materials are stored offsite so that I know retrieval of these
+  materials will take longer.
+* As a user, I can see a scope note at the folder level of the finding
+  aid in order to see additional information the archivist has added
+  about that folder's contents.
+* As an administrator, I can change staff contacts listed in the finding
+  aids database website so that I can manage the names and emails displayed
+  on the request materials page.
+* As an administrator I can initiate a user account from LDAP without
+  requiring the person to log in so that I can manage user accounts
+  more efficiently.
+* bugfix: whitespace inconsistencies in keyword search results
+* bugfix: browse by letters label inconsistency in certain rare cases
+  (complete label with partial overlap in next label)
+* Upgraded to eulexistdb 0.20 and eXist-db 2.2
+* Upgrade to current Django 1.9
+* Switched from local ldap implementation to django-auth-ldap
+* Now configured to use django-debug-toolbar for development, with
+  a panel for viewing existdb xqueries.
+
 1.8.3
 -----
 

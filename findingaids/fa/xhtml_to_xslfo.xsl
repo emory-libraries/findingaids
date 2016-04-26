@@ -457,21 +457,45 @@
 </xsl:template>
 
 <!-- special case: digital materials banner -->
-<xsl:template match="div[@id='digital-materials']">
-   <xsl:variable name="banner_width">5</xsl:variable>
+<xsl:template match="div[@class='collection-banner']">
+   <xsl:variable name="banner_width">5.5</xsl:variable>
 
-  <fo:block-container width="5in" height="0.6in" background-color="#002878" color="white"
+  <fo:block-container width="5.5in" height="0.6in" background-color="#002878" color="white"
     margin="auto">
     <xsl:attribute name="width"><xsl:value-of select="concat($banner_width, 'in')"/></xsl:attribute>
     <!-- calculate indent relative to page width so banner is centered -->
     <xsl:attribute name="start-indent"><xsl:value-of select="concat(($pagewidth - $banner_width) div 2, 'in')"/></xsl:attribute>
+    <xsl:choose>
+      <xsl:when test="@id = 'stored-offsite'"> <!-- adjust style for off-site banner -->
+        <xsl:attribute name="background-color">#f19b62</xsl:attribute>
+        <xsl:attribute name="height">1in</xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+
     <!-- NOTE: requires extra layout work here because fop doesn't support float -->
-    <fo:block-container position="absolute" top="3px" left="15px" width="0.5in" start-indent="0px">
+    <fo:block-container position="absolute" top="0px" left="10px" width="1in"
+      start-indent="0px" text-align="center">
+      <xsl:choose>
+        <xsl:when test="@id = 'stored-offsite'"> <!-- adjust placement for off-site icon -->
+          <xsl:attribute name="top">5px</xsl:attribute>
+        </xsl:when>
+      </xsl:choose>
+
       <fo:block>
-        <xsl:apply-templates select="img"/>
+        <xsl:variable name="icon">
+          <xsl:choose>
+            <xsl:when test="@id = 'digital-materials'">fa-laptop</xsl:when>
+            <xsl:when test="@id = 'stored-offsite'">fa-truck</xsl:when>
+          </xsl:choose>
+        </xsl:variable>
+
+        <fo:external-graphic>
+          <xsl:attribute name="src">file:<xsl:value-of select="concat($STATIC_ROOT, 'images/', $icon, '.png')"/></xsl:attribute>
+        </fo:external-graphic>
+
       </fo:block>
     </fo:block-container>
-    <fo:block-container position="absolute" top="5px" left="75px" start-indent="0px">
+    <fo:block-container position="absolute" top="5px" left="1.25in" start-indent="0px">
        <fo:block font-size="14pt">
          <xsl:apply-templates select="p[1]"/>
        </fo:block>

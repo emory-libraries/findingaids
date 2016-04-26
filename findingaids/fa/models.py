@@ -94,6 +94,41 @@ class Name(XmlModel):
             return 'http://dbpedia.org/resource/%s' % self.authfilenumber
 
 
+class PhysicalDescription(eadmap._EadBase):
+    '''Custom `physdesc` object, to handle customized display of
+    extent tags.
+
+    Extent tags can be repeated and some of them may provide parallel or
+    equivalent information, but there is no way to indicate this in
+    EAD2.  Other extents provide additional information, and thus are
+    separated in the text with commas or a text string such as "and".
+    In some cases (i.e., highlighted search results) empty text nodes
+    are omitted by eXist, but required for display.
+    '''
+    ROOT_NAME = 'physdesc'
+    #: extents or text nodes, in order
+    elements = xmlmap.NodeListField('e:extent|text()', xmlmap.XmlObject)
+
+    extent_tag = '{%s}extent' % eadmap.EAD_NAMESPACE
+
+    def __unicode__(self):
+        count = 0
+        text = []   # list of text segments to be combined
+        for element in self.elements:
+            # due to spacing issues / missing text nodes in certain
+            # cases (particularly when search term highlighting is
+            # enabled), force a space before any extent tag
+            if getattr(element.node, 'tag', None) == self.extent_tag:
+                if count > 0:
+                    text.append(' ')
+                count += 1
+
+            # add current node text content
+            text.append(unicode(element))
+
+        return normalize_whitespace(''.join(text))
+
+
 class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     """
     Customized version of :class:`eulxml.EncodedArchivalDescription` EAD object.
@@ -113,13 +148,14 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     # in the constructed return object returned from eXist for search/browse
     unittitle = xmlmap.NodeField('.//e:unittitle[not(ancestor::e:dsc)]', eadmap.UnitTitle)
     abstract = xmlmap.NodeField('.//e:abstract[not(ancestor::e:dsc)]', xmlmap.XmlObject)
-    physical_descriptions = xmlmap.StringListField('.//e:physdesc[not(ancestor::e:dsc)]', normalize=True)
+    physical_descriptions = xmlmap.NodeListField('.//e:physdesc[not(ancestor::e:dsc)]',
+        PhysicalDescription)
 
     list_title_xpaths = [
         "e:archdesc/e:did/e:origination/e:corpname",
         "e:archdesc/e:did/e:origination/e:famname",
         "e:archdesc/e:did/e:origination/e:persname",
-        "e:archdesc/e:did[not(e:origination/e:corpname or e:origination/e:famname or e:origination/e:persname)]/e:unittitle"
+        "e:archdesc/e:did[count(e:origination/e:corpname|e:origination/e:famname|e:origination/e:persname) = 0]/e:unittitle"
     ]
     list_title_xpath = "|".join("./%s" % xp for xp in list_title_xpaths)
     #./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
@@ -204,9 +240,28 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
 
     @property
     def has_digital_content(self):
-        'boolean to indicate whether or not this EAD includes public digital content'
+        '''boolean to indicate whether or not this EAD includes public
+        digital content.
+
+        .. Note::
+            If using partial xml return, requires that `public_dao_count`
+            is included.
+
+        '''
         return self.public_dao_count >= 1
-        # NOTE: if using partial xml return, requires that public_dao_count is included
+
+    @property
+    def stored_offsite(self):
+        '''boolean to indicate if collection materials are stored offsite,
+        based on text in the collection access restriction note.
+
+        .. Note::
+
+            If using partial xml return, requires that
+            `archdesc__access_restriction` is included.
+        '''
+        return 'collection stored off-site' in \
+            unicode(self.archdesc.access_restriction).lower()
 
     def admin_info(self):
         """
@@ -320,7 +375,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     def request_materials_url(self):
         ''' Construct the absolute url for use with external services such as Aeon'''
 
-        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+        if not hasattr(settings, 'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
             logger.warn("Request materials url is not configured.")
             return
 
@@ -331,10 +386,10 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         ''' Determines if the EAD is applicable for the electronic request service.'''
 
         # If the request url is not configured, then the request can't be generated.
-        if not hasattr(settings,'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
+        if not hasattr(settings, 'REQUEST_MATERIALS_URL') or not settings.REQUEST_MATERIALS_URL:
             return False
 
-        if not hasattr(settings,'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
+        if not hasattr(settings, 'REQUEST_MATERIALS_REPOS') or not settings.REQUEST_MATERIALS_REPOS:
             return False
 
         # If the item is in on of the libraries defined, then it should be displayed.
@@ -399,6 +454,9 @@ class LocalComponent(eadmap.Component):
 def title_rdf_identifier(src, idno):
     ''''Generate an RDF identifier for a title, based on source and id
     attributes.  Currently supports ISSN, ISBN, and OCLC.'''
+    # if either src or idno is None, bail out right away
+    if src is None or idno is None:
+        return
     src = src.lower()
     idno = idno.strip()  # remove whitespace, just in case of errors in entry
 
@@ -808,7 +866,9 @@ class FileComponent(XmlModel, eadmap.Component):
     public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@xlink:show="none")][not(@audience) or @audience="external"])')
 
 
-    objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
+    # objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
+    # eXist can query *much* more efficiently on generic paths
+    objects = Manager('''//*[@level="file"]''')
     """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c-series file objects
         in eXist.
@@ -823,7 +883,7 @@ class Deleted(models.Model):
     """
     eadid = models.CharField('EAD Identifier', max_length=50, unique=True)
     title = models.CharField(max_length=200)
-    date = models.DateTimeField('Date removed', default=datetime.now())
+    date = models.DateTimeField('Date removed', auto_now_add=True)
     note = models.CharField(
         max_length=400, blank=True,
         help_text="Optional: Enter the reason this document is being deleted. " +
@@ -849,6 +909,10 @@ class Archive(models.Model):
         help_text='URL to subversion repository containing EAD for this archive')
     slug = models.SlugField(help_text='''shorthand id
         (auto-generated from label; do not modify after initial archive definition)''')
+    contacts = models.ManyToManyField(settings.AUTH_USER_MODEL,
+        help_text='Contact person for display on the Request Materials page (email required)',
+        blank=True)
+
 
     def __unicode__(self):
         return self.label
@@ -856,3 +920,10 @@ class Archive(models.Model):
     @property
     def svn_local_path(self):
         return os.path.join(settings.SVN_WORKING_DIR, self.slug)
+
+    def contact_names(self):
+        '''List of contact names method for display in django admin list
+        display.  Shows email if user has no full name.'''
+        return ', '.join([contact.get_full_name() or contact.email
+                          for contact in self.contacts.all()])
+    contact_names.short_description = "Contacts"

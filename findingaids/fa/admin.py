@@ -14,8 +14,9 @@ admin.site.register(Deleted, DeletedAdmin)
 
 
 class ArchiveAdmin(admin.ModelAdmin):
-    list_display = ('label', 'name', 'svn')
+    list_display = ('label', 'name', 'svn', 'contact_names')
     prepopulated_fields = {'slug': ('label',)}
+    filter_horizontal = ("contacts",)
     # TODO: if possible, we should make the slug field read only
 
 

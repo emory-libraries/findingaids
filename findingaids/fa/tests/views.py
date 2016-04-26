@@ -14,6 +14,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
+from cStringIO import StringIO
 from os import path
 from types import ListType
 from lxml import etree
@@ -504,6 +505,44 @@ class FaViewsTest(TestCase):
             html=True,
             msg_prefix='external dao with show=none should be displayed to admin user')
 
+    def test_stored_offsite(self):
+        # pomerantz fixture has offsite access text
+        fa_url = reverse('fa:findingaid', kwargs={'id': 'pomerantz890'})
+        response = self.client.get(fa_url)
+        self.assertContains(response, "Collection Stored Off-Site",
+            msg_prefix='Main findingaid page should include off-site banner when' +
+                       'offsite text is in access restriction note')
+
+        # no other fixture has offsite text
+        fa_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})
+        response = self.client.get(fa_url)
+        self.assertNotContains(response, "Collection Stored Off-Site",
+            msg_prefix='off-site banner should not display for findingaids without' +
+                       'offsite text in access restriction')
+
+        # offsite should also display on series pages
+        series_url = reverse('fa:series-or-index', kwargs={'id': 'pomerantz890',
+                     'series_id': 'series1'})
+        response = self.client.get(series_url)
+        self.assertContains(response, "Collection Stored Off-Site",
+            msg_prefix='series page should display off-site banner for ' +
+                       'collections with offsite restriction note')
+
+        # offsite should display on index pages too
+        response = self.client.get(reverse('fa:findingaid',
+            kwargs={'id': 'raoul548'}))
+        self.assertContains(response, "Collection Stored Off-Site",
+            msg_prefix='index page should display off-site banner for ' +
+                       'collections with offsite restriction note')
+
+        # offsite banner should display once on full view (used for pdf)
+        response = self.client.get(reverse('fa:full-findingaid',
+            kwargs={'id': 'raoul548'}))
+        self.assertContains(response, "<p>Collection Stored Off-Site</p>",
+            count=1,
+            msg_prefix='index page should display off-site banner for ' +
+                       'collections with offsite restriction note')
+
 
     def test_view__fa_with_series(self):
         fa_url = reverse('fa:findingaid', kwargs={'id': 'abbey244'})
@@ -767,6 +806,13 @@ class FaViewsTest(TestCase):
         self.assertPattern(
             '<div class="fa-title">.* >\s+Interview transcripts\s+</div>', response.content,
             msg_prefix='short series title in breadcrumb displays text without date')
+
+        # folder-level scope content note should be displayed
+        self.assertContains(response, 'Test scope note about this cassette',
+            msg_prefix='folder-level scope content note should be displayed')
+        self.assertContains(response, '<div class="scopenote">',
+            msg_prefix='scope note section should be present if any folders ' +
+                       'include scopecontent note')
 
         # ead should be requestable from series
         # (testing that response includes enough data for requestable method)
@@ -1199,8 +1245,9 @@ class FaViewsTest(TestCase):
         # load httpresponse body into an XmlObject to compare with findingaid doc
         ead = load_xmlobject_from_string(response.content)
         abbey = FindingAid.objects.get(eadid='abbey244')
+
         self.assertEqual(
-            ead.serialize(), abbey.serialize(),
+            ead.serialize().strip(), abbey.serialize().strip(),
             "response content should be the full, valid XML content of the requested EAD document")
 
     def test_content_negotiation(self):
@@ -1632,8 +1679,9 @@ class FullTextFaViewsTest(TestCase):
         self.assertPattern(
             r'<li>.*Descriptive Summary.*4 matches.*</li>', response.content,
             msg_prefix="descriptive summary has match count in ToC")
+        # NOTE: previously was 51; in existdb 2.2 with same  index, returns 48
         self.assertPattern(
-            r'<li>.*Collection Description.*51 matches.*</li>', response.content,
+            r'<li>.*Collection Description.*48 matches.*</li>', response.content,
             msg_prefix="collection description has match count in ToC")
         self.assertPattern(
             r'<li>.*Selected Search Terms.*30 matches.*</li>', response.content,
@@ -1693,8 +1741,9 @@ class FullTextFaViewsTest(TestCase):
         self.assertPattern(
             r'<li>.*Descriptive Summary.*4 matches.*</li>', response.content,
             msg_prefix="descriptive summary has match count in ToC")
+        # NOTE: as above; previously 51, now 48 matches in existdb 2.2
         self.assertPattern(
-            r'<li>.*Collection Description.*51 matches.*</li>', response.content,
+            r'<li>.*Collection Description.*48 matches.*</li>', response.content,
             msg_prefix="collection description has match count in ToC")
         self.assertPattern(
             r'<li>.*Selected Search Terms.*30 matches.*</li>', response.content,

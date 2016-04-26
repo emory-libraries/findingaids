@@ -1,5 +1,6 @@
 {% extends "site_base.html" %}
 {# base template for single-finding aid content pages - handles preview logic if preview is set to True #}
+{% load firstof from future %}
 
 {% block page-subtitle %}{% if preview %} : PREVIEW{% endif %} : Home{% endblock %}
 
@@ -11,7 +12,7 @@
     {% if preview and perms.fa_admin.can_publish %}
         <div style="clear:right"></div> {# clearfix between login info & buttons #}
         <form id="preview-publish" action="{% url 'fa-admin:publish-ead' %}" method="post">{% csrf_token %}
-            <button class="admin-action" type="submit" name="preview_id" value="{% firstof findingaid.eadid ead.eadid %}">PUBLISH</button>
+            <button class="admin-action" type="submit" name="preview_id" value="{% firstof findingaid.eadid.value ead.eadid.value %}">PUBLISH</button>
         </form>
     {% endif %}
     <h1 class="title">{% if preview %}<span class="preview-label">PREVIEW:</span> {% endif %}{% block content-title %}{% endblock %}</h1>
@@ -44,7 +45,7 @@
 
   </div>
   {% endif %}
-  
+
   {% if ead.requestable %}
     {% include "fa/snippets/aeon-link.html" %}
   {% endif %}

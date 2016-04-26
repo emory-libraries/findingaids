@@ -3,9 +3,10 @@
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
         <link rel="stylesheet" type="text/css" href="/static/style/local.css" />
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css"/>
     </head>
     <body>
-<div class="fa">
+<div class="findingaid">
 <h1>
     <a name="{{ ead.eadid }}">
     {% if ead.archdesc.origination %}{{ ead.archdesc.origination|upper }}<br/>{% endif %}
@@ -22,6 +23,7 @@
     {% endwith %}
 </div>
 {% include "fa/snippets/digital-content.html" %}
+{% include "fa/snippets/stored-offsite.html" %}
 <hr/>
 {% include "fa/snippets/description.html" %}
 

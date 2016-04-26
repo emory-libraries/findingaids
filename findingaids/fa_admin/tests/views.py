@@ -1,4 +1,5 @@
 # file findingaids/fa_admin/tests/views.py
+# -*- coding: utf-8 -*-
 #
 #   Copyright 2012 Emory University Library
 #
@@ -24,12 +25,12 @@ import unittest
 
 from django.test import Client
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB
-from eullocal.django.emory_ldap.models import EmoryLDAPUser
 from eullocal.django.taskresult.models import TaskResult
 from eulexistdb.testutil import TestCase
 from eulxml.xmlmap import load_xmlobject_from_file
@@ -46,6 +47,8 @@ from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unu
 
 skipIf_no_proxy = unittest.skipIf('HTTP_PROXY' not in os.environ,
     'Schema validation test requires an HTTP_PROXY')
+
+User = get_user_model()
 
 
 class BaseAdminViewsTest(TestCase):
@@ -144,7 +147,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # TODO: resolve preview list view (going away? archive specific)
         # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}), 0,
         #     msg_prefix='response for user with no permissions does not include link to preview docs')
-        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
+        self.assertContains(response, 'href="%s"' % reverse('admin:auth_user_changelist'), 0,
             msg_prefix='response for user with no permissions does not include link to list/edit staff')
         self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
             msg_prefix='response for user with no permissions does not include link to django db admin')
@@ -156,7 +159,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix='response for non-superuser FA admin does not link to all published docs')
 
         # archive-specific published lists only
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         for archive in user.archivist.archives.all():
             self.assertContains(response, reverse('fa-admin:published-by-archive',
                 kwargs={'archive': archive.slug}),
@@ -164,7 +167,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # TODO: resolve preview list view (going away? archive specific)
         # self.assertContains(response, reverse('fa-admin:preview-ead', kwargs={'archive': archive.slug}),
         #     msg_prefix='response for FA admin includes link to preview docs')
-        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'), 0,
+        self.assertContains(response, 'href="%s"' % reverse('admin:auth_user_changelist'), 0,
             msg_prefix='response for (non super) FA admin does not include link to list/edit staff')
         self.assertContains(response, 'href="%s"' % reverse('admin:index'), 0,
             msg_prefix='response for (non super) FA admin does not include link to django db admin')
@@ -172,7 +175,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         # superuser
         self.client.login(**self.credentials['superuser'])
         response = self.client.get(admin_index)
-        self.assertContains(response, 'href="%s"' % reverse('fa-admin:list-staff'),
+        self.assertContains(response, 'href="%s"' % reverse('admin:auth_user_changelist'),
             msg_prefix='response for superuser includes link to list/edit staff')
         self.assertContains(response, reverse('admin:index'),
             msg_prefix='response for superuser includes link to django db admin')
@@ -310,7 +313,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             'Expected %s but returned %s for POST on %s with valid data'
             % (expected, code, order_url))
 
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         # check that order was stored as expected
         self.assertEqual('%d,%d' % (eua.id, theo.id), user.archivist.order)
 
@@ -343,7 +346,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual(docinfo['name'], settings.EXISTDB_PREVIEW_COLLECTION + '/' + filename)
 
         # GET should just list files available for preview
-        # FIXME: preview list view doesn't currently use archive; this functionality
+        # NOTE: preview list view doesn't currently use archive; this functionality
         # needs to either be removed, separated, or filter on archive
         response = self.client.get(preview_url, {'archive': arch.slug})
         code = response.status_code
@@ -354,7 +357,7 @@ class AdminViewsTest(BaseAdminViewsTest):
             msg_prefix="preview summary should list title of document loaded for preview")
         self.assertContains(response, reverse('fa-admin:preview:findingaid', kwargs={'id': 'hartsfield558'}),
             msg_prefix="preview summary should link to preview page for document loaded to preview")
-        self.assertContains(response, 'last modified: 0 minutes ago',
+        self.assertContains(response, 'last modified: 0 minutes ago',
             msg_prefix="preview summary listing includes modification time")
 
         # preview page should include publish form for users with permission to publish
@@ -387,20 +390,16 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertEqual({}, docinfo, "invalid xml document not loaded to exist preview")
 
         # exist save errors should be caught & handled gracefully
-        # - force an error by setting preview collection to a non-existent collection
-        with override_settings(EXISTDB_PREVIEW_COLLECTION='/bogus/doesntexist'):
-            with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
-                response = self.client.post(preview_url, {'filename': 'hartsfield558.xml',
-                    'archive': arch.slug})
-                self.assertContains(response, "Could not preview")
-                self.assertContains(response,
-                    "Collection %s not found" % settings.EXISTDB_PREVIEW_COLLECTION)
-                self.assertContains(response, "Database Error",
-                    msg_prefix="error page displays explanation and instructions to user")
+
+        # NOTE: previously using a non-existent preview collection would
+        # cause an error, but now eXist creates the collection automatically
 
         # simulate incorrect eXist permissions by not specifying username/password
         # ensure guest account cannot update
-        self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-update')
+        # self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 'other=-write,update')
+        # NOTE: string syntax should still be valid according to the docs,
+        # but it results in an error where this does not
+        self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 0774)
 
         fake_collection = '/bogus/doesntexist'
         with override_settings(EXISTDB_SERVER_USER=None,
@@ -410,10 +409,8 @@ class AdminViewsTest(BaseAdminViewsTest):
                 response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
 
         self.assertContains(response, "Could not preview")
-        self.assertContains(response, "Database Error",
+        self.assertContains(response, "Failed to load the document",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "Collection %s not found" % fake_collection,
-                msg_prefix="error page displays specific eXist permission message")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
         with override_settings(EXISTDB_SERVER_URL='http://localhost:9191/not-exist',
@@ -424,8 +421,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assertContains(response, "Could not preview")
         self.assertContains(response, "Database Error",
                 msg_prefix="error page displays explanation and instructions to user")
-        self.assertContains(response, "I/O Error: Connection refused",
-                msg_prefix="error page displays specific connection error message")
 
     def test_logout(self):
         admin_logout = reverse('fa-admin:logout')
@@ -434,16 +429,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.get(admin_logout, follow=True)
         msgs = [str(msg) for msg in response.context['messages']]
         self.assert_('You are now logged out' in msgs[0])
-
-    def test_list_staff(self):
-        list_staff = reverse('fa-admin:list-staff')
-        # test as an admin with permissions to edit accounts
-        self.client.login(**self.credentials['superuser'])
-        response = self.client.get(list_staff)
-        self.assertContains(response, "Current users")
-        # should list users from fixture
-        self.assertContains(response, "marbl")
-        self.assertContains(response, "peon")
 
     def test_prep_ead(self):
         # use fixture directory to test publication
@@ -606,7 +591,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         }
         # use django test client to login and setup session
         self.client.login(**self.credentials['admin'])
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         arch = user.archivist.archives.all()[0]
 
         # use a fixture that does not have an ARK
@@ -689,7 +674,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         response = self.client.get(arch_published_url)
         self.assertContains(response, "Published Finding Aids for %s" % archive.name)
 
-        print response
         fa = response.context['findingaids']
 
         self.assert_(fa, "findingaids result is set in response context")
@@ -717,7 +701,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         title, note = 'William Berry Hartsfield papers', 'Moved to another archive.'
 
         # temporarily remove access to archive to test permission logic
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         marbl = Archive.objects.get(slug='marbl')
         user.archivist.archives.remove(marbl)
         user.save()
@@ -946,16 +930,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 {'filename': filename})
 
         # publish to non-existent collection
-        with override_settings(EXISTDB_ROOT_COLLECTION='/bogus/doesntexist'):
-            response = self.client.post(publish_url, {'preview_id': document_id})
-
-            self.assertContains(response, "Could not publish",
-                msg_prefix="exist save error on publish displays error to user")
-            self.assertContains(response,
-                "Collection %s not found" % settings.EXISTDB_ROOT_COLLECTION,
-                msg_prefix="specific exist save error displayed to user")
-            self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
+        # - doesn't cause an error on existdb 2.2 / using rest api
 
         # NOTE: formerly included tests for publish invalid or badly formed xml
         # these cases are no longer possible since it is impossible
@@ -963,15 +938,15 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
 
         # simulate incorrect eXist permissions by not specifying username/password
         # ensure guest account cannot update
-        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+        # self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
+        self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 0774)
         with override_settings(EXISTDB_SERVER_USER=None,
                                EXISTDB_SERVER_PASSWORD=None):
-            response = self.client.post(publish_url, {'preview_id': document_id})
-            self.assertContains(response, "Could not publish")
-            self.assertContains(response, "Database Error",
-                msg_prefix="error page displays explanation and instructions to user")
-            self.assertContains(response, "Insufficient privileges",
-                msg_prefix="error page displays specific exist permissions message")
+            response = self.client.post(publish_url, {'preview_id': document_id},
+                follow=True)
+            self.assertContains(response, "Publish failed")
+            self.assertContains(response, "Could not retrieve",
+                msg_prefix="error message displays explanation and instructions to user")
 
         # NOTE: formerly included test for exist not running, but not testable
         # because publish now requires preview database be accessible
@@ -984,7 +959,7 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
                 {'filename': filename}, follow=True)
 
         # update user to remove marbl access
-        user = EmoryLDAPUser.objects.get(username=self.credentials['admin']['username'])
+        user = User.objects.get(username=self.credentials['admin']['username'])
         marbl = Archive.objects.get(slug='marbl')
         user.archivist.archives.remove(marbl)
         user.save()

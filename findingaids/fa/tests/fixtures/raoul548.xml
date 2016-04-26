@@ -67,6 +67,8 @@
       <p>Special restrictions apply: OP2a is restricted for preservation
 
 		  purposes.</p>
+        <!-- added to test stored-offsite functionality -->
+      <p>collection stored off-site</p>
     </accessrestrict>
     <userestrict encodinganalog="540">
       <head>Terms Governing Use and Reproduction</head>
