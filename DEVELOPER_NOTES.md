@@ -1,10 +1,6 @@
----
-layout: post
-title: Setup Finding Aids
----
+# MAC OS X Setup Notes
 
-# Setup Finding Aids
-
+## Python Installation
 Install Python first:
 > brew install python
 
@@ -22,6 +18,7 @@ You can install it through Homebrew on OS X. But why should you install Python w
 Reference:
 [Python, Pip on Mac OS X Yosemite] (http://www.lecloud.net/post/119427148455/python-pip-on-mac-os-x-yosemite)
 
+## Dependency Installation
 Once you finish the installation and have an environment created, you can proceed to the next step which is to check out the repository and 'bundle' with:
 
 `pip install -r pip-install-req.txt`
@@ -46,6 +43,8 @@ To stop the RabbitMQ service we can use:
 FOB can also be installed via brew:
 `brew install fob`
 
+## Application Configuration
+### Super User Creation
 If the app is installed correctly we can create a superuser with:
 `./manage.py createsuperuser`
 
@@ -62,25 +61,20 @@ If you can see above information then it means you have created a superuser most
 Another tip is that you should make sure that you are always using your virtualenvironment while working on a specific Django project:
 > (finding-aids)wml-yli60:findingaids yli60$
 
+### Data Migration
 Show migration status:
 > ./manage.py showmigrations
 
+### Django Admin
 We can also visit the Django admin page by going to:
 > http://localhost:8000/db-admin/
 
+### Fixture Data Import
 We might also need some fixture data (dummy/sample data) so that the site will actually render some contents. I received some json files from Rebecca.
 
 > dev_archives.json
 > dev_archivists.json
 > dev_users.json
-
-When I was installing the Finding Aids I did run into an error that is related to eullocal library/module. And here are some attempts to fix:
-
-`pip install -r pip-install-req.txt`
-
-if it doesn’t update the `eullocal`, you may have to run
-
-`pip uninstall eullocal`
 
 In order to load data (fixture from a json file) we can use the `loaddata` function as:
 `manage.py loaddata`
@@ -89,7 +83,6 @@ Reference:
 [loaddata](https://docs.djangoproject.com/en/1.9/ref/django-admin/#loaddata)
 
 > django.db.utils.OperationalError: Problem installing fixture '/Users/yli60/Documents/emory/repos/findingaids/./data/dev_archives.json': Could not load fa.Archive(pk=1): no such table: taskresult_taskresult
-
 
 looks like i have a missing table? migration related might be?
 We'd like to use the latest Django version post the upgrade
@@ -100,7 +93,6 @@ We'd like to use the latest Django version post the upgrade
 Reference:
 [How to check Django version](http://stackoverflow.com/questions/6468397/how-to-check-django-version)
 
-
 My problem turns out to be I installed packages outside the virtualenvironment. So the take home message is to make sure that you installed packages via pip **inside** your virtualenv
 
 System check identified 1 issue (0 silenced).
@@ -109,3 +101,12 @@ System check identified 1 issue (0 silenced).
 > Run 'python manage.py migrate' to apply them.
 
 Then we can try `python manage.py createsuperuser` again
+
+### `eullocal` Setup
+When I was installing the Finding Aids I did run into an error that is related to eullocal library/module. And here are some attempts to fix:
+
+`pip install -r pip-install-req.txt`
+
+if it doesn’t update the `eullocal`, you may have to run
+
+`pip uninstall eullocal`
