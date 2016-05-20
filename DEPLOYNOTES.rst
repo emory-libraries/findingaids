@@ -18,6 +18,30 @@ management in this and other Python projects. If you don't have them
 installed, you can get them with ``sudo easy_install pip`` and then ``sudo pip install
 virtualenv``.
 
+Bootstrapping a development environment
+---------------------------------------
+
+* Copy ``findingaids/localsettings.py.dist`` to ``findingaids/localsettings.py``
+  and configure any local settings: **DATABASES**,  **SECRET_KEY**,
+  **SOLR_**, **EXISTDB_**,  customize **LOGGING**, etc.
+* Create a new virtualenv and activate it.
+* Install fabric: ``pip install fabric``
+* Install subversion libraries: ``apt-get install libsvn-dev`` on debian/ubuntu, or
+  ``brew install subversion`` on OSX.
+* Use fabric to run a local build, which will install python dependencies in
+  your virtualenv, run unit tests, and build sphinx documentation: ``fab build``
+* To generate PDFs, you will need to install
+  `Apache FOP <https://xmlgraphics.apache.org/fop/>`_ (``apt-get install fop``
+  on debian/ubuntu or ``brew install fop`` on OSX)
+* You probably don't need to setup and configure celery and rabbitmq unless you
+  are doing development on the celery tasks.
+
+After configuring your database, run migrate:
+
+    python manage.py migrate
+
+Deploy to QA and Production should be done using ``fab deploy``.
+
 Setup the environment
 ~~~~~~~~~~~~~~~~~~~~~
 
