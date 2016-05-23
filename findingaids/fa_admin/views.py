@@ -437,7 +437,6 @@ def prepared_eadxml(request, archive, filename):
 
     # on GET, display the xml and make available for download
     if request.method == 'GET':
-        
         response = HttpResponse(prepped_xml, content_type='application/xml')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
@@ -446,7 +445,7 @@ def prepared_eadxml(request, archive, filename):
     if request.method == 'POST':
         file_path = os.path.join(arch.svn_local_path, filename)
         with open(file_path, 'w') as xmlfile:
-            ead.serializeDocument(xmlfile)  # FIXME: pretty print?
+            xmlfile.write(prepped_xml)
 
         svn = svn_client()
         # seems to be the only way to set a commit log message via client
@@ -497,7 +496,7 @@ def prepared_ead(request, archive, filename, mode):
     fullpath = os.path.join(arch.svn_local_path, filename)
     changes = []
 
-    # TODO: expire cache if file has changed since prepped eadxml was cached
+    # clear up the cache on this view to avoid using existing ark message
     cache.delete(filename)
     prep_ead = prepared_eadxml(request, arch.slug, filename)
 
