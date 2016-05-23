@@ -41,9 +41,9 @@ def doc():
 @task
 def build():
     '''Run a full local build/test cycle.'''
-    all_deps()
+    # all_deps()
     test()
-    doc()
+    # doc()
 
 
 ##
