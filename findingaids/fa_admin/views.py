@@ -19,6 +19,7 @@ import difflib
 import logging
 from lxml.etree import XMLSyntaxError
 import time
+import datetime
 
 from django.http import HttpResponse, HttpResponseServerError, Http404, \
     HttpResponseBadRequest
@@ -30,6 +31,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import require_POST
@@ -395,7 +397,7 @@ def preview(request, archive):
 
 
 @permission_required_with_403('fa_admin.can_prepare')
-@cache_page(1)  # cache this view and use it as source for prep diff/summary views
+# @cache_page(1)  # cache this view and use it as source for prep diff/summary views
 @user_passes_test_with_ajax(archive_access)
 def prepared_eadxml(request, archive, filename):
     """On GET, serves out a prepared version of the EAD file in the specified
@@ -414,24 +416,28 @@ def prepared_eadxml(request, archive, filename):
         document will be pulled from the configured source directory.
     """
     # find relative to svn path if associated with an archive
+    prepped_xml = cache.get(filename)
     arch = get_object_or_404(Archive, slug=archive)
     fullpath = os.path.join(arch.svn_local_path, filename)
-    try:
-        ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
-    except XMLSyntaxError, e:
-        # xml is not well-formed : return 500 with error message
-        return HttpResponseServerError("Could not load document: %s" % e)
-
-    with message_logging(request, 'findingaids.fa_admin.utils', logging.INFO):
+    if prepped_xml is None:
         try:
-            ead = utils.prep_ead(ead, filename)
-        except Exception as e:
-            # any exception on prep is most likely ark generation
-            return HttpResponseServerError('Failed to prep the document: ' + str(e))
+            ead = load_xmlobject_from_file(fullpath, FindingAid)  # validate or not?
+        except XMLSyntaxError, e:
+            # xml is not well-formed : return 500 with error message
+            return HttpResponseServerError("Could not load document: %s" % e)
+
+        with message_logging(request, 'findingaids.fa_admin.utils', logging.INFO):
+            try:
+                ead = utils.prep_ead(ead, filename)
+                prepped_xml = ead.serializeDocument()
+                cache.set(filename, prepped_xml)
+            except Exception as e:
+                # any exception on prep is most likely ark generation
+                return HttpResponseServerError('Failed to prep the document: ' + str(e))
 
     # on GET, display the xml and make available for download
     if request.method == 'GET':
-        prepped_xml = ead.serializeDocument()
+        
         response = HttpResponse(prepped_xml, content_type='application/xml')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
@@ -492,6 +498,7 @@ def prepared_ead(request, archive, filename, mode):
     changes = []
 
     # TODO: expire cache if file has changed since prepped eadxml was cached
+    cache.delete(filename)
     prep_ead = prepared_eadxml(request, arch.slug, filename)
 
     if prep_ead.status_code == 200:

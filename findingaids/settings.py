@@ -21,10 +21,12 @@ import os
 import djcelery
 djcelery.setup_loader()
 
+
+SECRET_KEY = "123134f2ewf13rf2qewf24qf4f2wf32qfq4"
 # explicitly set celery task to findingaids queue (let celery create the queue)
 CELERY_ROUTES = {
-    'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': 'findingaids'},
-    'findingaids.fa_admin.tasks.archive_svn_checkout': {'queue': 'findingaids'}
+    'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': 'findingaids-zo'},
+    'findingaids.fa_admin.tasks.archive_svn_checkout': {'queue': 'findingaids-zo'}
 }
 
 # Get the directory of this file for relative dir paths.
