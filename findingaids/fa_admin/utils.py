@@ -333,7 +333,8 @@ def generate_ark(ead):
             # what if no default target is not found? (unlikely but possible...)
             return ark_url
 
-        # if no matches found, create a new ark
+        # if no matches found, create a new ark and output a flash message to a user about it.
+        logger.info("Created a new ARK %s for %s", ark_url, ead.eadid.value)
         return pidclient.create_ark(settings.PIDMAN_DOMAIN, ead_url,
                                    name=unicode(ead.unittitle))
 
