@@ -551,6 +551,8 @@ class AdminViewsTest(BaseAdminViewsTest):
             with patch('findingaids.fa_admin.views.svn_client') as svn_client:
                 # simulate successful commit
                 svn_client.return_value.commit.return_value = (8, '2013-11-13T18:19:00.191382Z', 'keep')
+                # delete
+                cache.delete(filename)
                 response = self.client.post(prep_xml, follow=True)
 
         msgs = [str(msg) for msg in response.context['messages']]

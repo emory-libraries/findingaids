@@ -397,7 +397,6 @@ def preview(request, archive):
 
 
 @permission_required_with_403('fa_admin.can_prepare')
-# @cache_page(1)  # cache this view and use it as source for prep diff/summary views
 @user_passes_test_with_ajax(archive_access)
 def prepared_eadxml(request, archive, filename):
     """On GET, serves out a prepared version of the EAD file in the specified
@@ -426,6 +425,7 @@ def prepared_eadxml(request, archive, filename):
             # xml is not well-formed : return 500 with error message
             return HttpResponseServerError("Could not load document: %s" % e)
 
+        # flash meesage that appear on the screen for user, message itself is generated in utils.py
         with message_logging(request, 'findingaids.fa_admin.utils', logging.INFO):
             try:
                 ead = utils.prep_ead(ead, filename)
@@ -437,7 +437,6 @@ def prepared_eadxml(request, archive, filename):
 
     # on GET, display the xml and make available for download
     if request.method == 'GET':
-        
         response = HttpResponse(prepped_xml, content_type='application/xml')
         response['Content-Disposition'] = "attachment; filename=%s" % filename
         return response
@@ -446,7 +445,7 @@ def prepared_eadxml(request, archive, filename):
     if request.method == 'POST':
         file_path = os.path.join(arch.svn_local_path, filename)
         with open(file_path, 'w') as xmlfile:
-            ead.serializeDocument(xmlfile)  # FIXME: pretty print?
+            xmlfile.write(prepped_xml)
 
         svn = svn_client()
         # seems to be the only way to set a commit log message via client
@@ -497,7 +496,8 @@ def prepared_ead(request, archive, filename, mode):
     fullpath = os.path.join(arch.svn_local_path, filename)
     changes = []
 
-    # TODO: expire cache if file has changed since prepped eadxml was cached
+    # this my change clear up the cache on this view so user-uploaded
+    # document matches the prepped ead that is displayed, rather than using an out of date cached copy
     cache.delete(filename)
     prep_ead = prepared_eadxml(request, arch.slug, filename)
 
