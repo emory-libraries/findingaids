@@ -1,7 +1,7 @@
 eulxml>=1.1
 eulexistdb>=0.20.1
 eulcommon>=0.18.0
-https://wilson.library.emory.edu/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
+https://wilson.library.emory.edu/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0.dev0.tar.gz
 https://wilson.library.emory.edu/jenkins/job/pidman-rest-client_1.1.x/lastSuccessfulBuild/artifact/pidmanclient/dist/pidservices-1.1.2.tar.gz
 # pin to before 1.6 for now, until we update to be compatible
 Django>=1.9,<1.10
