@@ -31,7 +31,7 @@ from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB
-from eullocal.django.taskresult.models import TaskResult
+from eulcommon.djangoextras.taskresult.models import TaskResult
 from eulexistdb.testutil import TestCase
 from eulxml.xmlmap import load_xmlobject_from_file
 

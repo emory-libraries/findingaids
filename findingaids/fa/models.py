@@ -141,7 +141,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         'exist': 'http://exist.sourceforge.net/NS/exist',
         'util': 'http://exist-db.org/xquery/util',
     }
-    # redeclaring namespace from eulcore to ensure prefix is correct for xpaths
+    # redeclaring namespace from eulxml to ensure prefix is correct for xpaths
 
     # NOTE: overridding these fields from EncodedArchivalDescription to allow
     # for efficiently retrieving unittitle and abstract in the full document OR
@@ -186,8 +186,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     repository = xmlmap.StringListField('.//e:subarea', normalize=True)
 
     # boosted fields in the index: must be searched to get proper relevance score
-    boostfields = xmlmap.StringField('.//e:titleproper | .//e:origination | \
-        .//e:abstract | .//e:bioghist | .//e:scopecontent | .//e:controlaccess')
+    boostfields = xmlmap.StringField('''.//e:titleproper | .//e:origination |
+        .//e:abstract | .//e:bioghist | .//e:scopecontent | .//e:controlaccess''')
 
     # temporary manual mapping for processinfo, will be incorporated into a release of eulxml
     process_info = xmlmap.NodeField("e:archdesc/e:processinfo", eadmap.Section)
@@ -231,7 +231,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     public_dao_count = xmlmap.IntegerField('count(.//e:dao[@xlink:href][not(@xlink:show="none")][not(@audience) or @audience="external"])')
 
     objects = Manager('/e:ead')
-    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
+    """:class:`eulexistdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving FindingAid objects
         in eXist.
 
@@ -274,7 +274,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         access restrictions, use restrictions, alternate form, related material,
         separated material, acquisition info, custodial history, preferred citation
 
-        :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
+        :rtype: list of :class:`eulxml.xmlmap.eadmap.Section`
         """
         info = []
         if self.archdesc.access_restriction:
@@ -307,7 +307,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         These fields are included, in this order:
         biography/history, bibliography, scope & content, arrangement, other finding aid
 
-        :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
+        :rtype: list of :class:`eulxml.xmlmap.eadmap.Section`
         """
         fields = []
         if self.archdesc.biography_history:
@@ -436,7 +436,7 @@ class EadRepository(XmlModel):
 
 
 class LocalComponent(eadmap.Component):
-    '''Extend default :class:`eulcore.xmlmap.eadmap.Component` class to add a
+    '''Extend default :class:`eulxml.xmlmap.eadmap.Component` class to add a
     method to detect first file-item in a list.  (Needed for container list display
     in templates).'''
     ROOT_NAMESPACES = {
@@ -490,7 +490,7 @@ class Series(XmlModel, LocalComponent):
     """
       Top-level (c01) series.
 
-      Customized version of :class:`eulcore.xmlmap.eadmap.Component`
+      Customized version of :class:`eulxml.xmlmap.eadmap.Component`
     """
 
     ROOT_NAMESPACES = {
@@ -508,7 +508,7 @@ class Series(XmlModel, LocalComponent):
     objects = Manager('//e:c01')
     # NOTE: this element should not be restricted by level=series because eXist full-text indexing
     # is more efficient if the queried element matches the indexed element
-    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
+    """:class:`eulxml.django.existdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c01 series objects
         in eXist.
 
@@ -553,7 +553,7 @@ class Series(XmlModel, LocalComponent):
         use restrictions, access restrictions, alternate form, location of original,
         bibliography
 
-        :rtype: list of :class:`eulcore.xmlmap.eadmap.Section`
+        :rtype: list of :class:`eulxml.xmlmap.eadmap.Section`
         """
         fields = []
         if self.biography_history:
@@ -758,13 +758,13 @@ class Series2(Series):
     """
       c02 level subseries
 
-      Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
+      Customized version of :class:`eulxml.xmlmap.eadmap.Component`; extends
       :class:`Series`
     """
     series = xmlmap.NodeField("parent::e:c01", Series)
     ":class:`findingaids.fa.models.Series` access to c01 series this subseries belongs to"
     objects = Manager('//e:c02')
-    """:class:`eulcore.django.existdb.manager.Manager`
+    """:class:`eulexistdb.manager.Manager`
 
         Configured to use *//c02* as base search path.
     """
@@ -774,7 +774,7 @@ class Series3(Series):
     """
       c03 level subseries
 
-      Customized version of :class:`eulcore.xmlmap.eadmap.Component`; extends
+      Customized version of :class:`eulxml.xmlmap.eadmap.Component`; extends
       :class:`Series`
     """
     series2 = xmlmap.NodeField("parent::e:c02", Series2)
@@ -782,7 +782,7 @@ class Series3(Series):
     series = xmlmap.NodeField("ancestor::e:c01", Series)
     ":class:`findingaids.fa.models.Series` access to c01 series this sub-subseries belongs to"
     objects = Manager('//e:c03')
-    """:class:`eulcore.django.existdb.manager.Manager`
+    """:class:`eulexistdb.manager.Manager`
 
         Configured to use *//c03* as base search path.
     """
@@ -792,7 +792,7 @@ class Index(XmlModel, eadmap.Index):
     """
       EAD Index, with index entries.
 
-      Customized version of :class:`eulcore.xmlmap.eadmap.Index`
+      Customized version of :class:`eulxml.xmlmap.eadmap.Index`
     """
 
     ROOT_NAMESPACES = {
@@ -807,7 +807,7 @@ class Index(XmlModel, eadmap.Index):
     parent = xmlmap.NodeField("parent::node()", "self")
 
     objects = Manager('//e:index')
-    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
+    """:class:`eulexistdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving index objects
         in eXist.
 
@@ -869,7 +869,7 @@ class FileComponent(XmlModel, eadmap.Component):
     # objects = Manager('''(e:ead//e:c01|e:ead//e:c02|e:ead//e:c03|e:ead//e:c04)[@level="file"]''')
     # eXist can query *much* more efficiently on generic paths
     objects = Manager('''//*[@level="file"]''')
-    """:class:`eulcore.django.existdb.manager.Manager` - similar to an object manager
+    """:class:`eulexistdb.manager.Manager` - similar to an object manager
         for django db objects, used for finding and retrieving c-series file objects
         in eXist.
 

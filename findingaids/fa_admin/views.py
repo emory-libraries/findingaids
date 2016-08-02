@@ -41,8 +41,8 @@ from eulcommon.djangoextras.auth import permission_required_with_403, \
    login_required_with_ajax, user_passes_test_with_ajax
 from eulexistdb.db import ExistDB, ExistDBException
 from eulcommon.djangoextras.http import HttpResponseSeeOtherRedirect
+from eulcommon.djangoextras.taskresult.models import TaskResult
 from eullocal.django.log import message_logging
-from eullocal.django.taskresult.models import TaskResult
 from eulxml.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulexistdb.exceptions import DoesNotExist
 
@@ -253,7 +253,7 @@ def publish(request):
 
     # retrieve info about the document from preview collection
     try:
-        # because of the way eulcore.existdb.queryset constructs returns with 'also' fields,
+        # because of the way existdb.query.queryset constructs returns with 'also' fields,
         # it is simpler and better to retrieve document name separately
         ead = get_findingaid(id, preview=True)
         ead_docname = get_findingaid(id, preview=True, only=['document_name'])

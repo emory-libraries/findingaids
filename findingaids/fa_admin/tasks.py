@@ -25,7 +25,7 @@ from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from eullocal.django.taskresult.models import TaskResult
+from eulcommon.djangoextras.taskresult.models import TaskResult
 
 from findingaids import __version__ as SW_VERSION
 from findingaids.fa.models import Archive
