@@ -167,19 +167,18 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-#MEDIA_ROOT = ''
+# MEDIA_ROOT = ''
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-#MEDIA_URL = ''
+# MEDIA_URL = ''
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = ''
 
-# configure an HTTP PROXY to enable lxml to cache XML Schemas (e.g., EAD XSD)
-import os
-os.putenv('HTTP_PROXY', 'http://localhost:3128/')  # local squid proxy on default port
+# override default celery queue, e.g. for development
+# CELERY_DEFAULT_QUEUE = 'findingaids-###'
 
 # Sample logging configuration for Django 1.3.
 # Be sure to preserve the configuration is to send an email to the
