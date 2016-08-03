@@ -114,7 +114,7 @@ directory will be loaded."""
                                 print "    %s" % err
                     else:
                         with open(file, 'r') as eadfile:
-                            success = db.load(eadfile, dbpath, overwrite=True)
+                            success = db.load(eadfile, dbpath)
 
                         if success:
                             loaded += 1
