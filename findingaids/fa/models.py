@@ -404,7 +404,7 @@ class ListTitle(XmlModel):
     # xpath to use for alpha-browse - using list title xpaths from FindingAid
 
     # first letter of list title field (using generic item field to avoid string() conversion)
-    first_letter = xmlmap.ItemField("substring(.,1,1)")
+    first_letter = xmlmap.ItemField("substring(normalize-space(.),1,1)")
     "First letter of a finding aid list title: use to generate list of first-letters for browse."
     objects = Manager(xpath)
 
