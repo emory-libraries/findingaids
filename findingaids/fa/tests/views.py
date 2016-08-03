@@ -962,7 +962,8 @@ class FaViewsTest(TestCase):
 
         # load fixture to preview collection
         fullpath = path.join(exist_fixture_path, 'raoul548.xml')
-        self.db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')                     overwrite=True)
+        self.db.load(open(fullpath, 'r'),
+                     settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
 
         # non-preview page should *NOT* include publish form
         response = self.client.get(reverse('fa:findingaid', kwargs={'id': 'raoul548'}))
