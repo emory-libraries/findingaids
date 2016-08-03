@@ -69,7 +69,7 @@
       <h3>Task Results</h3>
       <ul>
       {% for r in task_results %}
-      {% include 'taskresult/snippets/display_task.html' %}
+      {% include 'taskresult/snippets/display_task.html' with result=r %}
       {% empty %}
         <li>No recent tasks.</li>
       {% endfor %}
