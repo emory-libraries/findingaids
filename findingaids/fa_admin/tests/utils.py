@@ -114,13 +114,13 @@ class UtilsTest(TestCase):
         self.assert_("index id attribute is not set for Index of Selected Correspondents" in errors[4])
 
         # eadid uniqueness check in eXist
-        self.db.load(open(self.valid_eadfile), dbpath, True)
+        self.db.load(open(self.valid_eadfile), dbpath)
         errors = utils.check_ead(self.valid_eadfile, dbpath)
         # same eadid, but present in the file that will be updated - no errors
         self.assertEqual(0, len(errors))
 
         # upload same file to a different path - non-unique eadid error
-        self.db.load(open(self.valid_eadfile), settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml', True)
+        self.db.load(open(self.valid_eadfile), settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml')
         errors = utils.check_ead(self.valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database already contains 2 instances of eadid" in errors[0])
@@ -603,7 +603,6 @@ class PrepEadTestCommand(prep_ead_cmd.Command, TestCommand):
     pass
 
 
-@unittest.skip('test approach should be updated; broken in jenkins for reasons unclear')
 @override_settings(PIDMAN_PASSWORD='this-better-not-be-a-real-password')
 class PrepEadCommandTest(TestCase):
     fixtures = ['archives']
@@ -715,7 +714,6 @@ class PrepEadCommandTest(TestCase):
 class UnitidIdentifierTestCommand(unitid_identifier.Command, TestCommand):
     pass
 
-@unittest.skip('test approach should be updated; broken in jenkins for reasons unclear')
 class UnitidIdentifierCommandTest(TestCase):
     fixtures = ['archives']
 
