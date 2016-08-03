@@ -56,7 +56,8 @@ env.git_rev = ''
 env.remote_path = '/home/httpd/sites/findingaids'
 env.url_prefix = None
 env.remote_proxy = None
-env.remote_acct = 'findingaids'
+env.remote_acct = 'deploy'
+
 
 def configure(path=None, user=None, url_prefix=None, remote_proxy=None):
     'Configuration settings used internally for the build.'
