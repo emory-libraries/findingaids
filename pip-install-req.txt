@@ -3,7 +3,7 @@ eulexistdb>=0.20.1
 #eulcommon>=0.18.0
 # dev eulcommon to test removing eullocal ldap/taskresults (should be 0.19)
 git+https://github.com/emory-libraries/eulcommon.git@feature/import-eullocal-taskresult#egg=eulcommon
-git+ssh://github.com/emory-libraries/eullocal.git@0.22g#egg=eullocal
+git+ssh://git@github.com/emory-libraries/eullocal.git@0.22#egg=eullocal
 git+https://github.com/emory-libraries/pidman-client.git@release-1.1.2#egg=pidservices
 recaptcha-client
 # pin to before 1.6 for now, until we update to be compatible
