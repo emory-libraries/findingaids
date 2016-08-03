@@ -157,8 +157,9 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
         "e:archdesc/e:did/e:origination/e:persname",
         "e:archdesc/e:did[count(e:origination/e:corpname|e:origination/e:famname|e:origination/e:persname) = 0]/e:unittitle"
     ]
-    list_title_xpath = "|".join("./%s" % xp for xp in list_title_xpaths)
-    #./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
+    list_title_xpath = "normalize-space(%s)" % \
+        "|".join("./%s" % xp for xp in list_title_xpaths)
+    # ./archdesc/did/origination/node()|./archdesc/did[not(origination/node())]/unittitle"
 
     # field to use for alpha-browse - any origination name, fall back to unit title if no origination
     list_title = xmlmap.NodeField(list_title_xpath, xmlmap.XmlObject)
