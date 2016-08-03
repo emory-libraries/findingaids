@@ -365,7 +365,7 @@ def preview(request, archive):
             # load the document to the *preview* collection in eXist with the same fileneame
             preview_dbpath = settings.EXISTDB_PREVIEW_COLLECTION + "/" + filename
             # make sure the preview collection exists, but don't complain if it's already there
-            success = db.load(open(fullpath, 'r'), preview_dbpath, overwrite=True)
+            success = db.load(open(fullpath, 'r'), preview_dbpath)
         except ExistDBException as err:
             success = False
             errors.append(err.message())

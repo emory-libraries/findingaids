@@ -45,11 +45,7 @@ from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unu
 # note: tests for publish view are in a separate test case because
 # publish makes use of a celery task, which requires additional setup for testing
 
-skipIf_no_proxy = unittest.skipIf('HTTP_PROXY' not in os.environ,
-    'Schema validation test requires an HTTP_PROXY')
-
 User = get_user_model()
-
 
 class BaseAdminViewsTest(TestCase):
     "Base TestCase for admin views tests.  Common setup/teardown for admin view tests."
@@ -317,7 +313,6 @@ class AdminViewsTest(BaseAdminViewsTest):
         # check that order was stored as expected
         self.assertEqual('%d,%d' % (eua.id, theo.id), user.archivist.order)
 
-    @skipIf_no_proxy
     def test_preview(self):
         arch = Archive.objects.all()[0]
         preview_url = reverse('fa-admin:preview-ead', kwargs={'archive': arch.slug})
@@ -402,14 +397,14 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.db.setPermissions(settings.EXISTDB_PREVIEW_COLLECTION, 0774)
 
         fake_collection = '/bogus/doesntexist'
-        with override_settings(EXISTDB_SERVER_USER=None,
-                               EXISTDB_SERVER_PASSWORD=None,
+        with override_settings(EXISTDB_SERVER_USER='bogus',
+                               EXISTDB_SERVER_PASSWORD='nonexistent',
                                EXISTDB_PREVIEW_COLLECTION=fake_collection):
             with patch('findingaids.fa.models.Archive.svn_local_path', fixture_dir):
                 response = self.client.post(preview_url, {'filename': 'hartsfield558.xml'})
 
         self.assertContains(response, "Could not preview")
-        self.assertContains(response, "Failed to load the document",
+        self.assertContains(response, "problem loading your document",
                 msg_prefix="error page displays explanation and instructions to user")
 
         # - simulate eXist not running by setting existdb url to non-existent exist
@@ -565,7 +560,7 @@ class AdminViewsTest(BaseAdminViewsTest):
         self.assert_(redirect_url.endswith(reverse('fa-admin:index')),
             "response should redirect to main admin page")
 
-       # simulate commit with no changes
+        # simulate commit with no changes
         with patch('findingaids.fa.models.Archive.svn_local_path', tmpdir):
             with patch('findingaids.fa_admin.views.svn_client') as svn_client:
                 svn_client.return_value.commit.return_value = None
@@ -853,7 +848,6 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # restore the real celery task
         views.reload_cached_pdf = self.real_reload
 
-    @skipIf_no_proxy
     def test_publish(self):
         # publish from file no longer supported; publish from preview only
         self.client.login(**self.credentials['admin'])
@@ -942,8 +936,8 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         # ensure guest account cannot update
         # self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 'other=-update')
         self.db.setPermissions(settings.EXISTDB_ROOT_COLLECTION, 0774)
-        with override_settings(EXISTDB_SERVER_USER=None,
-                               EXISTDB_SERVER_PASSWORD=None):
+        with override_settings(EXISTDB_SERVER_USER='bogus',
+                               EXISTDB_SERVER_PASSWORD='nonexistent'):
             response = self.client.post(publish_url, {'preview_id': document_id},
                 follow=True)
             self.assertContains(response, "Publish failed")

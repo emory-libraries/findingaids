@@ -48,9 +48,6 @@ from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unu
 
 # unit tests for utils, manage commands, etc
 
-skipIf_no_proxy = unittest.skipIf('HTTP_PROXY' not in os.environ,
-    'Schema validation test requires an HTTP_PROXY')
-
 ### unit tests for findingaids.fa_admin.utils
 
 class UtilsTest(TestCase):
@@ -93,7 +90,6 @@ class UtilsTest(TestCase):
         for key, val in self._pid_config.iteritems():
             setattr(settings, key, val)
 
-    @skipIf_no_proxy
     def test_check_ead(self):
         # check valid EAD - no errors  -- good fixture, should pass all tests
         dbpath = settings.EXISTDB_TEST_COLLECTION + '/hartsfield558.xml'
