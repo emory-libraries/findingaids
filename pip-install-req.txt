@@ -1,6 +1,5 @@
 eulxml>=1.1
-#eulexistdb>=0.20.1
-git+https://github.com/emory-libraries/eulexistdb.git@release/0.21#egg=eulexistdb
+eulexistdb>=0.21
 #eulcommon>=0.18.0
 # dev eulcommon to test removing eullocal ldap/taskresults (should be 0.19)
 git+https://github.com/emory-libraries/eulcommon.git@feature/import-eullocal-taskresult#egg=eulcommon
