@@ -288,7 +288,12 @@ def prep_ead(ead, filename):
     if ead.eadid.identifier is None or not is_ark(ead.eadid.identifier):
         ark_parts = parse_ark(ead.eadid.url)
         ead.eadid.identifier = 'ark:/%(naan)s/%(noid)s' % ark_parts
+
+    # NOTE: doesn't seem to be explicitly cleaning whitespace in unittitle,
+    # but unit tests make it seem that it is getting cleaned ... (??)
+
     return ead
+
 
 def generate_ark(ead):
     '''Generate an ARK for the specified EAD document.  ARK will be created
@@ -345,7 +350,6 @@ def generate_ark(ead):
     # any error in the pidclient is raised as an HTTPError
     except HTTPError as err:
         raise Exception('Error generating ARK: %s' % err)
-
 
 
 def set_series_ids(series, eadid, position):

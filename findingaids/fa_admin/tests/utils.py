@@ -284,6 +284,7 @@ class UtilsTest(TestCase):
 
         # whitespace cleanup
         ead = utils.prep_ead(self.invalid_ead, self.invalid_eadfile)
+
         # - no leading whitespace in list title
         # ead.archdesc.origination is getting normalized, so can't be used for testing
         origination = ead.node.xpath('//e:origination/e:persname', namespaces={'e': EAD_NAMESPACE})
