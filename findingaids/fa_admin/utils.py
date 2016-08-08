@@ -163,8 +163,6 @@ def check_eadxml(ead):
         errors.append(['Line %d: %s' % (c.sourceline, tostring(c)) for c in containers])
 
     # - no leading whitespace in list title
-    # NOTE: this first test may be redundant - possibly use only the first_letter check,
-    # now that the first_letter xpath uses normalize-space
     title_node = ead.node.xpath("%s/text()" % ead.list_title_xpath,
                                 namespaces={'e': EAD_NAMESPACE})
     if hasattr(title_node[0], 'text'):
@@ -176,7 +174,7 @@ def check_eadxml(ead):
         errors.append("List title seems to be empty")
     elif re.match('\s+', title_text):
         # using node.text because unicode() normalizes, which obscures whitespace problems
-        errors.append("Found leading whitespace in list title field (%s): '%s'" % \
+        errors.append("Found leading whitespace in list title field (%s): '%s'" %
                         (list_title_path, ead.list_title.node.text))
         # report with enough context that they can find the appropriate element to fix
 
@@ -184,6 +182,11 @@ def check_eadxml(ead):
     elif not re.match(TITLE_LETTERS, ead.first_letter):
         errors.append("First letter ('%s') of list title field %s does not match browse letter URL regex '%s'" % \
                       (ead.first_letter, list_title_path, TITLE_LETTERS))
+
+    # leading space in unit title (could be list title but might not be)
+    if re.match('\s+', ead.unittitle.text):
+        errors.append("Found leading whitespace in unittitle: '%s'" %
+                      ead.unittitle.text)
 
     # leading whitespace in control access fields (if any)
     if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:

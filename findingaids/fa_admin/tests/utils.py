@@ -113,6 +113,9 @@ class UtilsTest(TestCase):
         self.assert_("subseries c02 id attribute is not set for Subseries 6.1" in errors[3])
         self.assert_("index id attribute is not set for Index of Selected Correspondents" in errors[4])
 
+        errors = utils.check_ead(self.valid_eadfile, dbpath)
+        self.assertEqual(0, len(errors))
+
         # eadid uniqueness check in eXist
         self.db.load(open(self.valid_eadfile), dbpath)
         errors = utils.check_ead(self.valid_eadfile, dbpath)
@@ -130,6 +133,26 @@ class UtilsTest(TestCase):
         errors = utils.check_ead(self.valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database contains eadid 'hartsfield558' in a different document" in errors[0])
+
+        # leading whitespace in unit title
+        with tempfile.NamedTemporaryFile(prefix='findingaids-ead-',
+                                         suffix='xml', delete=False) as tmpfile:
+            # modify fixture to introduce leading whitespace
+            ead = load_xmlobject_from_file(self.valid_eadfile, FindingAid)
+            # check expects eadid to match filename
+            ead.eadid.value = os.path.basename(tmpfile.name)
+            # add whiespace at beginning of title
+            ead.unittitle.text = "\n  %s" % ead.unittitle.text
+            ead.serializeDocument(tmpfile)
+            # close to flush content
+            tmpfile.close()
+
+            errors = utils.check_ead(tmpfile.name, dbpath)
+            os.remove(tmpfile.name)
+
+        # should have 1 error for leading whitespace
+        self.assertEqual(1, len(errors))
+        self.assert_(errors[0].startswith('Found leading whitespace in unittitle'))
 
     def test_check_eadxml(self):
         # use invalid ead fixture to check error detection
