@@ -164,7 +164,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     list_title = xmlmap.NodeField(list_title_xpath, xmlmap.XmlObject)
     "list title used for alphabetical browse - any origination name, or unittitle if there is none"
 
-    list_title_normalized = xmlmap.StringField(list_title_xpath, normalize=True)
+    list_title_normalized = xmlmap.StringField('normalize-space(%s)' %
+                                               list_title_xpath)
     'list title variant with normalized whitespace, for searching'
 
     # first letter of title field
