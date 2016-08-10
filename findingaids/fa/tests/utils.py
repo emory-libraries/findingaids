@@ -114,8 +114,7 @@ class UtilsTest(TestCase):
         db = ExistDB()
         # preview document - load fixture to preview collection
         fullpath = path.join(exist_fixture_path, 'raoul548.xml')
-        db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml',
-                overwrite=True)
+        db.load(open(fullpath, 'r'), settings.EXISTDB_PREVIEW_COLLECTION + '/raoul548.xml')
         preview_modified = ead_lastmodified('rqst', 'raoul548', preview=True)
         self.assert_(isinstance(preview_modified, datetime),
                      "ead_lastmodified should return a datetime object")

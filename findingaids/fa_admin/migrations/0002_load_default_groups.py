@@ -8,6 +8,7 @@ from django.contrib.auth.management import create_permissions
 
 DEFAULT_GROUPS = ["Editors", "Publishers"]
 
+
 def load_fixture(apps, schema_editor):
     'Load default groups.'
     # load initial groups if they are not already present
@@ -22,6 +23,7 @@ def load_fixture(apps, schema_editor):
     if Group.objects.filter(name__in=DEFAULT_GROUPS).count() != len(DEFAULT_GROUPS):
         call_command('loaddata', 'initial_groups', app_label='fa_admin')
 
+
 def unload_fixture(apps, schema_editor):
     'Remove default groups.'
     Group = apps.get_model("auth", "Group")
@@ -30,10 +32,11 @@ def unload_fixture(apps, schema_editor):
         if group.name in DEFAULT_GROUPS:
             group.delete()
 
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('fa_admin', '0003_emoryldap_user_to_auth_user'),
+        ('fa_admin', '0001_initial'),
         ('auth', '0001_initial'),
         ('contenttypes', '0001_initial'),
         # requires permissions references for other models:

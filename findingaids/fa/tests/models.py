@@ -39,7 +39,7 @@ exist_index_path = path.join(path.dirname(path.abspath(__file__)), '..', '..', '
 
 
 class FindingAidTestCase(DjangoTestCase):
-    # test finding aid model (customization of eulcore xmlmap ead object)
+    # test finding aid model (customization of eulxml xmlmap ead object)
     FIXTURES = ['leverette135.xml',  # simple finding aid (no series/subseries), origination is a person name
                 'abbey244.xml',      # finding aid with series (no subseries), origination is a corporate name
                 'raoul548.xml',      # finding aid with series & subseries, origination is a family name

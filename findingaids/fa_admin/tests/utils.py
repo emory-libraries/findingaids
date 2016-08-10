@@ -48,9 +48,6 @@ from findingaids.fa_admin.mocks import MockDjangoPidmanClient  # MockHttplib unu
 
 # unit tests for utils, manage commands, etc
 
-skipIf_no_proxy = unittest.skipIf('HTTP_PROXY' not in os.environ,
-    'Schema validation test requires an HTTP_PROXY')
-
 ### unit tests for findingaids.fa_admin.utils
 
 class UtilsTest(TestCase):
@@ -93,7 +90,6 @@ class UtilsTest(TestCase):
         for key, val in self._pid_config.iteritems():
             setattr(settings, key, val)
 
-    @skipIf_no_proxy
     def test_check_ead(self):
         # check valid EAD - no errors  -- good fixture, should pass all tests
         dbpath = settings.EXISTDB_TEST_COLLECTION + '/hartsfield558.xml'
@@ -117,14 +113,17 @@ class UtilsTest(TestCase):
         self.assert_("subseries c02 id attribute is not set for Subseries 6.1" in errors[3])
         self.assert_("index id attribute is not set for Index of Selected Correspondents" in errors[4])
 
+        errors = utils.check_ead(self.valid_eadfile, dbpath)
+        self.assertEqual(0, len(errors))
+
         # eadid uniqueness check in eXist
-        self.db.load(open(self.valid_eadfile), dbpath, True)
+        self.db.load(open(self.valid_eadfile), dbpath)
         errors = utils.check_ead(self.valid_eadfile, dbpath)
         # same eadid, but present in the file that will be updated - no errors
         self.assertEqual(0, len(errors))
 
         # upload same file to a different path - non-unique eadid error
-        self.db.load(open(self.valid_eadfile), settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml', True)
+        self.db.load(open(self.valid_eadfile), settings.EXISTDB_TEST_COLLECTION + '/hartsfield_other.xml')
         errors = utils.check_ead(self.valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database already contains 2 instances of eadid" in errors[0])
@@ -134,6 +133,26 @@ class UtilsTest(TestCase):
         errors = utils.check_ead(self.valid_eadfile, dbpath)
         self.assertEqual(1, len(errors))
         self.assert_("Database contains eadid 'hartsfield558' in a different document" in errors[0])
+
+        # leading whitespace in unit title
+        with tempfile.NamedTemporaryFile(prefix='findingaids-ead-',
+                                         suffix='xml', delete=False) as tmpfile:
+            # modify fixture to introduce leading whitespace
+            ead = load_xmlobject_from_file(self.valid_eadfile, FindingAid)
+            # check expects eadid to match filename
+            ead.eadid.value = os.path.basename(tmpfile.name)
+            # add whiespace at beginning of title
+            ead.unittitle.text = "\n  %s" % ead.unittitle.text
+            ead.serializeDocument(tmpfile)
+            # close to flush content
+            tmpfile.close()
+
+            errors = utils.check_ead(tmpfile.name, dbpath)
+            os.remove(tmpfile.name)
+
+        # should have 1 error for leading whitespace
+        self.assertEqual(1, len(errors))
+        self.assert_(errors[0].startswith('Found leading whitespace in unittitle'))
 
     def test_check_eadxml(self):
         # use invalid ead fixture to check error detection
@@ -265,6 +284,7 @@ class UtilsTest(TestCase):
 
         # whitespace cleanup
         ead = utils.prep_ead(self.invalid_ead, self.invalid_eadfile)
+
         # - no leading whitespace in list title
         # ead.archdesc.origination is getting normalized, so can't be used for testing
         origination = ead.node.xpath('//e:origination/e:persname', namespaces={'e': EAD_NAMESPACE})
@@ -607,7 +627,6 @@ class PrepEadTestCommand(prep_ead_cmd.Command, TestCommand):
     pass
 
 
-@unittest.skip('test approach should be updated; broken in jenkins for reasons unclear')
 @override_settings(PIDMAN_PASSWORD='this-better-not-be-a-real-password')
 class PrepEadCommandTest(TestCase):
     fixtures = ['archives']
@@ -719,7 +738,6 @@ class PrepEadCommandTest(TestCase):
 class UnitidIdentifierTestCommand(unitid_identifier.Command, TestCommand):
     pass
 
-@unittest.skip('test approach should be updated; broken in jenkins for reasons unclear')
 class UnitidIdentifierCommandTest(TestCase):
     fixtures = ['archives']
 

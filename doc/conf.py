@@ -16,6 +16,9 @@
 
 # Finding Aids documentation build configuration file
 
+import django
+django.setup()
+
 import findingaids
 
 extensions = [

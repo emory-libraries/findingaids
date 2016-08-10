@@ -14,23 +14,19 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from os import path
-
 import os
-
 import djcelery
+
 djcelery.setup_loader()
 
-
 # explicitly set celery task to findingaids queue (let celery create the queue)
-CELERY_ROUTES = {
-    'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': 'findingaids'},
-    'findingaids.fa_admin.tasks.archive_svn_checkout': {'queue': 'findingaids'}
-}
+# NOTE: queue is set here and routes configured below so that the queue
+# can be overriden in localsettings if needed
+CELERY_DEFAULT_QUEUE = 'findingaids'
 
 # Get the directory of this file for relative dir paths.
 # Django sets too many absolute paths.
-BASE_DIR = path.dirname(path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -119,14 +115,13 @@ ROOT_URLCONF = 'findingaids.urls'
 WSGI_APPLICATION = 'findingaids.wsgi.application'
 
 TEMPLATE_DIRS = [
-    path.join(BASE_DIR, '..', 'templates'),
+    os.path.join(BASE_DIR, '..', 'templates'),
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 ]
 
 # also look for templates in virtualenv
-import os
 if 'VIRTUAL_ENV' in os.environ:
     genlib_path = os.path.join(os.environ['VIRTUAL_ENV'], 'themes', 'genlib')
     TEMPLATE_DIRS.append(genlib_path)
@@ -172,8 +167,7 @@ INSTALLED_APPS = [
     'django.contrib.sitemaps',
     'django.contrib.humanize',
     'djcelery',
-    'eullocal.django.emory_ldap',
-    'eullocal.django.taskresult',
+    'eulcommon.djangoextras.taskresult',
     'eullocal.django.util',
     'eulexistdb',
     'eulxml',
@@ -183,22 +177,10 @@ INSTALLED_APPS = [
 ]
 
 
-EXTENSION_DIRS = (
-    #path.join(BASE_DIR, '../external/django-modules'),
-)
-
-
-EXISTDB_INDEX_CONFIGFILE = path.join(BASE_DIR, "exist_index.xconf")
+EXISTDB_INDEX_CONFIGFILE = os.path.join(BASE_DIR, "exist_index.xconf")
 
 # explicitly set to false to simplify patching value for tests
 CELERY_ALWAYS_EAGER = False
-
-import sys
-try:
-    sys.path.extend(EXTENSION_DIRS)
-except NameError:
-    pass  # EXTENSION_DIRS not defined. This is OK; we just won't use it.
-del sys
 
 try:
     from localsettings import *
@@ -207,7 +189,14 @@ except ImportError:
     print >>sys.stderr, 'No local settings. Trying to start, but if ' + \
         'stuff blows up, try copying localsettings.py.dist to ' + \
         'localsettings.py and setting appropriately for your environment.'
-    pass
+
+
+# explicitly set celery task to findingaids queue (let celery create the queue)
+CELERY_ROUTES = {
+    'findingaids.fa_admin.tasks.reload_cached_pdf': {'queue': CELERY_DEFAULT_QUEUE},
+    'findingaids.fa_admin.tasks.archive_svn_checkout': {'queue': CELERY_DEFAULT_QUEUE}
+}
+
 
 # django_nose configurations
 django_nose = None

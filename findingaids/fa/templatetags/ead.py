@@ -377,7 +377,7 @@ def format_nametag(node, default_role=None):
 def format_ead(value, autoescape=None, rdfa=False, default_rel=None):
     """
     Custom django filter to convert structured fields in EAD objects to
-    HTML. :class:`~eulcore.xmlmap.XmlObject` values are recursively
+    HTML. :class:`~eulxml.xmlmap.XmlObject` values are recursively
     processed, escaping text nodes and converting elements to <span> objects
     where appropriate. Other values are simply converted to unicode and
     escaped.

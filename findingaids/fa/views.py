@@ -88,7 +88,8 @@ def titles_by_letter(request, letter):
     request.session.set_expiry(0)  # set to expire when browser closes
 
     # using ~ to do case-insensitive ordering
-    fa = FindingAid.objects.filter(list_title__startswith=letter).order_by('~list_title').only(*fa_listfields)
+    fa = FindingAid.objects.filter(list_title_normalized__startswith=letter) \
+                           .order_by('~list_title_normalized').only(*fa_listfields)
     fa_subset, paginator = paginate_queryset(request, fa, per_page=10, orphans=5)
     page_labels = alpha_pagelabels(paginator, fa, label_attribute='list_title')
     # No longer restricting the number of page labels shown using pages_to_show (like we do for numeric pages).

@@ -8,11 +8,16 @@ from fabric.colors import green, yellow
 from fabric.context_managers import cd, hide, settings
 from fabric.contrib import files
 from fabric.contrib.console import confirm
+from fabric.state import env
 import findingaids
 
 ##
 # automated build/test tasks
 ##
+
+# set -H prefix for all sudo commands (sets home to match user)
+# (this is particularly important for pip install commands)
+env.sudo_prefix = 'sudo -H'
 
 
 def all_deps():
@@ -56,7 +61,8 @@ env.git_rev = ''
 env.remote_path = '/home/httpd/sites/findingaids'
 env.url_prefix = None
 env.remote_proxy = None
-env.remote_acct = 'findingaids'
+env.remote_acct = 'deploy'
+
 
 def configure(path=None, user=None, url_prefix=None, remote_proxy=None):
     'Configuration settings used internally for the build.'

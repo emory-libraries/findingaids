@@ -8,6 +8,19 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.10 - Maintenance updates
+--------------------------
+
+* Update to use migrated taskresult module in eulcommon instead of
+  eullocal
+* Install eullocal from private github instead of old CI server
+* bugfix: Finding aids containing leading whitespace in the title or
+  main entry of a collection break browse functionality (and the homepage).
+  [Now normalizing whitespace before selecting or filtering on first letter]
+* bugfix: Archivists can publish finding aids to the finding aids database
+  that do not pass all the checks from the prep stage.
+  [Now explicitly checking for whitespace in top-level unittitle]
+
 1.9.1
 -----
 

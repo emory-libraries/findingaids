@@ -233,7 +233,7 @@ def alpha_pagelabels(paginator, objects, label_attribute):
 def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=None,
         filter=None):
     """Retrieve a  :class:`~findingaids.fa.models.FindingAid` (or
-    :class:`~findingaids.fa.models.FindingAid`  :class:`eulcore.django.existdb.manager.Manager`)
+    :class:`~findingaids.fa.models.FindingAid`  :class:`eulexistdb.manager.Manager`)
     from eXist by eadid, with any query options specified.  Raises a
     :class:`django.http.Http404` if the requested document is not found in eXist.
 
@@ -241,7 +241,7 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
     preview is set to True.
 
     :param eadid: eadid of the :class:`~findingaids.fa.models.FindingAid` to
-            retrieve; if not specified, a :class:`eulcore.django.existdb.manager.Manager`
+            retrieve; if not specified, a :class:`eulexistdb.manager.Manager`
             will be returned instead
     :param preview: optional; set to True to load the finding aid from the
             preview collection; defaults to False
@@ -250,7 +250,7 @@ def get_findingaid(eadid=None, preview=False, only=None, also=None, order_by=Non
     :param order_by: optional field to use for sorting
     :param filter: optional queryset filter to apply, in dictionary form
     :returns: :class:`~findingaids.fa.models.FindingAid` (when eadid is specified)
-            or a :class:`~findingaids.fa.models.FindingAid` :class:`eulcore.django.existdb.manager.Manager`
+            or a :class:`~findingaids.fa.models.FindingAid` :class:`eulexistdb.manager.Manager`
             (if no eadid is specified)
     """
     try:

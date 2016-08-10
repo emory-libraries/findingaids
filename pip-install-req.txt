@@ -1,8 +1,9 @@
 eulxml>=1.1
-eulexistdb>=0.20.1
-eulcommon>=0.18.0
-https://wilson.library.emory.edu/jenkins/job/eullocal/lastSuccessfulBuild/artifact/eullocal/dist/eullocal-0.22.0-dev.tar.gz
-https://wilson.library.emory.edu/jenkins/job/pidman-rest-client_1.1.x/lastSuccessfulBuild/artifact/pidmanclient/dist/pidservices-1.1.2.tar.gz
+eulexistdb>=0.21
+eulcommon>=0.19.0
+git+ssh://git@github.com/emory-libraries/eullocal.git@0.22#egg=eullocal
+git+https://github.com/emory-libraries/pidman-client.git@release-1.1.2#egg=pidservices
+recaptcha-client
 # pin to before 1.6 for now, until we update to be compatible
 Django>=1.9,<1.10
 python-dateutil

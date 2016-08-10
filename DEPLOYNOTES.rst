@@ -33,8 +33,11 @@ Bootstrapping a development environment
 * To generate PDFs, you will need to install
   `Apache FOP <https://xmlgraphics.apache.org/fop/>`_ (``apt-get install fop``
   on debian/ubuntu or ``brew install fop`` on OSX)
-* You probably don't need to setup and configure celery and rabbitmq unless you
-  are doing development on the celery tasks.
+* Celery/rabbitmq is only needed for publication and svn checkout, so you
+  may not need to set it up.
+
+  - To run celery, use ``python manage.py celeryd -Q findingaids``
+  - To trigger an EAD svn checkout, define an archive in django admin.
 
 After configuring your database, run migrate:
 
