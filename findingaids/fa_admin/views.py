@@ -228,6 +228,7 @@ def _prepublication_check(request, filename, archive, mode='publish', xml=None):
         response = None
     return [ok, response, dbpath, fullpath]
 
+
 @permission_required_with_403('fa_admin.can_publish')
 @require_POST
 def publish(request):
@@ -267,8 +268,6 @@ def publish(request):
         return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
     # determine archive this ead is associated with
-
-    xml = ead.serialize()
     archive = None
     if not ead.repository:
         messages.error(request,
@@ -295,10 +294,11 @@ def publish(request):
             % archive.label)
         return HttpResponseSeeOtherRedirect(reverse('fa-admin:index'))
 
-
     errors = []
     try:
-        ok, response, dbpath, fullpath = _prepublication_check(request, filename, archive, xml=xml)
+        # NOTE: *not* using serialized xml here, because it may introduce
+        # whitespace errors not present in the original file.
+        ok, response, dbpath, fullpath = _prepublication_check(request, filename, archive)
         if ok is not True:
             # publication check failed - do not publish
             return response
@@ -342,6 +342,7 @@ def publish(request):
     else:
         return render(request, 'fa_admin/publish-errors.html',
             {'errors': errors, 'filename': filename, 'mode': 'publish', 'exception': err})
+
 
 @permission_required_with_403('fa_admin.can_preview')
 @user_passes_test_with_ajax(archive_access)
