@@ -28,6 +28,8 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from django.dispatch import Signal
+from django.db.models.signals import post_save
 from django.test.utils import override_settings
 
 from eulexistdb.db import ExistDB
@@ -875,20 +877,20 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
             response = self.client.post(reverse('fa-admin:preview-ead', kwargs={'archive': 'marbl'}),
                 {'filename': filename})
 
-        # publish the preview file
-        document_id = 'hartsfield558'
-        filename = '%s.xml' % document_id
-        response = self.client.post(publish_url, {'preview_id': document_id}, follow=True)
-        code = response.status_code
-        expected = 200  # final code, after following redirects
-        self.assertEqual(code, expected,
-            'Expected %s but returned %s for %s (POST, following redirects) as admin user'
-            % (expected, code, publish_url))
-        (redirect_url, code) = response.redirect_chain[0]
-        self.assert_(reverse('fa-admin:index') in redirect_url)
-        expected = 303      # redirect
-        self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
-            % (expected, code, publish_url))
+            # publish the preview file
+            document_id = 'hartsfield558'
+            filename = '%s.xml' % document_id
+            response = self.client.post(publish_url, {'preview_id': document_id}, follow=True)
+            code = response.status_code
+            expected = 200  # final code, after following redirects
+            self.assertEqual(code, expected,
+                'Expected %s but returned %s for %s (POST, following redirects) as admin user'
+                % (expected, code, publish_url))
+            (redirect_url, code) = response.redirect_chain[0]
+            self.assert_(reverse('fa-admin:index') in redirect_url)
+            expected = 303      # redirect
+            self.assertEqual(code, expected, 'Expected %s but returned %s for %s (POST) as admin user'
+                % (expected, code, publish_url))
 
         # convert messages into an easier format to test
         msgs = [str(msg) for msg in response.context['messages']]
@@ -965,6 +967,8 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
             'user should see a message if they don\'t have access to publish')
 
         # test archive not identified from ead (subarea/name mismatch)
+        # disable signal to skip svn checkout
+        post_save.disconnect(receiver=tasks.archive_save_hook, sender=Archive)
         marbl.name = 'Manuscripts & Archives'
         marbl.save()
         user.archivist.archives.add(marbl)
@@ -990,4 +994,3 @@ class CeleryAdminViewsTest(BaseAdminViewsTest):
         msgs = [str(msg) for msg in response.context['messages']]
         self.assert_('Could not determine which archive' in msgs[0],
             'user should see an error message if the EAD has no subarea present')
-

@@ -8,6 +8,13 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.10.1
+------
+
+* Fix whitespace prep and publication check to handle top-level unittitles
+  that include a nested <title> or <emph> tag.
+
+
 1.10 - Maintenance updates
 --------------------------
 
