@@ -22,6 +22,7 @@ from urllib2 import HTTPError
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
+from django.template.defaultfilters import striptags
 
 from eulxml.xmlmap.core import load_xmlobject_from_file, load_xmlobject_from_string
 from eulxml.xmlmap.eadmap import EAD_NAMESPACE
@@ -30,6 +31,7 @@ from pidservices.clients import is_ark, parse_ark
 
 from findingaids.fa.models import FindingAid, ID_DELIMITER
 from findingaids.fa.urls import EADID_URL_REGEX, TITLE_LETTERS
+from findingaids.fa.templatetags.ead import format_ead
 
 # pre-compile an xpath to easily get node names without EAD namespace
 local_name = XPath('local-name()')
@@ -172,10 +174,10 @@ def check_eadxml(ead):
 
     if title_text is None:
         errors.append("List title seems to be empty")
-    elif re.match('\s+', title_text):
+    elif re.match(r'\s+', title_text):
         # using node.text because unicode() normalizes, which obscures whitespace problems
         errors.append("Found leading whitespace in list title field (%s): '%s'" %
-                        (list_title_path, ead.list_title.node.text))
+                      (list_title_path, ead.list_title.node.text))
         # report with enough context that they can find the appropriate element to fix
 
     # - first letter of title matches regex   -- only check if whitespace test fails
@@ -184,9 +186,14 @@ def check_eadxml(ead):
                       (ead.first_letter, list_title_path, TITLE_LETTERS))
 
     # leading space in unit title (could be list title but might not be)
-    if re.match('\s+', ead.unittitle.text):
+    # NOTE: title can contain and even start with subtags such as <title>
+    # or <emph>, which is hard to account for with lxml or text() xpath.
+    # Using format_ead to generate html that would be displayed, and then
+    # stripping tags to check for any leading whitespace within a leading tag
+    title = striptags(format_ead(ead.unittitle))
+    if re.match(r'\s+', title):
         errors.append("Found leading whitespace in unittitle: '%s'" %
-                      ead.unittitle.text)
+                      title)
 
     # leading whitespace in control access fields (if any)
     if ead.archdesc.controlaccess and ead.archdesc.controlaccess.controlaccess:
@@ -213,8 +220,8 @@ def check_eadxml(ead):
         errors.append("eadid url and identifier do not match: url '%s' should end with identifier '%s'" \
                      % (ead.eadid.url, ead.eadid.identifier))
 
-
     return errors
+
 
 def check_series_ids(series):
     """Recursive function to check that series and subseries ids are present.

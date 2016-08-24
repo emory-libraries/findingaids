@@ -154,6 +154,18 @@ class UtilsTest(TestCase):
         self.assertEqual(1, len(errors))
         self.assert_(errors[0].startswith('Found leading whitespace in unittitle'))
 
+        # pomerantz unit title starts with an <emph> tag; test that
+        # this doesn't trip up check for leading whitespace in title
+        dbpath = settings.EXISTDB_TEST_COLLECTION + '/pomerantz890.xml'
+        pomerantz_eadfile = os.path.join(settings.BASE_DIR, 'fa', 'tests',
+                                         'fixtures', 'pomerantz890.xml')
+        errors = utils.check_ead(pomerantz_eadfile, dbpath)
+        # fixture contains subjects with leading whitespace, which is fine
+        # we just care that the unittitle check passes
+        self.assert_('Found leading whitespace in unittitle:' not in
+                     errors[0])
+
+
     def test_check_eadxml(self):
         # use invalid ead fixture to check error detection
         ead = self.invalid_ead
