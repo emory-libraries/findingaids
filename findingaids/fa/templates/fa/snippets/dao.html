@@ -7,5 +7,5 @@ context). Adds CSS classes to style public, internal, and hidden daos differentl
 <a {% if component.has_semantic_data and component.rdf_type and dao.href and show_link %}property="schema:URL" {% endif %}
    class="dao{% if dao.audience = 'internal' and perms.fa_admin.can_view_internal_dao %} dao-internal{% endif %}{% if dao.show = 'none' %} dao-hidden{% endif %}"
    {% if dao.href and show_link %}href="{{ dao.href }}">{{ dao.title|default:DEFAULT_DAO_LINK_TEXT }}</a>
-   {% else %}>[Reading Room access only: id {% firstof dao.id dao.href|ark_pid %}]</a>
+   {% else %}>[Digital/digitized copy available in the Reading Room: id {% firstof dao.id dao.href|ark_pid %}]</a>
 {% endif %}

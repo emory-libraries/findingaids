@@ -8,6 +8,11 @@ Aids application.  New features in each version should be listed, with the most
 recent version first.  Upgrade or deployment notes should be found in
 :ref:`DEPLOYNOTES`.
 
+1.11
+----
+
+* Change default stylesheet display text for <dao> objects.
+
 1.10.1
 ------
 
