@@ -154,7 +154,7 @@ def findingaid(request, id, preview=False):
     if 'keywords' in request.GET:
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
-        filter = {'highlight': search_terms}
+        filter = {'fulltext_terms': search_terms, 'boostfields__fulltext_terms':search_terms,'highlight':True}    # disable highlighting in search results list}
     else:
         url_params = ''
         filter = {}
@@ -581,7 +581,6 @@ def search(request):
                 highlight_params = urlencode({'keywords': search_params['keywords']})
             else:
                 highlight_params = None
-
             response_context = {
                 'findingaids': result_subset,
                 'search_params': search_params,    # actual search terms, for display
@@ -666,7 +665,6 @@ def document_search(request, id):
             url_params = ''
             if search_terms:
                 url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
-
             return render(request, 'fa/document_search.html', {
                 'files': files,
                 'ead': ead,
