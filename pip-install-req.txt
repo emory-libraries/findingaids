@@ -1,7 +1,7 @@
 eulxml>=1.1
 eulexistdb>=0.21
 eulcommon>=0.19.0
-git+ssh://git@github.com/emory-libraries/eullocal.git@0.22#egg=eullocal
+git+ssh://git@github.com/emory-libraries/eullocal.git#egg=eullocal
 git+https://github.com/emory-libraries/pidman-client.git@release-1.1.2#egg=pidservices
 recaptcha-client
 # pin to before 1.6 for now, until we update to be compatible
