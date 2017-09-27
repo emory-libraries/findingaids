@@ -17,6 +17,7 @@
                 <ignore qname="ead:altformavail"/>
                 <ignore qname="ead:processinfo"/>
                 <ignore qname="ead:arrangement"/>
+                <ignore qname="ead:appraisal"/>
                 <ignore qname="ead:otherfindaid"/>
                 <ignore qname="ead:separatedmaterial"/>
                 <ignore qname="ead:relatedmaterial"/>

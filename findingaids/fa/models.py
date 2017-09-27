@@ -214,7 +214,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     admin_info_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' + \
         '|'.join(['e:%s' % field for field in _admin_info]) + '))//exist:match)'
     # - collection description fields
-    _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'otherfindaid']
+    _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'appraisal', 'otherfindaid']
     # -- map as regular xmlmap field, for use when entire object is returned
     coll_desc_matches = xmlmap.IntegerField(
         'count(' + '|'.join('./e:archdesc/e:%s//exist:match' % field for field in _coll_desc) + ')')
@@ -322,6 +322,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             fields.append(self.archdesc.scope_content)
         if self.archdesc.arrangement:
             fields.append(self.archdesc.arrangement)
+        if self.archdesc.appraisal:
+            fields.append(self.archdesc.appraisal)
         if self.archdesc.other:
             fields.append(self.archdesc.other)
 
@@ -566,6 +568,8 @@ class Series(XmlModel, LocalComponent):
             fields.append(self.scope_content)
         if self.arrangement:
             fields.append(self.arrangement)
+        if self.appraisal:
+            fields.append(self.appraisal)
         if self.other:
             fields.append(self.other)
         if self.use_restriction:
