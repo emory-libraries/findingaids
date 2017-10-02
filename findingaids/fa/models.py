@@ -203,7 +203,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     # match-count on special groups of data for table of contents listing
     # - administrative info fields
     _admin_info = ['userestrict', 'altformavail', 'relatedmaterial', 'separatedmaterial',
-                   'acqinfo', 'custodhist', 'prefercite']
+                   'acqinfo', 'custodhist', 'prefercite', 'appraisal']
 
 
     # -- map as regular xmlmap field, for use when entire object is returned
@@ -214,7 +214,7 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
     admin_info_matches_xpath = 'count(util:expand(%(xq_var)s/e:archdesc/(' + \
         '|'.join(['e:%s' % field for field in _admin_info]) + '))//exist:match)'
     # - collection description fields
-    _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'appraisal', 'otherfindaid']
+    _coll_desc = ['bioghist', 'bibliography', 'scopecontent', 'arrangement', 'otherfindaid']
     # -- map as regular xmlmap field, for use when entire object is returned
     coll_desc_matches = xmlmap.IntegerField(
         'count(' + '|'.join('./e:archdesc/e:%s//exist:match' % field for field in _coll_desc) + ')')
@@ -297,6 +297,8 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             info.append(self.archdesc.custodial_history)
         if self.archdesc.preferred_citation:
             info.append(self.archdesc.preferred_citation)
+        if self.archdesc.appraisal:
+            info.append(self.archdesc.appraisal)
         if self.process_info:
             info.append(self.process_info)
         return info
@@ -322,8 +324,6 @@ class FindingAid(XmlModel, eadmap.EncodedArchivalDescription):
             fields.append(self.archdesc.scope_content)
         if self.archdesc.arrangement:
             fields.append(self.archdesc.arrangement)
-        if self.archdesc.appraisal:
-            fields.append(self.archdesc.appraisal)
         if self.archdesc.other:
             fields.append(self.archdesc.other)
 
