@@ -303,8 +303,8 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
         #filter further based on highlighting
-        filter = {'highlight': True}
-        # filter = {'fulltext_terms': search_terms, 'boostfields__fulltext_terms':search_terms,'highlight':True}
+        # filter = {'highlight': search_terms}
+        filter = {'fulltext_terms': search_terms, 'boostfields__fulltext_terms':search_terms,'highlight':search_terms}
         # add highlighting & match counts to series & index lists for navigation links
         all_series = all_series.filter(**filter)
         all_indexes = all_indexes.filter(**filter)
