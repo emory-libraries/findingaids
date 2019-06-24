@@ -13,7 +13,11 @@
 #   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
+import urllib
+import urllib2
+import json
 
+from django.contrib import messages
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
@@ -44,12 +48,31 @@ def feedback(request):
         form = FeedbackForm(data)
         if form.is_valid():
             err = None
-            try:
-                email_ok = form.send_email()
-                # if it processed without exception, email should be sent ok
-            except Exception as ex:
-                err = ex
+            ''' Begin reCAPTCHA validation '''
+            recaptcha_response = request.POST.get('g-recaptcha-response')
+            url = 'https://www.google.com/recaptcha/api/siteverify'
+            values = {
+                'secret': settings.RECAPTCHA_PRIVATE_KEY,
+                'response': recaptcha_response
+            }
+            data = urllib.urlencode(values)
+            req = urllib2.Request(url, data)
+            response = urllib2.urlopen(req)
+            result = json.load(response)
+            ''' End reCAPTCHA validation '''
+
+            if result['success']:
+                try:
+                    email_ok = form.send_email()
+                    messages.success(request, 'New comment added with success!')
+                except Exception as ex:
+                    err = ex
+                    email_ok = False
+                    messages.success(request, 'Invalid reCAPTCHA. Please try again.')
+            else:
                 email_ok = False
+                messages.error(request, 'Invalid reCAPTCHA. Please try again.')
+
             # display a success/thank you page
             response = render(request, 'content/feedback.html', {
                     'email_sent': email_ok,
