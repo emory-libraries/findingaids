@@ -45,7 +45,7 @@ class FeedbackForm(forms.Form):
     eadid = forms.CharField(widget=forms.HiddenInput, required=False)
     url = forms.CharField(widget=forms.HiddenInput, required=False)
 
-    captcha = captchafield.ReCaptchaField()
+    #captcha = captchafield.ReCaptchaField()
 
     email_subject = 'Site Feedback'
 
