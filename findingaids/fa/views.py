@@ -155,6 +155,7 @@ def findingaid(request, id, preview=False):
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
         filter = {'fulltext_terms': search_terms, 'boostfields__fulltext_terms': search_terms, 'highlight': True}    # disable highlighting in search results list}
+        print search_terms, "#######"
     else:
         url_params = ''
         filter = {}
@@ -303,8 +304,8 @@ def _view_series(request, eadid, *series_ids, **kwargs):
         search_terms = request.GET['keywords']
         url_params = '?' + urlencode({'keywords': search_terms.encode('utf-8')})
         #filter further based on highlighting
-        # filter = {'highlight': search_terms}
-        filter = {'fulltext_terms': search_terms, 'boostfields__fulltext_terms':search_terms,'highlight':search_terms}
+        filter = {'highlight': search_terms}
+        # filter = {'boostfields__fulltext_terms':search_terms,'highlight':search_terms}
         # add highlighting & match counts to series & index lists for navigation links
         all_series = all_series.filter(**filter)
         all_indexes = all_indexes.filter(**filter)
@@ -497,7 +498,7 @@ def search(request):
         repository = form.cleaned_data['repository']
         dao = form.cleaned_data['dao']
         page = request.GET.get('page', 1)
-
+        print keywords, "#######"
         # initialize findingaid queryset - filters will be added based on search terms
         findingaids = FindingAid.objects
 

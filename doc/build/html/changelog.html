@@ -1,0 +1,747 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>CHANGELOG &mdash; Finding Aids 1.11.0-dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.11.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Finding Aids 1.11.0-dev documentation" href="index.html" />
+    <link rel="next" title="DEPLOYNOTES" href="deploynotes.html" />
+    <link rel="prev" title="README" href="readme.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="changelog">
+<span id="id1"></span><h1>CHANGELOG<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<p>The following is a summary of changes and improvements to the Finding
+Aids application.  New features in each version should be listed, with the most
+recent version first.  Upgrade or deployment notes should be found in
+<a class="reference internal" href="deploynotes.html#deploynotes"><span class="std std-ref">DEPLOYNOTES</span></a>.</p>
+<div class="section" id="id2">
+<h2>1.11<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Change default stylesheet display text for &lt;dao&gt; objects.</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h2>1.10.1<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Fix whitespace prep and publication check to handle top-level unittitles
+that include a nested &lt;title&gt; or &lt;emph&gt; tag.</li>
+</ul>
+</div>
+<div class="section" id="maintenance-updates">
+<h2>1.10 - Maintenance updates<a class="headerlink" href="#maintenance-updates" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Update to use migrated taskresult module in eulcommon instead of
+eullocal</li>
+<li>Install eullocal from private github instead of old CI server</li>
+<li>bugfix: Finding aids containing leading whitespace in the title or
+main entry of a collection break browse functionality (and the homepage).
+[Now normalizing whitespace before selecting or filtering on first letter]</li>
+<li>bugfix: Archivists can publish finding aids to the finding aids database
+that do not pass all the checks from the prep stage.
+[Now explicitly checking for whitespace in top-level unittitle]</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h2>1.9.1<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Prep step returns an incorrect message for new finding aids.</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h2>1.9.0<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>As a user, I can see a banner on individual finding aids where
+materials are stored offsite so that I know retrieval of these
+materials will take longer.</li>
+<li>As a user, I can see a scope note at the folder level of the finding
+aid in order to see additional information the archivist has added
+about that folder&#8217;s contents.</li>
+<li>As an administrator, I can change staff contacts listed in the finding
+aids database website so that I can manage the names and emails displayed
+on the request materials page.</li>
+<li>As an administrator I can initiate a user account from LDAP without
+requiring the person to log in so that I can manage user accounts
+more efficiently.</li>
+<li>bugfix: whitespace inconsistencies in keyword search results</li>
+<li>bugfix: browse by letters label inconsistency in certain rare cases
+(complete label with partial overlap in next label)</li>
+<li>Upgraded to eulexistdb 0.20 and eXist-db 2.2</li>
+<li>Upgrade to current Django 1.9</li>
+<li>Switched from local ldap implementation to django-auth-ldap</li>
+<li>Now configured to use django-debug-toolbar for development, with
+a panel for viewing existdb xqueries.</li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h2>1.8.3<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Text content changes for MARBL rename to Rose Library, along with
+other contact and name updates.</li>
+<li>Updated home page banner image for Pitts.</li>
+</ul>
+</div>
+<div class="section" id="id7">
+<h2>1.8.2<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>bugfix: correct RDFa for untitled container-level contents with tagged
+creator name.</li>
+</ul>
+</div>
+<div class="section" id="id8">
+<h2>1.8.1<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>bugfix: repeating biographical note in PDFs for documents with RDFa</li>
+<li>bugfix: Names in correspondence series &lt;scopecontent&gt; are no longer
+linked to &lt;origination&gt; in the RDF.</li>
+</ul>
+</div>
+<div class="section" id="rdfa-enhancements">
+<h2>1.8 - RDFa enhancements<a class="headerlink" href="#rdfa-enhancements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>As a researcher, I want to export title information from a finding
+aid so that I can analyze and organize the works in a person’s papers
+according to genre.</li>
+<li>As a researcher, I want to export titles&#8217; ISBN, ISSN, or OCLC numbers
+from a finding aid so that I can access the data associated with those
+publications.</li>
+<li>As a researcher, I want to export semantic, relational data from EAD
+so that I can analyze it in network graph software like Gephi.
+[See the new script in scripts/rdfa-to-gexf]</li>
+<li>bugfix: PDF generation display issue for long numbers in box/folder</li>
+<li>bugfix: Request materials button not appearing for appropriate series.</li>
+<li>Replaced current finding aids logo with the standard LITS logo.</li>
+<li>Update Database Group initial fixture data to avoid overwriting
+new production group definitions</li>
+</ul>
+</div>
+<div class="section" id="id9">
+<h2>1.7.4<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>made related_materials repeatable</li>
+</ul>
+</div>
+<div class="section" id="aeon-integration">
+<h2>1.7.3 - Aeon integration<a class="headerlink" href="#aeon-integration" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>As a user viewing individual finding aids in the finding aids
+database, I can click on a button in a finding aid that takes me into
+the Aeon system in order to request boxes I want to use.</li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h2>1.7.2<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Minor text corrections on the site home page.</li>
+<li>bugfix: updated the ead_load script so it can be used with the subversion
+architecture for EAD content that we switched to in 1.5</li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h2>1.7.1<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>bugfix: small corrections to itemid_to_dao script for issues
+encountered in production that were not found in testing</li>
+<li>bugfix: RDFa collection resource should be URI instead of string</li>
+</ul>
+</div>
+<div class="section" id="administrative-and-internal-digital-archival-object-support">
+<h2>1.7 - administrative and internal digital archival object support<a class="headerlink" href="#administrative-and-internal-digital-archival-object-support" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>When a logged in administrative user is searching the finding aids
+database, they can optionally restrict results to all collections with
+digital objects.</li>
+<li>Researchers will be able to see identifiers for digitized content that
+can only be accessed in the reading room, so that they can search for
+those items in the kiosk.</li>
+<li>When an administrative user is viewing the web page for a single
+finding aid, they can search for digital objects within that finding
+aid either by entering a keyword/keyword phrase in combination with the
+digital objects only filter or by just searching for all the digital
+objects in the finding aid.</li>
+<li>When an administrative user is logged into the finding aids database,
+they will see an indication that they are logged in on each page of the
+finding aids website in order to remember which view (administrative or
+public) they are seeing.</li>
+<li>When administrative users view webpages for a finding aid with digital
+archival object references in the EAD document, they can distinguish
+when the &lt;dao&gt; display in the administrative view is different from the
+public view and when &lt;dao&gt; information is hidden from the public view
+completely.</li>
+<li>A logged in findingaids staff user will be able to see links for
+internal-only digitized content, including any that are suppressed
+from display for researchers, so that they can access and manage
+archival digitized content.</li>
+<li>When administrative users view webpages for a finding aid with digital
+archival object references in the EAD document, they can see and click
+on links in order to access all the digital archival objects created
+or owned by Emory University, both public and for internal use only.</li>
+<li>A developer or system administrator can run a script on all EAD finding
+aids to add digital archival object references for container-level items
+that include digital filenames in order to provide administrative access
+to digitized content and prepare for future access options.</li>
+<li>As a researcher, I want to be able to see archivist supplied notes about
+processing at the series and subseries level so that I can understand
+how to locate material within a collection.</li>
+<li>New banners from the home page.</li>
+<li>bugfix: series titles with quotes break RDFa output</li>
+<li>bugfix: As a researcher, I want to be able to see any notes associated
+with index content, so that I have any additional information provided
+by the archivists.</li>
+<li>bugfix: As a researcher, I want to be able to see archivist supplied
+notes about processing at the series and subseries level so that I can
+understand how to locate material within a collection.</li>
+<li>bugfix: correct RDFa relation between collection and creator of the collection.</li>
+</ul>
+</div>
+<div class="section" id="id12">
+<h2>1.6<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Remove dependency on RSS feeds for content pages, home page banners,
+and home page news items.</li>
+<li>Updated organizational logo in the header.</li>
+<li>bugfix: Loading the list of finding aid files from subversion in the
+tabbed display of the administrative interface is too slow.</li>
+<li>bugfix: display repeated &lt;separatedmaterial&gt; sections (formerly
+only the first one was being displayed)</li>
+<li>bugfix: if a login session times out, admin file tabs will not load;
+now redirects user to login again</li>
+</ul>
+</div>
+<div class="section" id="id13">
+<h2>1.5.1<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>bugfix: configure celery task added in 1.5 for svn checkout so it is
+directed to findingaids queue so it gets picked up by the celery worker.</li>
+</ul>
+</div>
+<div class="section" id="id14">
+<h2>1.5<a class="headerlink" href="#id14" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>A superuser can associate an archivist with one or more archives and their
+corresponding subversion repositories so that archivists can preview and
+publish for only the archives they are assigned.</li>
+<li>Superusers of the finding aids database can easily navigate between the
+django administrative module and the finding aids database administrative module.</li>
+<li>When an archivist associated with a single archive logs in to the admin site,
+they see a list of EAD documents in the associated subversion repository and
+are able to prep, preview, and publish finding aids from that repository.</li>
+<li>When an archivist associated with multiple archives logs in to the admin site,
+they see a tab for each corresponding subversion repository, each with a list
+of EAD documents in that subversion repo for prep, preview and publication.</li>
+<li>An archivist with permissions on multiple archives can choose a primary
+archive so they can view EAD documents from that repository by default
+when they log in.</li>
+<li>When an archivist preps an EAD document that requires modifications, they can
+click a button to accept and apply those changes so that updates are automatically
+committed to subversion on their behalf.</li>
+<li>Archivists can only prep, preview, and publish EAD documents from the  subversion
+repositories they have been associated with in the admin site, for security.</li>
+<li>An archivist can only delete a published finding aid from the website if it is
+associated with an archive that they have permission to manage, for security reasons.</li>
+<li>When an archivist with permissions for multiple repositories selects a repository
+tab on the main admin page, that repository tab stays active until they select
+another repository or logout, in order to avoid confusion when prepping,
+previewing, and publishing content from a single repository.</li>
+<li>Deprecated and unused support for publish without preview has been removed.</li>
+<li>New celery task: when an archive is defined or updated, check out (or update)
+a local copy of the subversion repository.</li>
+<li>bugfix: add redirect for top-level /favicon.ico url</li>
+</ul>
+</div>
+<div class="section" id="id15">
+<h2>1.4.1<a class="headerlink" href="#id15" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>bugfix to correct PDF generation (broken in some cases due to template
+changes relating to RDFa output)</li>
+</ul>
+</div>
+<div class="section" id="rdfa">
+<h2>1.4 - RDFa<a class="headerlink" href="#rdfa" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>When a search engine accesses the web page for a finding aid, it can
+harvest semantic information about the finding aid document, so that
+the document can be related to other embedded semantic content.</li>
+<li>A system or technical user can view RDF XML based on the embedded RDFa
+in a finding aid page, in order to harvest RDF in a more standard format
+or to review the embedded data on the page.</li>
+<li>When a search engine accesses the web page for a finding aid with names
+tagged in the EAD, it can harvest semantic information about the originator
+of the finding aid from the collection description so the embedded data
+can become useful in another context.</li>
+<li>When a search engine accesses the Index of Selected Correspondents for
+a finding aid with names tagged in the EAD, it can harvest semantic
+information about correspondents with the originator of the finding aid
+so the embedded data can become useful in another context.</li>
+<li>When a search engine accesses a finding aid series describing correspondence
+for a finding aid with names tagged in the EAD, it can harvest semantic
+information about correspondents with the originator of the finding aid
+so the embedded data can become useful in another context</li>
+<li>When a search engine accesses the finding aid series for the Belfast Group
+Worksheets for a finding aid with names tagged in the EAD, it can harvest
+semantic information about participants in the group so the embedded data
+can become useful in another context.</li>
+<li>When a search engine accesses the finding aid series for the Belfast Group
+Worksheets for a finding aid with names tagged in the EAD, it can harvest
+group sheet titles in order so that title sequence can be preserved.</li>
+</ul>
+</div>
+<div class="section" id="id16">
+<h2>1.3<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>When a researcher is viewing web pages or PDF documents for a finding aid
+with digital archival object references in the EAD document, they can see and
+click on links in order to access digital items associated with the
+collection.</li>
+<li>A researcher searching within a single finding aid can optionally restrict
+results to items that include digital objects in order to find digital content
+by keyword or all digital objects in one finding aid.</li>
+<li>A researcher searching all finding aids by keyword can optionally restrict
+results to collections with publicly accessible digital objects in order to make
+use of archival items available online.</li>
+<li>A researcher viewing the web page or PDF for a finding aid with
+digital archival object references in the EAD can see that the
+finding aid includes digital content by a header at the top of the
+page, so that they are aware some of the materials may be available
+online.</li>
+<li>Users can view PDF documents from within a browser so they can view,
+print, and save the entire finding aid quickly and easily.</li>
+<li>Configurable beta warning to be displayed in test/staging sites; turn on
+via <strong>ENABLE_BETA_WARNING</strong> setting.</li>
+</ul>
+</div>
+<div class="section" id="id17">
+<h2>1.2<a class="headerlink" href="#id17" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Updated to Django 1.5.</li>
+<li>When a user is viewing web pages for a finding aid with external references (extref tags)
+in the EAD document, they can see and click on links in order to access
+external webpages.</li>
+<li>When a user downloads the PDF for a finding aid with external references
+in the EAD document, they can click on links in case they want to access
+related content from the PDF.</li>
+<li>Automated tools, such as search engine robots or site crawlers, can find
+machine-readable site maps for findingaids and content pages, in order to
+improve search engine harvesting of finding aids site content.</li>
+<li>Bug fix: related material section should be displayed when present at series level</li>
+</ul>
+</div>
+<div class="section" id="id18">
+<h2>1.1<a class="headerlink" href="#id18" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>When an admin is logged in, they will see a link to the admin page at
+the top of the left sidebar, so that they can always get back to the
+main admin page.</li>
+<li>A researcher viewing the HTML or PDF version of a finding aid can see
+the processing information from the EAD, so that they know who is responsible
+for the content.</li>
+<li>Updated to Django 1.4.2</li>
+<li>Updates to follow team best practices for Django project code organization:<ul>
+<li>Moved media directory to top-level sitemedia directory</li>
+<li>Moved templates directory to top-level and moved app-specific templates
+into their respective apps.</li>
+<li>Renamed localsettings.py example from <code class="docutils literal"><span class="pre">localsettings-sample.py</span></code> to
+<code class="docutils literal"><span class="pre">localsettings.py.dist</span></code></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="micro-releases">
+<h2>1.0 micro releases<a class="headerlink" href="#micro-releases" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id19">
+<h3>1.0.12<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Catch exceptions when reloading cached content feed data.</li>
+</ul>
+</div>
+<div class="section" id="id20">
+<h3>1.0.11<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Adjust the XQuery for single-document searches to be more efficient
+for large documents, in order to address a time-out issue identified
+in SCLC1083.</li>
+</ul>
+</div>
+<div class="section" id="id21">
+<h3>1.0.10<a class="headerlink" href="#id21" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Better error-handling for empty list title in EAD when prepping for
+preview/load.</li>
+<li>Require eulxml 0.17.1 for improved xpath parser handling.</li>
+</ul>
+</div>
+<div class="section" id="id22">
+<h3>1.0.9<a class="headerlink" href="#id22" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Now compatible with Python 2.7</li>
+<li>Upgrade to Django 1.3 and the latest released versions of the
+broken-out eulcore modules (<code class="xref py py-mod docutils literal"><span class="pre">eulxml</span></code>, <code class="xref py py-mod docutils literal"><span class="pre">eulexistdb</span></code>, and
+<code class="xref py py-mod docutils literal"><span class="pre">eulcommon</span></code>).</li>
+<li>Minor error-handling and search-engine optimization for the feedback
+page.</li>
+<li>Rewrite rule to handle non-existent URL
+(&#8216;-Libraries-EmoryFindingAids&#8217;) that search engines follow from
+other Emory sites.</li>
+<li>Add a reset button to the advanced search form so that a selected
+repository can be unselected.</li>
+</ul>
+</div>
+<div class="section" id="id23">
+<h3>1.0.8<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>bugfix: allow admin publication of documents with a <code class="docutils literal"><span class="pre">&lt;title&gt;</span></code> at
+the beginning of the document <code class="docutils literal"><span class="pre">&lt;unittitle&gt;</span></code></li>
+<li>bugfix: Revised logic for celery PDF caching task, to ensure cache is
+cleared and reloaded with the new version of a published document.</li>
+<li>Plain HTML page with a list of all published findingaids, with a
+link to the full EAD xml for each, as a simple way to allow
+harvesting content.</li>
+</ul>
+</div>
+<div class="section" id="id24">
+<h3>1.0.6<a class="headerlink" href="#id24" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Newer version of <code class="xref py py-mod docutils literal"><span class="pre">eulcore.existdb</span></code> that adds a configurable
+timeout on queries made to the eXist database.</li>
+</ul>
+</div>
+<div class="section" id="id25">
+<h3>1.0.5<a class="headerlink" href="#id25" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fix response-time issue for series/subseries page with highlighted search
+terms.</li>
+<li>Rework admin site preview mode logic so site cannot get stuck in preview
+mode.</li>
+<li>Use pip+virtualenv to manage dependencies like eulcore.</li>
+</ul>
+</div>
+<div class="section" id="id26">
+<h3>1.0.4<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fix preview subseries link so it stays in series mode</li>
+<li>Update to eulcore to try to improve xpath error reporting for errors that
+are being generated on the prodution site by web spiders.</li>
+</ul>
+</div>
+<div class="section" id="id27">
+<h3>1.0.3<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h3>
+<p>Minor usability and display tweaks:
+* Show all alpha-browse page labels instead of only 9
+* Brief search tips on the main page</p>
+</div>
+<div class="section" id="id28">
+<h3>1.0.2<a class="headerlink" href="#id28" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Fix character corruption issue in origination field on main finding aid
+page.</li>
+</ul>
+</div>
+<div class="section" id="id29">
+<h3>1.0.1<a class="headerlink" href="#id29" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Correct single-doucment search for simple finding aids with no series.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="site-design-content">
+<h2>1.0 Site Design &amp; Content<a class="headerlink" href="#site-design-content" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Users can view additional pages maintained by the finding aids administrator
+which contain helpful information for regarding searching, defining terms,
+participating institutions, etc.</li>
+<li>User visiting the homepage sees one of several archivist-selected images
+(rotate randomly on page refresh) to market unique items in MARBL&#8217;s collections.</li>
+<li>A user visiting the Finding Aids home page will see the most recent archivist-
+entered/created announcement (if any), in order to receive up-to-date news
+about special events or notifications about site downtime.</li>
+<li>Researchers can submit feedback relating to the website site from the main
+homepage to help improve content and functionality.</li>
+<li>When a researcher is viewing a single finding aid, they can submit feedback to
+help correct typos and errors in the text or provide additional information
+which may be helpful to future researchers.</li>
+<li>Prospective visitors/researchers can submit a request for materials to
+facilitate retrieval prior to their arrival, which will be routed to the
+appropriate repository via email.</li>
+<li>Researchers can select a repository (other than &#8216;All&#8217;) on the advanced search
+form and submit the form without entering any other search terms, in order to
+browse all finding aids from a single repository.</li>
+<li>Users view html and PDF versions of finding aids that are consistently and
+cleanly formatted and displayed according to MARBL formatting requirements.</li>
+</ul>
+</div>
+<div class="section" id="unitid-identifiers">
+<h2>0.4.1 Unitid Identifiers<a class="headerlink" href="#unitid-identifiers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Custom manage command to add machine-readable identifiers to the top-level
+unitid tag.</li>
+</ul>
+</div>
+<div class="section" id="persistent-ids">
+<h2>0.4 Persistent IDs<a class="headerlink" href="#persistent-ids" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>A system administrator can run a command that will generate ARKs for
+all existing EAD documents that do not already have ARKs to update the
+documents and store the ARK in the appropriate eadid attribute.</li>
+<li>When an archivist runs the &#8216;prep&#8217; step in the Finding Aid admin
+site, an ARK will be generated and added to the &#8216;prepared&#8217; EAD.</li>
+<li>When an archivist runs the &#8216;prep&#8217; step on a Finding Aid with no ARK
+stored in the EADID, but for which an ARK has already been generated,
+the existing ARK will be used and the archivist will see an
+explanatory message.</li>
+<li>When an archivist attempts to publish a Finding Aid without an ARK
+stored in the EADID, the document will not be published and the
+archivist will see an explanatory message.</li>
+<li>A researcher or search engine accessing a Finding Aid document has
+access to view and bookmark the permanent url for that document.</li>
+<li>When researchers try to use the Emory Finding Aids Database and it
+is down, they will see a message about the problem and who to contact.</li>
+</ul>
+</div>
+<div class="section" id="enhanced-search">
+<h2>0.3 Enhanced Search<a class="headerlink" href="#enhanced-search" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>When viewing a finding aid after a search, a researcher can easily find search
+terms and exact phrases because they are highlighted.</li>
+<li>When viewing a finding aid after a search, a researcher sees an indicator of
+which sections of the finding aid include their search terms.</li>
+<li>A system administrator can run a script to migrate EAD files in the
+configured source directory from EAD DTD format to EAD XSD schema.</li>
+<li>When an admin cleans, publishes, or previews an schema-based EAD document,
+the application validates against the XSD schema.</li>
+<li>Researchers can retrieve an alphabetical browse list in less than 5 seconds,
+based on the first letter of a stakeholder specified field.</li>
+<li>Researchers receive their search results in less than 5 seconds.</li>
+<li>Researchers can see how many pages of search results there are, and jump to
+any section of search results from any page in the search results.</li>
+<li>When viewing a finding aid with series or sub-series, a researcher can use
+breadcrumbs to navigate within the hierarchy of the document.</li>
+<li>Researchers can search for an exact phrase in all indexed fields in the full
+text of the finding aid, to allow targeted discovery.</li>
+<li>Researchers can search using wildcards to match partial or variant words.</li>
+<li>Researchers can use grouping and boolean operators in the main search input,
+to generate very precise, relevant search results.</li>
+<li>Researchers find finding aids with matches in stake-holder specified fields
+at the top of search results.</li>
+<li>When viewing a finding aid, a researcher can search within that one document,
+to find relevant folder contents in a large finding aid.</li>
+<li>Researchers can click on a subject heading (any of the controlaccess terms)
+in a single finding aid to discover other finding aids with the same subject headings.</li>
+<li>When browsing finding aids by any first letter, a researcher can jump to
+alphabetical groupings within that letter, to enable identifying and accessing
+a particular portion of that browse listing (e.g., A-Ar, As-Ax, etc.).</li>
+<li>When viewing a finding aid found via search, a researcher can get back to the
+last page of search results they were on.</li>
+<li>Researchers can filter their search by repository (MARBL, Pitts, University
+Archives, etc.), to find resources available at a specific location.</li>
+<li>Users interact with a site that has a consistent look and feel across
+Emory Libraries websites.</li>
+</ul>
+<p><strong>Minor changes</strong></p>
+<ul class="simple">
+<li>Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.</li>
+<li>Logging now available in runserver</li>
+<li>Clean urls for series/subseries/index (without redundant eadid)</li>
+<li>Includes a prototype version simplepages for editable site content</li>
+</ul>
+</div>
+<div class="section" id="data-preparation-admin-site">
+<h2>0.2 Data Preparation / Admin site<a class="headerlink" href="#data-preparation-admin-site" title="Permalink to this headline">¶</a></h2>
+<p>Replaces the legacy command-line ant process for validating EAD xml
+data and loading it to the eXist database.</p>
+<ul class="simple">
+<li>An authorized archivist can log in to an admin section of the
+finding aids site inaccessible to other users.</li>
+<li>Logged in admins can view a list of finding aid files recently
+modified on F:and ready for upload, sorted by last modified.</li>
+<li>Logged in admins can select files from the recently modified list
+for upload directly to publication.</li>
+<li>Logged in admins can select a file from the recently modified list
+for preparing, see a list of changes made, and optionally download
+the prepared version if changes were made, in order to safely
+prepare the canonical copy of the EAD xml files.</li>
+<li>Logged in admins can select files from the recently modified list
+for preview; multiple admins can preview different documents
+simultaneously.</li>
+<li>An admin previewing a finding aid can click a link (on any page in a
+multi-page finding aid) to publish that document.</li>
+<li>When an admin tries to publish or preview an invalid finding aid,
+the user sees a meaningful error message directing them how to fix
+it.</li>
+<li>When the web application is unable to save a finding aid, the user
+sees a meaningful message describing the problem and how to proceed.</li>
+<li>Logged in admins can view a minimal alphabetical list of published
+finding aids.</li>
+<li>Logged in admins can select a finding aid for deletion from the
+alphabetical list of published finding aids.</li>
+<li>When a collection is removed from the production site, patrons
+accessing their URLs are referred to MARBL staff for collection
+status.</li>
+<li>Researchers can receive a pdf of a finding aid in less than 10
+seconds.</li>
+<li>A search engine or web crawler can harvest descriptive metadata
+based on the EAD contents along with the HTML data, to improve
+google-ability.</li>
+<li>A system administrator can run a command to prepare all or specified
+EAD xml files in the configured directory, in order to easily update
+all existing files to new standards.</li>
+<li>A system administrator can run a command to load all or specified
+EAD xml files in the configured source directory to the configured
+eXist collection, in order to easily populate a new eXist collection</li>
+</ul>
+</div>
+<div class="section" id="port-to-django">
+<h2>0.1 Port to Django<a class="headerlink" href="#port-to-django" title="Permalink to this headline">¶</a></h2>
+<p>Reimplementation of the functionality of the existing PHP Finding Aids
+site in django and eXist 1.4.</p>
+<ul class="simple">
+<li>Researchers can browse finding aids alphabetically by first letter
+of title.</li>
+<li>Researchers can click on the title of a finding aid in search or
+browse results to view more details about what resources are
+available in that collection.</li>
+<li>Researchers can search finding aids by keyword.</li>
+<li>Developers can access EAD XML objects in an eXist-backed Django
+Model workalike.</li>
+<li>Researchers can click &#8216;download PDF&#8217; when viewing a single finding
+aid to download a PDF version of the entire finding aid.</li>
+<li>Researchers can navigate through finding aid site with the same look
+and feel of the library site.</li>
+<li>When a researcher clicks on an old link to a drupal or pre-drupal
+finding aid URL, they are automatically redirected to new finding
+aid URLs.</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">CHANGELOG</a><ul>
+<li><a class="reference internal" href="#id2">1.11</a></li>
+<li><a class="reference internal" href="#id3">1.10.1</a></li>
+<li><a class="reference internal" href="#maintenance-updates">1.10 - Maintenance updates</a></li>
+<li><a class="reference internal" href="#id4">1.9.1</a></li>
+<li><a class="reference internal" href="#id5">1.9.0</a></li>
+<li><a class="reference internal" href="#id6">1.8.3</a></li>
+<li><a class="reference internal" href="#id7">1.8.2</a></li>
+<li><a class="reference internal" href="#id8">1.8.1</a></li>
+<li><a class="reference internal" href="#rdfa-enhancements">1.8 - RDFa enhancements</a></li>
+<li><a class="reference internal" href="#id9">1.7.4</a></li>
+<li><a class="reference internal" href="#aeon-integration">1.7.3 - Aeon integration</a></li>
+<li><a class="reference internal" href="#id10">1.7.2</a></li>
+<li><a class="reference internal" href="#id11">1.7.1</a></li>
+<li><a class="reference internal" href="#administrative-and-internal-digital-archival-object-support">1.7 - administrative and internal digital archival object support</a></li>
+<li><a class="reference internal" href="#id12">1.6</a></li>
+<li><a class="reference internal" href="#id13">1.5.1</a></li>
+<li><a class="reference internal" href="#id14">1.5</a></li>
+<li><a class="reference internal" href="#id15">1.4.1</a></li>
+<li><a class="reference internal" href="#rdfa">1.4 - RDFa</a></li>
+<li><a class="reference internal" href="#id16">1.3</a></li>
+<li><a class="reference internal" href="#id17">1.2</a></li>
+<li><a class="reference internal" href="#id18">1.1</a></li>
+<li><a class="reference internal" href="#micro-releases">1.0 micro releases</a><ul>
+<li><a class="reference internal" href="#id19">1.0.12</a></li>
+<li><a class="reference internal" href="#id20">1.0.11</a></li>
+<li><a class="reference internal" href="#id21">1.0.10</a></li>
+<li><a class="reference internal" href="#id22">1.0.9</a></li>
+<li><a class="reference internal" href="#id23">1.0.8</a></li>
+<li><a class="reference internal" href="#id24">1.0.6</a></li>
+<li><a class="reference internal" href="#id25">1.0.5</a></li>
+<li><a class="reference internal" href="#id26">1.0.4</a></li>
+<li><a class="reference internal" href="#id27">1.0.3</a></li>
+<li><a class="reference internal" href="#id28">1.0.2</a></li>
+<li><a class="reference internal" href="#id29">1.0.1</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#site-design-content">1.0 Site Design &amp; Content</a></li>
+<li><a class="reference internal" href="#unitid-identifiers">0.4.1 Unitid Identifiers</a></li>
+<li><a class="reference internal" href="#persistent-ids">0.4 Persistent IDs</a></li>
+<li><a class="reference internal" href="#enhanced-search">0.3 Enhanced Search</a></li>
+<li><a class="reference internal" href="#data-preparation-admin-site">0.2 Data Preparation / Admin site</a></li>
+<li><a class="reference internal" href="#port-to-django">0.1 Port to Django</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="readme.html" title="previous chapter">README</a></li>
+      <li>Next: <a href="deploynotes.html" title="next chapter">DEPLOYNOTES</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/changelog.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010, Emory University Libraries.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/changelog.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

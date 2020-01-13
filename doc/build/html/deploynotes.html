@@ -1,0 +1,886 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>DEPLOYNOTES &mdash; Finding Aids 1.11.0-dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.11.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Finding Aids 1.11.0-dev documentation" href="index.html" />
+    <link rel="next" title="findingaids – Django-based Finding Aids site" href="findingaids.html" />
+    <link rel="prev" title="CHANGELOG" href="changelog.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="deploynotes">
+<span id="id1"></span><h1>DEPLOYNOTES<a class="headerlink" href="#deploynotes" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Instructions to install required software and systems, configure the application,
+and run various scripts to load initial data.</p>
+<div class="section" id="software-dependencies">
+<h3>Software Dependencies<a class="headerlink" href="#software-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>We recommend the use of <a class="reference external" href="http://pip.openplans.org/">pip</a> and <a class="reference external" href="http://virtualenv.openplans.org/">virtualenv</a> for environment and dependency
+management in this and other Python projects. If you don&#8217;t have them
+installed, you can get them with <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">easy_install</span> <span class="pre">pip</span></code> and then <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">pip</span> <span class="pre">install</span>
+<span class="pre">virtualenv</span></code>.</p>
+</div>
+</div>
+<div class="section" id="bootstrapping-a-development-environment">
+<h2>Bootstrapping a development environment<a class="headerlink" href="#bootstrapping-a-development-environment" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Copy <code class="docutils literal"><span class="pre">findingaids/localsettings.py.dist</span></code> to <code class="docutils literal"><span class="pre">findingaids/localsettings.py</span></code>
+and configure any local settings: <strong>DATABASES</strong>,  <strong>SECRET_KEY</strong>,
+<strong>SOLR_</strong>, <strong>EXISTDB_</strong>,  customize <strong>LOGGING</strong>, etc.</li>
+<li>Create a new virtualenv and activate it.</li>
+<li>Install fabric: <code class="docutils literal"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">fabric</span></code></li>
+<li>Install subversion libraries: <code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">libsvn-dev</span></code> on debian/ubuntu, or
+<code class="docutils literal"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">subversion</span></code> on OSX.</li>
+<li>Use fabric to run a local build, which will install python dependencies in
+your virtualenv, run unit tests, and build sphinx documentation: <code class="docutils literal"><span class="pre">fab</span> <span class="pre">build</span></code></li>
+<li>To generate PDFs, you will need to install
+<a class="reference external" href="https://xmlgraphics.apache.org/fop/">Apache FOP</a> (<code class="docutils literal"><span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">fop</span></code>
+on debian/ubuntu or <code class="docutils literal"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">fop</span></code> on OSX)</li>
+<li>Celery/rabbitmq is only needed for publication and svn checkout, so you
+may not need to set it up.<ul>
+<li>To run celery, use <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">celeryd</span> <span class="pre">-Q</span> <span class="pre">findingaids</span></code></li>
+<li>To trigger an EAD svn checkout, define an archive in django admin.</li>
+</ul>
+</li>
+</ul>
+<p>After configuring your database, run migrate:</p>
+<blockquote>
+<div>python manage.py migrate</div></blockquote>
+<p>Deploy to QA and Production should be done using <code class="docutils literal"><span class="pre">fab</span> <span class="pre">deploy</span></code>.</p>
+<div class="section" id="setup-the-environment">
+<h3>Setup the environment<a class="headerlink" href="#setup-the-environment" title="Permalink to this headline">¶</a></h3>
+<p>When first installing this project, it is recommended to create a virtual environment
+for it.  The virtualenv environment is a directory that can be installed anywhere you like,
+perhaps adjacent to wherever the source code is deployed. To create your new environment,
+simply run the virtualenv command:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ virtualenv --no-site-packages /home/findingaids/fa-env
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For Apache/WSGI installations, you should run this command as the apache user.</p>
+</div>
+<p>Source the activation file to invoke your new virtual environment (this requires that you
+use the bash shell):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ . /home/findingaids/fa-env
+</pre></div>
+</div>
+<p>Once the environment has been activated inside a shell, Python programs
+spawned from that shell will read their environment only from this
+directory, not from the system-wide site packages. Installations will
+correspondingly be installed into this environment.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Installation instructions and upgrade notes below assume that
+you are already in an activated shell.</p>
+</div>
+<div class="section" id="install-python-dependencies">
+<h4>Install python dependencies<a class="headerlink" href="#install-python-dependencies" title="Permalink to this headline">¶</a></h4>
+<p>FindingAids depends on several python libraries. If you are using pip, you can
+install all of the dependencies in an automated fashion that will print status
+messages as packages are installed. If there are any errors, pip should display
+messages indicating the problem.</p>
+<p>To install python dependencies, cd into the repository checkout and:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install -r pip-install-req.txt
+</pre></div>
+</div>
+<p>FindingAids requires a SQL database, but the type does not matter,
+so this is not included in the pip-dependencies file.  You may want to
+pip install  <code class="docutils literal"><span class="pre">MySQL-python</span></code> or <code class="docutils literal"><span class="pre">psycopg</span></code>, depending on the database you
+plan to use.</p>
+<p>FindingAids requires a SQL database, but the type does not matter,
+so this is not included in the pip-dependencies file.  You may want to
+pip install  <code class="docutils literal"><span class="pre">MySQL-python</span></code> or <code class="docutils literal"><span class="pre">psycopg</span></code>, depending on the database you
+plan to use.</p>
+<p>If you are a developer or are installing to a continuous ingration server
+where you plan to run unit tests, code coverage reports, or build sphinx
+documentation, you probably will also want to:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install -r pip-dev-req.txt
+</pre></div>
+</div>
+<div class="section" id="known-issues">
+<h5>Known Issues<a class="headerlink" href="#known-issues" title="Permalink to this headline">¶</a></h5>
+<ul>
+<li><p class="first">As of 04/2011, installing <strong>python-eulcore</strong> from SVN via pip does not
+install the eulcore template themes correctly.  The easiest way to fix
+this is to manually create a symbolic link from the root of your
+virtualenv to the python-eulcore theme directory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd /home/findingaids/fa-env
+$ ln -s src/python-eulcore/themes/
+</pre></div>
+</div>
+</li>
+</ul>
+<hr class="docutils" />
+<ul>
+<li><p class="first">As of 04/2011, installing <strong>python-eulcore</strong> from SVN via pip does not
+install the eulcore template themes correctly.  The easiest way to fix
+this is to manually create a symbolic link from the root of your
+virtualenv to the python-eulcore theme directory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ cd /home/findingaids/fa-env
+$ ln -s src/python-eulcore/themes/
+</pre></div>
+</div>
+</li>
+</ul>
+<hr class="docutils" />
+<p>If you are <strong>not</strong> using pip to install python libraries, you will need the
+following python libraries:</p>
+<blockquote>
+<div><ul class="simple">
+<li>python-dateutil library <a class="reference external" href="http://labix.org/python-dateutil">downloadable package</a> or install via <code class="docutils literal"><span class="pre">easy_install</span>
+<span class="pre">python-dateutil</span></code></li>
+<li><a class="reference external" href="http://pypi.python.org/pypi/zc.icp">zc.icp</a> for querying cache status;
+install via <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">zc.icp</span></code></li>
+<li>django-celery installed via <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">django-celery</span></code></li>
+<li>feedparser -  <code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">feedparser</span></code></li>
+<li><a class="reference external" href="http://pypi.python.org/pypi/recaptcha-client">recaptcha-client</a>
+<code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">recaptcha-client</span></code></li>
+<li><a class="reference external" href="http://www.crummy.com/software/BeautifulSoup/">Beautiful Soup</a>
+<code class="docutils literal"><span class="pre">easy_install</span> <span class="pre">beautifulsoup</span></code></li>
+<li>PIDmanager REST client - <a class="reference external" href="http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x">http://waterhouse.library.emory.edu:8080/hudson/job/pidman-rest-client-1.1.x</a></li>
+<li>eulxml, eulexistdb, eulcommon, and eullocal</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+</div>
+<div class="section" id="system-dependencies">
+<h3>System Dependencies<a class="headerlink" href="#system-dependencies" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="celery-rabbitmq">
+<h4>Celery/RabbitMQ<a class="headerlink" href="#celery-rabbitmq" title="Permalink to this headline">¶</a></h4>
+<p>We use celery for asynchronous tasks (currently for generating PDFs of Finding
+Aids and populate them in the web cache), which requires a task broker.  We
+recommend RabbitMQ.   On Ubuntu, RabbitMQ can be installed via:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ sudo easy_install django-celery
+$ sudo apt-get install rabbitmq-server
+</pre></div>
+</div>
+<p>For more information on configuring this, please see
+<a class="reference external" href="http://celeryq.org/docs/getting-started/broker-installation.html">http://celeryq.org/docs/getting-started/broker-installation.html</a></p>
+</div>
+<div class="section" id="fop">
+<h4>FOP<a class="headerlink" href="#fop" title="Permalink to this headline">¶</a></h4>
+<p>Install <a class="reference external" href="http://xmlgraphics.apache.org/fop/">Apache FOP</a> for PDF generation.
+On Ubuntu systems, <code class="docutils literal"><span class="pre">sudo</span> <span class="pre">apt-get</span> <span class="pre">install</span> <span class="pre">fop</span></code>.  You will need to configure
+the <strong>XSLFO_PROCESSOR</strong> setting with the full path to the command-line version of fop.
+Note that running Fop requires a valid JAVA_HOME be set in the environment.</p>
+</div>
+<div class="section" id="squid-cache">
+<h4>Squid Cache<a class="headerlink" href="#squid-cache" title="Permalink to this headline">¶</a></h4>
+<p>To address certain performance issues (in particular, dynamic PDF generation),
+this site should be set up behind a Squid Cache, which should be configured as a
+transparent proxy.  Sample configuration:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">http_port</span> <span class="mf">170.140</span><span class="o">.</span><span class="mf">223.20</span><span class="p">:</span><span class="mi">80</span> <span class="n">transparent</span> <span class="n">vhost</span> <span class="n">defaultsite</span><span class="o">=</span><span class="n">findingaids</span><span class="o">.</span><span class="n">library</span><span class="o">.</span><span class="n">emory</span><span class="o">.</span><span class="n">edu</span>
+</pre></div>
+</div>
+<p>Because PDFs will not be changing frequently, and because the django application
+will refresh cached PDFs on when new or updated documents are published, Squid
+should be configured to retain PDFs for longer than it normally would:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">refresh_pattern</span> <span class="o">/</span><span class="n">documents</span><span class="o">/.*/</span><span class="n">printable</span><span class="o">/</span>        <span class="mi">10080</span>   <span class="mi">90</span><span class="o">%</span>     <span class="mi">10080</span>
+</pre></div>
+</div>
+<p>Other parts of the website include Last-Modified and ETag headers which should
+make caching more effective.  This includes all single-document finding aid pages
+as well as search and browse pages.  Browse and Search page urls are indicated
+via query string, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>/titles/B?page=2
+/search?keywords=ciaran+carson
+</pre></div>
+</div>
+<p>In the transparent cache set up, Squid should automatically cache these documents
+as users access them.  If possible, Squid should be configured so that cached
+PDFs will be kept in preference to search and browse pages (the custom refresh
+pattern for printable urls above may be sufficient for this).</p>
+</div>
+</div>
+<div class="section" id="install-the-application">
+<h3>Install the Application<a class="headerlink" href="#install-the-application" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="apache">
+<h4>Apache<a class="headerlink" href="#apache" title="Permalink to this headline">¶</a></h4>
+<p>It is recommended to set up FindingAids up under Apache using mod_wsgi. Because
+of a locking issue with a python library we use, the site <cite>must</cite> be configured as
+a WSGI daemon using the <strong>WSGIDaemonProcess</strong> and <strong>WSGIProcessGroup</strong> settings.</p>
+<p>The admin section of the site is found at <code class="docutils literal"><span class="pre">/admin/</span></code> under the base site url.
+This uses Emory LDAP for login, so the admin site should be configured to run
+under SSL.</p>
+<p>Sample wsgi and apache configuration files are located in the apache directory
+inside the source code checkout.  Copy them and edit them to adjust
+for installation paths and IP addresses.</p>
+</div>
+<div class="section" id="configuration">
+<h4>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h4>
+<p>Configure the application settings by copying localsettings.py.dist to
+localsettings.py and editing settings for local database, LDAP, fedora, PID
+manager, eXist-DB and key configuration.</p>
+<div class="section" id="exist-db">
+<h5>eXist-DB<a class="headerlink" href="#exist-db" title="Permalink to this headline">¶</a></h5>
+<p>FindingAids requires access to an eXist Database to publish, search, and displya
+EAD Finding Aid documents.  All <strong>EXISTDB_</strong> settings in the localsettings example file
+should be configured for access to an eXist 1.4.x instance.  It is recommended
+to use this applicatoni to manage the eXist index configuration; if you plan to
+do this, your configured <strong>EXISTDB_SERVER_USER</strong> should be in the DBA group.</p>
+<p>The <strong>EXISTDB_PREVIEW_COLLECTION</strong> should be set to an eXist collection <cite>outside</cite>
+of the main Finding Aids collection in eXist; it is used for admin functionality
+only.  The preview collection should be present in eXist, and the configured
+eXist user should have permission to write to this collection.</p>
+</div>
+<div class="section" id="proxy-cache">
+<h5>Proxy/Cache<a class="headerlink" href="#proxy-cache" title="Permalink to this headline">¶</a></h5>
+<p>The celery task that loads the PDFs in the cache requires configuration
+settings for <strong>PROXY_HOST</strong> and <strong>SITE_BASE_URL</strong>.</p>
+<p>If you want to be able to check the status of PDFs in the cache, you must
+also configure <strong>PROXY_ICP_PORT</strong>.  If you are using Squid, you may need
+to adjust the <code class="docutils literal"><span class="pre">icp_port</span></code> and <code class="docutils literal"><span class="pre">icp_access</span></code> settings to allow this.</p>
+</div>
+<div class="section" id="celery-broker">
+<h5>Celery Broker<a class="headerlink" href="#celery-broker" title="Permalink to this headline">¶</a></h5>
+<p>The <strong>BROKER_</strong> settings in should be configured to match where your RabbitMQ
+instance is installed and running.</p>
+</div>
+<div class="section" id="pid-manager">
+<h5>PID Manager<a class="headerlink" href="#pid-manager" title="Permalink to this headline">¶</a></h5>
+<p>The configured <strong>PIDMAN_USER</strong> must have permission inside the pid manager to add
+pids and targets.</p>
+</div>
+<div class="section" id="email-addresses-notifications">
+<h5>Email Addresses &amp; Notifications<a class="headerlink" href="#email-addresses-notifications" title="Permalink to this headline">¶</a></h5>
+<p>When this application is deployed to production, the Django <strong>ADMINS</strong> setting
+should be populated with contact information for technical administators; when
+any views raise an exception, these people will be emailed with the error.
+Optionally, <strong>SEND_BROKEN_LINK_EMAILS</strong> can also be configured for additional
+error reporting to either <strong>ADMINS</strong> or <strong>MANAGERS</strong>.  See <a class="reference external" href="http://docs.djangoproject.com/en/1.2/howto/error-reporting/">Django Error Reporting</a> for more details.</p>
+<p>There are feedback forms on the site that generate and send emails.  This
+makes use of the Django settings for <strong>SERVER_EMAIL</strong> and <strong>EMAIL_SUBJECT_PREFIX</strong>
+and also requires some custom configurations:</p>
+<ul class="simple">
+<li><strong>FEEDBACK_EMAIL</strong> should be configured with list of one or more email addresses
+to receive emails from the main feedback form.</li>
+<li><strong>REQUEST_MATERIALS_CONTACTS</strong> should be a list of email &amp; Archive pairs
+to be used with the request materials web form.</li>
+</ul>
+<p>If the server where this site is deployed is not configured to act as an SMTP
+server, you should make use of the Django EMAIL settings to specify the SMTP
+server host and port (see <a class="reference external" href="http://docs.djangoproject.com/en/1.2/ref/settings/#email-host">Django Email settings</a>).</p>
+</div>
+<div class="section" id="recaptcha">
+<h5>reCAPTCHA<a class="headerlink" href="#recaptcha" title="Permalink to this headline">¶</a></h5>
+<p>This application includes email forms that make use of <a class="reference external" href="http://www.google.com/recaptcha">reCAPTCHA</a> to avoid spam. reCAPTCHA requires the use of
+keys restricted to your domain.  These can be generated for free on the reCAPTCHA
+website.</p>
+<p>The <strong>RECAPTCHA_PUBLIC_KEY</strong> and <strong>RECAPTCHA_PRIVATE_KEY</strong> settings are required
+for the reCAPTCHA and feedback forms to work.  You may also set <strong>RECAPTCHA_OPTIONS</strong>,
+to customize the way the CAPTCHA widget is displayed.</p>
+</div>
+<div class="section" id="django-cache">
+<h5>Django Cache<a class="headerlink" href="#django-cache" title="Permalink to this headline">¶</a></h5>
+<p>A few small items within the site that are expected not to change frequently
+(browse starting letters, RSS feeds for content) are cached with Django&#8217;s internal
+cache framework.  This should be configured with the <strong>CACHE_BACKEND</strong> setting.
+Where caching is used, it will use the configured cache timeout, so it is
+recommended to configure this explicitly.  The items being cached are not expected
+to change frequently, so a timeout of 30 minutes or more may be reasonable; the
+Django default timeout is 5 minutes.</p>
+<p>For more details, see the documentation for <a class="reference external" href="http://docs.djangoproject.com/en/1.2/topics/cache/">Django&#8217;s cache framework</a>.</p>
+</div>
+<div class="section" id="misc">
+<h5>Misc<a class="headerlink" href="#misc" title="Permalink to this headline">¶</a></h5>
+<p>The <strong>FINDINGAID_EAD_SOURCE</strong> configuration should be set to the directory path
+for the EAD files that will be accessible for loading to eXist via the admin
+interface.  For normal operations, this directory does not need to be writable
+by this application; however, some migration scripts expect to be able
+to update the EAD documents in this configured directory.</p>
+<p>The <strong>CONTENT_RSS_FEEDS</strong> configuration should be populated with URLs
+for RSS feeds with content to populate the front-page site banner, announcements,
+and non-EAD content pages.</p>
+</div>
+<div class="section" id="developer-specific-configuration">
+<h5>Developer-specific configuration<a class="headerlink" href="#developer-specific-configuration" title="Permalink to this headline">¶</a></h5>
+<p>These settings may only be of interest to developers working on the application,
+and are probably not relevant when installing the application to a QA or
+production environment.</p>
+<ul class="simple">
+<li>eXist query response times are reported on templates in Debug mode
+only.  To view them, set DEBUG = True in your settings, and add any IP
+addresses that should have access to the <strong>INTERNAL_IPS</strong>.</li>
+<li>Logging is now available when running via runserver; logging settings are
+currently configured in localsettings.py.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="initialize-update-the-database">
+<h4>Initialize/Update the Database<a class="headerlink" href="#initialize-update-the-database" title="Permalink to this headline">¶</a></h4>
+<p>After all settings have been configured, initialize the relational db with all
+needed tables and initial data using:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py migrate
+</pre></div>
+</div>
+<p>When an upgrade requires new database tables, the same command should be used.</p>
+</div>
+<div class="section" id="exist-index">
+<h4>eXist Index<a class="headerlink" href="#exist-index" title="Permalink to this headline">¶</a></h4>
+<p>After you have configured all the <strong>EXISTDB_</strong> settings in localsettings.py,
+if you are using an eXist-db user in the DBA group, you can use the app
+to manage the eXist index.  Load the index configuration using:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py existdb_index load
+</pre></div>
+</div>
+<p>This command should also be used when an upgrade requires a change to the eXist
+index configuration.  If there is data loaded to eXist, you should reindex it
+after loading the index configuration:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py existdb_reindex
+</pre></div>
+</div>
+<p>If you have a large number of finding aids loaded to the eXist database,
+reindexing can take a while.</p>
+</div>
+<div class="section" id="load-ead-to-exist">
+<h4>Load EAD to eXist<a class="headerlink" href="#load-ead-to-exist" title="Permalink to this headline">¶</a></h4>
+<p>For an initial installation, several migration steps should be run on the EAD
+documents found in the configured <strong>FINDINGAID_EAD_SOURCE</strong> directory; these scripts
+require write access to the EAD source documents.  After these migration steps,
+the documents can be loaded to eXist so they will be accessible in the website.</p>
+<p>If you are starting with EAD documents in DTD-format, they must be converted
+to the EAD XSD schema format:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py ead_to_xsd
+</pre></div>
+</div>
+<p>Prep the documents (automated cleaning, adding IDs, etc):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py prep_ead
+</pre></div>
+</div>
+<p>Run a one-time migration to add machine-readable identifiers:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py unitid_identifiers
+</pre></div>
+</div>
+<p>Load the converted &amp; prepared EAD documents to the eXist database:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py load_ead
+</pre></div>
+</div>
+<p>By default, <code class="docutils literal"><span class="pre">load_ead</span></code> will start celery tasks to generate and cache the PDFs
+in the configured web cache.  This requires the celery daemon process to be
+running.  The default behavior can be adjusted with command-line options (use
+<code class="docutils literal"><span class="pre">--h</span></code> to see available options).  When run in a mode that caches the PDFs,
+the load script will wait until all celery tasks have completed in order to
+report on the outcome; this can take a long time to finish.</p>
+<p>(OPTIONAL) After you have loaded the data, you may want to check that all
+eadids and titles in the loaded data are acceptable for the site:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py check_ead eadid
+$ python manage.py check_ead title
+</pre></div>
+</div>
+<p>(OPTIONAL) To check response times for searching and browsing the loaded
+content with the configured index, run the following:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py response_times browse
+$ python manage.py response_times search
+</pre></div>
+</div>
+<div class="admonition tip">
+<p class="first admonition-title">Tip</p>
+<p class="last">For minimal output with summary information only, use <code class="docutils literal"><span class="pre">-v</span> <span class="pre">0</span></code>.</p>
+</div>
+<div class="section" id="cached-pdfs">
+<h5>Cached PDFs<a class="headerlink" href="#cached-pdfs" title="Permalink to this headline">¶</a></h5>
+<p>To check the status of PDFs in the cache, use:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py check_pdfcache
+</pre></div>
+</div>
+<p>This uses Internat Cache Protocol (ICP) to query the configured cache, and
+requires that <strong>PROXY_ICP_PORT</strong> is set and the cache is configured to allow
+ICP access.  See <a class="reference internal" href="#proxy-cache">Proxy/Cache</a> instructions in the <a class="reference internal" href="#configuration">Configuration</a> section.</p>
+</div>
+</div>
+<div class="section" id="celery-daemon">
+<h4>Celery Daemon<a class="headerlink" href="#celery-daemon" title="Permalink to this headline">¶</a></h4>
+<p>The celery worker needs to be running for asynchronous tasks.  To run through
+django do:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py celeryd
+</pre></div>
+</div>
+<p>See <a class="reference external" href="http://ask.github.com/celery/cookbook/daemonizing.html">http://ask.github.com/celery/cookbook/daemonizing.html</a> for instructions
+on configuring celery to run as a daemon.</p>
+</div>
+</div>
+</div>
+<div class="section" id="upgrade-notes">
+<h2>Upgrade Notes<a class="headerlink" href="#upgrade-notes" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="id4">
+<h2>1.9<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Upgrade to Django 1.8 includes a switch from South to Django migrations.
+For a brand new deploy, you should run <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">migrate</span></code>
+normally.  To update an <strong>existing</strong> database, you will need to run
+migrations in this order (if you are prompted to remove
+<cite>emory_ldap | emoryldapuserprofile</cite> say no until after migrations
+are complete):</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="c1"># migrate content types, required by everything else</span>
+<span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span> <span class="n">contenttypes</span> <span class="o">--</span><span class="n">fake</span><span class="o">-</span><span class="n">initial</span>
+<span class="c1"># explicitly fake initial auth migration</span>
+<span class="c1"># (can&#39;t use fake initial fails because auth_user doesn&#39;t exist yet)</span>
+<span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span> <span class="n">auth</span> <span class="mi">0001</span> <span class="o">--</span><span class="n">fake</span>
+<span class="c1"># fake emory_ldap migrations to avoid blanking out existing content</span>
+<span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span> <span class="n">emory_ldap</span> <span class="o">--</span><span class="n">fake</span>
+<span class="c1"># fake-initial not working on fa_admin migrations</span>
+<span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span> <span class="n">fa_admin</span> <span class="mi">0001</span> <span class="o">--</span><span class="n">fake</span>
+<span class="c1"># repeat if you get an error the first time</span>
+<span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span> <span class="n">fa_admin</span>
+<span class="c1"># run all other migrations, faking initial migrations where tables exist</span>
+<span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">migrate</span> <span class="o">--</span><span class="n">fake</span><span class="o">-</span><span class="n">initial</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first"><strong>SEND_BROKEN_LINK_EMAILS</strong> setting has been removed in Django 1.8
+and should be removed from <code class="docutils literal"><span class="pre">localsettings.py</span></code>.</p>
+</li>
+<li><p class="first">The configuration for LDAP has changed; update <code class="docutils literal"><span class="pre">localsettings.py</span></code>
+based on the example LDAP configuration in <code class="docutils literal"><span class="pre">localsettings.py.dist</span></code>.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="id5">
+<h2>1.7.3<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This release adds integrations with Aeon, which requires the
+addition of two settings in localsettings.py:<ol class="arabic">
+<li>REQUEST_MATERIALS_URL</li>
+<li>REQUEST_MATERIALS_REPOS</li>
+</ol>
+</li>
+</ul>
+</div>
+<div class="section" id="id6">
+<h2>1.7<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">A new custom permission has been added to allow admins to view internal
+digital archival object (dao) links.  Run <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">syncdb</span></code>
+to create the new permission and add it to the Finding Aids Administrator
+group.</p>
+</li>
+<li><p class="first">Configure <strong>KEEP_SOLR_SERVER_URL</strong> to point to the Solr core used by the
+instance of the Keep corresponding to the findingaids site (e.g., QA or Production),
+so that item ids can be looked up and converted to ARK identifiers.</p>
+</li>
+<li><p class="first">Run a script to update findingaids in subversion, converting item ids
+in text notes to &lt;dao&gt;:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">itemid_to_dao</span> <span class="o">-</span><span class="n">c</span>
+</pre></div>
+</div>
+<p>Note that this will update the EAD documents in subversion (the -c specifies
+to commit changes to subversion when the processing is complete).  Use
+the -n (dry run) option or run without -c if you wish to test first.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="id7">
+<h2>1.6<a class="headerlink" href="#id7" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>CONTENT_RSS_FEEDS</strong> configuration is no longer used and can be removed
+from localsettings.</li>
+</ul>
+</div>
+<div class="section" id="svn-admin-release">
+<h2>1.5 - svn admin release<a class="headerlink" href="#svn-admin-release" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This release adds a dependency on subversion python bindings; installation
+requires that subversion libraries be installed on the system (on
+debian/ubuntu installe the <code class="docutils literal"><span class="pre">libsvn-dev</span></code> package; on OSX running
+<code class="docutils literal"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">subversion</span></code> should be sufficient).</li>
+<li>Run <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">migrate</span> <span class="pre">emory_ldap</span></code> to convert the user accounts
+in the database to the new custom user model.</li>
+<li>Run <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">syncdb</span></code> to create new database tables and update
+permissions.</li>
+<li>Configure subversion admin user and base working directory in localsettings.py
+with <strong>SVN_USERNAME</strong>, <strong>SVN_PASSWORD</strong>, and <strong>SVN_WORKING_DIR</strong></li>
+<li>Remove <strong>FINDINGAID_EAD_SOURCE</strong> from localsettings since it is no longer used.</li>
+<li>Celery daemons should be restarted to pick up a newly added celery task.</li>
+</ul>
+</div>
+<div class="section" id="id8">
+<h2>1.3<a class="headerlink" href="#id8" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Adds a new configuration <strong>DEFAULT_DAO_LINK_TEXT</strong> in <code class="docutils literal"><span class="pre">localsettings.py</span></code> which
+can be used to specify the default link text for digital archival objects referenced
+in the EAD.  See the commented out example in <code class="docutils literal"><span class="pre">localsettings.py.dist</span></code>; default
+value should be fine.</li>
+<li>When the code is deployed to staging the <strong>ENABLE_BETA_WARNING</strong> configuration
+should be set to True on <code class="docutils literal"><span class="pre">localsettings.py`</span></code></li>
+</ul>
+<div class="section" id="id9">
+<h3>1.2<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>The logging configuration for sending error messages to site admins has been updated
+for Django 1.5; it is recommended to update the logging configuration in
+<code class="docutils literal"><span class="pre">localsettings.py</span></code> based on the latest version of <code class="docutils literal"><span class="pre">localsettings.py.dist</span></code></li>
+</ul>
+</div>
+<div class="section" id="id10">
+<h3>1.1<a class="headerlink" href="#id10" title="Permalink to this headline">¶</a></h3>
+<ul>
+<li><p class="first">If Apache is configured to use the included wsgi script, update the <strong>WSGIScriptAlias</strong>
+to the new location (<code class="docutils literal"><span class="pre">findingaids/wsgi.py</span></code>).</p>
+</li>
+<li><p class="first">Static files to be served out by Apache have been consolidated to a single
+directory; apache configuration files should be updated to serve out
+the <code class="docutils literal"><span class="pre">static</span></code> directory as <code class="docutils literal"><span class="pre">/static</span></code> and other references to the media directories
+should be removed.</p>
+</li>
+<li><p class="first">Update site and database to work with celery 3.0.</p>
+<ul>
+<li><p class="first">Add database tables for <code class="xref py py-mod docutils literal"><span class="pre">south</span></code> migrations and update the database
+for the newest version of <code class="xref py py-mod docutils literal"><span class="pre">celery</span></code>.</p>
+<ul class="simple">
+<li>python manage.py syncdb</li>
+<li>python manage.py migrate djcelery &#8211;fake 0001</li>
+<li>python manage.py migrate djcelery</li>
+</ul>
+</li>
+<li><p class="first">Celery broker should now be configured using <strong>BROKER_URL</strong> instead of
+individual <strong>BROKER_</strong> settings; see <code class="docutils literal"><span class="pre">localsettings.py.dist</span></code> for
+an example.</p>
+</li>
+<li><p class="first">The celery worker should now be started via:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">manage</span><span class="o">.</span><span class="n">py</span> <span class="n">celery</span> <span class="n">worker</span> <span class="o">-</span><span class="n">Q</span> <span class="n">findingaids</span>
+</pre></div>
+</div>
+<p>Be sure to update any init scripts that use the old <code class="docutils literal"><span class="pre">celeryd</span></code> syntax.</p>
+</li>
+<li><p class="first">If not using the WSGI script included with the source code, add the
+following to your wsgi script:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">djcelery</span>
+<span class="n">djcelery</span><span class="o">.</span><span class="n">setup_loader</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</li>
+<li><p class="first">Recommended: update emory_ldap database tables for <code class="xref py py-mod docutils literal"><span class="pre">south</span></code> migrations
+using <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">migrate</span> <span class="pre">emory_ldap</span></code>.  If you get an error on the last
+migration, it is fine to fake it using <code class="docutils literal"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">migrate</span> <span class="pre">emory_ldap</span> <span class="pre">0004</span> <span class="pre">--fake</span></code></p>
+</li>
+</ul>
+</div>
+<div class="section" id="id11">
+<h3>1.0.9<a class="headerlink" href="#id11" title="Permalink to this headline">¶</a></h3>
+<p>This update requires an upgrade to Django 1.3 and broken-out eulcore
+modules (<code class="xref py py-mod docutils literal"><span class="pre">eulxml</span></code>, <code class="xref py py-mod docutils literal"><span class="pre">eulexistdb</span></code>, and <code class="xref py py-mod docutils literal"><span class="pre">eulcommon</span></code>). To
+update to the latest versions of Python dependencies, activate the
+virtualenv environment and run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install -r pip-install-req.txt
+</pre></div>
+</div>
+<p>If you wish to remove the old version of <code class="xref py py-mod docutils literal"><span class="pre">eulcore</span></code>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip uninstall eulcore
+</pre></div>
+</div>
+<p>Logging must now be configured in <code class="docutils literal"><span class="pre">localsettings.py</span></code> in the Django
+1.3 logging config format; see <code class="docutils literal"><span class="pre">localsettings-sample.py</span></code> for an
+example configuration, and
+<a class="reference external" href="http://docs.djangoproject.com/en/dev/topics/logging">http://docs.djangoproject.com/en/dev/topics/logging</a> for more details.</p>
+<p>Previous, custom logging configurations (<strong>LOGGING_LEVEL</strong>,
+<strong>LOGGING_FORMAT</strong>, and <strong>LOGGING_FILENAME</strong>) will no longer be used,
+so you may want to remove them from your <code class="docutils literal"><span class="pre">localsettings.py</span></code> file.</p>
+</div>
+<div class="section" id="id12">
+<h3>1.0.8<a class="headerlink" href="#id12" title="Permalink to this headline">¶</a></h3>
+<p>Because the PDF caching celery task has been modified, the FindingAids
+celery daemon process should be restarted after updating the code.</p>
+</div>
+<div class="section" id="id13">
+<h3>1.0.6<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<p>To update to the latest version of <code class="xref py py-mod docutils literal"><span class="pre">eulcore</span></code>, activate the
+virtualenv environment and run:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ pip install -r pip-dependencies
+</pre></div>
+</div>
+<p>This update requires a slight modification in the <strong>EXISTDB</strong>
+configuration values in django settings and adds a new timeout
+configuration.  You should update <code class="docutils literal"><span class="pre">localsettings.py</span></code> to split out
+the eXist-db username and password from the <strong>EXISTDB_SERVER_URL</strong>
+setting.  See <code class="docutils literal"><span class="pre">localsettings-sample.py</span></code> for an example.</p>
+<p>You may now configure a timeout for eXist XML-RPC connections via the
+new <strong>EXISTDB_TIMEOUT</strong> setting in <code class="docutils literal"><span class="pre">localsettings.py</span></code>.  See
+<code class="docutils literal"><span class="pre">localsettings-sample.py</span></code> for an example and additional information.</p>
+</div>
+<div class="section" id="bugfix-release">
+<h3>1.0.5 bugfix release<a class="headerlink" href="#bugfix-release" title="Permalink to this headline">¶</a></h3>
+<p>FindingAids has been updated for deploy with pip+virtualenv.  All dependencies
+are now managed through pip, rather than using svn externals for local
+dependencies.  To get the latest version of the software:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ . /home/findingaids/fa-env/bin/activate
+$ pip install -r pip-dependencies
+</pre></div>
+</div>
+<p>There is currently a problem with automatic installation of eulcore themes.
+Please follow the work-around instructions described under <a class="reference internal" href="#known-issues">Known Issues</a>.</p>
+<p>Because of this change, the CSS and images for the genlib theme are now
+located under the <code class="docutils literal"><span class="pre">themes</span></code> directory in the virtualenv.  You should either
+create a symbolic link to the genlib_media directory under the project media
+director, or add a new apache alias to the virtualenv location, e.g.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">Alias</span> <span class="o">/</span><span class="n">static</span><span class="o">/</span><span class="n">genlib_media</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">findingaids</span><span class="o">/</span><span class="n">env</span><span class="o">/</span><span class="n">themes</span><span class="o">/</span><span class="n">genlib</span><span class="o">/</span><span class="n">genlib_media</span>
+</pre></div>
+</div>
+<p>Make sure that the apache configuration specifies the virtualenv in the
+WSGI python-path and edit your django.wsgi file to set the <strong>VIRTUAL_ENV</strong>
+environment variable, eg.:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;VIRTUAL_ENV&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;/home/httpd/findingaids/env/&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="site-design-content">
+<h3>1.0 Site Design &amp; Content<a class="headerlink" href="#site-design-content" title="Permalink to this headline">¶</a></h3>
+<p>To get the latest database changes and fixtures, run <code class="docutils literal"><span class="pre">syncdb</span></code> as documented in
+<a class="reference internal" href="#initialize-update-the-database">Initialize/Update the Database</a>.</p>
+<p>The eXist index configuration has changed slightly.  Please reload and reindex
+as described in <a class="reference internal" href="#exist-index">eXist Index</a>.</p>
+<p>New python libraries are required for reCAPTCHA (recaptcha-client) and RSS feed
+parsing (feedparser).  The easiest way to install them is using the
+pip-dependencies file as documented in <a class="reference internal" href="#install-python-dependencies">Install python dependencies</a>.</p>
+<p>Non-EAD content pages are now populated with RSS feeds; configure the expected
+feeds in the new <strong>CONTENT_RSS_FEEDS</strong>  setting as documented in <a class="reference internal" href="#misc">Misc</a>.</p>
+<p>RSS feeds are cached using Django&#8217;s internal caching framework; see <a class="reference internal" href="#django-cache">Django
+Cache</a> in the <a class="reference internal" href="#configuration">Configuration</a> documentation for details on what should be
+configured in local settings.</p>
+<p>There are new two web-based forms that generate emails.  In support of this,
+several new configurations are required in localsettings.py.  New fields are
+<strong>FEEDBACK_EMAIL</strong> and <strong>REQUEST_MATERIALS_CONTACTS</strong>.  See <a class="reference internal" href="#email-addresses-notifications">Email Addresses &amp;
+Notifications</a>. These forms also make use of reCAPTCHA, which requires that
+you set reCAPTHCA public and private keys in localsettings.py as documented
+in <a class="reference external" href="http://www.google.com/recaptcha">reCAPTCHA</a>.</p>
+<p>Now using the BeautifulSoup python library for some minimal processing of RSS
+feed HTML content; install using the pip-dependencies file as documented in
+<a class="reference internal" href="#install-python-dependencies">Install python dependencies</a>.</p>
+</div>
+<div class="section" id="unitid-identifiers">
+<h3>0.4.1 Unitid Identifiers<a class="headerlink" href="#unitid-identifiers" title="Permalink to this headline">¶</a></h3>
+<p>There is a new one-time migration script that is now part of the initial
+data load process.  Run the new command and then reload documents
+as documented in <a class="reference internal" href="#load-ead-to-exist">Load EAD to eXist</a>:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>$ python manage.py unitid_identifiers
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The unitid_identifiers script requires write access to the EAD source documents.</p>
+</div>
+</div>
+<div class="section" id="persistent-ids">
+<h3>0.4 Persistent IDs<a class="headerlink" href="#persistent-ids" title="Permalink to this headline">¶</a></h3>
+<p>Finding Aids now relies on the PID manager for generating ARKs.
+(Requires at least 0.9.x, with REST API).  See the <a class="reference internal" href="#pid-manager">PID Manager</a> section
+in the <a class="reference internal" href="#configuration">Configuration</a> section of the installation instructions, and
+see localsettings-sample.py for the required settings.</p>
+<p>Re-run the prep and load steps documented in <a class="reference internal" href="#load-ead-to-exist">Load EAD to eXist</a> to
+create ARKs for all EADs (shis is now part of the prep step) and load the
+updated documents to eXist.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The prep script requires write-access to the EAD source files.</p>
+</div>
+</div>
+<div class="section" id="enhanced-search">
+<h3>0.3 Enhanced Search<a class="headerlink" href="#enhanced-search" title="Permalink to this headline">¶</a></h3>
+<p>Pisa/ReportLab PDF generation has been replaced with XSL-FO and Apache FOP.
+See <a class="reference internal" href="#fop">FOP</a> section under <a class="reference internal" href="#system-dependencies">System Dependencies</a> .
+Pisa and ReportLab are no longer in use and can be uninstalled.</p>
+<p>To get the latest database changes and fixtures, run <code class="docutils literal"><span class="pre">syncdb</span></code> (documented in
+<a class="reference internal" href="#initialize-update-the-database">Initialize/Update the Database</a>).</p>
+<p>Search and browse pages now include a last-modified header to enable caching.
+There may be no additional configuration required to take advantage of this;
+see <a class="reference internal" href="#squid-cache">Squid Cache</a> for more details.</p>
+<p>The eXist index configuration has changed.  Load the new version as documented
+in <a class="reference internal" href="#exist-index">eXist Index</a> (reindex is not required).</p>
+<p>The FindingAids site now requires EAD documents in EAD schema format instead
+of the DTD-format we were using previously.  Migrate and reload all documents
+as documented in <a class="reference internal" href="#load-ead-to-exist">Load EAD to eXist</a>.</p>
+<p>Logging is now available when running via runserver; it is currently NOT
+enabled when running through mod wsgi.  See <a class="reference internal" href="#developer-specific-configuration">Developer-specific configuration</a>.</p>
+</div>
+<div class="section" id="data-preparation-admin-site">
+<h3>0.2 Data Preparation / Admin site<a class="headerlink" href="#data-preparation-admin-site" title="Permalink to this headline">¶</a></h3>
+<p>There are a few new external dependencies; see <a class="reference internal" href="#install-python-dependencies">Install python dependencies</a>
+for details.</p>
+<p>The application now requires a <a class="reference internal" href="#celery-rabbitmq">Celery/RabbitMQ</a> task broker and requires that
+the celery daemon be running to handle asynchronous tasks (caching PDFs).  See
+<a class="reference internal" href="#celery-daemon">Celery Daemon</a> for details.</p>
+<p>Update localsettings.py with configuration settings that have been
+added since the last version (see examples in localsettings-sample.py and
+documentation in the <a class="reference internal" href="#configuration">Configuration</a> instructions).</p>
+<ul class="simple">
+<li><strong>EXISTDB_SERVER_TIMEZONE</strong> and <strong>EXISTDB_PREVIEW_COLLECTION</strong> - see <a class="reference internal" href="#exist-db">eXist-DB</a></li>
+<li><strong>FINDINGAID_EAD_SOURCE</strong> - see <a class="reference internal" href="#misc">Misc</a></li>
+<li>Proxy/cache settings: <strong>PROXY_HOST</strong> &amp; <strong>SITE_BASE_URL</strong> - see <a class="reference internal" href="#proxy-cache">Proxy/Cache</a></li>
+<li>Celery Broker/RabbitMQ settings - see <a class="reference internal" href="#celery-broker">Celery Broker</a></li>
+</ul>
+<p>The Finding Aids site now requires a sql database for user
+management and tracking deleted finding aids.  You should set up a
+database, configure it in localsettings.py, and run <code class="docutils literal"><span class="pre">migrate</span></code> to
+initialize required tables, as documented in <a class="reference internal" href="#initialize-update-the-database">Initialize/Update the Database</a>.</p>
+<p>There are new manage.py scripts to clean up EAD documents and load them to eXist.
+Follow the steps documented in <a class="reference internal" href="#load-ead-to-exist">Load EAD to eXist</a>.</p>
+<p>The new admin section of the site is at <code class="docutils literal"><span class="pre">/admin/</span></code> under the base site url.
+This uses Emory LDAP for login, so it should be configured to run under SSL.
+See the <a class="reference internal" href="#apache">Apache</a> section of <a class="reference internal" href="#install-the-application">Install the Application</a>.</p>
+<p>eXist query response times can be reported on web pages for developers; see
+<a class="reference internal" href="#developer-specific-configuration">Developer-specific configuration</a> for details.</p>
+<p>There is a new script to check the status of PDFs in the configured cache.  See
+<a class="reference internal" href="#cached-pdfs">Cached PDFs</a> for details.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">DEPLOYNOTES</a><ul>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#software-dependencies">Software Dependencies</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#bootstrapping-a-development-environment">Bootstrapping a development environment</a><ul>
+<li><a class="reference internal" href="#setup-the-environment">Setup the environment</a><ul>
+<li><a class="reference internal" href="#install-python-dependencies">Install python dependencies</a><ul>
+<li><a class="reference internal" href="#known-issues">Known Issues</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#system-dependencies">System Dependencies</a><ul>
+<li><a class="reference internal" href="#celery-rabbitmq">Celery/RabbitMQ</a></li>
+<li><a class="reference internal" href="#fop">FOP</a></li>
+<li><a class="reference internal" href="#squid-cache">Squid Cache</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#install-the-application">Install the Application</a><ul>
+<li><a class="reference internal" href="#apache">Apache</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#exist-db">eXist-DB</a></li>
+<li><a class="reference internal" href="#proxy-cache">Proxy/Cache</a></li>
+<li><a class="reference internal" href="#celery-broker">Celery Broker</a></li>
+<li><a class="reference internal" href="#pid-manager">PID Manager</a></li>
+<li><a class="reference internal" href="#email-addresses-notifications">Email Addresses &amp; Notifications</a></li>
+<li><a class="reference internal" href="#recaptcha">reCAPTCHA</a></li>
+<li><a class="reference internal" href="#django-cache">Django Cache</a></li>
+<li><a class="reference internal" href="#misc">Misc</a></li>
+<li><a class="reference internal" href="#developer-specific-configuration">Developer-specific configuration</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#initialize-update-the-database">Initialize/Update the Database</a></li>
+<li><a class="reference internal" href="#exist-index">eXist Index</a></li>
+<li><a class="reference internal" href="#load-ead-to-exist">Load EAD to eXist</a><ul>
+<li><a class="reference internal" href="#cached-pdfs">Cached PDFs</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#celery-daemon">Celery Daemon</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#upgrade-notes">Upgrade Notes</a></li>
+<li><a class="reference internal" href="#id4">1.9</a></li>
+<li><a class="reference internal" href="#id5">1.7.3</a></li>
+<li><a class="reference internal" href="#id6">1.7</a></li>
+<li><a class="reference internal" href="#id7">1.6</a></li>
+<li><a class="reference internal" href="#svn-admin-release">1.5 - svn admin release</a></li>
+<li><a class="reference internal" href="#id8">1.3</a><ul>
+<li><a class="reference internal" href="#id9">1.2</a></li>
+<li><a class="reference internal" href="#id10">1.1</a></li>
+<li><a class="reference internal" href="#id11">1.0.9</a></li>
+<li><a class="reference internal" href="#id12">1.0.8</a></li>
+<li><a class="reference internal" href="#id13">1.0.6</a></li>
+<li><a class="reference internal" href="#bugfix-release">1.0.5 bugfix release</a></li>
+<li><a class="reference internal" href="#site-design-content">1.0 Site Design &amp; Content</a></li>
+<li><a class="reference internal" href="#unitid-identifiers">0.4.1 Unitid Identifiers</a></li>
+<li><a class="reference internal" href="#persistent-ids">0.4 Persistent IDs</a></li>
+<li><a class="reference internal" href="#enhanced-search">0.3 Enhanced Search</a></li>
+<li><a class="reference internal" href="#data-preparation-admin-site">0.2 Data Preparation / Admin site</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="changelog.html" title="previous chapter">CHANGELOG</a></li>
+      <li>Next: <a href="findingaids.html" title="next chapter"><code class="docutils literal"><span class="pre">findingaids</span></code> &#8211; Django-based Finding Aids site</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/deploynotes.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010, Emory University Libraries.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/deploynotes.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

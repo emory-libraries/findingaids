@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>README &mdash; Finding Aids 1.11.0-dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.11.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Finding Aids 1.11.0-dev documentation" href="index.html" />
+    <link rel="next" title="CHANGELOG" href="changelog.html" />
+    <link rel="prev" title="Finding Aids documentation" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="readme">
+<h1>README<a class="headerlink" href="#readme" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>This project is a Django web application for providing access to and limited
+administration for Archival Finding Aid XML documents in the Encoded Archival
+Description format (<a class="reference external" href="http://www.loc.gov/ead/">EAD</a> ).</p>
+</div>
+<div class="section" id="license">
+<h2>License<a class="headerlink" href="#license" title="Permalink to this headline">¶</a></h2>
+<p>This software is distributed under the <a class="reference external" href="http://www.apache.org/licenses/LICENSE-2.0.html">Apache 2.0 License</a>.</p>
+</div>
+<div class="section" id="components">
+<h2>Components<a class="headerlink" href="#components" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="fa">
+<h3>fa<a class="headerlink" href="#fa" title="Permalink to this headline">¶</a></h3>
+<p>Functionality for searching, browsing, and displaying Finding Aid objects.
+Includes PDF version of Finding Aid and mulitple views for complex, multi-part
+Finding Aids with series, subseries, and indexes.  Also includes a &#8216;preview&#8217; mode
+for use with the <code class="xref py py-mod docutils literal"><span class="pre">fa_admin</span></code> component, so that unpublished
+documents can be previewed exactly as they will appear when published.</p>
+</div>
+<div class="section" id="fa-admin">
+<h3>fa_admin<a class="headerlink" href="#fa-admin" title="Permalink to this headline">¶</a></h3>
+<p>This is a custom administration component for managing Finding Aid documents
+and the Finding Aids site.  Includes some user account management, but the bulk
+of the functionality revolves around preparing EAD files for publication on the
+main site, via the &#8216;prep&#8217;, &#8216;preview&#8217;, and &#8216;publish&#8217; functions.</p>
+</div>
+<div class="section" id="content">
+<h3>content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h3>
+<p>Functionality for displaying the few non-EAD-based pages that are part of the
+Finding Aids website.  Includes the site home page, content pages that are
+populated via RSS feeds to allow leveraging existing content management tools,
+and some simple email forms.</p>
+</div>
+</div>
+<div class="section" id="system-dependencies">
+<h2>System Dependencies<a class="headerlink" href="#system-dependencies" title="Permalink to this headline">¶</a></h2>
+<p>findingaids requires the following network resources:</p>
+<blockquote>
+<div><ul class="simple">
+<li>LDAP for user authentication</li>
+<li>A relational database for user and session information, task result status,
+and deleted Finding Aids</li>
+<li>Persistent ID manager for minting ARKs to use as permanent URLs for Finding
+Aid documents</li>
+<li><a class="reference external" href="http://exist.sourceforge.net">eXist-db XML database</a> (1.4 or greater) for
+loading, searching, browsing, &amp; displaying EAD Finding Aid XML documents</li>
+<li><a class="reference external" href="http://www.rabbitmq.com/">RabbitMQ</a> for brokering asynchronous tasks</li>
+<li>Squid Web Cache</li>
+</ul>
+</div></blockquote>
+<hr class="docutils" />
+<p>For more detailed information, including installation instructions and upgrade
+notes, see <a class="reference internal" href="deploynotes.html#deploynotes"><span class="std std-ref">DEPLOYNOTES</span></a>.  For details about the features included in each release,
+see <a class="reference internal" href="changelog.html#changelog"><span class="std std-ref">CHANGELOG</span></a>.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">README</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#license">License</a></li>
+<li><a class="reference internal" href="#components">Components</a><ul>
+<li><a class="reference internal" href="#fa">fa</a></li>
+<li><a class="reference internal" href="#fa-admin">fa_admin</a></li>
+<li><a class="reference internal" href="#content">content</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#system-dependencies">System Dependencies</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Finding Aids documentation</a></li>
+      <li>Next: <a href="changelog.html" title="next chapter">CHANGELOG</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/readme.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010, Emory University Libraries.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/readme.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

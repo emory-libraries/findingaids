@@ -1,0 +1,1619 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>findingaids – Django-based Finding Aids site &mdash; Finding Aids 1.11.0-dev documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.11.0-dev',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Finding Aids 1.11.0-dev documentation" href="index.html" />
+    <link rel="prev" title="DEPLOYNOTES" href="deploynotes.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-findingaids">
+<span id="findingaids-django-based-finding-aids-site"></span><h1><a class="reference internal" href="#module-findingaids" title="findingaids"><code class="xref py py-mod docutils literal"><span class="pre">findingaids</span></code></a> &#8211; Django-based Finding Aids site<a class="headerlink" href="#module-findingaids" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference internal" href="#module-findingaids" title="findingaids"><code class="xref py py-mod docutils literal"><span class="pre">findingaids</span></code></a> is a django site for search, browse, and display of
+EAD xml finding aids, based on the eXist-db xml database.</p>
+<div class="section" id="models">
+<h2>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h2>
+<p>Because finding aids is an eXist/xml-based site, models are based on
+<code class="xref py py-class docutils literal"><span class="pre">eulcore.xmlmap.XmlObject</span></code> and make use of
+<code class="xref py py-class docutils literal"><span class="pre">eulcore.existdb.query.QuerySet</span></code> for easy access to sections of
+EAD xml, and for search and retrieval within the eXist database.</p>
+<div class="section" id="finding-aid-ead">
+<h3>Finding Aid (EAD)<a class="headerlink" href="#finding-aid-ead" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="findingaids.fa.models.FindingAid">
+<em class="property">class </em><code class="descclassname">findingaids.fa.models.</code><code class="descname">FindingAid</code><span class="sig-paren">(</span><em>node=None</em>, <em>context=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Customized version of <code class="xref py py-class docutils literal"><span class="pre">eulxml.EncodedArchivalDescription</span></code> EAD object.</p>
+<p>Additional fields and methods are used for search, browse, and display.</p>
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.absolute_eadxml_url">
+<code class="descname">absolute_eadxml_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.absolute_eadxml_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an absolute url to the xml view for this ead
+for use with external services such as Aeon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.admin_info">
+<code class="descname">admin_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.admin_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of administrative information fields from the archive description.
+Only includes MARBL-designated fields to be displayed as administrative information,
+in a specified order.  Any fields not present in the finding aid will
+not be included in the list returned.</p>
+<p>These fields are included, in this order:
+access restrictions, use restrictions, alternate form, related material,
+separated material, acquisition info, custodial history, preferred citation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of <code class="xref py py-class docutils literal"><span class="pre">eulxml.xmlmap.eadmap.Section</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.collection_description">
+<code class="descname">collection_description</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.collection_description" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a list of collection description fields from the archive description.
+Only includes MARBL-designated fields to be displayed as collection description,
+in a specified order.  Any fields not present in the finding aid will
+not be included in the list returned.</p>
+<p>These fields are included, in this order:
+biography/history, bibliography, scope &amp; content, arrangement, other finding aid</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of <code class="xref py py-class docutils literal"><span class="pre">eulxml.xmlmap.eadmap.Section</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.dc_contributors">
+<code class="descname">dc_contributors</code><em class="property"> = &lt;eulxml.xmlmap.fields.StringListField&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.dc_contributors" title="Permalink to this definition">¶</a></dt>
+<dd><p>control access fields that should be mapped to Dublin Core contributor, based on encodinganalog attribute</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.dc_fields">
+<code class="descname">dc_fields</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.dc_fields" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary of Dublin Core fields from an EAD.
+Dictionary key: base name of a Dublin Core field (e.g., creator, title)
+Dictionary value: a list of values corresponding to the DC field.
+Note that some keys may have empty lists as their values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.dc_subjects">
+<code class="descname">dc_subjects</code><em class="property"> = &lt;eulxml.xmlmap.fields.StringListField&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.dc_subjects" title="Permalink to this definition">¶</a></dt>
+<dd><p>control access fields that should be mapped to Dublin Core subject, based on encodinganalog attribute</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.first_letter">
+<code class="descname">first_letter</code><em class="property"> = &lt;eulxml.xmlmap.fields.StringField&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.first_letter" title="Permalink to this definition">¶</a></dt>
+<dd><p>First letter of list title</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.has_digital_content">
+<code class="descname">has_digital_content</code><a class="headerlink" href="#findingaids.fa.models.FindingAid.has_digital_content" title="Permalink to this definition">¶</a></dt>
+<dd><p>boolean to indicate whether or not this EAD includes public
+digital content.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If using partial xml return, requires that <cite>public_dao_count</cite>
+is included.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.is_empty">
+<code class="descname">is_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the root node contains no child elements, no
+attributes, and no text. Returns False if any are present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.is_valid">
+<code class="descname">is_valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the current document is valid as far as we can determine.
+If there is a schema associated, check for schema validity.  Otherwise,
+return True.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.list_title">
+<code class="descname">list_title</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.list_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>list title used for alphabetical browse - any origination name, or unittitle if there is none</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.list_title_normalized">
+<code class="descname">list_title_normalized</code><em class="property"> = &lt;eulxml.xmlmap.fields.StringField&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.list_title_normalized" title="Permalink to this definition">¶</a></dt>
+<dd><p>list title variant with normalized whitespace, for searching</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.objects">
+<code class="descname">objects</code><em class="property"> = &lt;eulexistdb.manager.Manager object&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.objects" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">eulexistdb.manager.Manager</span></code> - similar to an object manager
+for django db objects, used for finding and retrieving FindingAid objects
+in eXist.</p>
+<p>Configured to use <em>/ead</em> as base search path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.origination_name">
+<code class="descname">origination_name</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.origination_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>origination name, as an instance of <code class="xref py py-class docutils literal"><span class="pre">Name</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.public_dao_count">
+<code class="descname">public_dao_count</code><em class="property"> = &lt;eulxml.xmlmap.fields.IntegerField&gt;</em><a class="headerlink" href="#findingaids.fa.models.FindingAid.public_dao_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>count of public dao elements in a record, to support search filtering
+&#8220;public&#8221; is defined as audience external or not set, xlink:href present,
+and show not set to none.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.request_materials_url">
+<code class="descname">request_materials_url</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.request_materials_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct the absolute url for use with external services such as Aeon</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.requestable">
+<code class="descname">requestable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.requestable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if the EAD is applicable for the electronic request service.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.schema_valid">
+<code class="descname">schema_valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.schema_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the current document is schema-valid according to the
+configured XSD Schema associated with this instance of <code class="xref py py-class docutils literal"><span class="pre">XmlObject</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">Exception if no XSD schema is defined for this XmlObject instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.schema_validation_errors">
+<code class="descname">schema_validation_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.schema_validation_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve any validation errors that occured during schema validation
+done via <code class="xref py py-meth docutils literal"><span class="pre">is_valid()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a list of <code class="xref py py-class docutils literal"><span class="pre">lxml.etree._LogEntry</span></code> instances</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">Exception if no XSD schema is defined for this XmlObject instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>stream=None</em>, <em>pretty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize the contents of the XmlObject to a stream.  Serializes
+current node only; for the entire XML document, use <code class="xref py py-meth docutils literal"><span class="pre">serializeDocument()</span></code>.</p>
+<p>If no stream is specified, returns a string.
+:param stream: stream or other file-like object to write content to (optional)
+:param pretty: pretty-print the XML output; boolean, defaults to False
+:rtype: stream passed in or an instance of <code class="xref py py-class docutils literal"><span class="pre">cStringIO.StringIO</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.serializeDocument">
+<code class="descname">serializeDocument</code><span class="sig-paren">(</span><em>stream=None</em>, <em>pretty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.serializeDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize the contents of the entire XML document (including Doctype
+declaration, if there is one), with an XML declaration, for the current
+XmlObject to a stream.</p>
+<p>If no stream is specified, returns a string.
+:param stream: stream or other file-like object to write content to (optional)
+:param pretty: pretty-print the XML output; boolean, defaults to False
+:rtype: stream passed in or an instance of <code class="xref py py-class docutils literal"><span class="pre">cStringIO.StringIO</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.stored_offsite">
+<code class="descname">stored_offsite</code><a class="headerlink" href="#findingaids.fa.models.FindingAid.stored_offsite" title="Permalink to this definition">¶</a></dt>
+<dd><p>boolean to indicate if collection materials are stored offsite,
+based on text in the collection access restriction note.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If using partial xml return, requires that
+<cite>archdesc__access_restriction</cite> is included.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.validation_errors">
+<code class="descname">validation_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.validation_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of validation errors.  Returns an empty list
+if the xml is schema valid or no schema is defined.  If a
+schema is defined but <code class="xref py py-attr docutils literal"><span class="pre">schema_validate</span></code> is False, schema
+validation will be skipped.</p>
+<p>Currently only supports schema validation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.FindingAid.xmlschema">
+<code class="descname">xmlschema</code><a class="headerlink" href="#findingaids.fa.models.FindingAid.xmlschema" title="Permalink to this definition">¶</a></dt>
+<dd><p>A parsed XSD schema instance of
+<code class="xref py py-class docutils literal"><span class="pre">lxml.etree.XMLSchema</span></code>; will be loaded the first time
+it is requested on any instance of this class if XSD_SCHEMA is
+set and xmlchema is None.  If you wish to load and parse the
+schema at class definition time, instead of at class instance
+initialization time, you may want to define your schema in
+your subclass like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">XSD_SCHEMA</span> <span class="o">=</span> <span class="s2">&quot;http://www.openarchives.org/OAI/2.0/oai_dc.xsd&quot;</span>
+<span class="n">xmlschema</span> <span class="o">=</span> <span class="n">xmlmap</span><span class="o">.</span><span class="n">loadSchema</span><span class="p">(</span><span class="n">XSD_SCHEMA</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.FindingAid.xsl_transform">
+<code class="descname">xsl_transform</code><span class="sig-paren">(</span><em>filename=None</em>, <em>xsl=None</em>, <em>return_type=None</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.FindingAid.xsl_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run an xslt transform on the contents of the XmlObject.</p>
+<p>XSLT can be passed in as an XSLT object generated by <code class="xref py py-meth docutils literal"><span class="pre">load_xslt()</span></code>
+or as filename or string. If a params dictionary is specified, its items
+will be passed as parameters to the XSL transformation, and any string
+values will automatically be encoded as XSL string parameters.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If XSL is being used multiple times, it is recommended to
+use :meth`:load_xslt` to load and compile the XSLT once.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> &#8211; xslt filename (optional, one of file and xsl is required)</li>
+<li><strong>xsl</strong> &#8211; xslt as string OR compiled XSLT object as returned by
+<code class="xref py py-meth docutils literal"><span class="pre">load_xslt()</span></code> (optional)</li>
+<li><strong>return_type</strong> &#8211; type of object to return; optional, defaults to
+<code class="xref py py-class docutils literal"><span class="pre">XmlObject</span></code>; specify unicode or string for text output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">an instance of <code class="xref py py-class docutils literal"><span class="pre">XmlObject</span></code> or the return_type specified</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="series-and-other-finding-aid-sections">
+<h3>Series and other Finding Aid sections<a class="headerlink" href="#series-and-other-finding-aid-sections" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="findingaids.fa.models.Series">
+<em class="property">class </em><code class="descclassname">findingaids.fa.models.</code><code class="descname">Series</code><span class="sig-paren">(</span><em>node=None</em>, <em>context=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Top-level (c01) series.</p>
+<p>Customized version of <code class="xref py py-class docutils literal"><span class="pre">eulxml.xmlmap.eadmap.Component</span></code></p>
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.contains_correspondence">
+<code class="descname">contains_correspondence</code><a class="headerlink" href="#findingaids.fa.models.Series.contains_correspondence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean property indicating if this series containes correspondence.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.display_label">
+<code class="descname">display_label</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.display_label" title="Permalink to this definition">¶</a></dt>
+<dd><p>Series display label - <em>unitid : unittitle</em> (if unitid) or <em>unittitle</em> (if no unitid)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.ead">
+<code class="descname">ead</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series.ead" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.FindingAid</span></code></a> access to ancestor EAD element</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.first_file_item">
+<code class="descname">first_file_item</code><a class="headerlink" href="#findingaids.fa.models.Series.first_file_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Boolean: True if this component is the first file item in a series/container list</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.generic_rdf_type_by_series">
+<code class="descname">generic_rdf_type_by_series</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.generic_rdf_type_by_series" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a generic RDF type based on the series an item belongs to.
+Using bibo:Document for printed material, bibo:Image for photographs,
+bibo:AudioVisualDocument for audio/visual materials, with a fallback
+of bibo:Manuscript.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.hasSubseries">
+<code class="descname">hasSubseries</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.hasSubseries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if this component has subseries or not.</p>
+<p>Determined based on level of first subcomponent (series or subseries)
+or if first component has subcomponents present.</p>
+<blockquote>
+<div><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.has_semantic_data">
+<code class="descname">has_semantic_data</code><a class="headerlink" href="#findingaids.fa.models.Series.has_semantic_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does this item contains semantic data that should be rendered with
+RDFa?  Currently checks the unittitle for a tagged person, corporate, or
+geographic name or for a title with source and authfilenumber attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.is_empty">
+<code class="descname">is_empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.is_empty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns True if the root node contains no child elements, no
+attributes, and no text. Returns False if any are present.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.is_valid">
+<code class="descname">is_valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.is_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the current document is valid as far as we can determine.
+If there is a schema associated, check for schema validity.  Otherwise,
+return True.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.match_count">
+<code class="descname">match_count</code><em class="property"> = &lt;eulxml.xmlmap.fields.IntegerField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series.match_count" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.FindingAid</span></code></a> number of keyword matchs</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.objects">
+<code class="descname">objects</code><em class="property"> = &lt;eulexistdb.manager.Manager object&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series.objects" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">eulxml.django.existdb.manager.Manager</span></code> - similar to an object manager
+for django db objects, used for finding and retrieving c01 series objects
+in eXist.</p>
+<p>Configured to use <em>//c01</em> as base search path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.rdf_type">
+<code class="descname">rdf_type</code><a class="headerlink" href="#findingaids.fa.models.Series.rdf_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#8216;rdf type to use for a semantically-tagged component item</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.schema_valid">
+<code class="descname">schema_valid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.schema_valid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the current document is schema-valid according to the
+configured XSD Schema associated with this instance of <code class="xref py py-class docutils literal"><span class="pre">XmlObject</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">boolean</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">Exception if no XSD schema is defined for this XmlObject instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.schema_validation_errors">
+<code class="descname">schema_validation_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.schema_validation_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve any validation errors that occured during schema validation
+done via <code class="xref py py-meth docutils literal"><span class="pre">is_valid()</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">a list of <code class="xref py py-class docutils literal"><span class="pre">lxml.etree._LogEntry</span></code> instances</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body">Exception if no XSD schema is defined for this XmlObject instance</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.serialize">
+<code class="descname">serialize</code><span class="sig-paren">(</span><em>stream=None</em>, <em>pretty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize the contents of the XmlObject to a stream.  Serializes
+current node only; for the entire XML document, use <code class="xref py py-meth docutils literal"><span class="pre">serializeDocument()</span></code>.</p>
+<p>If no stream is specified, returns a string.
+:param stream: stream or other file-like object to write content to (optional)
+:param pretty: pretty-print the XML output; boolean, defaults to False
+:rtype: stream passed in or an instance of <code class="xref py py-class docutils literal"><span class="pre">cStringIO.StringIO</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.serializeDocument">
+<code class="descname">serializeDocument</code><span class="sig-paren">(</span><em>stream=None</em>, <em>pretty=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.serializeDocument" title="Permalink to this definition">¶</a></dt>
+<dd><p>Serialize the contents of the entire XML document (including Doctype
+declaration, if there is one), with an XML declaration, for the current
+XmlObject to a stream.</p>
+<p>If no stream is specified, returns a string.
+:param stream: stream or other file-like object to write content to (optional)
+:param pretty: pretty-print the XML output; boolean, defaults to False
+:rtype: stream passed in or an instance of <code class="xref py py-class docutils literal"><span class="pre">cStringIO.StringIO</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.series_info">
+<code class="descname">series_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.series_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>&#8221;
+Generate a list of sereies information fields.
+Only includes MARBL-designated fields to be displayed as part of series
+description, in a specified order.  Any fields not present in the finding
+aid will not be included in the list returned.</p>
+<p>These fields are included, in this order:
+biography/history, scope &amp; content, arrangement, other finding aid,
+use restrictions, access restrictions, alternate form, location of original,
+bibliography</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of <code class="xref py py-class docutils literal"><span class="pre">eulxml.xmlmap.eadmap.Section</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.series_title">
+<code class="descname">series_title</code><em class="property"> = &lt;eulxml.xmlmap.fields.StringField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series.series_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>title of the nearest ancestor series;
+used to determine what kind of content this is, for default rdf type</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.short_id">
+<code class="descname">short_id</code><a class="headerlink" href="#findingaids.fa.models.Series.short_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short-form id (without eadid prefix) for use in external urls.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.unittitle_name">
+<code class="descname">unittitle_name</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series.unittitle_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>name in the unittitle, as an instance of <code class="xref py py-class docutils literal"><span class="pre">Name</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.unittitle_names">
+<code class="descname">unittitle_names</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeListField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series.unittitle_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>names in the unittitle, as a list of <code class="xref py py-class docutils literal"><span class="pre">Name</span></code></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.unittitle_titles">
+<code class="descname">unittitle_titles</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeListField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series.unittitle_titles" title="Permalink to this definition">¶</a></dt>
+<dd><p>list of titles in the unittitle, as <code class="xref py py-class docutils literal"><span class="pre">Title</span></code></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.validation_errors">
+<code class="descname">validation_errors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.validation_errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of validation errors.  Returns an empty list
+if the xml is schema valid or no schema is defined.  If a
+schema is defined but <code class="xref py py-attr docutils literal"><span class="pre">schema_validate</span></code> is False, schema
+validation will be skipped.</p>
+<p>Currently only supports schema validation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series.xmlschema">
+<code class="descname">xmlschema</code><a class="headerlink" href="#findingaids.fa.models.Series.xmlschema" title="Permalink to this definition">¶</a></dt>
+<dd><p>A parsed XSD schema instance of
+<code class="xref py py-class docutils literal"><span class="pre">lxml.etree.XMLSchema</span></code>; will be loaded the first time
+it is requested on any instance of this class if XSD_SCHEMA is
+set and xmlchema is None.  If you wish to load and parse the
+schema at class definition time, instead of at class instance
+initialization time, you may want to define your schema in
+your subclass like this:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">XSD_SCHEMA</span> <span class="o">=</span> <span class="s2">&quot;http://www.openarchives.org/OAI/2.0/oai_dc.xsd&quot;</span>
+<span class="n">xmlschema</span> <span class="o">=</span> <span class="n">xmlmap</span><span class="o">.</span><span class="n">loadSchema</span><span class="p">(</span><span class="n">XSD_SCHEMA</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="findingaids.fa.models.Series.xsl_transform">
+<code class="descname">xsl_transform</code><span class="sig-paren">(</span><em>filename=None</em>, <em>xsl=None</em>, <em>return_type=None</em>, <em>**params</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series.xsl_transform" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run an xslt transform on the contents of the XmlObject.</p>
+<p>XSLT can be passed in as an XSLT object generated by <code class="xref py py-meth docutils literal"><span class="pre">load_xslt()</span></code>
+or as filename or string. If a params dictionary is specified, its items
+will be passed as parameters to the XSL transformation, and any string
+values will automatically be encoded as XSL string parameters.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">If XSL is being used multiple times, it is recommended to
+use :meth`:load_xslt` to load and compile the XSLT once.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> &#8211; xslt filename (optional, one of file and xsl is required)</li>
+<li><strong>xsl</strong> &#8211; xslt as string OR compiled XSLT object as returned by
+<code class="xref py py-meth docutils literal"><span class="pre">load_xslt()</span></code> (optional)</li>
+<li><strong>return_type</strong> &#8211; type of object to return; optional, defaults to
+<code class="xref py py-class docutils literal"><span class="pre">XmlObject</span></code>; specify unicode or string for text output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">an instance of <code class="xref py py-class docutils literal"><span class="pre">XmlObject</span></code> or the return_type specified</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="findingaids.fa.models.Series2">
+<em class="property">class </em><code class="descclassname">findingaids.fa.models.</code><code class="descname">Series2</code><span class="sig-paren">(</span><em>node=None</em>, <em>context=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series2" title="Permalink to this definition">¶</a></dt>
+<dd><p>c02 level subseries</p>
+<p>Customized version of <code class="xref py py-class docutils literal"><span class="pre">eulxml.xmlmap.eadmap.Component</span></code>; extends
+<code class="xref py py-class docutils literal"><span class="pre">Series</span></code></p>
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series2.objects">
+<code class="descname">objects</code><em class="property"> = &lt;eulexistdb.manager.Manager object&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series2.objects" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">eulexistdb.manager.Manager</span></code></p>
+<p>Configured to use <em>//c02</em> as base search path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series2.series">
+<code class="descname">series</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series2.series" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#findingaids.fa.models.Series" title="findingaids.fa.models.Series"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.Series</span></code></a> access to c01 series this subseries belongs to</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="findingaids.fa.models.Series3">
+<em class="property">class </em><code class="descclassname">findingaids.fa.models.</code><code class="descname">Series3</code><span class="sig-paren">(</span><em>node=None</em>, <em>context=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Series3" title="Permalink to this definition">¶</a></dt>
+<dd><p>c03 level subseries</p>
+<p>Customized version of <code class="xref py py-class docutils literal"><span class="pre">eulxml.xmlmap.eadmap.Component</span></code>; extends
+<code class="xref py py-class docutils literal"><span class="pre">Series</span></code></p>
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series3.objects">
+<code class="descname">objects</code><em class="property"> = &lt;eulexistdb.manager.Manager object&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series3.objects" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">eulexistdb.manager.Manager</span></code></p>
+<p>Configured to use <em>//c03</em> as base search path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series3.series">
+<code class="descname">series</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series3.series" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#findingaids.fa.models.Series" title="findingaids.fa.models.Series"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.Series</span></code></a> access to c01 series this sub-subseries belongs to</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Series3.series2">
+<code class="descname">series2</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Series3.series2" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.Subseries</span></code> access to c02 subseries this sub-subseries belongs to</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="findingaids.fa.models.Index">
+<em class="property">class </em><code class="descclassname">findingaids.fa.models.</code><code class="descname">Index</code><span class="sig-paren">(</span><em>node=None</em>, <em>context=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.Index" title="Permalink to this definition">¶</a></dt>
+<dd><p>EAD Index, with index entries.</p>
+<p>Customized version of <code class="xref py py-class docutils literal"><span class="pre">eulxml.xmlmap.eadmap.Index</span></code></p>
+<dl class="attribute">
+<dt id="findingaids.fa.models.Index.ead">
+<code class="descname">ead</code><em class="property"> = &lt;eulxml.xmlmap.fields.NodeField&gt;</em><a class="headerlink" href="#findingaids.fa.models.Index.ead" title="Permalink to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.FindingAid</span></code></a> access to ancestor EAD element</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Index.objects">
+<code class="descname">objects</code><em class="property"> = &lt;eulexistdb.manager.Manager object&gt;</em><a class="headerlink" href="#findingaids.fa.models.Index.objects" title="Permalink to this definition">¶</a></dt>
+<dd><p><code class="xref py py-class docutils literal"><span class="pre">eulexistdb.manager.Manager</span></code> - similar to an object manager
+for django db objects, used for finding and retrieving index objects
+in eXist.</p>
+<p>Configured to use <em>//index</em> as base search path.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="findingaids.fa.models.Index.short_id">
+<code class="descname">short_id</code><a class="headerlink" href="#findingaids.fa.models.Index.short_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Short-form id (without eadid prefix) for use in external urls.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="findingaids.fa.models.ListTitle">
+<em class="property">class </em><code class="descclassname">findingaids.fa.models.</code><code class="descname">ListTitle</code><span class="sig-paren">(</span><em>node=None</em>, <em>context=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.models.ListTitle" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="findingaids.fa.models.ListTitle.first_letter">
+<code class="descname">first_letter</code><em class="property"> = &lt;eulxml.xmlmap.fields.ItemField&gt;</em><a class="headerlink" href="#findingaids.fa.models.ListTitle.first_letter" title="Permalink to this definition">¶</a></dt>
+<dd><p>First letter of a finding aid list title: use to generate list of first-letters for browse.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-findingaids.fa.views">
+<span id="views"></span><h2>Views<a class="headerlink" href="#module-findingaids.fa.views" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="findingaids.fa.views.browse_titles">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">browse_titles</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.browse_titles" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all first letters in finding aid list title, with a link to browse by letter.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.document_search">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">document_search</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.document_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Keyword search on file-level items in a single Finding Aid.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.eadxml">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">eadxml</code><span class="sig-paren">(</span><em>request</em>, <em>id</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.eadxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the full EAD XML content of a finding aid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> &#8211; eadid for the document to be displayed</li>
+<li><strong>preview</strong> &#8211; boolean indicating preview mode, defaults to False</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="data">
+<dt id="findingaids.fa.views.fa_listfields">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">fa_listfields</code><em class="property"> = ['eadid', 'list_title', 'archdesc__did']</em><a class="headerlink" href="#findingaids.fa.views.fa_listfields" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of fields that should be returned for brief list display of a finding aid.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.findingaid">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">findingaid</code><span class="sig-paren">(</span><em>request</em>, <em>id</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.findingaid" title="Permalink to this definition">¶</a></dt>
+<dd><p>View a single finding aid.   In preview mode, pulls the document from the
+configured eXist-db preview collection instead of the default public one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> &#8211; eadid for the document to view</li>
+<li><strong>preview</strong> &#8211; boolean indicating preview mode, defaults to False</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.full_findingaid">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">full_findingaid</code><span class="sig-paren">(</span><em>request</em>, <em>id</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.full_findingaid" title="Permalink to this definition">¶</a></dt>
+<dd><p>View the full contents of a single finding aid as PDF or plain html.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> &#8211; eadid for the document to be displayed</li>
+<li><strong>mode</strong> &#8211; one of &#8216;html&#8217; or &#8216;pdf&#8217; - note that the html mode is not publicly
+linked anywhere, and is intended mostly for development and testing
+of the PDF display</li>
+<li><strong>preview</strong> &#8211; boolean indicating preview mode, defaults to False</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.search">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">search</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple keyword search - runs exist full-text terms query on all terms included.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.series_or_index">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">series_or_index</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.series_or_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>View a single series or subseries (c01, c02, or c03) or an index from a
+finding aid.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>id</strong> &#8211; eadid for the document the series belongs to</li>
+<li><strong>series_id</strong> &#8211; c01 series or index id</li>
+<li><strong>series2_id</strong> &#8211; c02 subseries id (optional)</li>
+<li><strong>series3_id</strong> &#8211; c03 sub-subseries id (optional)</li>
+<li><strong>preview</strong> &#8211; boolean indicating preview mode, defaults to False</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.site_index">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">site_index</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.site_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Site home page.  Currently includes browse letter links.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.titles_by_letter">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">titles_by_letter</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.titles_by_letter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paginated list of finding aids by first letter in list title.
+Includes list of browse first-letters as in <a class="reference internal" href="#findingaids.fa.views.browse_titles" title="findingaids.fa.views.browse_titles"><code class="xref py py-meth docutils literal"><span class="pre">browse_titles()</span></code></a>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.views.xml_titles">
+<code class="descclassname">findingaids.fa.views.</code><code class="descname">xml_titles</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.views.xml_titles" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all findingaids in the database and link to the EAD xml,
+as a simple way to make content available for harvesting.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-findingaids.fa.utils">
+<span id="other-functions"></span><h2>Other Functions<a class="headerlink" href="#module-findingaids.fa.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="findingaids.fa.utils.alpha_pagelabels">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">alpha_pagelabels</code><span class="sig-paren">(</span><em>paginator</em>, <em>objects</em>, <em>label_attribute</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.alpha_pagelabels" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate abbreviated, alphabetical page labels for pagination items.
+Label format should be something like &#8216;Ab - Ad&#8217;, &#8216;Ard - Art&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paginator</strong> &#8211; a django paginator</li>
+<li><strong>objects</strong> &#8211; the complete list of objects paginated by the paginator</li>
+<li><strong>label_attribute</strong> &#8211; attribute on the object to use to generate
+page labels</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">dictionary appropriate for use with <a class="reference internal" href="#findingaids.fa.utils.pages_to_show" title="findingaids.fa.utils.pages_to_show"><code class="xref py py-meth docutils literal"><span class="pre">pages_to_show()</span></code></a>, keyed
+on page numbers</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.collection_lastmodified">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">collection_lastmodified</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.collection_lastmodified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the last modification time for the entire finding aid collection.
+Used to generate last-modified header for views that are based on the entire
+collection (e.g., <a class="reference internal" href="#findingaids.fa.views.titles_by_letter" title="findingaids.fa.views.titles_by_letter"><code class="xref py py-meth docutils literal"><span class="pre">titles_by_letter()</span></code></a> browse view,
+<a class="reference internal" href="#findingaids.fa.views.search" title="findingaids.fa.views.search"><code class="xref py py-meth docutils literal"><span class="pre">findingaids.fa.views.search()</span></code></a> search view).</p>
+<p>If no documents are found in eXist and there are no deleted records, no
+value is returned and django will not send a Last-Modified header.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.ead_etag">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">ead_etag</code><span class="sig-paren">(</span><em>request</em>, <em>id</em>, <em>preview=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.ead_etag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an Etag for an ead (specified by eadid) by requesting a SHA-1
+checksum of the entire EAD xml document from eXist.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>id</strong> &#8211; eadid</li>
+<li><strong>preview</strong> &#8211; requested document is in the preview collection; defaults to False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/library/string.html#module-string" title="(in Python v3.8)">string</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.ead_gone_or_404">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">ead_gone_or_404</code><span class="sig-paren">(</span><em>view_method</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.ead_gone_or_404" title="Permalink to this definition">¶</a></dt>
+<dd><p>This decorator is intended for use with single-ead views to determine if
+an EAD not found in eXist is gone or really not found.  If a requested
+EAD document is not found in the eXist database, the view method should raise
+a <code class="xref py py-class docutils literal"><span class="pre">django.http.Http404</span></code> exception.  This decorator will catch that
+and check for a deleted record which indicates the EAD has been removed.</p>
+<p>View method is expected to take a request parameter and an eadid.</p>
+<p>Raises an <code class="xref py py-class docutils literal"><span class="pre">django.http.Http404</span></code> when requested EAD was not found in
+the original view method and no deleted record was found.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">django.http.HttpResponse</span></code> with status 410 and a notice
+indicating that the document has been removed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.ead_lastmodified">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">ead_lastmodified</code><span class="sig-paren">(</span><em>request</em>, <em>id</em>, <em>preview=False</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.ead_lastmodified" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the last modification time for a finding aid in eXist by eadid.
+Used to generate last-modified header for views based on a single EAD document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>id</strong> &#8211; eadid</li>
+<li><strong>preview</strong> &#8211; load document from preview collection; defaults to False</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/library/datetime.html#datetime.datetime" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">datetime.datetime</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.exist_datetime_with_timezone">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">exist_datetime_with_timezone</code><span class="sig-paren">(</span><em>dt</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.exist_datetime_with_timezone" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an &#8216;offset-naive&#8217; datetime object into an &#8216;offset-aware&#8217; datetime
+using a configured timezone.</p>
+<p>The current version of xmlrpclib ignores timezones, which messes up dates
+(e.g., when used for last-modified header).  This function uses a configured
+timezone from django settings to convert a datetime to offset-aware.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.get_findingaid">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">get_findingaid</code><span class="sig-paren">(</span><em>eadid=None</em>, <em>preview=False</em>, <em>only=None</em>, <em>also=None</em>, <em>order_by=None</em>, <em>filter=None</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.get_findingaid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a  <a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a> (or
+<a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a>  <code class="xref py py-class docutils literal"><span class="pre">eulexistdb.manager.Manager</span></code>)
+from eXist by eadid, with any query options specified.  Raises a
+<code class="xref py py-class docutils literal"><span class="pre">django.http.Http404</span></code> if the requested document is not found in eXist.</p>
+<p>Handles switching to preview collection and then switching back when
+preview is set to True.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>eadid</strong> &#8211; eadid of the <a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a> to
+retrieve; if not specified, a <code class="xref py py-class docutils literal"><span class="pre">eulexistdb.manager.Manager</span></code>
+will be returned instead</li>
+<li><strong>preview</strong> &#8211; optional; set to True to load the finding aid from the
+preview collection; defaults to False</li>
+<li><strong>only</strong> &#8211; optional list of fields to return (<strong>only</strong> return the specified fields)</li>
+<li><strong>also</strong> &#8211; optional list of additional fields to return</li>
+<li><strong>order_by</strong> &#8211; optional field to use for sorting</li>
+<li><strong>filter</strong> &#8211; optional queryset filter to apply, in dictionary form</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a> (when eadid is specified)
+or a <a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a> <code class="xref py py-class docutils literal"><span class="pre">eulexistdb.manager.Manager</span></code>
+(if no eadid is specified)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.html_to_xslfo">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">html_to_xslfo</code><span class="sig-paren">(</span><em>template_src</em>, <em>context_dict</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.html_to_xslfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a template and template arguments, renders the template to get html,
+and then converts from html to XSL-FO.  Any template used with this function
+should produce well-formed xhtml so it can be parsed as xml.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>template_src</strong> &#8211; name of the template to render</li>
+<li><strong>context_dict</strong> &#8211; dictionary to pass to the template for rendering</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result of generated html, converted to XSL-FO, as an instance of
+<code class="xref py py-class docutils literal"><span class="pre">lxml.etree.ElementTree</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.pages_to_show">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">pages_to_show</code><span class="sig-paren">(</span><em>paginator</em>, <em>page</em>, <em>page_labels={}</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.pages_to_show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a dictionary of pages to show around the current page. Show
+3 numbers on either side of the specified page, or more if close to end or
+beginning of available pages.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>paginator</strong> &#8211; paginator object, populated with objects</li>
+<li><strong>page</strong> &#8211; number of the current page</li>
+<li><strong>page_labels</strong> &#8211; optional dictionary of page labels, keyed on page number</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">dictionary</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.utils.render_to_pdf">
+<code class="descclassname">findingaids.fa.utils.</code><code class="descname">render_to_pdf</code><span class="sig-paren">(</span><em>template_src</em>, <em>context_dict</em>, <em>filename=None</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.utils.render_to_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate and return a PDF response.</p>
+<p>Takes a template and template arguments; the template is rendered as html,
+converted to XSL-FO, which is run through the configured XSL-FO processor to
+generate a PDF.  Any template used with this function should produce
+well-formed xhtml so it can be parsed as xml.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>template_src</strong> &#8211; name of the template to render</li>
+<li><strong>context_dict</strong> &#8211; dictionary to pass to the template for rendering</li>
+<li><strong>filename</strong> &#8211; optional filename, to specify to the browser in the response</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">django.http.HttpResponse</span></code> with PDF content, content-type,
+and, if a filename was specified, a content-disposition header to
+prompt the browser to download the response as the filename specified</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-findingaids.fa.templatetags.ead">
+<span id="custom-template-filters-tags"></span><h2>Custom Template Filters &amp; Tags<a class="headerlink" href="#module-findingaids.fa.templatetags.ead" title="Permalink to this headline">¶</a></h2>
+<p>Custom template filters for converting EAD tags to HTML.</p>
+<dl class="function">
+<dt id="findingaids.fa.templatetags.ead.format_ead">
+<code class="descclassname">findingaids.fa.templatetags.ead.</code><code class="descname">format_ead</code><span class="sig-paren">(</span><em>value</em>, <em>autoescape=None</em>, <em>rdfa=False</em>, <em>default_rel=None</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.templatetags.ead.format_ead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom django filter to convert structured fields in EAD objects to
+HTML. <code class="xref py py-class docutils literal"><span class="pre">XmlObject</span></code> values are recursively
+processed, escaping text nodes and converting elements to &lt;span&gt; objects
+where appropriate. Other values are simply converted to unicode and
+escaped.</p>
+<dl class="docutils">
+<dt>Currently performs the following conversions:</dt>
+<dd><ul class="first last simple">
+<li>elements with <code class="docutils literal"><span class="pre">&#64;render=&quot;doublequote&quot;</span></code> are wrapped in double quotes
+after stripping the element</li>
+<li>elements with <code class="docutils literal"><span class="pre">&#64;render=&quot;bold&quot;</span></code> are replaced with <code class="docutils literal"><span class="pre">&lt;span</span>
+<span class="pre">class=&quot;ead-bold&quot;&gt;</span></code></li>
+<li>elements with <code class="docutils literal"><span class="pre">&#64;render=&quot;italic&quot;</span></code> are replaced with <code class="docutils literal"><span class="pre">&lt;span</span>
+<span class="pre">class=&quot;ead-italic&quot;</span></code></li>
+<li><code class="docutils literal"><span class="pre">&lt;emph&gt;</span></code> elements are replaced with <code class="docutils literal"><span class="pre">&lt;em&gt;</span></code></li>
+<li><code class="docutils literal"><span class="pre">&lt;title&gt;</span></code> elements are replaced with <code class="docutils literal"><span class="pre">&lt;span</span> <span class="pre">class=&quot;ead-title&quot;&gt;</span></code></li>
+<li>other elements are stripped</li>
+<li>text nodes are HTML escaped where the template context calls for it</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa.templatetags.ead.format_ead_rdfa">
+<code class="descclassname">findingaids.fa.templatetags.ead.</code><code class="descname">format_ead_rdfa</code><span class="sig-paren">(</span><em>value</em>, <em>default_rel=None</em>, <em>autoescape=None</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.templatetags.ead.format_ead_rdfa" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom filter to convert EAD to HTML, with support for converting
+name tags such as persname, corpname, and geogname to RDFa.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>default_rel</strong> &#8211; relationship to use for all entities
+found under this node</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<span class="target" id="module-findingaids.fa.templatetags.ifurl"></span><dl class="function">
+<dt id="findingaids.fa.templatetags.ifurl.ifurl">
+<code class="descclassname">findingaids.fa.templatetags.ifurl.</code><code class="descname">ifurl</code><span class="sig-paren">(</span><em>parser</em>, <em>token</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.templatetags.ifurl.ifurl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Customized version of Django&#8217;s template tag <em>url</em>.</p>
+<p>Takes a condition and two view names, followed by any arguments taken by url.
+If the condition is true, will render the url with the first view name
+specified, otherwise will use the second.</p>
+<p>For example:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span><span class="o">%</span> <span class="n">ifurl</span> <span class="n">preview</span> <span class="s1">&#39;preview:doc&#39;</span> <span class="s1">&#39;main:doc&#39;</span> <span class="n">arg1</span><span class="o">=</span><span class="n">foo</span> <span class="o">%</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>When preview is true in the template context, url will be generated as
+preview:doc, otherwise it will be generated as main:doc.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="admin-site">
+<h2>Admin Site<a class="headerlink" href="#admin-site" title="Permalink to this headline">¶</a></h2>
+<p>The admin section of the finding aids site is designed to allow archivists to
+manage the finding aids content.</p>
+<div class="section" id="module-findingaids.fa_admin.views">
+<span id="admin-views"></span><h3>Admin Views<a class="headerlink" href="#module-findingaids.fa_admin.views" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="findingaids.fa_admin.views.delete_ead">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">delete_ead</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.delete_ead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a published EAD.</p>
+<p>On GET, display a form with information about the document to be removed.</p>
+<p>On POST, actually remove the specified EAD document from eXist and create (or
+update) a deleted record for that document in the relational DB.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.init_ldap_user">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">init_ldap_user</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.init_ldap_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Use django-auth-ldap to initialize a new user account from LDAP.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.list_files">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">list_files</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.list_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>List files associated with an archive to be prepped and previewed
+for publication.  Expected to be retrieved via ajax and loaded in a
+jquery ui tab, so only returns a partial html page without site theme.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.list_published">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">list_published</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.list_published" title="Permalink to this definition">¶</a></dt>
+<dd><p>List all published EADs, optionally restricted to a single archive.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.logout">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">logout</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.logout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Admin Logout view. Displays a message and then calls
+<code class="xref py py-meth docutils literal"><span class="pre">django.contrib.auth.views.logout_then_login()</span></code>.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.main">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">main</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main admin page.</p>
+<p>Displayes a paginated list of files configured source directory (sorted by
+most recently modified) to be previewed, published, or prepared for
+preview/publish.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.prepared_ead">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">prepared_ead</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.prepared_ead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display information about changes made by preparing an EAD file for
+publication.  If no changes are made, user will be redirected to main admin
+page with a message to that effect.</p>
+<p>In <strong>summary</strong> mode, displays a brief, color-coded summary of changes between
+original and prepped version of the file.  In <strong>diff</strong> mode, displays a full,
+side-by-side diff generated by <a class="reference external" href="http://docs.python.org/library/difflib.html#difflib.HtmlDiff" title="(in Python v3.8)"><code class="xref py py-class docutils literal"><span class="pre">difflib.HtmlDiff</span></code></a>.  (Note: because it
+is very large, the full diff is <em>not</em> embedded in the site template, and is
+intended to be opened in a new window.)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>filename</strong> &#8211; name of the file to prep; should be base filename only,
+document will be pulled from the configured source directory.</li>
+<li><strong>mode</strong> &#8211; one of <strong>diff</strong> or <strong>summary</strong></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.prepared_eadxml">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">prepared_eadxml</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.prepared_eadxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>On GET, serves out a prepared version of the EAD file in the specified
+archive subversion directory. Response header is set so the user should
+be prompted to download the xml, with a filename matching that of
+the original document.</p>
+<p>On POST, commits the prepared version of the EAD file to the subversion
+directory of the specified archive, with a log message indicating the user
+who requested the commit.</p>
+<p>Steps taken to prepare a document are documented in
+<a class="reference internal" href="#findingaids.fa_admin.utils.prep_ead" title="findingaids.fa_admin.utils.prep_ead"><code class="xref py py-meth docutils literal"><span class="pre">prep_ead()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> &#8211; name of the file to prep; should be base filename only,
+document will be pulled from the configured source directory.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.views.publish">
+<code class="descclassname">findingaids.fa_admin.views.</code><code class="descname">publish</code><span class="sig-paren">(</span><em>request</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.views.publish" title="Permalink to this definition">¶</a></dt>
+<dd><p>Admin publication form.  Allows publishing an EAD file by updating or adding
+it to the configured eXist database so it will be immediately visible on
+the public site.  Files can only be published if they pass an EAD sanity check,
+implemented in <a class="reference internal" href="#findingaids.fa_admin.utils.check_ead" title="findingaids.fa_admin.utils.check_ead"><code class="xref py py-meth docutils literal"><span class="pre">check_ead()</span></code></a>.</p>
+<p>On POST, sanity-check the EAD file specified in request from the configured
+and (if it passes all checks), publish it to make it immediately visible on
+the site.  If publish is successful, redirects the user to main admin page
+with a success message that links to the published document on the site.
+If the sanity-check fails, displays a page with any problems found.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-findingaids.fa_admin.utils">
+<span id="admin-functions"></span><h3>Admin Functions<a class="headerlink" href="#module-findingaids.fa_admin.utils" title="Permalink to this headline">¶</a></h3>
+<dl class="function">
+<dt id="findingaids.fa_admin.utils.check_ead">
+<code class="descclassname">findingaids.fa_admin.utils.</code><code class="descname">check_ead</code><span class="sig-paren">(</span><em>filename</em>, <em>dbpath</em>, <em>xml=None</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.utils.check_ead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sanity check an EAD file before it is loaded to the configured database.</p>
+<dl class="docutils">
+<dt>Checks the following:</dt>
+<dd><ul class="first last simple">
+<li>EAD schema valid</li>
+<li>eadid matches expected pattern&#8211; filename without .xml</li>
+<li>check that eadid is unique within the database (only present once, in the file that will be updated)</li>
+<li>additional checks done by <a class="reference internal" href="#findingaids.fa_admin.utils.check_eadxml" title="findingaids.fa_admin.utils.check_eadxml"><code class="xref py py-meth docutils literal"><span class="pre">check_eadxml()</span></code></a></li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> &#8211; full path to the EAD file to be checked</li>
+<li><strong>dbpath</strong> &#8211; full path within eXist where the document will be saved</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of all errors found</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/library/stdtypes.html#list" title="(in Python v3.8)">list</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.utils.check_eadxml">
+<code class="descclassname">findingaids.fa_admin.utils.</code><code class="descname">check_eadxml</code><span class="sig-paren">(</span><em>ead</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.utils.check_eadxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sanity checks specific to the EAD xml, independent of file or eXist.</p>
+<dl class="docutils">
+<dt>Checks the following:</dt>
+<dd><ul class="first last">
+<li><p class="first">series and index ids are present</p>
+</li>
+<li><dl class="first docutils">
+<dt>fields used for search/browse title match code expectations:</dt>
+<dd><ul class="first last simple">
+<li>at most one top-level origination</li>
+<li>no leading whitespace in list-title (origination or unittitle)</li>
+<li>alphabetical first letter (for first-letter browse)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">eadid matches site URL regex</p>
+</li>
+</ul>
+</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ead</strong> &#8211; <a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a> ead instance to be checked</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of all errors found</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/library/stdtypes.html#list" title="(in Python v3.8)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.utils.check_series_ids">
+<code class="descclassname">findingaids.fa_admin.utils.</code><code class="descname">check_series_ids</code><span class="sig-paren">(</span><em>series</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.utils.check_series_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursive function to check that series and subseries ids are present.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>series</strong> &#8211; <a class="reference internal" href="#findingaids.fa.models.Series" title="findingaids.fa.models.Series"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.Series</span></code></a></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of errors, if any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.utils.generate_ark">
+<code class="descclassname">findingaids.fa_admin.utils.</code><code class="descname">generate_ark</code><span class="sig-paren">(</span><em>ead</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.utils.generate_ark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate an ARK for the specified EAD document.  ARK will be created
+with a default target of the url for the main page of the specified EAD
+document in this site.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ead</strong> &#8211; <a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.FindingAid</span></code></a> instance</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">resolvable URL for generated ARK on success</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.utils.prep_ead">
+<code class="descclassname">findingaids.fa_admin.utils.</code><code class="descname">prep_ead</code><span class="sig-paren">(</span><em>ead</em>, <em>filename</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.utils.prep_ead" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare EAD xml for publication.  Currently does the following:</p>
+<blockquote>
+<div><ul class="simple">
+<li>sets the eadid and ids on any series, subseries, and index elements based
+on filename and series unitid or index number.</li>
+<li>removes any leading whitespace from controlaccess terms</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ead</strong> &#8211; <a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a> ead instance to be prepared</li>
+<li><strong>string</strong> &#8211; filename of the EAD file (used as base eadid)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#findingaids.fa.models.FindingAid" title="findingaids.fa.models.FindingAid"><code class="xref py py-class docutils literal"><span class="pre">FindingAid</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="findingaids.fa_admin.utils.set_series_ids">
+<code class="descclassname">findingaids.fa_admin.utils.</code><code class="descname">set_series_ids</code><span class="sig-paren">(</span><em>series</em>, <em>eadid</em>, <em>position</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.utils.set_series_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Recursive function to set series and subseries ids.  Series id will be set
+to something like &#8216;&#8217;eadid_series1&#8217;&#8216;, where series1 is a lower-case, spaceless
+version of the series unitid.  If no unitid is present, the second half of
+the series id will be set based on the series level (e.g., series, subseries)
+and its position in the list of series in the document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>series</strong> &#8211; <a class="reference internal" href="#findingaids.fa.models.Series" title="findingaids.fa.models.Series"><code class="xref py py-class docutils literal"><span class="pre">findingaids.fa.models.Series</span></code></a></li>
+<li><strong>eadid</strong> &#8211; eadid of the document this series belongs to</li>
+<li><strong>position</strong> &#8211; numerical position in series&#8211; used as fall-back to generate
+series id when series does not have a unitid</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of errors, if any</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="custom-manage-commands">
+<h2>Custom manage commands<a class="headerlink" href="#custom-manage-commands" title="Permalink to this headline">¶</a></h2>
+<p>The following management commands are available.  For more details, use
+<code class="docutils literal"><span class="pre">manage.py</span> <span class="pre">help</span> <span class="pre">&lt;command&gt;</span></code>.  As much as possible, all custom commands honor the
+built-in django verbosity options.</p>
+<blockquote>
+<div><ul>
+<li><dl class="first docutils">
+<dt><strong>check_ead</strong></dt>
+<dd><dl class="first last class">
+<dt id="findingaids.fa.management.commands.check_ead.Command">
+<em class="property">class </em><code class="descclassname">findingaids.fa.management.commands.check_ead.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>stdout=None</em>, <em>stderr=None</em>, <em>no_color=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.management.commands.check_ead.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the specified field in all Finding Aids loaded in the configured
+eXist collection against the regular expressions used for URLs in the site,
+and reports on any documents that fail.</p>
+<p>If <code class="docutils literal"><span class="pre">eadid</span></code> is specified, checks that each eadid matches the regular expression
+in the single document URL pattern.</p>
+<p>If <code class="docutils literal"><span class="pre">title</span></code> is specified, checks that the first letter of the list title is
+included in the allowed first-letters for the browse URL.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>prep_ead</strong></dt>
+<dd><dl class="first last class">
+<dt id="findingaids.fa_admin.management.commands.prep_ead.Command">
+<em class="property">class </em><code class="descclassname">findingaids.fa_admin.management.commands.prep_ead.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>stdout=None</em>, <em>stderr=None</em>, <em>no_color=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.management.commands.prep_ead.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prepare all or specified EAD xml files in the configured source directory.</p>
+<p>Runs EAD xml files through a prep process to set ids, etc., as needed
+to be published, verifies that the resulting EAD is valid and passes all
+checks, and if so, updates the original file with the new, prepared EAD xml.</p>
+<p>If filenames are specified as arguments, only those files will be prepared.
+Files should be specified by full path. Otherwise, all .xml files in each of
+the defined Archives will be prepared.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>load_ead</strong></dt>
+<dd><dl class="first last class">
+<dt id="findingaids.fa_admin.management.commands.load_ead.Command">
+<em class="property">class </em><code class="descclassname">findingaids.fa_admin.management.commands.load_ead.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>stdout=None</em>, <em>stderr=None</em>, <em>no_color=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.management.commands.load_ead.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load all or specified EAD xml files in the configured source directory
+to the configured eXist collection.  For each document successfully loaded to
+eXist, this script will trigger a celery task to reload the PDF in the cache; the
+script will not exit until all tasks have completed.</p>
+<p>If filenames are specified as arguments, only those files will be loaded.
+Files should be specified by basename only (they will be loaded from the configured
+EAD source directory). Otherwise, all .xml files in the configured EAD source
+directory will be loaded.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<ul>
+<li><dl class="first docutils">
+<dt><strong>response_times</strong></dt>
+<dd><dl class="first last class">
+<dt id="findingaids.fa.management.commands.response_times.Command">
+<em class="property">class </em><code class="descclassname">findingaids.fa.management.commands.response_times.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>stdout=None</em>, <em>stderr=None</em>, <em>no_color=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa.management.commands.response_times.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Benchmark response times for running queries against the configured eXist
+database, and warn if any take longer than the current threshold of 5 seconds.</p>
+<p>In browse mode, tests eXist Finding Aid browse query for all browse letters.</p>
+<p>In pages mode, tests a few pre-specified page urls.</p>
+<dl class="attribute">
+<dt id="findingaids.fa.management.commands.response_times.Command.threshold">
+<code class="descname">threshold</code><em class="property"> = 5000</em><a class="headerlink" href="#findingaids.fa.management.commands.response_times.Command.threshold" title="Permalink to this definition">¶</a></dt>
+<dd><p>warning-level threshold, in ms (queries that take longer than this will generate warnings)</p>
+</dd></dl>
+
+</dd></dl>
+
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>check_pdfcache</strong></dt>
+<dd><dl class="first last class">
+<dt id="findingaids.fa_admin.management.commands.check_pdfcache.Command">
+<em class="property">class </em><code class="descclassname">findingaids.fa_admin.management.commands.check_pdfcache.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>stdout=None</em>, <em>stderr=None</em>, <em>no_color=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.management.commands.check_pdfcache.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check status of Finding Aid PDFs in the configured cache.  If any eadids
+are specified, checks only those documents; otherwise, checks all published
+Finding Aids, up to any maximum number specified.</p>
+<p>In verbose mode, reports the cache age and any warnings for cached items.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>ead_to_xsd</strong></dt>
+<dd><dl class="first last class">
+<dt id="findingaids.fa_admin.management.commands.ead_to_xsd.Command">
+<em class="property">class </em><code class="descclassname">findingaids.fa_admin.management.commands.ead_to_xsd.</code><code class="descname">Command</code><span class="sig-paren">(</span><em>stdout=None</em>, <em>stderr=None</em>, <em>no_color=False</em><span class="sig-paren">)</span><a class="headerlink" href="#findingaids.fa_admin.management.commands.ead_to_xsd.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert DTD-based EAD to XSD schema-based EAD.</p>
+<p>If filenames are specified as arguments, only those files will be converted.
+Files should be specified by basename only (assumed to be in the configured
+EAD source directory). Otherwise, all .xml files in the configured EAD source
+directory will be converted.</p>
+</dd></dl>
+
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal"><span class="pre">findingaids</span></code> &#8211; Django-based Finding Aids site</a><ul>
+<li><a class="reference internal" href="#models">Models</a><ul>
+<li><a class="reference internal" href="#finding-aid-ead">Finding Aid (EAD)</a></li>
+<li><a class="reference internal" href="#series-and-other-finding-aid-sections">Series and other Finding Aid sections</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-findingaids.fa.views">Views</a></li>
+<li><a class="reference internal" href="#module-findingaids.fa.utils">Other Functions</a></li>
+<li><a class="reference internal" href="#module-findingaids.fa.templatetags.ead">Custom Template Filters &amp; Tags</a></li>
+<li><a class="reference internal" href="#admin-site">Admin Site</a><ul>
+<li><a class="reference internal" href="#module-findingaids.fa_admin.views">Admin Views</a></li>
+<li><a class="reference internal" href="#module-findingaids.fa_admin.utils">Admin Functions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#custom-manage-commands">Custom manage commands</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="deploynotes.html" title="previous chapter">DEPLOYNOTES</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/findingaids.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010, Emory University Libraries.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+      |
+      <a href="_sources/findingaids.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
